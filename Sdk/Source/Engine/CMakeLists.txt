@@ -34,9 +34,10 @@ target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Backend
 # Creates folder "cave" and adds target project (cave.vcproj)
 set_property(TARGET cave PROPERTY FOLDER "sdk")
 
+
 IF(WIN32)
 	set_target_properties(cave PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CAVE_RUNTIME_LIB_DIR})
 	set_target_properties(cave PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CAVE_RUNTIME_BIN_DIR})
 ELSE()  
-	set_target_properties(cave PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CAVE_RUNTIME_BIN_DIR})
+	set_target_properties(cave PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CAVE_RUNTIME_BIN_DIR})
 ENDIF()

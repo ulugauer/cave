@@ -29,12 +29,13 @@ namespace cave
 
 #elif defined(__GNUC__)
 
-#ifdef CAVE_EXPORTS && HAVE_VISIBILITY
+#if CAVE_EXPORTS && HAVE_VISIBILITY
 #define CAVE_INTERFACE  __attribute__((__visibility__("default")))   ///< Function (or class) is defined to be a interface
-
 #else
 #define CAVE_INTERFACE                           ///< Function (or class) is imported
 #endif
+
+#else
 
 #error "Unknown compiler"
 

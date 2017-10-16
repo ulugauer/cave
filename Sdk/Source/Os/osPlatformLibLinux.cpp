@@ -12,8 +12,6 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-#pragma once
-
 /// @file osPlatformLibLinux.cpp
 ///       Cave OS linux library interface.
 
@@ -31,7 +29,7 @@ osLibraryHandle OsPlatformLib::OsLoadLibrary(char *name)
     std::string soName;
     soName = name;
     soName += ".so"; 
-    osLibraryHandle handle = dlopen(soName.c_str(), RTLD_LAZY)
+    osLibraryHandle handle = dlopen(soName.c_str(), RTLD_LAZY);
 
     return handle;
 }

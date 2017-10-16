@@ -13,7 +13,7 @@ set(CAVE_ENGINE_VERSION
 #-------------------------------------------------------------------------------
 # System packages
 #-------------------------------------------------------------------------------
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 include(SetBuildType)
 
 #-------------------------------------------------------------------------------
