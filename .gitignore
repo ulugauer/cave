@@ -1,5 +1,6 @@
 # directories
 /build*
 /bin*
+/libs*
 
 # files
