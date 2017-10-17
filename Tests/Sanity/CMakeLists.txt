@@ -1,7 +1,7 @@
 # The engine
 
 # find pthread libs
-IF(LINUX)
+IF(UNIX)
 	find_package(Threads REQUIRED)
 ENDIF()
 
@@ -11,8 +11,18 @@ IF(WIN32)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 ENDIF()
 
+# disable warnings for test CAVE_SANITY_SOURCE
+IF(UNIX)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+ENDIF()
+
 # librarie search path
 link_directories(${CAVE_RUNTIME_LIB_DIR}) 
+
+# shared libs
+IF(UNIX)
+link_directories(${CAVE_RUNTIME_BIN_DIR}) 
+ENDIF()
 
 # Add sources
 list(APPEND CAVE_SANITY_SOURCE caveSanity.cpp) 

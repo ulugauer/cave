@@ -20,6 +20,7 @@ using namespace cave;
 
 int main(int argc, char* argv[])
 {  
+
 	// Create HAL instance which we use to create a device from.
 	HalInstance* halInstance = new HalInstance(InstanceTypes::INSTANCE_VULKAN);
 	if (!halInstance)
