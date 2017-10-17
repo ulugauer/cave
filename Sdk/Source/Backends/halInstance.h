@@ -22,23 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-/*
-* @brief Hardware instance types
+/**
+* Hardware instance types
 */
 enum class InstanceTypes
 {
-	INSTANCE_UNKNOWN = 0,
-	INSTANCE_VULKAN = 1,
-	INSTANCE_DX12 = 2,
+	INSTANCE_UNKNOWN = 0,	///< unknown instance
+	INSTANCE_VULKAN = 1,	///< Vulkan instance
+	INSTANCE_DX12 = 2,		///< DX12 instance
 };
 
-/*
-* @brief Abstraction type of a device instance
+/**
+* Abstraction type of a device instance
 */
 class CAVE_INTERFACE HalInstance
 {
 public:
-	/** @brief Constructor */
+	/**
+	* @brief Constructor
+	*
+	* @param[in] type Instance type
+	*
+	*/
 	HalInstance(InstanceTypes type);
 	/** @brief Destructor */
 	~HalInstance();

@@ -15,7 +15,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #pragma once
 
 
-/// @file osLibIf.h
+/// @file osPlatformLib.h
 ///       cave OS library interface.
 
 #include <string>
@@ -28,8 +28,8 @@ typedef void* osLibraryHandle;
 /// osProcAddress function pointer
 typedef void* osProcAddress;
 
-/*
-* @brief Abstraction of os library loading functions
+/**
+* Abstraction of os library loading functions
 */
 class OsPlatformLib
 {
@@ -43,7 +43,7 @@ class OsPlatformLib
 	*/
 	static osLibraryHandle OsLoadLibrary(char *name);
 
-	/*
+	/**
 	* @brief Unload a library
 	*
 	* @param[in] handle Handle returned from a osLoadLibrary call
@@ -52,10 +52,10 @@ class OsPlatformLib
 	*/
 	static void OsUnloadLibrary(osLibraryHandle handle);
 
-	/*
+	/**
 	* @brief Load a function from a library
 	*
-	* @param[im] handle   Handle to a module
+	* @param[in] handle   Handle to a module
 	* @param[in] name     Name of the function to load
 	*
 	* @returns a address to a function or nullptr on failure

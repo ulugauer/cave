@@ -2,5 +2,6 @@
 /build*
 /bin*
 /libs*
+/docs*
 
 # files
