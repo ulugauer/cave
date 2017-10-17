@@ -11,45 +11,24 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file halInstance.h
-///       Hardware instance abstraction
+#include "halInstance.h"
 
-#include "engineDefines.h"
-#include "osPlatformLib.h"
+#include <iostream>
 
-namespace cave
-{
+using namespace cave;
 
-/**
-* Hardware instance types
-*/
-enum class InstanceTypes
-{
-	INSTANCE_VULKAN = 1,	///< Vulkan instance
-	INSTANCE_DX12 = 2,		///< DX12 instance
-};
+int main(int argc, char* argv[])
+{  
+	// Create HAL instance which we use to create a device from.
+	HalInstance* halInstance = new HalInstance(InstanceTypes::INSTANCE_VULKAN);
+	if (!halInstance)
+	{
+		std::cerr << "Failed to create HAL instance\n";
+		return -1;
+	}
 
-/**
-* Abstraction type of a device instance
-*/
-class CAVE_INTERFACE HalInstance
-{
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] type Instance type
-	*
-	*/
-	HalInstance(InstanceTypes type);
-	/** @brief Destructor */
-	~HalInstance();
+	delete halInstance;
 
-private:
-
-	InstanceTypes _type;	///< Instance type
-};
-
+	return 0;
 }
