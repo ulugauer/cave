@@ -12,38 +12,32 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file renderInstance.cpp
-///       Render instance abstraction
+/// @file vulkanInstance.cpp
+///       Vulkan instance
 
-#include "renderInstance.h"
+#include "vulkanInstance.h"
+#include "vulkanApi.h"
+
+#include <iostream>
 
 namespace cave
 {
 
-RenderInstance::RenderInstance(RenderInstanceTypes type)
+VulkanInstance::VulkanInstance(BackendInstanceTypes type)
+	: HalInstance(type)
 {
-	// convert to backend type
-	BackendInstanceTypes backendType;
-	switch(type)
+	// this loads the library functions
+	VulkanApi* pApi = VulkanApi::GetApi();
+	if (!pApi)
 	{
-		case RenderInstanceTypes::InstanceVulkan:
-			backendType = BackendInstanceTypes::InstanceVulkan;
-			break; 
-		case RenderInstanceTypes::InstanceDX12:
-			backendType = BackendInstanceTypes::InstanceDX12;
-			break; 
-		default:
-			backendType = BackendInstanceTypes::InstanceVulkan;
-			break;
+		std::cerr << "ERROR: Failed to load vulkan API\n";
+		return;
 	}
-
-	_pHalInstance = HalInstance::CreateInstance(backendType);
 }
 
-RenderInstance::~RenderInstance()
+VulkanInstance::~VulkanInstance()
 {
-	if (_pHalInstance)
-		HalInstance::ReleaseInstance(_pHalInstance);
+
 }
 
 }

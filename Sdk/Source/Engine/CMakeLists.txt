@@ -33,6 +33,7 @@ add_library(cave SHARED ${ENGINE_SOURCE} ${ENGINE_HEADERS} ${RENDER_SOURCE}
 
 # additional include directories
 target_include_directories(cave PRIVATE .)
+target_include_directories(cave PRIVATE Render)
 target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Os)
 target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Backends)
 

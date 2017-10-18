@@ -24,7 +24,7 @@ namespace cave
 {
 
 // load a library
-osLibraryHandle OsPlatformLib::OsLoadLibrary(char *name)
+osLibraryHandle OsPlatformLib::OsLoadLibrary(const char *name)
 {
     std::string soName;
     soName = name;
@@ -41,7 +41,7 @@ void OsPlatformLib::OsUnloadLibrary(osLibraryHandle handle)
 }
 
 // get a function pointer
-osProcAddress OsPlatformLib::OsGetProcAddress(osLibraryHandle handle, char *name)
+osProcAddress OsPlatformLib::OsGetProcAddress(osLibraryHandle handle, const char *name)
 {
     osProcAddress address = nullptr;
 

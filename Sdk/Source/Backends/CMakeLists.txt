@@ -8,20 +8,24 @@ ENDIF()
 add_definitions(-DCAVE_EXPORTS) 
 
 # Add sources
-set(BACKENDS_INCLUDE halInstance.h )
-set(BACKENDS_SOURCE halInstance.cpp )
-
+set(BACKENDS_SOURCE halInstance.h halInstance.cpp )
+# vulkan source
+set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h 
+					 	   Vulkan/vulkanInstance.h 
+					 	   Vulkan/vulkanInstance.cpp )
 
 
 # Create named folders for the sources within the .vcproj
 # Empty name lists them directly under the .vcproj
 source_group("backends" FILES ${BACKENDS_SOURCE})
-source_group("backends" FILES ${BACKENDS_INCLUDE})
+source_group("backends\\vulkan" FILES ${BACKENDS_VULKAN_SOURCE})
 
 #Generate the static library from the sources
-add_library(backends OBJECT ${BACKENDS_SOURCE} ${BACKENDS_INCLUDE})
+add_library(backends OBJECT ${BACKENDS_SOURCE} ${BACKENDS_VULKAN_SOURCE})
 
 # additional include directories
+target_include_directories(backends PRIVATE . )
+target_include_directories(backends PRIVATE Vulkan )
 target_include_directories(backends PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Engine)
 target_include_directories(backends PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Os)
 

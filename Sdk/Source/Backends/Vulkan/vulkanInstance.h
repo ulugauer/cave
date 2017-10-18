@@ -11,39 +11,38 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file renderInstance.cpp
-///       Render instance abstraction
+/// @file vulkanInstance.h
+///       Vulkan instance
 
-#include "renderInstance.h"
+#include "halInstance.h"
+#include "osPlatformLib.h"
+
+/** \addtogroup backend 
+*  @{
+*		
+*/
 
 namespace cave
 {
 
-RenderInstance::RenderInstance(RenderInstanceTypes type)
+
+/**
+* Vulkan device instance
+*/
+class CAVE_INTERFACE VulkanInstance : public HalInstance
 {
-	// convert to backend type
-	BackendInstanceTypes backendType;
-	switch(type)
-	{
-		case RenderInstanceTypes::InstanceVulkan:
-			backendType = BackendInstanceTypes::InstanceVulkan;
-			break; 
-		case RenderInstanceTypes::InstanceDX12:
-			backendType = BackendInstanceTypes::InstanceDX12;
-			break; 
-		default:
-			backendType = BackendInstanceTypes::InstanceVulkan;
-			break;
-	}
-
-	_pHalInstance = HalInstance::CreateInstance(backendType);
-}
-
-RenderInstance::~RenderInstance()
-{
-	if (_pHalInstance)
-		HalInstance::ReleaseInstance(_pHalInstance);
-}
+public:
+	/**
+	* @brief Constructor
+	*
+	*/
+	VulkanInstance(BackendInstanceTypes type);
+	/** @brief Destructor */
+	~VulkanInstance();
+};
 
 }
+
+/** @}*/

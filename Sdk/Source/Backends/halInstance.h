@@ -17,7 +17,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Hardware instance abstraction
 
 #include "engineDefines.h"
-#include "osPlatformLib.h"
 
 /** \defgroup backend Backend 
 *  @{
@@ -60,6 +59,22 @@ public:
 	*
 	*/
 	const BackendInstanceTypes GetInstanceType() const { return _type; }
+
+	/**
+	* @brief Static function to create a hardware instance
+	*
+	* @param[in] type Instance type
+	*
+	*/
+	static HalInstance* CreateInstance(BackendInstanceTypes type);
+
+	/**
+	* @brief Static function to reelase a hardware instance
+	*
+	* @param[in] instance Pointer to instance
+	*
+	*/
+	static void ReleaseInstance(HalInstance* instance);
 
 private:
 

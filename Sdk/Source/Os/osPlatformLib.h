@@ -47,7 +47,7 @@ class OsPlatformLib
 	*
 	* @returns a handle to a library
 	*/
-	static osLibraryHandle OsLoadLibrary(char *name);
+	static osLibraryHandle OsLoadLibrary(const char *name);
 
 	/**
 	* @brief Unload a library
@@ -66,7 +66,7 @@ class OsPlatformLib
 	*
 	* @returns a address to a function or nullptr on failure
 	*/
-	static osProcAddress OsGetProcAddress(osLibraryHandle handle, char *name);
+	static osProcAddress OsGetProcAddress(osLibraryHandle handle, const char *name);
 };
 
 }

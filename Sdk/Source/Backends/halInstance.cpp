@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Hardware instance abstraction
 
 #include "halInstance.h"
+#include "vulkanInstance.h"
 
 namespace cave
 {
@@ -29,6 +30,21 @@ HalInstance::HalInstance(BackendInstanceTypes type)
 HalInstance::~HalInstance()
 {
 
+}
+
+HalInstance* HalInstance::CreateInstance(BackendInstanceTypes type)
+{
+	HalInstance* pHalInstance = nullptr;
+	if (type == BackendInstanceTypes::InstanceVulkan)
+		pHalInstance = new VulkanInstance(type);
+
+	return pHalInstance;
+}
+
+void HalInstance::ReleaseInstance(HalInstance* instance)
+{
+	if (instance)
+		delete instance;
 }
 
 }
