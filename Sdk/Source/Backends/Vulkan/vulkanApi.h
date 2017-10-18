@@ -52,7 +52,11 @@ private:
 	*/
 	VulkanApi() 
 	{
+#if defined(_WIN32)		
 		_hVulkan = OsPlatformLib::OsLoadLibrary("vulkan-1");
+#else
+		_hVulkan = OsPlatformLib::OsLoadLibrary("vulkan");
+#endif
 
 		if (_hVulkan)
 		{
@@ -91,7 +95,7 @@ private:
 		fnPtr = reinterpret_cast<TFuncType>(OsPlatformLib::OsGetProcAddress(module, fnName));
 
 		if (fnPtr == nullptr)
-			std::cerr << "Could not load function: " << fnPtr << "!" << std::endl;
+			std::cerr << "Could not load function: " << fnName << "!" << std::endl;
 
 		return fnPtr != nullptr;
 	}

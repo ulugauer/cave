@@ -27,8 +27,9 @@ namespace cave
 osLibraryHandle OsPlatformLib::OsLoadLibrary(const char *name)
 {
     std::string soName;
-    soName = name;
-    soName += ".so"; 
+    soName = "lib";
+    soName += name;
+    soName += ".so.1"; 
     osLibraryHandle handle = dlopen(soName.c_str(), RTLD_LAZY);
 
     return handle;
