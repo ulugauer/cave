@@ -19,16 +19,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineDefines.h"
 #include "osPlatformLib.h"
 
+/** \defgroup backend Backend 
+*  @{
+*		This module handles the hardware abstractions of
+*		various graphics API like DirectX, Vulkan
+*/
+
 namespace cave
 {
 
 /**
 * Hardware instance types
 */
-enum class InstanceTypes
+enum class BackendInstanceTypes
 {
-	INSTANCE_VULKAN = 1,	///< Vulkan instance
-	INSTANCE_DX12 = 2,		///< DX12 instance
+	InstanceVulkan = 1,	///< Vulkan instance
+	InstanceDX12 = 2,	///< DX12 instance
 };
 
 /**
@@ -43,13 +49,23 @@ public:
 	* @param[in] type Instance type
 	*
 	*/
-	HalInstance(InstanceTypes type);
+	HalInstance(BackendInstanceTypes type);
 	/** @brief Destructor */
 	~HalInstance();
 
+	/**
+	* @brief Get hardware instance type
+	*
+	* @return Hardware instance type
+	*
+	*/
+	const BackendInstanceTypes GetInstanceType() const { return _type; }
+
 private:
 
-	InstanceTypes _type;	///< Instance type
+	BackendInstanceTypes _type;	///< Instance type
 };
 
 }
+
+/** @}*/

@@ -12,24 +12,38 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-#include "Render/renderInstance.h"
+/// @file renderInstance.cpp
+///       Render instance abstraction
 
-#include <iostream>
+#include "renderInstance.h"
 
-using namespace cave;
+namespace cave
+{
 
-int main(int argc, char* argv[])
-{  
-
-	// Create HAL instance which we use to create a device from.
-	RenderInstance* renderInstance = new RenderInstance(RenderInstanceTypes::InstanceVulkan);
-	if (!renderInstance)
+RenderInstance::RenderInstance(RenderInstanceTypes type)
+{
+	// convert to backend type
+	BackendInstanceTypes backendType;
+	switch(type)
 	{
-		std::cerr << "Failed to create render instance\n";
-		return -1;
+		case RenderInstanceTypes::InstanceVulkan:
+			backendType = BackendInstanceTypes::InstanceVulkan;
+			break; 
+		case RenderInstanceTypes::InstanceDX12:
+			backendType = BackendInstanceTypes::InstanceDX12;
+			break; 
+		default:
+			backendType = BackendInstanceTypes::InstanceVulkan;
+			break;
 	}
 
-	delete renderInstance;
+	_pHalInstance = new HalInstance(backendType);
+}
 
-	return 0;
+RenderInstance::~RenderInstance()
+{
+	if (_pHalInstance)
+		delete _pHalInstance;
+}
+
 }
