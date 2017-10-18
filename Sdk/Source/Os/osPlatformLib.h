@@ -20,6 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include <string>
 
+/** \defgroup os System
+*  @{
+*		This module handles the operating system abstraction
+*/
+
+
 namespace cave
 {
 
@@ -65,3 +71,4 @@ class OsPlatformLib
 
 }
 
+/** @}*/

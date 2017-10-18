@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-HalInstance::HalInstance(InstanceTypes type)
+HalInstance::HalInstance(BackendInstanceTypes type)
 	: _type(type)
 {
 

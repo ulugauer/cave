@@ -11,25 +11,28 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-#include "Render/renderInstance.h"
+/// @file engineTypes.h
+///       Shared types
 
-#include <iostream>
+/** \defgroup engine Engine
+*  @{
+*		This module contains all code related to the engine
+*/
 
-using namespace cave;
+namespace cave
+{
 
-int main(int argc, char* argv[])
-{  
+/**
+* Render instance types
+*/
+enum class RenderInstanceTypes
+{
+	InstanceVulkan = 1,	///< Vulkan instance
+	InstanceDX12 = 2,	///< DX12 instance
+};
 
-	// Create HAL instance which we use to create a device from.
-	RenderInstance* renderInstance = new RenderInstance(RenderInstanceTypes::InstanceVulkan);
-	if (!renderInstance)
-	{
-		std::cerr << "Failed to create render instance\n";
-		return -1;
-	}
-
-	delete renderInstance;
-
-	return 0;
 }
+
+/** @}*/
