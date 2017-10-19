@@ -34,17 +34,26 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Install location
 #-------------------------------------------------------------------------------
 IF(WIN32)
-set(CAVE_RUNTIME_BIN_DIR ${PROJECT_SOURCE_DIR}/binary/win)
-set(CAVE_RUNTIME_LIB_DIR ${PROJECT_SOURCE_DIR}/libs/win)
+	set(CAVE_RUNTIME_BIN_DIR ${PROJECT_SOURCE_DIR}/binary/win)
+	set(CAVE_RUNTIME_LIB_DIR ${PROJECT_SOURCE_DIR}/libs/win)
 ELSE()
-set(CAVE_RUNTIME_BIN_DIR ${PROJECT_SOURCE_DIR}/binary/linux)
-set(CAVE_RUNTIME_LIB_DIR ${PROJECT_SOURCE_DIR}/libs/linux)
+	set(CAVE_RUNTIME_BIN_DIR ${PROJECT_SOURCE_DIR}/binary/linux)
+	set(CAVE_RUNTIME_LIB_DIR ${PROJECT_SOURCE_DIR}/libs/linux)
 ENDIF()
+
 #-------------------------------------------------------------------------------
 # 3rdparty Dependencies
 #-------------------------------------------------------------------------------
 
 
+#-------------------------------------------------------------------------------
+# Platform defines
+#-------------------------------------------------------------------------------
+IF(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
+ELSEIF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	add_definitions(-DVK_USE_PLATFORM_XCB_KHR) 
+ENDIF()
 
 # add postfix for debug builds
 SET(CMAKE_DEBUG_POSTFIX d)

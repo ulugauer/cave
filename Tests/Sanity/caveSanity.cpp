@@ -28,6 +28,10 @@ int main(int argc, char* argv[])
 		std::cerr << "Failed to create render instance\n";
 		return -1;
 	}
+	else
+	{
+		std::cout << "Successfuly created a render instance\n";
+	}
 
 	delete renderInstance;
 

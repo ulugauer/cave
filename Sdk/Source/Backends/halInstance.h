@@ -50,7 +50,7 @@ public:
 	*/
 	HalInstance(BackendInstanceTypes type);
 	/** @brief Destructor */
-	~HalInstance();
+	virtual ~HalInstance();
 
 	/**
 	* @brief Get hardware instance type

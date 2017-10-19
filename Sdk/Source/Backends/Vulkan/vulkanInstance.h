@@ -19,6 +19,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halInstance.h"
 #include "osPlatformLib.h"
 
+#include "vulkan.h"
+
 /** \addtogroup backend 
 *  @{
 *		
@@ -26,7 +28,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
-
 
 /**
 * Vulkan device instance
@@ -40,7 +41,10 @@ public:
 	*/
 	VulkanInstance(BackendInstanceTypes type);
 	/** @brief Destructor */
-	~VulkanInstance();
+	virtual ~VulkanInstance();
+
+private:
+	VkInstance _vkInstance;	///< Handle to vulkan instance
 };
 
 }
