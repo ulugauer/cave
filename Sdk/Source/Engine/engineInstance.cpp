@@ -12,31 +12,25 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
+/// @file engineInstance.cpp
+///       Render instance abstraction
+
 #include "engineInstance.h"
 
-#include <iostream>
+namespace cave
+{
 
-using namespace cave;
+EngineInstance::EngineInstance(EngineCreateStruct& engineCreate)
+	:_pEnginePrivate(nullptr)
+{
+	// create our private pointer
+	_pEnginePrivate = new EngineInstancePrivate(engineCreate);
+}
 
-int main(int argc, char* argv[])
-{  
-	EngineInstance* engineInstance = nullptr;
-	try
-	{
-		// Create engine instance which we use to create all other things
-		EngineCreateStruct engineInfo = { 0, "caveSanity" };
-		engineInstance = new EngineInstance(engineInfo);
+EngineInstance::~EngineInstance()
+{
+	if (_pEnginePrivate)
+		delete _pEnginePrivate;
+}
 
-		// create renderer
-		engineInstance->CreateRenderer(RenderInstanceTypes::InstanceVulkan);
-	}
-	catch (...)
-	{
-		std::cerr << "Failed to create engine instance\n";
-		return -1;
-	}
-
-	delete engineInstance;
-
-	return 0;
 }

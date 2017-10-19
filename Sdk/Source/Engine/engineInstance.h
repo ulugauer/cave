@@ -11,32 +11,58 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-#include "engineInstance.h"
+/// @file engineInstance.h
+///       Engine runtime
 
-#include <iostream>
+#include "engineInstancePrivate.h"
+#include "engineTypes.h"
 
-using namespace cave;
+#include <string>
 
-int main(int argc, char* argv[])
-{  
-	EngineInstance* engineInstance = nullptr;
-	try
+/** \addtogroup engine
+*  @{
+*		This module contains all code related to the engine
+*/
+
+namespace cave
+{
+
+
+/**
+* Our main engine runtime interface
+*/
+class CAVE_INTERFACE EngineInstance
+{
+public:
+	/**
+	* @brief Constructor
+	*
+	* @param[in] engineCreate Engine instance create info
+	*
+	*/
+	EngineInstance(EngineCreateStruct& engineCreate);
+	/** @brief Destructor */
+	~EngineInstance();
+
+	/**
+	* @brief Create Renderer
+	*
+	* @param[in] type Graphics instance type
+	*
+	* @return RenderInstance object or nullptr
+	*/
+	RenderInstance* CreateRenderer(RenderInstanceTypes type)
 	{
-		// Create engine instance which we use to create all other things
-		EngineCreateStruct engineInfo = { 0, "caveSanity" };
-		engineInstance = new EngineInstance(engineInfo);
-
-		// create renderer
-		engineInstance->CreateRenderer(RenderInstanceTypes::InstanceVulkan);
-	}
-	catch (...)
-	{
-		std::cerr << "Failed to create engine instance\n";
-		return -1;
+		return _pEnginePrivate->CreateRenderer(type);
 	}
 
-	delete engineInstance;
+private:
+	EngineInstancePrivate* _pEnginePrivate;		///< Pointer to not exported engine instance
 
-	return 0;
+};
+
 }
+
+/** @}*/

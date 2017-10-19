@@ -14,20 +14,23 @@ ENDIF()
 add_definitions(-DCAVE_EXPORTS) 
 
 # Add sources
-set(ENGINE_HEADERS engineDefines.h 
-				   engineTypes.h )
+set(ENGINE_SOURCE engineDefines.h 
+				  engineTypes.h 
+				  engineInstancePrivate.h 
+				  engineInstancePrivate.cpp 
+				  engineInstance.h 
+				  engineInstance.cpp )
 
 set(RENDER_SOURCE Render/renderInstance.h 
 				  Render/renderInstance.cpp )
 
 # Create named folders for the sources within the .vcproj
 # Empty name lists them directly under the .vcproj
-source_group("engine\\include" FILES ${ENGINE_HEADERS})
-source_group("engine\\source" FILES ${ENGINE_SOURCE})
+source_group("engine" FILES ${ENGINE_SOURCE})
 source_group("engine\\render" FILES ${RENDER_SOURCE})
 
 #Generate the shared library from the sources
-add_library(cave SHARED ${ENGINE_SOURCE} ${ENGINE_HEADERS} ${RENDER_SOURCE} 
+add_library(cave SHARED ${ENGINE_SOURCE} ${RENDER_SOURCE} 
 			$<TARGET_OBJECTS:os> 
 			$<TARGET_OBJECTS:backends> )
 

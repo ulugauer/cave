@@ -37,6 +37,7 @@ add_executable(CaveSanity ${CAVE_SANITY_SOURCE})
 # additional include directories
 target_include_directories(CaveSanity PRIVATE .)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Engine)
+target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Engine/Render)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Os)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Backends)
 
