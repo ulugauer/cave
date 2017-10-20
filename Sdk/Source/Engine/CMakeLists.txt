@@ -21,7 +21,9 @@ set(ENGINE_SOURCE engineDefines.h
 				  engineInstance.h 
 				  engineInstance.cpp 
 				  engineError.h 
-				  engineError.cpp )
+				  engineError.cpp
+				  engineLog.h 
+				  engineLog.cpp )
 
 set(RENDER_SOURCE Render/renderInstance.h 
 				  Render/renderInstance.cpp )

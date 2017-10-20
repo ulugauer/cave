@@ -25,10 +25,14 @@ EngineInstance::EngineInstance(EngineCreateStruct& engineCreate)
 {
 	// create our private pointer
 	_pEnginePrivate = new EngineInstancePrivate(engineCreate);
+	// create our logger
+	_pEngineLog = new EngineLog();
 }
 
 EngineInstance::~EngineInstance()
 {
+	if (_pEngineLog)
+		delete _pEngineLog;
 	if (_pEnginePrivate)
 		delete _pEnginePrivate;
 }
