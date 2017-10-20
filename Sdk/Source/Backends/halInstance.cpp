@@ -32,11 +32,11 @@ HalInstance::~HalInstance()
 
 }
 
-HalInstance* HalInstance::CreateInstance(BackendInstanceTypes type)
+HalInstance* HalInstance::CreateInstance(BackendInstanceTypes type, const char* applicationName)
 {
 	HalInstance* pHalInstance = nullptr;
 	if (type == BackendInstanceTypes::InstanceVulkan)
-		pHalInstance = new VulkanInstance(type);
+		pHalInstance = new VulkanInstance(type, applicationName);
 
 	return pHalInstance;
 }

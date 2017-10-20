@@ -38,8 +38,11 @@ public:
 	/**
 	* @brief Constructor
 	*
+	* @param type	Backend graphics API 
+	* @param applicationName	Name of application (optional)
+	*
 	*/
-	VulkanInstance(BackendInstanceTypes type);
+	VulkanInstance(BackendInstanceTypes type, const char* applicationName);
 	/** @brief Destructor */
 	virtual ~VulkanInstance();
 

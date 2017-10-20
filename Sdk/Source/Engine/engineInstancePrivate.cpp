@@ -40,7 +40,7 @@ RenderInstance* EngineInstancePrivate::CreateRenderer(RenderInstanceTypes type)
 {
 	if (!_pRenderer)
 	{
-		_pRenderer = new RenderInstance(type);
+		_pRenderer = new RenderInstance(type, _ApplicationName.c_str());
 	}
 
 	return _pRenderer;

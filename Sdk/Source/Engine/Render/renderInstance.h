@@ -36,10 +36,11 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] type Instance type
+	* @param[in] type	Instance type
+	* @param applicationName	Name of application (optional)
 	*
 	*/
-	RenderInstance(RenderInstanceTypes type);
+	RenderInstance(RenderInstanceTypes type, const char* applicationName);
 	/** @brief Destructor */
 	~RenderInstance();
 

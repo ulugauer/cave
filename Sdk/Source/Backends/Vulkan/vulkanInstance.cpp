@@ -46,22 +46,20 @@ static bool CheckExtensionAvailability(const char *extension_name, const std::ve
 }
 
 
-VulkanInstance::VulkanInstance(BackendInstanceTypes type)
+VulkanInstance::VulkanInstance(BackendInstanceTypes type, const char* applicationName)
 	: HalInstance(type)
 {
 	// this loads the library 
 	VulkanApi* pApi = VulkanApi::GetApi();
 	if (!pApi)
 	{
-		std::cerr << "ERROR: Failed to load vulkan library\n";
-		return;
+		throw BackendException("Failed to load vulkan library");
 	}
 
 	// load global accessible functions
 	if (!pApi->LoadGlobalFunctions())
 	{
-		std::cerr << "ERROR: Failed to load vulkan global functions\n";
-		return;
+		throw BackendException("Failed to load vulkan global functions");
 	}
 
 	// We need to setup all possible used extension before we can create an instance
@@ -69,15 +67,13 @@ VulkanInstance::VulkanInstance(BackendInstanceTypes type)
 	if ((pApi->vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, nullptr) != VK_SUCCESS) ||
 		(extensions_count == 0))
 	{
-		std::cout << "Error occurred during instance extensions enumeration!" << std::endl;
-		return;
+		throw BackendException("Error no instance extensions found");
 	}
 
 	std::vector<VkExtensionProperties> available_extensions(extensions_count);
 	if (pApi->vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, &available_extensions[0]) != VK_SUCCESS)
 	{
-		std::cerr << "Error occurred during instance extensions enumeration!" << std::endl;
-		return;
+		throw BackendException("Error instance extensions query failed");
 	}
 
 	// we probably need the surface extension
@@ -93,8 +89,9 @@ VulkanInstance::VulkanInstance(BackendInstanceTypes type)
 	{
 		if (!CheckExtensionAvailability(extensions[i], available_extensions))
 		{
-			std::cerr << "Could not find instance extension named \"" << extensions[i] << "\"!" << std::endl;
-			return ;
+			std::string msg("Error failed to load extension: ");
+			msg += extensions[i];
+			throw BackendException(msg);
 		}
 	}
 
@@ -105,8 +102,8 @@ VulkanInstance::VulkanInstance(BackendInstanceTypes type)
 
 	// setup application info
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "Application";
-	appInfo.applicationVersion = 1;
+	appInfo.pApplicationName = applicationName;
+	appInfo.applicationVersion = 0;
 	appInfo.pEngineName = "cave";
 	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 	appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 3);
@@ -122,15 +119,13 @@ VulkanInstance::VulkanInstance(BackendInstanceTypes type)
 
 	if (result != VK_SUCCESS)
 	{
-		std::cerr << "ERROR: Failed to create vulkan instance\n";
-		return;
+		throw BackendException("Failed to create vulkan instance");
 	}
 
 	// load instance accessible functions
 	if (!pApi->LoadInstanceFunctions(&_vkInstance))
 	{
-		std::cerr << "ERROR: Failed to load vulkan global functions\n";
-		return;
+		throw BackendException("Failed to load vulkan instance functions");
 	}
 }
 

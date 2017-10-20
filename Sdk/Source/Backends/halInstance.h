@@ -18,6 +18,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineDefines.h"
 
+#include <iostream>		// includes exception handling
+
 /** \defgroup backend Backend 
 *  @{
 *		This module handles the hardware abstractions of
@@ -26,6 +28,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
+
+/**
+* Backend exception handling
+*/
+class BackendException : public std::exception
+{
+public:
+	/**
+	* @brief Constructor
+	*
+	* @param[in] message Message string
+	*
+	*/
+	explicit BackendException(const std::string& message)
+		: _message(message)
+	{
+
+	}
+
+	/**
+	* @brief return message
+	*
+	* @return error message string
+	*/
+	virtual const char* what() const throw()
+	{
+		return _message.c_str();
+	}
+private:
+	std::string _message;	///< stores error string
+};
 
 /**
 * Hardware instance types
@@ -64,9 +97,10 @@ public:
 	* @brief Static function to create a hardware instance
 	*
 	* @param[in] type Instance type
+	* @param applicationName	Name of application (optional)
 	*
 	*/
-	static HalInstance* CreateInstance(BackendInstanceTypes type);
+	static HalInstance* CreateInstance(BackendInstanceTypes type, const char* applicationName);
 
 	/**
 	* @brief Static function to reelase a hardware instance

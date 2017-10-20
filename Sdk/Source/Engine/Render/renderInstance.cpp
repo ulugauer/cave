@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-RenderInstance::RenderInstance(RenderInstanceTypes type)
+RenderInstance::RenderInstance(RenderInstanceTypes type, const char* applicationName)
+	: _pHalInstance(nullptr)
 {
 	// convert to backend type
 	BackendInstanceTypes backendType;
@@ -37,7 +38,14 @@ RenderInstance::RenderInstance(RenderInstanceTypes type)
 			break;
 	}
 
-	_pHalInstance = HalInstance::CreateInstance(backendType);
+	try
+	{
+		_pHalInstance = HalInstance::CreateInstance(backendType, applicationName);
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << e.what();
+	}
 }
 
 RenderInstance::~RenderInstance()
