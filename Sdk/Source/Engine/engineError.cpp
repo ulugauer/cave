@@ -17,7 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineError.h"
 
-#include <string>
+#include <cstring>
 
 namespace cave
 {
@@ -25,15 +25,15 @@ namespace cave
 EngineError::EngineError(const std::string& message)
 {
 	_errorString = new char[message.size()+1];
-    strcpy(_errorString, message.c_str());
+    std::strcpy(_errorString, message.c_str());
 }
 
 EngineError::EngineError(const EngineError& copy)
 {
-	const size_t stringLength = strlen(copy._errorString) + 1;
+	const size_t stringLength = std::strlen(copy._errorString) + 1;
 
 	_errorString = new char[stringLength];
-	strcpy(_errorString, copy._errorString);
+	std::strcpy(_errorString, copy._errorString);
 }
 
 EngineError::~EngineError()
@@ -45,7 +45,7 @@ EngineError::~EngineError()
 	}
 }
 
-const char *EngineError::what() const
+const char* EngineError::what() const throw()
 {
     return _errorString;
 }
