@@ -51,7 +51,7 @@ bool EngineLog::Open()
 void EngineLog::PrintToLog(const char *string)
 {
 	if (Open())
-		fprintf((FILE*)_logFile, string);
+		fprintf((FILE*)_logFile, "%s", string);
 }
 
 void EngineLog::Timestamp()
