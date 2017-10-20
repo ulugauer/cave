@@ -11,38 +11,58 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-#include "engineInstance.h"
-#include "engineError.h"
+/// @file engineError.h
+///       handle engine exceptions
 
-#include <iostream>
+#include "engineDefines.h"
 
-using namespace cave;
+#include <string>
 
-int main(int argc, char* argv[])
-{  
-	EngineInstance* engineInstance = nullptr;
-	try
-	{
-		// Create engine instance which we use to create all other things
-		EngineCreateStruct engineInfo = { 0, "caveSanity" };
-		engineInstance = new EngineInstance(engineInfo);
+/** \addtogroup engine 
+*  @{
+*		
+*/
 
-		// create renderer
-		engineInstance->CreateRenderer(RenderInstanceTypes::InstanceVulkan);
-	}
-	catch (cave::EngineError err)
-	{
-		std::cerr << err.what();
-		return -1;
-	}
-	catch (...)
-	{
-		std::cerr << "Failed to create engine instance\n";
-		return -1;
-	}
+namespace cave
+{
 
-	delete engineInstance;
+/**
+* Engine error handling
+*/
+class CAVE_INTERFACE EngineError
+{
+public:
+	/**
+	* @brief Constructor
+	*
+	* @param[in] message Message string
+	*
+	*/
+	explicit EngineError(const std::string& message);
 
-	return 0;
+	/**
+	* @brief Copy Constructor
+	*
+	* @param[in] copy	Pointer to error object 
+	*
+	*/
+	EngineError(const EngineError& copy);
+
+	/** destructor */
+	~EngineError();
+
+	/**
+	* @brief return message
+	*
+	* @return error message string
+	*/
+	virtual const char* what() const throw();
+private:
+	char* _errorString;	///< Pointer to error string
+};
+
 }
+
+/** @}*/

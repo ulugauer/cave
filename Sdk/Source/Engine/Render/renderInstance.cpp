@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Render instance abstraction
 
 #include "renderInstance.h"
+#include "engineError.h"
 
 namespace cave
 {
@@ -44,7 +45,8 @@ RenderInstance::RenderInstance(RenderInstanceTypes type, const char* application
 	}
 	catch (std::exception& e)
 	{
-		std::cerr << e.what();
+		std::string msg(e.what());
+		throw EngineError(msg);
 	}
 }
 

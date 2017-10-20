@@ -12,38 +12,42 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file engineInstancePrivate.cpp
-///       Engine instance abstraction
+/// @file engineError.cpp
+///       Engine error handling
 
-#include "engineInstancePrivate.h"
+#include "engineError.h"
+
+#include <string>
 
 namespace cave
 {
 
-EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
-	: _pRenderer(nullptr)
-	, _ApplicationName(engineCreate.applicationName)
+EngineError::EngineError(const std::string& message)
 {
-
+	_errorString = new char[message.size()+1];
+    strcpy(_errorString, message.c_str());
 }
 
-EngineInstancePrivate::~EngineInstancePrivate()
+EngineError::EngineError(const EngineError& copy)
 {
-	if (_pRenderer)
+	const size_t stringLength = strlen(copy._errorString) + 1;
+
+	_errorString = new char[stringLength];
+	strcpy(_errorString, copy._errorString);
+}
+
+EngineError::~EngineError()
+{
+	if (_errorString)
 	{
-		delete _pRenderer;
-		_pRenderer = nullptr;
+		delete [] _errorString;
+		_errorString = nullptr;
 	}
 }
 
-RenderInstance* EngineInstancePrivate::CreateRenderer(RenderInstanceTypes type)
+const char *EngineError::what() const
 {
-	if (!_pRenderer)
-	{
-		_pRenderer = new RenderInstance(type, _ApplicationName.c_str());
-	}
-
-	return _pRenderer;
+    return _errorString;
 }
 
 }

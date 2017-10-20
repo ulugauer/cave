@@ -19,7 +19,9 @@ set(ENGINE_SOURCE engineDefines.h
 				  engineInstancePrivate.h 
 				  engineInstancePrivate.cpp 
 				  engineInstance.h 
-				  engineInstance.cpp )
+				  engineInstance.cpp 
+				  engineError.h 
+				  engineError.cpp )
 
 set(RENDER_SOURCE Render/renderInstance.h 
 				  Render/renderInstance.cpp )
