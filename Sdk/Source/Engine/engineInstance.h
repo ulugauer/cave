@@ -18,7 +18,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineInstancePrivate.h"
 #include "engineTypes.h"
-#include "engineLog.h"
 
 #include <string>
 
@@ -61,7 +60,6 @@ public:
 
 private:
 	EngineInstancePrivate* _pEnginePrivate;		///< Pointer to not exported engine instance
-	EngineLog* _pEngineLog;	///< Our engine wide message logger
 };
 
 }

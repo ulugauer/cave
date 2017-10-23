@@ -21,8 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-RenderInstance::RenderInstance(RenderInstanceTypes type, const char* applicationName)
-	: _pHalInstance(nullptr)
+RenderInstance::RenderInstance(EngineInstancePrivate* engine, RenderInstanceTypes type, const char* applicationName)
+	: _pEngineInstance(engine)
+	, _pHalInstance(nullptr)
 {
 	// convert to backend type
 	BackendInstanceTypes backendType;

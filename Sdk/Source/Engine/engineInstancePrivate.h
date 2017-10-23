@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "renderInstance.h"
 #include "engineTypes.h"
+#include "engineLog.h"
 
 #include <string>
 
@@ -64,10 +65,17 @@ public:
 	*/
 	RenderInstance* CreateRenderer(RenderInstanceTypes type);
 
+	/**
+	* @brief GetEngineLog
+	*
+	* @return Pointer to engine logging
+	*/
+	EngineLog* GetEnginLog() const { return _pEngineLog; }
+
 private:
 	RenderInstance* _pRenderer;		///< Pointer to renderer
 	std::string _ApplicationName;	///< Optional specified at creation time
-
+	EngineLog* _pEngineLog;	///< Our engine wide message logger
 };
 
 }

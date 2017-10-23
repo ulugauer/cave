@@ -25,12 +25,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-EngineLog::EngineLog()
+EngineLog::EngineLog(logWarningLevel warningLevel, logMessageLevel messageLevel, bool enableLogging)
+	: _minWarningLevel(warningLevel)
+	, _minMessageLevel(messageLevel)
+	, _enableLogging(enableLogging)
 {
-    // show all warnings and messages by default
-    _minWarningLevel = WARNING_LEVEL0;
-    _minMessageLevel = MESSAGE_LEVEL0;
-    
     _logFile = nullptr;
 }
 

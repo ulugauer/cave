@@ -23,16 +23,12 @@ namespace cave
 EngineInstance::EngineInstance(EngineCreateStruct& engineCreate)
 	:_pEnginePrivate(nullptr)
 {
-	// create our private pointer
+	// Create our private pointer
 	_pEnginePrivate = new EngineInstancePrivate(engineCreate);
-	// create our logger
-	_pEngineLog = new EngineLog();
 }
 
 EngineInstance::~EngineInstance()
 {
-	if (_pEngineLog)
-		delete _pEngineLog;
 	if (_pEnginePrivate)
 		delete _pEnginePrivate;
 }

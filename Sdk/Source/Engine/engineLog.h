@@ -35,21 +35,26 @@ public:
 	/// The warning levels
     typedef enum
     {
-        WARNING_LEVEL0 = 1,     ///< Level 0 - informational warnings
-        WARNING_LEVEL1,         ///< Level 1 - severe warnings
+		WARNING_LEVEL_NOENE = 0,	///< Level None - no warnings
+        WARNING_LEVEL0 = 1,			///< Level 0 - informational warnings
+        WARNING_LEVEL1,				///< Level 1 - severe warnings
     } logWarningLevel;
     /// The message levels
     typedef enum
     {
-        MESSAGE_LEVEL0 = 1,     ///< Level 0 - informational message
-        MESSAGE_LEVEL1,         ///< Level 1 - important messages
+		MESSAGE_LEVEL_NOENE = 0,	///< Level None - no messages
+        MESSAGE_LEVEL0 = 1,			///< Level 0 - informational message
+        MESSAGE_LEVEL1,				///< Level 1 - important messages
     } logMessageLevel;
 
 	/**
 	* @brief Constructor
 	*
+	* @param warningLevel Desired warning level
+	* @param messageLevel Desired message level
+	* @param enableLogging Set to true if engine should log
 	*/
-	EngineLog();
+	EngineLog(logWarningLevel warningLevel, logMessageLevel messageLevel, bool enableLogging);
 
 	/** destructor */
 	~EngineLog();
@@ -83,9 +88,10 @@ public:
 
 private:
 	
-	logWarningLevel _minWarningLevel;    ///< all warnings below this level are ignored
-    logMessageLevel _minMessageLevel;    ///< all messages below this level are ignored
-    void *_logFile;                         ///< log file handle
+	logWarningLevel _minWarningLevel;   ///< All warnings below this level are ignored
+    logMessageLevel _minMessageLevel;	///< All messages below this level are ignored
+	bool _enableLogging;				///< Set to true for enabling logging
+    void *_logFile;                     ///< Log file handle
 
     /**
 	* @brief Open log file

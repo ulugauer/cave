@@ -27,6 +27,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+/// forward declaration
+class EngineInstancePrivate;
+
 /**
 * Abstraction type of a device instance
 */
@@ -36,17 +39,19 @@ public:
 	/**
 	* @brief Constructor
 	*
+	* @param[in] engine	Pointer to engine instance
 	* @param[in] type	Instance type
-	* @param applicationName	Name of application (optional)
+	* @param[in] applicationName	Name of application (optional)
 	*
 	*/
-	RenderInstance(RenderInstanceTypes type, const char* applicationName);
+	RenderInstance(EngineInstancePrivate* engine, RenderInstanceTypes type, const char* applicationName);
 	/** @brief Destructor */
 	~RenderInstance();
 
 private:
+	EngineInstancePrivate* _pEngineInstance;	///< Pointer to the engine instance we belong to
 	HalInstance* _pHalInstance;	///< Pointer to HAL Instance
-
+	
 };
 
 }

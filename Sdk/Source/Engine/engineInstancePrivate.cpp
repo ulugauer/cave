@@ -24,11 +24,15 @@ EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
 	: _pRenderer(nullptr)
 	, _ApplicationName(engineCreate.applicationName)
 {
-
+	// Create our logger. By default no logging
+	_pEngineLog = new EngineLog(EngineLog::WARNING_LEVEL_NOENE, EngineLog::MESSAGE_LEVEL_NOENE, false);
 }
 
 EngineInstancePrivate::~EngineInstancePrivate()
 {
+	if (_pEngineLog)
+		delete _pEngineLog;
+
 	if (_pRenderer)
 	{
 		delete _pRenderer;
@@ -40,7 +44,12 @@ RenderInstance* EngineInstancePrivate::CreateRenderer(RenderInstanceTypes type)
 {
 	if (!_pRenderer)
 	{
-		_pRenderer = new RenderInstance(type, _ApplicationName.c_str());
+		_pRenderer = new RenderInstance(this, type, _ApplicationName.c_str());
+	}
+
+	if (!_pRenderer && _pEngineLog)
+	{
+		_pEngineLog->Error("Failed to create renderer");
 	}
 
 	return _pRenderer;
