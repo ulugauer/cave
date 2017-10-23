@@ -11,33 +11,63 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file engineInstance.cpp
-///       Render instance abstraction
+/// @file allocatorGlobal.h
+///       handle engine allocations
 
-#include "engineInstance.h"
+
+/** \addtogroup engine 
+*  @{
+*       
+*/
+
+#include "allocatorBase.h"
 
 namespace cave
 {
 
-EngineInstance::EngineInstance(EngineCreateStruct& engineCreate)
-	:_pEnginePrivate(nullptr)
+class AllocatorGlobal : public AllocatorBase
 {
-	try
-	{
-		// Create our private pointer
-		_pEnginePrivate = new EngineInstancePrivate(engineCreate);
-	}
-	catch (std::bad_alloc& )
-	{
-		return;
-	}
-}
+public:
+	/**
+	* @brief Constructor
+	*
+	* @param[in] size	Maximum size allowed for this heap (0 means unlimited)
+	*
+	*/
+    AllocatorGlobal(size_t size);
 
-EngineInstance::~EngineInstance()
-{
-	if (_pEnginePrivate)
-		delete _pEnginePrivate;
-}
+	/** destrucctor */
+    virtual ~AllocatorGlobal();
+
+	/**
+	* @brief Allocate. Needs to be overwritten
+	*
+	* @param[in] size	Allocation size
+	* @param[in] alignment	Allocation alignment
+	*
+	* @return Aligned pointer to allocation
+	*/
+    void* Allocate(size_t size, uint8_t alignment) override;
+
+	/**
+	* @brief Deallocate. Needs to be overwritten
+	*
+	* @param[in] p	Pointer to allocated memory
+	*
+	*/
+    void Deallocate(void* p) override;
+
+	/**
+	* @brief Reset all allocations
+	*
+	*/
+    void Reset();
+
+private:
+    AllocatorGlobal(const AllocatorGlobal&);                //no copy constructor
+    AllocatorGlobal& operator=(const AllocatorGlobal&);
+}; 
 
 }

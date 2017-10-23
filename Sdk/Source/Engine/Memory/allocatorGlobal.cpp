@@ -12,32 +12,47 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file engineInstance.cpp
-///       Render instance abstraction
+/// @file allocatorGlobal.cpp
+///       Handle engine allocations
 
-#include "engineInstance.h"
+#include "allocatorGlobal.h"
 
 namespace cave
 {
 
-EngineInstance::EngineInstance(EngineCreateStruct& engineCreate)
-	:_pEnginePrivate(nullptr)
+AllocatorGlobal::AllocatorGlobal(size_t size)
+    : AllocatorBase(size, nullptr)
 {
-	try
-	{
-		// Create our private pointer
-		_pEnginePrivate = new EngineInstancePrivate(engineCreate);
-	}
-	catch (std::bad_alloc& )
-	{
-		return;
-	}
+
 }
 
-EngineInstance::~EngineInstance()
+AllocatorGlobal::~AllocatorGlobal()
 {
-	if (_pEnginePrivate)
-		delete _pEnginePrivate;
+
+}
+
+void* AllocatorGlobal::Allocate(size_t size, uint8_t)
+{
+	if (size == 0)
+		return nullptr;
+
+    void *aligned_address = malloc(size);
+
+    _numAllocations++;
+
+    return (void*)aligned_address;
+}
+
+void AllocatorGlobal::Deallocate(void* p)
+{
+    _numAllocations--;
+    free(p);
+}
+
+void AllocatorGlobal::Reset()
+{
+    _numAllocations = 0;
+    _usedMemory = 0;
 }
 
 }

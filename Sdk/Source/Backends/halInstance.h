@@ -17,8 +17,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Hardware instance abstraction
 
 #include "engineDefines.h"
+#include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
+#include <memory>
 
 /** \defgroup backend Backend 
 *  @{
@@ -78,7 +80,7 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] type Instance type
+	* @param[in] type	Instance type
 	*
 	*/
 	HalInstance(BackendInstanceTypes type);
@@ -96,22 +98,23 @@ public:
 	/**
 	* @brief Static function to create a hardware instance
 	*
+	* @param[in] allocator	Engine global allocator
 	* @param[in] type Instance type
 	* @param applicationName	Name of application (optional)
 	*
 	*/
-	static HalInstance* CreateInstance(BackendInstanceTypes type, const char* applicationName);
+	static HalInstance* CreateInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName);
 
 	/**
 	* @brief Static function to reelase a hardware instance
 	*
+	* @param[in] allocator	Engine global allocator
 	* @param[in] instance Pointer to instance
 	*
 	*/
-	static void ReleaseInstance(HalInstance* instance);
+	static void ReleaseInstance(std::shared_ptr<AllocatorBase> allocator, HalInstance* instance);
 
 private:
-
 	BackendInstanceTypes _type;	///< Instance type
 };
 

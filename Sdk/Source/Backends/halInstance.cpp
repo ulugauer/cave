@@ -15,6 +15,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file halInstance.cpp
 ///       Hardware instance abstraction
 
+#include "Memory/allocatorBase.h"
 #include "halInstance.h"
 #include "vulkanInstance.h"
 
@@ -32,19 +33,19 @@ HalInstance::~HalInstance()
 
 }
 
-HalInstance* HalInstance::CreateInstance(BackendInstanceTypes type, const char* applicationName)
+HalInstance* HalInstance::CreateInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName)
 {
 	HalInstance* pHalInstance = nullptr;
 	if (type == BackendInstanceTypes::InstanceVulkan)
-		pHalInstance = new VulkanInstance(type, applicationName);
+		pHalInstance = AllocateObject<VulkanInstance>(*allocator, type, applicationName);
 
 	return pHalInstance;
 }
 
-void HalInstance::ReleaseInstance(HalInstance* instance)
+void HalInstance::ReleaseInstance(std::shared_ptr<AllocatorBase> allocator, HalInstance* instance)
 {
 	if (instance)
-		delete instance;
+		DeallocateDelete(*allocator, *instance);
 }
 
 }

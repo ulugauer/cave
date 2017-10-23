@@ -17,10 +17,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Engine runtime
 
 #include "renderInstance.h"
+#include "Memory/allocatorGlobal.h"
 #include "engineTypes.h"
 #include "engineLog.h"
 
 #include <string>
+#include <memory>
 
 /** \addtogroup engine
 *  @{
@@ -70,9 +72,17 @@ public:
 	*
 	* @return Pointer to engine logging
 	*/
-	EngineLog* GetEnginLog() const { return _pEngineLog; }
+	EngineLog* GetEngineLog() const { return _pEngineLog; }
+
+	/**
+	* @brief GetAllocator
+	*
+	* @return Pointer Engine allocator
+	*/
+	std::shared_ptr<AllocatorGlobal> GetEngineAllocator() { return _pAllocator; }
 
 private:
+	std::shared_ptr<AllocatorGlobal>    _pAllocator;	///< Pointer to engine custom allocations
 	RenderInstance* _pRenderer;		///< Pointer to renderer
 	std::string _ApplicationName;	///< Optional specified at creation time
 	EngineLog* _pEngineLog;	///< Our engine wide message logger

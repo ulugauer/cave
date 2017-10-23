@@ -21,21 +21,27 @@ namespace cave
 {
 
 EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
-	: _pRenderer(nullptr)
+	: _pAllocator(nullptr)
+	, _pRenderer(nullptr)
 	, _ApplicationName(engineCreate.applicationName)
 {
-	// Create our logger. By default no logging
-	_pEngineLog = new EngineLog(EngineLog::WARNING_LEVEL_NOENE, EngineLog::MESSAGE_LEVEL_NOENE, false);
+	// Create our engine wide allocate interface
+	_pAllocator = std::make_shared<AllocatorGlobal>(0);
+	if (_pAllocator)
+	{
+		// Create our logger. By default no logging
+		_pEngineLog = AllocateObject<EngineLog>(*_pAllocator, EngineLog::WARNING_LEVEL_NOENE, EngineLog::MESSAGE_LEVEL_NOENE, false);
+	}
 }
 
 EngineInstancePrivate::~EngineInstancePrivate()
 {
-	if (_pEngineLog)
-		delete _pEngineLog;
+	if (_pEngineLog && _pAllocator)
+		DeallocateDelete(*_pAllocator, *_pEngineLog);
 
 	if (_pRenderer)
 	{
-		delete _pRenderer;
+		DeallocateDelete(*_pAllocator, *_pRenderer);
 		_pRenderer = nullptr;
 	}
 }
@@ -44,7 +50,7 @@ RenderInstance* EngineInstancePrivate::CreateRenderer(RenderInstanceTypes type)
 {
 	if (!_pRenderer)
 	{
-		_pRenderer = new RenderInstance(this, type, _ApplicationName.c_str());
+		_pRenderer = AllocateObject<RenderInstance>(*_pAllocator, this, type, _ApplicationName.c_str());
 	}
 
 	if (!_pRenderer && _pEngineLog)

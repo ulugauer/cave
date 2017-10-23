@@ -16,17 +16,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineError.h"
 
 #include <iostream>
+#include <memory>
 
 using namespace cave;
 
 int main(int argc, char* argv[])
 {  
-	EngineInstance* engineInstance = nullptr;
+	std::unique_ptr<EngineInstance> engineInstance = nullptr;
 	try
 	{
 		// Create engine instance which we use to create all other things
 		EngineCreateStruct engineInfo = { 0, "caveSanity" };
-		engineInstance = new EngineInstance(engineInfo);
+		engineInstance = std::unique_ptr<EngineInstance>(new EngineInstance(engineInfo));
 
 		// create renderer
 		engineInstance->CreateRenderer(RenderInstanceTypes::InstanceVulkan);
@@ -41,8 +42,6 @@ int main(int argc, char* argv[])
 		std::cerr << "Failed to create engine instance\n";
 		return -1;
 	}
-
-	delete engineInstance;
 
 	return 0;
 }

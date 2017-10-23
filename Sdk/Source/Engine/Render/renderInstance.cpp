@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Render instance abstraction
 
 #include "renderInstance.h"
+#include "engineInstancePrivate.h"
 #include "engineError.h"
 
 namespace cave
@@ -42,7 +43,7 @@ RenderInstance::RenderInstance(EngineInstancePrivate* engine, RenderInstanceType
 
 	try
 	{
-		_pHalInstance = HalInstance::CreateInstance(backendType, applicationName);
+		_pHalInstance = HalInstance::CreateInstance(engine->GetEngineAllocator(), backendType, applicationName);
 	}
 	catch (std::exception& e)
 	{
@@ -54,7 +55,7 @@ RenderInstance::RenderInstance(EngineInstancePrivate* engine, RenderInstanceType
 RenderInstance::~RenderInstance()
 {
 	if (_pHalInstance)
-		HalInstance::ReleaseInstance(_pHalInstance);
+		HalInstance::ReleaseInstance(_pEngineInstance->GetEngineAllocator(), _pHalInstance);
 }
 
 }
