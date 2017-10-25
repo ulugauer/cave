@@ -11,30 +11,34 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file engineTypes.h
-///       Shared types
+/// @file frontend.cpp
+///       windows frontend abstraction
 
-/** \defgroup engine Engine
-*  @{
-*		This module contains all code related to the engine
-*/
 
-#include <string>
+#ifdef _WIN32
+#include "windowFrontend.h"
+#elif defined(__linux__)
+#include "x11Frontend.h"
+#else
+#error "unsupported frontend"
+#endif 
 
 namespace cave
 {
 
-/**
-* Render instance types
-*/
-enum class RenderInstanceTypes
+IFrontend* IFrontend::CreateFrontend(std::shared_ptr<AllocatorBase> allocator)
 {
-	InstanceVulkan = 1,	///< Vulkan instance
-	InstanceDX12 = 2,	///< DX12 instance
-};
+	IFrontend* frontend = nullptr;
+#ifdef _WIN32
+	frontend = AllocateObject<WindowFrontend>(*allocator);
+#elif defined(__linux__)
+	frontend = AllocateObject<X11Frontend>(*allocator);
+#else	
+#error "unsupported frontend"
+#endif 
 
+	return frontend;
 }
 
-/** @}*/
+}

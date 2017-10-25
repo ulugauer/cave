@@ -13,28 +13,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file engineTypes.h
-///       Shared types
+/// @file x11Frontend.h
+///       X11 frontend abstraction
 
-/** \defgroup engine Engine
+#include "frontend.h"
+
+/** \addtogroup frontend 
 *  @{
-*		This module contains all code related to the engine
+*		
 */
-
-#include <string>
 
 namespace cave
 {
 
-/**
-* Render instance types
-*/
-enum class RenderInstanceTypes
+class CAVE_INTERFACE X11Frontend : public IFrontend
 {
-	InstanceVulkan = 1,	///< Vulkan instance
-	InstanceDX12 = 2,	///< DX12 instance
+public:
+    X11Frontend();
+    virtual ~X11Frontend();
+
+public: 
+
+	/**
+	 * @brief Create a window on a specific target
+	 *
+	 * @param[in/out] windowInfo 	Window specific creation info
+	 *
+	 * @return  true if successfull
+	 */
+	virtual bool CreateOsWindow(RenderWindowInfo& windowInfo) override;
+
+	/**
+	* @brief Display the window
+	*
+	*/
+	virtual void DisplayWindow() override;
+
+	/**
+	* @brief Handle window messages
+	*
+	* @return true as long we handle messages
+	*/
+	virtual bool HandleWindowMessage() override;
+
+private:
+	xcb_connection_t* _connection;	///< xcb connection
+	xcb_window_t _windowId;	///< window id
+	xcb_visualid_t _visualId;		///< xcb visual id
 };
 
 }
-
-/** @}*/

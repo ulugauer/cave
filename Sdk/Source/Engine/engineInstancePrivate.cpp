@@ -23,6 +23,7 @@ namespace cave
 EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
 	: _pAllocator(nullptr)
 	, _pRenderInstance(nullptr)
+	, _pFrontend(nullptr)
 	, _ApplicationName(engineCreate.applicationName)
 {
 	// Create our engine wide allocate interface
@@ -38,6 +39,12 @@ EngineInstancePrivate::~EngineInstancePrivate()
 {
 	if (_pEngineLog && _pAllocator)
 		DeallocateDelete(*_pAllocator, *_pEngineLog);
+
+	if (_pFrontend)
+	{
+		DeallocateDelete(*_pAllocator, *_pFrontend);
+		_pFrontend = nullptr;
+	}
 
 	if (_pRenderInstance)
 	{
@@ -59,6 +66,23 @@ RenderInstance* EngineInstancePrivate::CreateRenderInstance(RenderInstanceTypes 
 	}
 
 	return _pRenderInstance;
+}
+
+IFrontend* EngineInstancePrivate::CreateFrontend()
+{
+	if (!_pFrontend)
+	{
+
+		_pFrontend = IFrontend::CreateFrontend(_pAllocator);
+	}
+
+	if (!_pFrontend && _pEngineLog)
+	{
+		_pEngineLog->Error("Failed to create frontend");
+		throw EngineError("Failed to create frontend");
+	}
+
+	return _pFrontend;
 }
 
 }

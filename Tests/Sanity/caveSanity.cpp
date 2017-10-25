@@ -25,6 +25,19 @@ int main(int argc, char* argv[])
 	std::unique_ptr<EngineInstance> engineInstance = nullptr;
 	RenderInstance* renderInstance = nullptr;
 	RenderDevice* renderDevice = nullptr;
+	IFrontend* frontend = nullptr;
+
+	// window cration info
+	FrontendWindowInfo windowInfo = {};
+	windowInfo.xOffset = windowInfo.yOffset = 50;
+	windowInfo.windowWidth = 800;
+	windowInfo.windowHeight = 600;
+	windowInfo.fullscreen = false;
+	windowInfo.borderLess = false;
+	windowInfo.colorBits = 32;
+	windowInfo.depthBits = 24;
+	windowInfo.windowTitle = "caveSanity";
+
 	try
 	{
 		// Create engine instance which we use to create all other things
@@ -35,6 +48,11 @@ int main(int argc, char* argv[])
 		renderInstance = engineInstance->CreateRenderInstance(RenderInstanceTypes::InstanceVulkan);
 		// Create a render device
 		renderDevice = renderInstance->CreateRenderDevice();
+
+		// create a window frontend interface
+		frontend = engineInstance->CreateFrontend();
+		// create window
+		frontend->CreateOsWindow(windowInfo);
 	}
 	catch (cave::EngineError err)
 	{
@@ -47,7 +65,15 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
+	// Initialization went successful dispaly window
+	frontend->DisplayWindow();
+
 	renderInstance->ReleaseRenderDevice(renderDevice);
+
+	do {
+
+
+	} while (frontend->HandleWindowMessage());
 
 	return 0;
 }

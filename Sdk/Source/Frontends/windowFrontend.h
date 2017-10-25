@@ -13,28 +13,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file engineTypes.h
-///       Shared types
+/// @file windowFrontend.h
+///       windows frontend abstraction
 
-/** \defgroup engine Engine
+#include "frontend.h"
+
+/** \addtogroup frontend 
 *  @{
-*		This module contains all code related to the engine
+*		
 */
-
-#include <string>
 
 namespace cave
 {
 
-/**
-* Render instance types
-*/
-enum class RenderInstanceTypes
+class CAVE_INTERFACE WindowFrontend : public IFrontend
 {
-	InstanceVulkan = 1,	///< Vulkan instance
-	InstanceDX12 = 2,	///< DX12 instance
+public:
+    WindowFrontend();
+    virtual ~WindowFrontend();
+
+public: 
+
+	/**
+	 * @brief Create a window on a specific target
+	 *
+	 * @param[in/out] windowInfo 	Window specific creation info
+	 *
+	 * @return  true if successfull
+	 */
+	virtual bool CreateOsWindow(RenderWindowInfo& windowInfo) override;
+
+	/**
+	* @brief Display the window
+	*
+	*/
+	virtual void DisplayWindow() override;
+
+	/**
+	* @brief Handle window messages
+	*
+	* @return true as long we handle messages
+	*/
+	virtual bool HandleWindowMessage() override;
+
+private:
+	HWND _hWnd;	///< Handle to the window
+	HINSTANCE _hInstance;	///< Handle to application instance
 };
 
 }
-
-/** @}*/

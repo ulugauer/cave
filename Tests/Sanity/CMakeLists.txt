@@ -3,6 +3,7 @@
 # find pthread libs
 IF(UNIX)
 	find_package(Threads REQUIRED)
+	find_package(X11 REQUIRED) 
 ENDIF()
 
 
@@ -37,9 +38,9 @@ add_executable(CaveSanity ${CAVE_SANITY_SOURCE})
 # additional include directories
 target_include_directories(CaveSanity PRIVATE .)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Engine)
-target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Engine/Render)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Os)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Backends)
+target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Frontends)
 
 # Properties->Linker->Input->Additional Dependencies
 # For the GNU compiler link order matters

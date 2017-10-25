@@ -68,6 +68,16 @@ public:
 		return _pEnginePrivate->CreateRenderInstance(type);
 	}
 
+	/**
+	* @brief Create os frontend interface
+	*
+	* @return IFrontend interface
+	*/
+	IFrontend* CreateFrontend()
+	{
+		return _pEnginePrivate->CreateFrontend();
+	}
+
 private:
 	EngineInstancePrivate* _pEnginePrivate;		///< Pointer to not exported engine instance
 };

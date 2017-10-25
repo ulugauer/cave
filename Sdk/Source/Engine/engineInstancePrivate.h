@@ -16,8 +16,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file engineInstancePrivate.h
 ///       Engine runtime
 
-#include "renderInstance.h"
+#include "Render/renderInstance.h"
 #include "Memory/allocatorGlobal.h"
+#include "frontend.h"
 #include "engineTypes.h"
 #include "engineLog.h"
 
@@ -68,6 +69,13 @@ public:
 	RenderInstance* CreateRenderInstance(RenderInstanceTypes type);
 
 	/**
+	* @brief Create os frontend interface
+	*
+	* @return IFrontend interface
+	*/
+	IFrontend* CreateFrontend();
+
+	/**
 	* @brief GetEngineLog
 	*
 	* @return Pointer to engine logging
@@ -83,7 +91,8 @@ public:
 
 private:
 	std::shared_ptr<AllocatorGlobal>    _pAllocator;	///< Pointer to engine custom allocations
-	RenderInstance* _pRenderInstance;		///< Pointer to render instance
+	RenderInstance* _pRenderInstance;	///< Pointer to render instance
+	IFrontend* _pFrontend;	///< Interface pointer to widow frontend
 	std::string _ApplicationName;	///< Optional specified at creation time
 	EngineLog* _pEngineLog;	///< Our engine wide message logger
 };
