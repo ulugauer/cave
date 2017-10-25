@@ -26,7 +26,9 @@ set(ENGINE_SOURCE engineDefines.h
 				  engineLog.cpp )
 
 set(RENDER_SOURCE Render/renderInstance.h 
-				  Render/renderInstance.cpp )
+				  Render/renderInstance.cpp 
+				  Render/renderDevice.h 
+				  Render/renderDevice.cpp)
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h

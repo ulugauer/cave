@@ -13,18 +13,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file engineInstance.h
-///       Engine runtime
+/// @file halRenderDevice.h
+///       Hardware render device abstraction
 
-#include "engineInstancePrivate.h"
-#include "engineTypes.h"
+#include "engineDefines.h"
+#include "HalInstance.h"
+#include "Memory/allocatorBase.h"
 
-#include <string>
+#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup engine
+/** \defgroup backend Backend 
 *  @{
-*		This module contains all code related to the engine
+*		This module handles the hardware abstractions of
+*		various rendering API like DirectX, Vulkan
 */
 
 namespace cave
@@ -32,44 +34,19 @@ namespace cave
 
 
 /**
-* Our main engine runtime interface
+* Abstraction type of a device instance
 */
-class CAVE_INTERFACE EngineInstance
+class HalRenderDevice
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] engineCreate Engine instance create info
-	*
 	*/
-	EngineInstance(EngineCreateStruct& engineCreate);
+	HalRenderDevice();
+
 	/** @brief Destructor */
-	~EngineInstance();
-
-	/**
-	* @brief Enable logging
-	*
-	* @param enable	True for enable logging
-	* @param warningLevel	Verbose level for warnings
-	* @param messageLevel	Verbose level for messsages
-	*/
-	void EnableLogging(bool enable, EngineLog::logWarningLevel warningLevel, EngineLog::logMessageLevel messageLevel);
-
-	/**
-	* @brief Create render instance
-	*
-	* @param[in] type Graphics instance type
-	*
-	* @return RenderInstance object or nullptr
-	*/
-	RenderInstance* CreateRenderInstance(RenderInstanceTypes type)
-	{
-		return _pEnginePrivate->CreateRenderInstance(type);
-	}
-
-private:
-	EngineInstancePrivate* _pEnginePrivate;		///< Pointer to not exported engine instance
+	virtual ~HalRenderDevice();
 };
 
 }

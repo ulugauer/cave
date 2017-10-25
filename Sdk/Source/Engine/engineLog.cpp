@@ -47,6 +47,13 @@ bool EngineLog::Open()
 	return (_logFile != nullptr);
 }
 
+void EngineLog::EnableLogging(bool enable, logWarningLevel warningLevel, logMessageLevel messageLevel)
+{
+	_enableLogging = enable;
+	_minWarningLevel = warningLevel;
+	_minMessageLevel = messageLevel;
+}
+
 void EngineLog::PrintToLog(const char *string)
 {
 	if (Open())
@@ -86,7 +93,7 @@ void EngineLog::Message(logMessageLevel level, const char *string, ...)
 	va_list marker;
 
 	// ignore this message if it's below the minimum level
-	if (level < _minMessageLevel)
+	if (_enableLogging && (level < _minMessageLevel))
 		return;
 
 	Timestamp();
@@ -106,7 +113,7 @@ void EngineLog::Warning(logWarningLevel level, const char *string, ...)
 	va_list marker;
 
 	// ignore this warning if it's below the minimum level
-	if ((level < _minWarningLevel))
+	if (_enableLogging && (level < _minWarningLevel))
 		return;
 
 	if (!Open())
@@ -138,7 +145,7 @@ void EngineLog::Error(const char *string, ...)
 	vsnprintf(errorString, stringLength - 1, string, marker);
 	va_end(marker);
 
-	//if (_globalConfig._logging._enable)
+	if (_enableLogging)
 	{
 		Timestamp();
 

@@ -8,11 +8,16 @@ ENDIF()
 add_definitions(-DCAVE_EXPORTS) 
 
 # Add sources
-set(BACKENDS_SOURCE halInstance.h halInstance.cpp )
+set(BACKENDS_SOURCE halInstance.h halInstance.cpp 
+					halRenderDevice.h halRenderDevice.cpp )
 # vulkan source
 set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h 
 					 	   Vulkan/vulkanInstance.h 
-					 	   Vulkan/vulkanInstance.cpp )
+					 	   Vulkan/vulkanInstance.cpp 
+					 	   Vulkan/vulkanPhysicalDevice.h 
+					 	   Vulkan/vulkanPhysicalDevice.cpp
+					 	   Vulkan/vulkanRenderDevice.h 
+					 	   Vulkan/vulkanRenderDevice.cpp )
 
 
 # Create named folders for the sources within the .vcproj

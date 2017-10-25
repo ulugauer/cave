@@ -12,38 +12,37 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file engineInstance.cpp
+/// @file renderDevice.cpp
 ///       Render instance abstraction
 
-#include "engineInstance.h"
+#include "renderDevice.h"
+#include "renderInstance.h"
+#include "halRenderDevice.h"
+#include "engineError.h"
 
 namespace cave
 {
 
-EngineInstance::EngineInstance(EngineCreateStruct& engineCreate)
-	:_pEnginePrivate(nullptr)
+RenderDevice::RenderDevice(RenderInstance* renderInstance, HalInstance* halInstance)
+	: _pRenderInstance(renderInstance)
+	, _pHalInstance(halInstance)
+	, _pHalRenderDevice(nullptr)
 {
 	try
 	{
-		// Create our private pointer
-		_pEnginePrivate = new EngineInstancePrivate(engineCreate);
+		_pHalRenderDevice = halInstance->CreateRenderDevice(renderInstance->GetEngineAllocator());
 	}
-	catch (std::bad_alloc& )
+	catch (std::exception& e)
 	{
-		return;
+		std::string msg(e.what());
+		throw EngineError(msg);
 	}
 }
 
-EngineInstance::~EngineInstance()
+RenderDevice::~RenderDevice()
 {
-	if (_pEnginePrivate)
-		delete _pEnginePrivate;
-}
-
-void EngineInstance::EnableLogging(bool enable, EngineLog::logWarningLevel warningLevel, EngineLog::logMessageLevel messageLevel)
-{
-	if (_pEnginePrivate && _pEnginePrivate->_pEngineLog)
-		_pEnginePrivate->_pEngineLog->EnableLogging(enable, warningLevel, messageLevel);
+	if (_pHalRenderDevice)
+		DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *_pHalRenderDevice);
 }
 
 }

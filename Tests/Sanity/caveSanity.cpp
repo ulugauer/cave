@@ -23,14 +23,18 @@ using namespace cave;
 int main(int argc, char* argv[])
 {  
 	std::unique_ptr<EngineInstance> engineInstance = nullptr;
+	RenderInstance* renderInstance = nullptr;
+	RenderDevice* renderDevice = nullptr;
 	try
 	{
 		// Create engine instance which we use to create all other things
 		EngineCreateStruct engineInfo = { 0, "caveSanity" };
 		engineInstance = std::unique_ptr<EngineInstance>(new EngineInstance(engineInfo));
 
-		// create renderer
-		engineInstance->CreateRenderer(RenderInstanceTypes::InstanceVulkan);
+		// Create render instance. Basically the door to the hardware device.
+		renderInstance = engineInstance->CreateRenderInstance(RenderInstanceTypes::InstanceVulkan);
+		// Create a render device
+		renderDevice = renderInstance->CreateRenderDevice();
 	}
 	catch (cave::EngineError err)
 	{
@@ -42,6 +46,8 @@ int main(int argc, char* argv[])
 		std::cerr << "Failed to create engine instance\n";
 		return -1;
 	}
+
+	renderInstance->ReleaseRenderDevice(renderDevice);
 
 	return 0;
 }

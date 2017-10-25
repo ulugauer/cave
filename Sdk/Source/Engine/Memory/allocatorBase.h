@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineError.h"
 
+#include <cassert>
+
 namespace cave
 {
 
@@ -53,6 +55,7 @@ public:
 	/** destrucctor */
     virtual ~AllocatorBase()
     {
+		assert(_numAllocations == 0 && _usedMemory == 0);
         _start = nullptr;
         _size = 0;
     }
@@ -163,5 +166,61 @@ void DeallocateDelete(AllocatorBase& allocator, T& object)
     object.~T();
     allocator.Deallocate(&object);
 } 
+
+/**
+* @brief Allocate a array of objects
+*
+* @param allocator Used allocator
+* @param length Array length
+*
+*/
+template<class T> 
+T* AllocateArray(AllocatorBase& allocator, size_t length)
+{
+	assert(length != 0);
+
+	uint8_t headerSize = sizeof(size_t) / sizeof(T);
+	uint8_t headerModuloSize = sizeof(size_t) % sizeof(T);
+
+	if (headerModuloSize > 0)
+		headerSize += 1;
+
+	//Allocate extra space to store array length in the bytes before the array
+	T* p = ((T*)allocator.Allocate(sizeof(T)*(length + headerSize), __alignof(T))) + headerSize;
+
+	*(((size_t*)p) - 1) = length;
+
+	for (size_t i = 0; i < length; i++)
+		new (&p[i]) T;
+
+	return p;
+}
+
+/**
+* @brief Deallocate an array of objects
+*
+* @param allocator Used allocator
+* @param array Pointer to array
+*
+*/
+template<class T> 
+void DeallocateArray(AllocatorBase& allocator, T* array)
+{
+	assert(array != nullptr);
+
+	size_t length = *(((size_t*)array) - 1);
+
+	for (size_t i = 0; i < length; i++)
+		array[i].~T();
+
+	//Calculate how much extra memory was allocated to store the length before the array
+	uint8_t headerSize = sizeof(size_t) / sizeof(T);
+	uint8_t headerModuloSize = sizeof(size_t) % sizeof(T);
+
+	if (headerModuloSize > 0)
+		headerSize += 1;
+
+	allocator.Deallocate(array - headerSize);
+}
 
 }

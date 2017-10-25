@@ -16,6 +16,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Vulkan instance
 
 #include "vulkanInstance.h"
+#include "vulkanPhysicalDevice.h"
+#include "vulkanRenderDevice.h"
 #include "vulkanApi.h"
 
 #include <iostream>
@@ -46,8 +48,11 @@ static bool CheckExtensionAvailability(const char *extension_name, const std::ve
 }
 
 
-VulkanInstance::VulkanInstance(BackendInstanceTypes type, const char* applicationName)
+VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName)
 	: HalInstance(type)
+	, _allocator(allocator)
+	, _physicalDeviceCount(0)
+	, _physicalDeviceArray(nullptr)
 {
 	// this loads the library 
 	VulkanApi* pApi = VulkanApi::GetApi();
@@ -131,10 +136,72 @@ VulkanInstance::VulkanInstance(BackendInstanceTypes type, const char* applicatio
 
 VulkanInstance::~VulkanInstance()
 {
+	if (_physicalDeviceArray)
+	{
+		for (uint32_t i = 0; i < _physicalDeviceCount; ++i)
+		{
+			_physicalDeviceArray[i].ReleasePhysicalDevice(_allocator);
+		}
+		DeallocateArray<VulkanPhysicalDevice>(*_allocator, _physicalDeviceArray);
+	}
 	if (_vkInstance)
 	{
 		VulkanApi::GetApi()->vkDestroyInstance(_vkInstance, nullptr);
 	}
+}
+
+
+bool VulkanInstance::QueryPhysicalDevices()
+{
+	bool success = false;
+	if (_vkInstance)
+	{
+		VulkanApi::GetApi()->vkEnumeratePhysicalDevices(_vkInstance, &_physicalDeviceCount, nullptr);
+		if (_physicalDeviceCount)
+		{
+			std::vector<VkPhysicalDevice> availableDevices(_physicalDeviceCount);
+			VulkanApi::GetApi()->vkEnumeratePhysicalDevices(_vkInstance, &_physicalDeviceCount, &availableDevices[0]);
+			// Create VulkanPhysicalDevice array
+			_physicalDeviceArray = AllocateArray<VulkanPhysicalDevice>(*_allocator, _physicalDeviceCount);
+			if (_physicalDeviceArray)
+			{
+				success = true;
+				for (uint32_t i = 0; i < _physicalDeviceCount; ++i)
+				{
+					_physicalDeviceArray[i].SetPhysicalDeviceHandle(_allocator, availableDevices[i]);
+				}
+			}
+		}
+	}
+
+	return success;
+}
+
+HalRenderDevice* VulkanInstance::CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator)
+{
+	// We want to create a render device.
+	// Check if we have a physical device which matches our needs
+	VulkanPhysicalDevice* physicalDevice = nullptr;
+	// We need graphics and transfer capability
+	VkQueueFlags flags = VkQueueFlagBits::VK_QUEUE_GRAPHICS_BIT;
+	flags |= VkQueueFlagBits::VK_QUEUE_TRANSFER_BIT;
+
+	for (uint32_t i = 0; i < _physicalDeviceCount; ++i)
+	{
+		if (_physicalDeviceArray[i].HasQueueCapabilites(flags))
+		{
+			physicalDevice = &_physicalDeviceArray[i];
+			break;
+		}
+	}
+
+	if (!physicalDevice)
+		throw BackendException("CreateRenderDevice: no suitable device found");
+
+	// Found something suitable -> create device
+	VulkanRenderDevice* renderDevice = AllocateObject<VulkanRenderDevice>(*allocator, physicalDevice);
+
+	return renderDevice;
 }
 
 }

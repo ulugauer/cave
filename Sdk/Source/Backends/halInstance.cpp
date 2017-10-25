@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Memory/allocatorBase.h"
 #include "halInstance.h"
 #include "vulkanInstance.h"
+#include "vulkanRenderDevice.h"
 
 namespace cave
 {
@@ -37,7 +38,10 @@ HalInstance* HalInstance::CreateInstance(std::shared_ptr<AllocatorBase> allocato
 {
 	HalInstance* pHalInstance = nullptr;
 	if (type == BackendInstanceTypes::InstanceVulkan)
-		pHalInstance = AllocateObject<VulkanInstance>(*allocator, type, applicationName);
+		pHalInstance = AllocateObject<VulkanInstance>(*allocator, allocator, type, applicationName);
+
+	if (pHalInstance)
+		pHalInstance->QueryPhysicalDevices();
 
 	return pHalInstance;
 }

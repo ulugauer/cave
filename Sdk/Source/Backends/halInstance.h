@@ -31,6 +31,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+///< forward
+class HalRenderDevice;
+
 /**
 * Backend exception handling
 */
@@ -74,7 +77,7 @@ enum class BackendInstanceTypes
 /**
 * Abstraction type of a device instance
 */
-class CAVE_INTERFACE HalInstance
+class HalInstance
 {
 public:
 	/**
@@ -84,6 +87,7 @@ public:
 	*
 	*/
 	HalInstance(BackendInstanceTypes type);
+
 	/** @brief Destructor */
 	virtual ~HalInstance();
 
@@ -96,12 +100,29 @@ public:
 	const BackendInstanceTypes GetInstanceType() const { return _type; }
 
 	/**
+	* @brief Create a list of physical devices supported by this instance
+	*
+	* @return True if a list was successfuly build
+	*/
+	virtual bool QueryPhysicalDevices() = 0;
+
+	/**
+	* @brief Create a hardware render device
+	*
+	* @param[in] allocator	Engine global allocator
+	*
+	* @return Pointer to a hardware render device
+	*/
+	virtual HalRenderDevice* CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator) = 0;
+
+	/**
 	* @brief Static function to create a hardware instance
 	*
 	* @param[in] allocator	Engine global allocator
 	* @param[in] type Instance type
 	* @param applicationName	Name of application (optional)
 	*
+	* @return Pointer to an API instance
 	*/
 	static HalInstance* CreateInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName);
 
@@ -114,7 +135,9 @@ public:
 	*/
 	static void ReleaseInstance(std::shared_ptr<AllocatorBase> allocator, HalInstance* instance);
 
+
 private:
+	std::shared_ptr<AllocatorBase> _allocator; ///< Global allocator
 	BackendInstanceTypes _type;	///< Instance type
 };
 

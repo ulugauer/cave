@@ -29,25 +29,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+///< forwards
+class VulkanPhysicalDevice;
+
 /**
 * Vulkan device instance
 */
-class CAVE_INTERFACE VulkanInstance : public HalInstance
+class VulkanInstance : public HalInstance
 {
 public:
 	/**
 	* @brief Constructor
 	*
+	* @param allocator	Pointer to global allocator
 	* @param type	Backend graphics API 
 	* @param applicationName	Name of application (optional)
 	*
 	*/
-	VulkanInstance(BackendInstanceTypes type, const char* applicationName);
+	VulkanInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName);
 	/** @brief Destructor */
 	virtual ~VulkanInstance();
 
+	/**
+	* @brief Create a list of physical devices supported by this instance
+	*
+	* @return True if a list was successfuly build
+	*/
+	bool QueryPhysicalDevices();
+
+	/**
+	* @brief Create a hardware render device
+	*
+	* @param[in] allocator	Engine global allocator
+	*
+	* @return Pointer to a hardware render device
+	*/
+	HalRenderDevice* CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator) override;
+
 private:
+	std::shared_ptr<AllocatorBase> _allocator;	///< Pointer to global allocator
 	VkInstance _vkInstance;	///< Handle to vulkan instance
+	uint32_t _physicalDeviceCount;	///< Physical devices accessible by this instance
+	VulkanPhysicalDevice* _physicalDeviceArray;	///< Pointer to array of physical devices
 };
 
 }

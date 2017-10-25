@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Render instance abstraction
 
 #include "renderInstance.h"
+#include "renderDevice.h"
 #include "engineInstancePrivate.h"
 #include "engineError.h"
 
@@ -56,6 +57,26 @@ RenderInstance::~RenderInstance()
 {
 	if (_pHalInstance)
 		HalInstance::ReleaseInstance(_pEngineInstance->GetEngineAllocator(), _pHalInstance);
+}
+
+std::shared_ptr<AllocatorGlobal> 
+RenderInstance::GetEngineAllocator()
+{
+	return _pEngineInstance->GetEngineAllocator();
+}
+
+RenderDevice* RenderInstance::CreateRenderDevice()
+{
+	RenderDevice* renderDevice = nullptr;
+	if (_pHalInstance)
+		renderDevice = AllocateObject<RenderDevice>(*_pEngineInstance->GetEngineAllocator(), this, _pHalInstance);
+
+	return renderDevice;
+}
+
+void RenderInstance::ReleaseRenderDevice(RenderDevice* renderDevice)
+{
+	DeallocateDelete(*_pEngineInstance->GetEngineAllocator(), *renderDevice);
 }
 
 }

@@ -59,13 +59,13 @@ public:
 	~EngineInstancePrivate();
 
 	/**
-	* @brief Create Renderer
+	* @brief Create a render instance
 	*
 	* @param[in] type Graphics instance type
 	*
 	* @return RenderInstance object or nullptr
 	*/
-	RenderInstance* CreateRenderer(RenderInstanceTypes type);
+	RenderInstance* CreateRenderInstance(RenderInstanceTypes type);
 
 	/**
 	* @brief GetEngineLog
@@ -83,7 +83,7 @@ public:
 
 private:
 	std::shared_ptr<AllocatorGlobal>    _pAllocator;	///< Pointer to engine custom allocations
-	RenderInstance* _pRenderer;		///< Pointer to renderer
+	RenderInstance* _pRenderInstance;		///< Pointer to render instance
 	std::string _ApplicationName;	///< Optional specified at creation time
 	EngineLog* _pEngineLog;	///< Our engine wide message logger
 };

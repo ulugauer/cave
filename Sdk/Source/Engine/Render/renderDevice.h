@@ -13,14 +13,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file engineInstance.h
-///       Engine runtime
+/// @file renderDevice.h
+///       Render device interface
 
-#include "engineInstancePrivate.h"
+#include "halRenderDevice.h"
 #include "engineTypes.h"
-
-#include <string>
-#include <memory>
 
 /** \addtogroup engine
 *  @{
@@ -30,46 +27,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+/// forward declaration
+class HalInstance;
+class HalRenderDevice;
+class RenderInstance;
 
 /**
-* Our main engine runtime interface
+* Abstraction type of a device instance
 */
-class CAVE_INTERFACE EngineInstance
+class CAVE_INTERFACE RenderDevice
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] engineCreate Engine instance create info
+	* @param[in] renderInstance	Pointer to render instance
+	* @param[in] halInstance	Pointer to HAL render instance
 	*
 	*/
-	EngineInstance(EngineCreateStruct& engineCreate);
+	RenderDevice(RenderInstance* renderInstance, HalInstance* halInstance);
 	/** @brief Destructor */
-	~EngineInstance();
-
-	/**
-	* @brief Enable logging
-	*
-	* @param enable	True for enable logging
-	* @param warningLevel	Verbose level for warnings
-	* @param messageLevel	Verbose level for messsages
-	*/
-	void EnableLogging(bool enable, EngineLog::logWarningLevel warningLevel, EngineLog::logMessageLevel messageLevel);
-
-	/**
-	* @brief Create render instance
-	*
-	* @param[in] type Graphics instance type
-	*
-	* @return RenderInstance object or nullptr
-	*/
-	RenderInstance* CreateRenderInstance(RenderInstanceTypes type)
-	{
-		return _pEnginePrivate->CreateRenderInstance(type);
-	}
+	~RenderDevice();
 
 private:
-	EngineInstancePrivate* _pEnginePrivate;		///< Pointer to not exported engine instance
+	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to
+	HalInstance* _pHalInstance;	///< Pointer to HAL Instance
+	HalRenderDevice* _pHalRenderDevice;	///< Pointer to HAL render device
+	
 };
 
 }

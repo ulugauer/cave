@@ -85,6 +85,14 @@ public:
 	*/
     void Error(const char *string, ...);
 
+	/**
+	* @brief Print error message
+	*
+	* @param enable	True for enable logging
+	* @param warningLevel	Verbose level for warnings
+	* @param messageLevel	Verbose level for messsages
+	*/
+	void EnableLogging(bool enable, logWarningLevel warningLevel, logMessageLevel messageLevel);
 
 private:
 	

@@ -12,38 +12,22 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file engineInstance.cpp
-///       Render instance abstraction
+/// @file halRenderDevice.cpp
+///       Hardware render device abstraction
 
-#include "engineInstance.h"
+#include "HalRenderDevice.h"
 
 namespace cave
 {
 
-EngineInstance::EngineInstance(EngineCreateStruct& engineCreate)
-	:_pEnginePrivate(nullptr)
+HalRenderDevice::HalRenderDevice()
 {
-	try
-	{
-		// Create our private pointer
-		_pEnginePrivate = new EngineInstancePrivate(engineCreate);
-	}
-	catch (std::bad_alloc& )
-	{
-		return;
-	}
+
 }
 
-EngineInstance::~EngineInstance()
+HalRenderDevice::~HalRenderDevice()
 {
-	if (_pEnginePrivate)
-		delete _pEnginePrivate;
-}
 
-void EngineInstance::EnableLogging(bool enable, EngineLog::logWarningLevel warningLevel, EngineLog::logMessageLevel messageLevel)
-{
-	if (_pEnginePrivate && _pEnginePrivate->_pEngineLog)
-		_pEnginePrivate->_pEngineLog->EnableLogging(enable, warningLevel, messageLevel);
 }
 
 }

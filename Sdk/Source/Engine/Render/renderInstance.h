@@ -18,6 +18,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "halInstance.h"
 #include "engineTypes.h"
+#include "Memory/allocatorGlobal.h"
+
+#include <memory>
 
 /** \addtogroup engine
 *  @{
@@ -29,6 +32,7 @@ namespace cave
 
 /// forward declaration
 class EngineInstancePrivate;
+class RenderDevice;
 
 /**
 * Abstraction type of a device instance
@@ -47,6 +51,27 @@ public:
 	RenderInstance(EngineInstancePrivate* engine, RenderInstanceTypes type, const char* applicationName);
 	/** @brief Destructor */
 	~RenderInstance();
+
+	/**
+	* @brief GetAllocator
+	*
+	* @return Pointer Engine allocator
+	*/
+	std::shared_ptr<AllocatorGlobal> GetEngineAllocator();
+
+	/**
+	* @brief Create a render device
+	*
+	* @return Pointer to a render device
+	*/
+	RenderDevice* CreateRenderDevice();
+
+	/**
+	* @brief Release a render device
+	*
+	* @param[in] renderDevice Pointer to a render device
+	*/
+	void ReleaseRenderDevice(RenderDevice* renderDevice);
 
 private:
 	EngineInstancePrivate* _pEngineInstance;	///< Pointer to the engine instance we belong to

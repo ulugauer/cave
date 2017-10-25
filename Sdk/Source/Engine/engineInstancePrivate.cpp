@@ -22,7 +22,7 @@ namespace cave
 
 EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
 	: _pAllocator(nullptr)
-	, _pRenderer(nullptr)
+	, _pRenderInstance(nullptr)
 	, _ApplicationName(engineCreate.applicationName)
 {
 	// Create our engine wide allocate interface
@@ -30,7 +30,7 @@ EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
 	if (_pAllocator)
 	{
 		// Create our logger. By default no logging
-		_pEngineLog = AllocateObject<EngineLog>(*_pAllocator, EngineLog::WARNING_LEVEL_NOENE, EngineLog::MESSAGE_LEVEL_NOENE, false);
+		_pEngineLog = AllocateObject<EngineLog>(*_pAllocator, EngineLog::WARNING_LEVEL_NOENE, EngineLog::MESSAGE_LEVEL_NOENE, true);
 	}
 }
 
@@ -39,26 +39,26 @@ EngineInstancePrivate::~EngineInstancePrivate()
 	if (_pEngineLog && _pAllocator)
 		DeallocateDelete(*_pAllocator, *_pEngineLog);
 
-	if (_pRenderer)
+	if (_pRenderInstance)
 	{
-		DeallocateDelete(*_pAllocator, *_pRenderer);
-		_pRenderer = nullptr;
+		DeallocateDelete(*_pAllocator, *_pRenderInstance);
+		_pRenderInstance = nullptr;
 	}
 }
 
-RenderInstance* EngineInstancePrivate::CreateRenderer(RenderInstanceTypes type)
+RenderInstance* EngineInstancePrivate::CreateRenderInstance(RenderInstanceTypes type)
 {
-	if (!_pRenderer)
+	if (!_pRenderInstance)
 	{
-		_pRenderer = AllocateObject<RenderInstance>(*_pAllocator, this, type, _ApplicationName.c_str());
+		_pRenderInstance = AllocateObject<RenderInstance>(*_pAllocator, this, type, _ApplicationName.c_str());
 	}
 
-	if (!_pRenderer && _pEngineLog)
+	if (!_pRenderInstance && _pEngineLog)
 	{
 		_pEngineLog->Error("Failed to create renderer");
 	}
 
-	return _pRenderer;
+	return _pRenderInstance;
 }
 
 }

@@ -13,63 +13,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file engineInstance.h
-///       Engine runtime
+/// @file vulkanRenderDevice.h
+///       Vulkan render device
 
-#include "engineInstancePrivate.h"
-#include "engineTypes.h"
+#include "HalRenderDevice.h"
+#include "osPlatformLib.h"
 
-#include <string>
-#include <memory>
+#include "vulkan.h"
 
-/** \addtogroup engine
+/** \addtogroup backend 
 *  @{
-*		This module contains all code related to the engine
+*		
 */
 
 namespace cave
 {
 
+///< forwards
+class VulkanPhysicalDevice;
 
 /**
-* Our main engine runtime interface
+* Vulkan render device
 */
-class CAVE_INTERFACE EngineInstance
+class VulkanRenderDevice : public HalRenderDevice
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] engineCreate Engine instance create info
+	* @param physicalDevice	Pointer to physical device
 	*
 	*/
-	EngineInstance(EngineCreateStruct& engineCreate);
+	VulkanRenderDevice(VulkanPhysicalDevice* physicalDevice);
+
 	/** @brief Destructor */
-	~EngineInstance();
-
-	/**
-	* @brief Enable logging
-	*
-	* @param enable	True for enable logging
-	* @param warningLevel	Verbose level for warnings
-	* @param messageLevel	Verbose level for messsages
-	*/
-	void EnableLogging(bool enable, EngineLog::logWarningLevel warningLevel, EngineLog::logMessageLevel messageLevel);
-
-	/**
-	* @brief Create render instance
-	*
-	* @param[in] type Graphics instance type
-	*
-	* @return RenderInstance object or nullptr
-	*/
-	RenderInstance* CreateRenderInstance(RenderInstanceTypes type)
-	{
-		return _pEnginePrivate->CreateRenderInstance(type);
-	}
+	virtual ~VulkanRenderDevice();
 
 private:
-	EngineInstancePrivate* _pEnginePrivate;		///< Pointer to not exported engine instance
+	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
+	VkDevice _vkDevice;	///< Handle to vulkan device
 };
 
 }
