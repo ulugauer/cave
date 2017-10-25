@@ -17,7 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Hardware render device abstraction
 
 #include "engineDefines.h"
-#include "HalInstance.h"
+#include "halInstance.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling

@@ -16,7 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file vulkanRenderDevice.h
 ///       Vulkan render device
 
-#include "HalRenderDevice.h"
+#include "halRenderDevice.h"
 #include "osPlatformLib.h"
 
 #include "vulkan.h"

@@ -15,7 +15,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file halRenderDevice.cpp
 ///       Hardware render device abstraction
 
-#include "HalRenderDevice.h"
+#include "halRenderDevice.h"
 
 namespace cave
 {
