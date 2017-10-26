@@ -56,9 +56,11 @@ typedef VkResult	(VKAPI_PTR* vkGetPhysicalDeviceSurfaceCapabilitiesKHRPtr) (VkPh
 typedef VkResult	(VKAPI_PTR* vkGetPhysicalDeviceSurfaceFormatsKHRPtr) (VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, uint32_t* pSurfaceFormatCount, VkSurfaceFormatKHR* pSurfaceFormats);
 typedef VkResult	(VKAPI_PTR* vkGetPhysicalDeviceSurfacePresentModesKHRPtr) (VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, uint32_t* pPresentModeCount, VkPresentModeKHR* pPresentModes);
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-typedef VkResult(VKAPI_PTR* vkCreateWin32SurfaceKHRPtr) (VkInstance instance, const VkWin32SurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);
+typedef VkResult	(VKAPI_PTR* vkCreateWin32SurfaceKHRPtr) (VkInstance instance, const VkWin32SurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);
+typedef VkBool32	(VKAPI_PTR* vkGetPhysicalDeviceWin32PresentationSupportKHRPtr) (VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex);
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
 typedef VkResult(VKAPI_PTR* vkCreateXcbSurfaceKHRPtr) (VkInstance instance, const VkXcbSurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);
+typedef VkBool32(VKAPI_PTR* vkGetPhysicalDeviceXcbPresentationSupportKHRPtr) (VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex, xcb_connection_t* connection, xcb_visualid_t visual_id);
 #endif
 
 typedef VkResult	(VKAPI_PTR* vkCreateSwapchainKHRPtr) (VkDevice device, const VkSwapchainCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSwapchainKHR* pSwapchain);
@@ -275,8 +277,10 @@ public:
 			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceSurfacePresentModesKHR", vkGetPhysicalDeviceSurfacePresentModesKHR);
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
 			retValue &= LoadInstanceFunction(pInstance, "vkCreateWin32SurfaceKHR", vkCreateWin32SurfaceKHR);
+			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceWin32PresentationSupportKHR", vkGetPhysicalDeviceWin32PresentationSupportKHR);
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
 			retValue &= LoadInstanceFunction(pInstance, "vkCreateXcbSurfaceKHR", vkCreateXcbSurfaceKHR);
+			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceXcbPresentationSupportKHR", vkGetPhysicalDeviceXcbPresentationSupportKHR);
 #endif
 		}
 
@@ -385,15 +389,17 @@ public:
 	//                                                              //
 	// Khronos extensions                                           //
 	// ************************************************************ // 
-	vkDestroySurfaceKHRPtr						vkDestroySurfaceKHR;
-	vkGetPhysicalDeviceSurfaceSupportKHRPtr		vkGetPhysicalDeviceSurfaceSupportKHR;
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHRPtr vkGetPhysicalDeviceSurfaceCapabilitiesKHR;
-	vkGetPhysicalDeviceSurfaceFormatsKHRPtr		vkGetPhysicalDeviceSurfaceFormatsKHR;
-	vkGetPhysicalDeviceSurfacePresentModesKHRPtr vkGetPhysicalDeviceSurfacePresentModesKHR;
+	vkDestroySurfaceKHRPtr								vkDestroySurfaceKHR;
+	vkGetPhysicalDeviceSurfaceSupportKHRPtr				vkGetPhysicalDeviceSurfaceSupportKHR;
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHRPtr		vkGetPhysicalDeviceSurfaceCapabilitiesKHR;
+	vkGetPhysicalDeviceSurfaceFormatsKHRPtr				vkGetPhysicalDeviceSurfaceFormatsKHR;
+	vkGetPhysicalDeviceSurfacePresentModesKHRPtr		vkGetPhysicalDeviceSurfacePresentModesKHR;
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-	vkCreateWin32SurfaceKHRPtr					vkCreateWin32SurfaceKHR;
+	vkCreateWin32SurfaceKHRPtr							vkCreateWin32SurfaceKHR;
+	vkGetPhysicalDeviceWin32PresentationSupportKHRPtr	vkGetPhysicalDeviceWin32PresentationSupportKHR;
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
-	vkCreateXcbSurfaceKHRPtr					vkCreateXcbSurfaceKHR;
+	vkCreateXcbSurfaceKHRPtr							vkCreateXcbSurfaceKHR;
+	vkGetPhysicalDeviceXcbPresentationSupportKHRPtr		vkGetPhysicalDeviceXcbPresentationSupportKHR;
 #endif
 
 	// ************************************************************ //

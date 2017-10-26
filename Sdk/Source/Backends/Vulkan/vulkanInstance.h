@@ -66,6 +66,20 @@ public:
 	*/
 	HalRenderDevice* CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator) override;
 
+	/**
+	* @brief Get vulkan instance handle
+	*
+	* @return Lowlevel vulkan handle
+	*/
+	VkInstance GetInstanceHandle() { return _vkInstance; }
+
+	/**
+	* @brief GetAllocator
+	*
+	* @return Pointer Engine allocator
+	*/
+	std::shared_ptr<AllocatorBase> GetEngineAllocator() { return _allocator; }
+
 private:
 	std::shared_ptr<AllocatorBase> _allocator;	///< Pointer to global allocator
 	VkInstance _vkInstance;	///< Handle to vulkan instance

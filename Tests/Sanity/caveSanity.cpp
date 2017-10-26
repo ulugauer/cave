@@ -46,13 +46,17 @@ int main(int argc, char* argv[])
 
 		// Create render instance. Basically the door to the hardware device.
 		renderInstance = engineInstance->CreateRenderInstance(RenderInstanceTypes::InstanceVulkan);
-		// Create a render device
-		renderDevice = renderInstance->CreateRenderDevice();
-
 		// create a window frontend interface
 		frontend = engineInstance->CreateFrontend();
-		// create window
+		// create window and fill in OS dependend information 
 		frontend->CreateOsWindow(windowInfo);
+
+		// Create a render device
+		renderDevice = renderInstance->CreateRenderDevice();
+		// Create a swap chain fro this device.
+		// Note the windowInfo should be properly filled by the CreateOsWindow call
+		// before a swap chain is created
+		renderDevice->CreateSwapChain(windowInfo);
 	}
 	catch (cave::EngineError err)
 	{

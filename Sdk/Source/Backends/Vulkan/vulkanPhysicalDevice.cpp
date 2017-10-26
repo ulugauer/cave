@@ -86,4 +86,28 @@ uint32_t VulkanPhysicalDevice::GetQueueFamilyIndex(VkQueueFlagBits queueBit)
 	return index;
 }
 
+bool VulkanPhysicalDevice::PresentationQueueSupported(SwapChainInfo& swapChainInfo, uint32_t &familiyQueueIndex)
+{
+	bool supported = false;
+
+	for (uint32_t i = 0; i < _physicalDeviceQueueFamilyCount; ++i)
+	{
+		VkBool32 retVal = VK_FALSE;
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+		retVal = VulkanApi::GetApi()->vkGetPhysicalDeviceWin32PresentationSupportKHR(_vkPhysicalDevice, i);
+#else
+		retVal = vkGetPhysicalDeviceXcbPresentationSupportKHR(_vkPhysicalDevice, i, swapChainInfo.connection, swapChainInfo.visualId);
+#endif
+		if (retVal)
+		{
+			// we take the first queue which fullfills the request
+			familiyQueueIndex = i;
+			supported = true;
+			break;
+		}
+	}
+
+	return supported;
+}
+
 }

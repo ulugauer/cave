@@ -45,4 +45,36 @@ RenderDevice::~RenderDevice()
 		DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *_pHalRenderDevice);
 }
 
+void RenderDevice::CreateSwapChain(FrontendWindowInfo& windowInfo)
+{
+	if (!_pHalRenderDevice || !_pRenderInstance || !_pHalInstance)
+		throw EngineError("Render device not properly setup");
+
+	// first copy data
+	SwapChainInfo swapChainInfo;
+	swapChainInfo.colorBits = windowInfo.colorBits;
+	swapChainInfo.depthBits = windowInfo.depthBits;
+	swapChainInfo.fullscreen = windowInfo.fullscreen;
+	swapChainInfo.surfaceHeight = windowInfo.windowHeight;
+	swapChainInfo.surfaceWidth = windowInfo.windowWidth;
+#ifdef _WIN32
+	swapChainInfo.hInstance = windowInfo.hInstance;
+	swapChainInfo.hWindow = windowInfo.hWindow;
+#else
+	swapChainInfo.connection = windowInfo.connection;
+	swapChainInfo.visualId = windowInfo.visualId;
+	swapChainInfo.window = windowInfo.window;
+#endif
+
+	try
+	{
+		_pHalRenderDevice->CreateSwapChain(swapChainInfo);
+	}
+	catch (std::exception& e)
+	{
+		std::string msg(e.what());
+		throw EngineError(msg);
+	}
+}
+
 }

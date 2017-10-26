@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Engine runtime
 
 #include "Render/renderInstance.h"
+#include "Render/renderDevice.h"
 #include "Memory/allocatorGlobal.h"
 #include "frontend.h"
 #include "engineTypes.h"

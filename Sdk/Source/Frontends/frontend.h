@@ -61,8 +61,9 @@ typedef struct FrontendWindowInfo
 	HINSTANCE hInstance;	///< Filled in at CreateOsWindow call
 	HWND hWindow;	///< Filled in at CreateOsWindow call
 #else
-	void* connection;		///< xcb connection. Filled in at CreateOsWindow call
-	uint32_t visualId;		///< xcb visual id. Filled in at CreateOsWindow call
+	xcb_connection_t* connection;		///< xcb connection. Filled in at CreateOsWindow call
+	xcb_visualid_ visualId;		///< xcb visual id. Filled in at CreateOsWindow call
+	xcb_window_t window;		///< Window id. Filled in at CreateOsWindow call
 #endif
 	const char* windowTitle;		///< Window Title
 }RenderWindowInfo;
@@ -76,7 +77,7 @@ public:
 	 /**
 	 * @brief Create a window on a specific target
 	 *
-	 * @param[in/out] windowInfo 	Window specific creation info
+	 * @param[in,out] windowInfo 	Window specific creation info
 	 *
 	 * @return  true if successfull
 	 */
@@ -98,7 +99,7 @@ public:
 	/**
 	* @brief Factory function for frontend creation
 	*
-	* @param[in/out] windowInfo 	Window specific creation info
+	* @param[in] allocator 	Pointer to global allocator
 	*
 	* @return  true if successfull
 	*/

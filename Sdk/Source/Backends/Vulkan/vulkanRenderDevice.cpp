@@ -15,8 +15,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file vulkanRenderDevice.cpp
 ///       Vulkan render device
 
+#include "vulkanInstance.h"
 #include "vulkanRenderDevice.h"
 #include "vulkanPhysicalDevice.h"
+#include "vulkanSwapChain.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -24,10 +26,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-VulkanRenderDevice::VulkanRenderDevice(VulkanPhysicalDevice* physicalDevice)
+VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice)
 	: HalRenderDevice()
+	, _pInstance(instance)
 	, _pPhysicalDevice(physicalDevice)
 	, _vkDevice(nullptr)
+	, _pSwapChain(nullptr)
 {
 	// First query the graphics queue index
 	uint32_t graphicsQueueFamilyIndex = physicalDevice->GetQueueFamilyIndex(VkQueueFlagBits::VK_QUEUE_GRAPHICS_BIT);
@@ -82,6 +86,11 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanPhysicalDevice* physicalDevice)
 
 VulkanRenderDevice::~VulkanRenderDevice()
 {
+	if (_pSwapChain)
+	{
+		DeallocateDelete(*_pInstance->GetEngineAllocator(), *_pSwapChain);
+	}
+
 	if (_vkDevice)
 	{
 		// Shutdown savely. Wait that the device is idle
@@ -89,6 +98,18 @@ VulkanRenderDevice::~VulkanRenderDevice()
 		VulkanApi::GetApi()->vkDestroyDevice(_vkDevice, nullptr);
 		_vkDevice = nullptr;
 	}
+}
+
+void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& swapChainInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		throw BackendException("Vulkan device not properly setup");
+
+	// we support only one swap chain per render device
+	if (_pSwapChain)
+		return;
+
+	_pSwapChain = AllocateObject<VulkanSwapChain>(*_pInstance->GetEngineAllocator(), _pInstance, _pPhysicalDevice, this, swapChainInfo);
 }
 
 }

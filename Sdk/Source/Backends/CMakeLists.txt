@@ -12,12 +12,10 @@ set(BACKENDS_SOURCE halInstance.h halInstance.cpp
 					halRenderDevice.h halRenderDevice.cpp )
 # vulkan source
 set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h 
-					 	   Vulkan/vulkanInstance.h 
-					 	   Vulkan/vulkanInstance.cpp 
-					 	   Vulkan/vulkanPhysicalDevice.h 
-					 	   Vulkan/vulkanPhysicalDevice.cpp
-					 	   Vulkan/vulkanRenderDevice.h 
-					 	   Vulkan/vulkanRenderDevice.cpp )
+					 	   Vulkan/vulkanInstance.h Vulkan/vulkanInstance.cpp 
+					 	   Vulkan/vulkanPhysicalDevice.h Vulkan/vulkanPhysicalDevice.cpp
+					 	   Vulkan/vulkanRenderDevice.h Vulkan/vulkanRenderDevice.cpp 
+					 	   Vulkan/vulkanSwapChain.h Vulkan/vulkanSwapChain.cpp )
 
 
 # Create named folders for the sources within the .vcproj

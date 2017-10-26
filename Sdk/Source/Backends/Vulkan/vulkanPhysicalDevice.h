@@ -16,7 +16,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file vulkanPhysicalDevice.h
 ///       Vulkan physical device
 
+#include "halRenderDevice.h"
 #include "Memory/allocatorBase.h"
+
 #include "vulkan.h"
 
 #include <memory>
@@ -94,6 +96,16 @@ public:
 	* @return Struct of supported device features
 	*/
 	const VkPhysicalDeviceFeatures& GetPhysicalDeviceFeatures() const { return _physicalDeviceFeatures; }
+
+	/**
+	* @brief Query supported device features
+	*
+	* @param[in] swapChainInfo	Swap chain creation info
+	* @param familiyQueueIndex[out]	Filled with family queue index supporting presentation
+	*
+	* @return true if any queue familiy supports presentation
+	*/
+	bool PresentationQueueSupported(SwapChainInfo& swapChainInfo, uint32_t &familiyQueueIndex);
 
 private:
 	VkPhysicalDevice _vkPhysicalDevice;	///< Handle to vulkan device

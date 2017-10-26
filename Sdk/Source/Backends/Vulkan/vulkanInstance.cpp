@@ -199,7 +199,7 @@ HalRenderDevice* VulkanInstance::CreateRenderDevice(std::shared_ptr<AllocatorBas
 		throw BackendException("CreateRenderDevice: no suitable device found");
 
 	// Found something suitable -> create device
-	VulkanRenderDevice* renderDevice = AllocateObject<VulkanRenderDevice>(*allocator, physicalDevice);
+	VulkanRenderDevice* renderDevice = AllocateObject<VulkanRenderDevice>(*allocator, this, physicalDevice);
 
 	return renderDevice;
 }

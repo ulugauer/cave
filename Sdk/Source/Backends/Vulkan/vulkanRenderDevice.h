@@ -30,7 +30,9 @@ namespace cave
 {
 
 ///< forwards
+class VulkanInstance;
 class VulkanPhysicalDevice;
+class VulkanSwapChain;
 
 /**
 * Vulkan render device
@@ -41,17 +43,35 @@ public:
 	/**
 	* @brief Constructor
 	*
+	* @param instance	Pointer to instance object
 	* @param physicalDevice	Pointer to physical device
 	*
 	*/
-	VulkanRenderDevice(VulkanPhysicalDevice* physicalDevice);
+	VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice);
 
 	/** @brief Destructor */
 	virtual ~VulkanRenderDevice();
 
+	/**
+	* @brief Get vulkan logical device handle
+	*
+	* @return Lowlevel vulkan handle
+	*/
+	VkDevice GetDeviceHandle() { return _vkDevice; }
+
+	/**
+	* @brief Create a vulkan swap chain
+	*
+	* @param[in] swapChainInfo	Swap chain creation info
+	*
+	*/
+	void CreateSwapChain(SwapChainInfo& swapChainInfo) override;
+
 private:
+	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
 	VkDevice _vkDevice;	///< Handle to vulkan device
+	VulkanSwapChain* _pSwapChain;	///< Handle to a swap chain
 };
 
 }

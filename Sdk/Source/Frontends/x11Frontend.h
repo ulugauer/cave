@@ -37,7 +37,7 @@ public:
 	/**
 	 * @brief Create a window on a specific target
 	 *
-	 * @param[in/out] windowInfo 	Window specific creation info
+	 * @param[in,out] windowInfo 	Window specific creation info
 	 *
 	 * @return  true if successfull
 	 */

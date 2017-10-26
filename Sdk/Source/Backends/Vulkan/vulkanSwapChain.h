@@ -13,56 +13,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file renderDevice.h
-///       Render device interface
+/// @file vulkanSwapChain.h
+///       Vulkan swapchain
 
 #include "halRenderDevice.h"
-#include "engineTypes.h"
-#include "frontend.h"
 
-/** \addtogroup engine
+#include "vulkan.h"
+
+/** \addtogroup backend 
 *  @{
-*		This module contains all code related to the engine
+*		
 */
 
 namespace cave
 {
 
-/// forward declaration
-class HalInstance;
-class HalRenderDevice;
-class RenderInstance;
+///< forwards
+class VulkanInstance;
+class VulkanPhysicalDevice;
+class VulkanRenderDevice;
 
 /**
-* Abstraction type of a device instance
+* Vulkan swap chain handling
 */
-class CAVE_INTERFACE RenderDevice
+class VulkanSwapChain
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderInstance	Pointer to render instance
-	* @param[in] halInstance	Pointer to HAL render instance
+	* @param[in] instance	Pointer to instance
+	* @param[in] physicalDevice	Pointer to physical device
+	* @param[in] renderDevice	Pointer to render device
+	* @param[in] swapChainInfo	Swap chain creation info
 	*
 	*/
-	RenderDevice(RenderInstance* renderInstance, HalInstance* halInstance);
-	/** @brief Destructor */
-	~RenderDevice();
+	VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice
+					, VulkanRenderDevice* renderDevice, SwapChainInfo& swapChainInfo);
 
-	/**
-	* @brief Create a swap chain
-	*
-	* @param[in] windowInfo	Window creation info
-	*
-	*/
-	void CreateSwapChain(FrontendWindowInfo& windowInfo);
+	/** @brief Destructor */
+	virtual ~VulkanSwapChain();
 
 private:
-	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to
-	HalInstance* _pHalInstance;	///< Pointer to HAL Instance
-	HalRenderDevice* _pHalRenderDevice;	///< Pointer to HAL render device
-	
+	VulkanInstance* _pInstance;	///< Pointer to instance
+	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
+	VulkanRenderDevice* _pRenderDevice;	///< Handle to render device
+	VkSurfaceKHR _presentationSurface;	///< Handle to presentation surface
 };
 
 }
