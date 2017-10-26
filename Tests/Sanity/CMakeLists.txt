@@ -3,7 +3,7 @@
 # find pthread libs
 IF(UNIX)
 	find_package(Threads REQUIRED)
-	find_package(X11 REQUIRED) 
+	find_package(X11 REQUIRED)
 ENDIF()
 
 
@@ -42,13 +42,21 @@ target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/O
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Backends)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Frontends)
 
+# Set OS related libs
+IF(UNIX)
+	set(OS_LIBRARIES 
+		xcb
+		${X11_LIBRARIES} )
+ELSE()
+	set(OS_LIBRARIES "")
+ENDIF()
+
 # Properties->Linker->Input->Additional Dependencies
 # For the GNU compiler link order matters
-# NVRender depends on NVRenderBackend and must therefore be namend first
 SET(LINK_LIBRARY optimized cave debug caved)
 target_link_libraries (CaveSanity ${LINK_LIBRARY} 
 								  ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} 
-								  ${X11_LIBRARIES} ${XKBCOMMON_LIBRARIES} )
+								  ${OS_LIBRARIES} )
  
 
 # Creates folder "cave" and adds target project (cave.vcproj)

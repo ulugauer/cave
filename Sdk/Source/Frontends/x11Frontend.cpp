@@ -52,11 +52,13 @@ bool X11Frontend::CreateOsWindow(RenderWindowInfo& windowInfo)
 	}
 
 	// Generate a window id
-	_windowId = xcb_generate_id(conn);
+	_windowId = xcb_generate_id(_connection);
   	uint32_t propNames = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
   	uint32_t propValues[2];
   	propValues[0] = screen->white_pixel;
   	propValues[1] = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS;
+
+	uint16_t windowBorder = (windowInfo.borderLess) ? 0 : 1;
 
   	// Create window
   	xcb_create_window(
@@ -65,17 +67,17 @@ bool X11Frontend::CreateOsWindow(RenderWindowInfo& windowInfo)
      	_windowId, 
      	screen->root, 
      	windowInfo.xOffset, windowInfo.yOffset, 
-     	indowInfo.windowWidth, indowInfo.windowHeight, 
-     	1,													// window border
+     	windowInfo.windowWidth, windowInfo.windowHeight, 
+     	windowBorder,
      	XCB_WINDOW_CLASS_INPUT_OUTPUT, 
      	screen->root_visual, 
-     	prop_name, 
-     	&prop_value);
+     	propNames, 
+     	propValues);
 
 	return true;
 }
 
-void WindowFrontend::DisplayWindow()
+void X11Frontend::DisplayWindow()
 {
 	if (_connection)
 	{
@@ -84,24 +86,26 @@ void WindowFrontend::DisplayWindow()
   	}
 }
 
-bool WindowFrontend::HandleWindowMessage()
+bool X11Frontend::HandleWindowMessage()
 {
-	xcb_generic_event_t event;
+	xcb_generic_event_t* event;
 
-	while((event = xcb_wait_for_event(conn)) ) 
+	while((event = xcb_wait_for_event(_connection)) ) 
 	{
-  		switch (event->response_type) 
-  		{
-  			switch(event->response_type) 
-  			{
-			  case XCB_KEY_PRESS:
-			    printf("Keycode: %d\n", ((xcb_key_press_event_t*)event)->detail);
-			    return false;
-
-			  case XCB_EXPOSE:
-			    break;
+		switch(event->response_type) 
+		{
+			case XCB_KEY_PRESS:
+			{
+				xcb_key_press_event_t* keyEvent = (xcb_key_press_event_t*)event;
+				if (keyEvent->detail == 9) // ESC key
+					return false;
 			}
-  		}
+			break;
+			case XCB_EXPOSE:
+			break;
+		}
+		 
+		free(event);
   	}
 
 	return true;

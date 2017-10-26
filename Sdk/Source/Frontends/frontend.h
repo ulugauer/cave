@@ -34,6 +34,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #elif defined(__linux__)
 
+#include <xcb/xcb.h>		// xcb support 
 #include <X11/Xlib.h>		// X11 support 
 
 #endif
@@ -63,7 +64,7 @@ typedef struct FrontendWindowInfo
 	void* connection;		///< xcb connection. Filled in at CreateOsWindow call
 	uint32_t visualId;		///< xcb visual id. Filled in at CreateOsWindow call
 #endif
-	char* windowTitle;		///< Window Title
+	const char* windowTitle;		///< Window Title
 }RenderWindowInfo;
 
 class CAVE_INTERFACE IFrontend
