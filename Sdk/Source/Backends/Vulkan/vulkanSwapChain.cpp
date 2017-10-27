@@ -62,9 +62,9 @@ VulkanSwapChain::~VulkanSwapChain()
 void VulkanSwapChain::CreateSwapChain()
 {
 	VkSurfaceKHR presentationSurface = _pRenderDevice->GetPresentationSurfaceHandle();
-	VkResult success = VK_SUCCESS;
+	
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;
-	success = VulkanApi::GetApi()->vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_pPhysicalDevice->GetPhysicalDeviceHandle()
+	VulkanApi::GetApi()->vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_pPhysicalDevice->GetPhysicalDeviceHandle()
 							, presentationSurface, &surfaceCapabilities);
 
 	uint32_t minImageCount = GetSwapChainNumImages(surfaceCapabilities);
@@ -212,7 +212,7 @@ VkExtent2D VulkanSwapChain::GetSwapChainExtent(VkSurfaceCapabilitiesKHR &surface
 {
 	// Special value of surface extent is width == height == -1
 	// If this is so we define the size by ourselves but it must fit within defined confines
-	if (surfaceCapabilities.currentExtent.width == -1)
+	if (surfaceCapabilities.currentExtent.width == static_cast<uint32_t>(-1))
 	{
 		VkExtent2D swapChainExtend = { 640, 480 };
 		if (swapChainExtend.width < surfaceCapabilities.minImageExtent.width)

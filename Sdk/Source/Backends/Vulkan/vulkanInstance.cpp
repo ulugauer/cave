@@ -233,7 +233,7 @@ VkSurfaceKHR VulkanInstance::CreatePresentaionSurface(SwapChainInfo& swapChainIn
 	surfaceCreateInfo.flags = 0;
 	surfaceCreateInfo.connection = swapChainInfo.connection;
 	surfaceCreateInfo.window = swapChainInfo.window;
-	success = VulkanApi::GetApi()->vkCreateXcbSurfaceKHR(instance->GetInstanceHandle(), &surfaceCreateInfo, nullptr, &_presentationSurface);
+	success = VulkanApi::GetApi()->vkCreateXcbSurfaceKHR(_vkInstance, &surfaceCreateInfo, nullptr, &presentationSurface);
 #endif
 
 	if (success != VK_SUCCESS)
