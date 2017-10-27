@@ -59,8 +59,8 @@ typedef VkResult	(VKAPI_PTR* vkGetPhysicalDeviceSurfacePresentModesKHRPtr) (VkPh
 typedef VkResult	(VKAPI_PTR* vkCreateWin32SurfaceKHRPtr) (VkInstance instance, const VkWin32SurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);
 typedef VkBool32	(VKAPI_PTR* vkGetPhysicalDeviceWin32PresentationSupportKHRPtr) (VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex);
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
-typedef VkResult(VKAPI_PTR* vkCreateXcbSurfaceKHRPtr) (VkInstance instance, const VkXcbSurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);
-typedef VkBool32(VKAPI_PTR* vkGetPhysicalDeviceXcbPresentationSupportKHRPtr) (VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex, xcb_connection_t* connection, xcb_visualid_t visual_id);
+typedef VkResult	(VKAPI_PTR* vkCreateXcbSurfaceKHRPtr) (VkInstance instance, const VkXcbSurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);
+typedef VkBool32	(VKAPI_PTR* vkGetPhysicalDeviceXcbPresentationSupportKHRPtr) (VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex, xcb_connection_t* connection, xcb_visualid_t visual_id);
 #endif
 
 typedef VkResult	(VKAPI_PTR* vkCreateSwapchainKHRPtr) (VkDevice device, const VkSwapchainCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSwapchainKHR* pSwapchain);

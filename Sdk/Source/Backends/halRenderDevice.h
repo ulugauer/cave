@@ -48,7 +48,7 @@ typedef struct SwapChainInfo
 	HWND hWindow;	///< Filled in at CreateOsWindow call
 #else
 	xcb_connection_t* connection;		///< xcb connection. Filled in at CreateOsWindow call
-	xcb_visualid_ visualId;		///< xcb visual id. Filled in at CreateOsWindow call
+	xcb_visualid_t visualId;		///< xcb visual id. Filled in at CreateOsWindow call
 	xcb_window_t window;		///< Window id. Filled in at CreateOsWindow call
 #endif
 }SwapChainInfo;

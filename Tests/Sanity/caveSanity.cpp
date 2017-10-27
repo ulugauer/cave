@@ -72,12 +72,14 @@ int main(int argc, char* argv[])
 	// Initialization went successful dispaly window
 	frontend->DisplayWindow();
 
-	renderInstance->ReleaseRenderDevice(renderDevice);
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
+
+	
+	renderInstance->ReleaseRenderDevice(renderDevice);
 
 	return 0;
 }

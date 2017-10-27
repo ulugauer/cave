@@ -60,6 +60,8 @@ private:
 	xcb_connection_t* _connection;	///< xcb connection
 	xcb_window_t _windowId;	///< window id
 	xcb_visualid_t _visualId;		///< xcb visual id
+	xcb_intern_atom_reply_t* _defaultReply; ///< default window messages
+	xcb_intern_atom_reply_t* _closeReply; ///< window close message
 };
 
 }

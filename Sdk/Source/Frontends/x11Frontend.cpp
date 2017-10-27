@@ -72,7 +72,20 @@ bool X11Frontend::CreateOsWindow(RenderWindowInfo& windowInfo)
      	XCB_WINDOW_CLASS_INPUT_OUTPUT, 
      	screen->root_visual, 
      	propNames, 
-     	propValues);
+		 propValues);
+
+	// xcb style of window close message via close button
+	xcb_intern_atom_cookie_t defaultCooky = xcb_intern_atom(_connection, 1, 12, "WM_PROTOCOLS");
+	_defaultReply = xcb_intern_atom_reply(_connection, defaultCooky, 0);
+	xcb_intern_atom_cookie_t closeCooky = xcb_intern_atom(_connection, 0, 16, "WM_DELETE_WINDOW");
+	_closeReply = xcb_intern_atom_reply(_connection, closeCooky, 0);
+
+	xcb_change_property(_connection, XCB_PROP_MODE_REPLACE, _windowId, (*_defaultReply).atom, 4, 32, 1, &(*_closeReply).atom);
+		 
+	// Fill in connection data
+	windowInfo.connection = _connection;
+	windowInfo.visualId = screen->root_visual;
+	windowInfo.window = _windowId;
 
 	return true;
 }
@@ -92,7 +105,7 @@ bool X11Frontend::HandleWindowMessage()
 
 	while((event = xcb_wait_for_event(_connection)) ) 
 	{
-		switch(event->response_type) 
+		switch(event->response_type & ~0x80) 
 		{
 			case XCB_KEY_PRESS:
 			{
@@ -103,6 +116,12 @@ bool X11Frontend::HandleWindowMessage()
 			break;
 			case XCB_EXPOSE:
 			break;
+			case XCB_CLIENT_MESSAGE:
+			{
+				xcb_client_message_event_t* clientEvent = (xcb_client_message_event_t*)event;
+				if (clientEvent->data.data32[0] == (*_closeReply).atom)
+					return 0;
+			}
 		}
 		 
 		free(event);

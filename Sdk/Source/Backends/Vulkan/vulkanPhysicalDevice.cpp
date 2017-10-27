@@ -96,7 +96,7 @@ bool VulkanPhysicalDevice::PresentationQueueSupported(SwapChainInfo& swapChainIn
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 		retVal = VulkanApi::GetApi()->vkGetPhysicalDeviceWin32PresentationSupportKHR(_vkPhysicalDevice, i);
 #else
-		retVal = vkGetPhysicalDeviceXcbPresentationSupportKHR(_vkPhysicalDevice, i, swapChainInfo.connection, swapChainInfo.visualId);
+		retVal = VulkanApi::GetApi()->vkGetPhysicalDeviceXcbPresentationSupportKHR(_vkPhysicalDevice, i, swapChainInfo.connection, swapChainInfo.visualId);
 #endif
 		if (retVal)
 		{

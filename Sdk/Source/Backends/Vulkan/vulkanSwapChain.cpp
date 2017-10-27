@@ -53,13 +53,21 @@ VulkanSwapChain::VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice*
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.pNext = nullptr;
 	surfaceCreateInfo.flags = 0;
+	surfaceCreateInfo.connection = swapChainInfo.connection;
+	surfaceCreateInfo.window = swapChainInfo.window;
 	success = VulkanApi::GetApi()->vkCreateXcbSurfaceKHR(instance->GetInstanceHandle(), &surfaceCreateInfo, nullptr, &_presentationSurface);
 #endif
+
+	if (success != VK_SUCCESS)
+		throw BackendException("Error at presentation surface generation");
 }
 
 VulkanSwapChain::~VulkanSwapChain()
 {
+	VulkanApi::GetApi()->vkDeviceWaitIdle(_pRenderDevice->GetDeviceHandle());
 
+	if (_presentationSurface)
+		VulkanApi::GetApi()->vkDestroySurfaceKHR(_pInstance->GetInstanceHandle(), _presentationSurface, nullptr);
 }
 
 }
