@@ -22,21 +22,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanApi.h"
 
 #include<limits>
+#include<set>
 
 namespace cave
 {
 
-VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice)
+VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice, VkSurfaceKHR surface)
 	: HalRenderDevice()
 	, _pInstance(instance)
 	, _pPhysicalDevice(physicalDevice)
+	, _presentationSurface(surface)
 	, _vkDevice(nullptr)
+	, _presentQueue(nullptr)
 	, _pSwapChain(nullptr)
 {
+	std::set<int> uniqueQueueFamilies;
 	// First query the graphics queue index
 	uint32_t graphicsQueueFamilyIndex = physicalDevice->GetQueueFamilyIndex(VkQueueFlagBits::VK_QUEUE_GRAPHICS_BIT);
 	if (graphicsQueueFamilyIndex == (std::numeric_limits<uint32_t>::max)())
 		throw BackendException("CreateRenderDevice: no suitable device queues found");
+
+	uniqueQueueFamilies.insert(graphicsQueueFamilyIndex);
+
+	uint32_t presentationQueueFamilyIndex = (std::numeric_limits<uint32_t>::max)();
+	if (surface)
+	{
+		presentationQueueFamilyIndex = physicalDevice->GetPresentationQueueFamilyIndex(graphicsQueueFamilyIndex, surface);
+		if (presentationQueueFamilyIndex == (std::numeric_limits<uint32_t>::max)())
+			throw BackendException("CreateRenderDevice: no suitable device queues found");
+
+		uniqueQueueFamilies.insert(graphicsQueueFamilyIndex);
+	}
+
+
+	// extensions
+	std::vector<const char*> extensions;
+	if (surface && physicalDevice->HasSwapChainSupport())
+	{
+		extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+	}
 
 	// enable minimum features
 	VkPhysicalDeviceFeatures supportedFeatures = _pPhysicalDevice->GetPhysicalDeviceFeatures();
@@ -46,27 +70,29 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	requiredFeatures.geometryShader = supportedFeatures.geometryShader;
 	requiredFeatures.multiDrawIndirect = supportedFeatures.multiDrawIndirect;
 
-	VkDeviceQueueCreateInfo deviceQueueCreateInfo =
+	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+	float queuePriority = 1.0f;
+	for (int queueFamily : uniqueQueueFamilies)
 	{
-		VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,  
-		nullptr,                                     
-		0,                                           
-		graphicsQueueFamilyIndex,
-		1,							// Single queue currently
-		nullptr,					// and no priorities      
-	};
+		VkDeviceQueueCreateInfo queueCreateInfo = {};
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = queueFamily;
+		queueCreateInfo.queueCount = 1;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+		queueCreateInfos.push_back(queueCreateInfo);
+	}
 
 	VkDeviceCreateInfo deviceCreateInfo =
 	{
 		VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,           
 		nullptr,                                        
 		0,                                              
-		1,										// single VkDeviceQueueCreateInfo currently
-		&deviceQueueCreateInfo,
+		static_cast<uint32_t>(queueCreateInfos.size()),
+		&queueCreateInfos[0],
 		0,                                             
 		nullptr,                                       
-		0,										// no device extension so far
-		nullptr,                                 
+		static_cast<uint32_t>(extensions.size()),
+		&extensions[0],
 		&requiredFeatures
 	};
 
@@ -82,10 +108,16 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	{
 		throw BackendException("Failed to create vulkan device");
 	}
+
+	if (surface)
+		VulkanApi::GetApi()->vkGetDeviceQueue(_vkDevice, presentationQueueFamilyIndex, 0, &_presentQueue);
 }
 
 VulkanRenderDevice::~VulkanRenderDevice()
 {
+	if (_presentationSurface)
+		VulkanApi::GetApi()->vkDestroySurfaceKHR(_pInstance->GetInstanceHandle(), _presentationSurface, nullptr);
+
 	if (_pSwapChain)
 	{
 		DeallocateDelete(*_pInstance->GetEngineAllocator(), *_pSwapChain);
@@ -100,16 +132,19 @@ VulkanRenderDevice::~VulkanRenderDevice()
 	}
 }
 
-void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& swapChainInfo)
+void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
 {
 	if (!_pPhysicalDevice || !_vkDevice)
 		throw BackendException("Vulkan device not properly setup");
+
+	if (!_presentationSurface)
+		throw BackendException("No presentation surface created");
 
 	// we support only one swap chain per render device
 	if (_pSwapChain)
 		return;
 
-	_pSwapChain = AllocateObject<VulkanSwapChain>(*_pInstance->GetEngineAllocator(), _pInstance, _pPhysicalDevice, this, swapChainInfo);
+	_pSwapChain = AllocateObject<VulkanSwapChain>(*_pInstance->GetEngineAllocator(), _pInstance, _pPhysicalDevice, this);
 }
 
 }

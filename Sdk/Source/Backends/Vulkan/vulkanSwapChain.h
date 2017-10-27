@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "vulkan.h"
 
+#include <vector>
+
 /** \addtogroup backend 
 *  @{
 *		
@@ -45,20 +47,93 @@ public:
 	* @param[in] instance	Pointer to instance
 	* @param[in] physicalDevice	Pointer to physical device
 	* @param[in] renderDevice	Pointer to render device
-	* @param[in] swapChainInfo	Swap chain creation info
 	*
 	*/
 	VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice
-					, VulkanRenderDevice* renderDevice, SwapChainInfo& swapChainInfo);
+					, VulkanRenderDevice* renderDevice);
 
 	/** @brief Destructor */
 	virtual ~VulkanSwapChain();
 
 private:
+	/**
+	* @brief Create a swap chain for the device
+	*
+	*/
+	void CreateSwapChain();
+
+	/**
+	* @brief Create swap chain image views
+	*
+	*/
+	void CreateImageViews();
+
+	/**
+	* @brief Get swap image count supported by the device
+	*
+	* @param[in] surfaceCapabilities	Surface capabilites
+	*
+	* @return supported swap chain image counts
+	*/
+	uint32_t GetSwapChainNumImages(VkSurfaceCapabilitiesKHR &surfaceCapabilities);
+
+	/**
+	* @brief Search surface format which matches the surface capabilites
+	*
+	* @param[in] surfaceFormats	Surface formats queried
+	*
+	* @return matching surface format
+	*/
+	VkSurfaceFormatKHR GetSwapChainFormat(std::vector<VkSurfaceFormatKHR> &surfaceFormats);
+
+	/**
+	* @brief Determine image extend.
+	*
+	* @param[in] surfaceCapabilities	Surface capabilites
+	*
+	* @return Matching iamge extends. Maybe clipped to max extend supported
+	*/
+	VkExtent2D GetSwapChainExtent(VkSurfaceCapabilitiesKHR &surfaceCapabilities);
+
+	/**
+	* @brief Determine image usage flag.
+	*		 For the presentation image we need color attachment at minmum
+	*
+	* @param[in] surfaceCapabilities	Surface capabilites
+	*
+	* @return Usage flags
+	*/
+	VkImageUsageFlags GetSwapChainUsageFlags(VkSurfaceCapabilitiesKHR &surfaceCapabilities);
+
+	/**
+	* @brief Determine pre swap transform
+	*		 Can be used to transform to portrait mode
+	*
+	* @param[in] surfaceCapabilities	Surface capabilites
+	*
+	* @return Transform bit
+	*/
+	VkSurfaceTransformFlagBitsKHR GetSwapChainTransform(VkSurfaceCapabilitiesKHR &surfaceCapabilities);
+
+	/**
+	* @brief Choose an available present mode
+	*
+	* @param[in] presentModes	Present modes queried
+	*
+	* @return matching present mode
+	*/
+	VkPresentModeKHR GetSwapChainPresentMode(std::vector<VkPresentModeKHR> &presentModes);
+
+private:
 	VulkanInstance* _pInstance;	///< Pointer to instance
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
 	VulkanRenderDevice* _pRenderDevice;	///< Handle to render device
-	VkSurfaceKHR _presentationSurface;	///< Handle to presentation surface
+	VkSwapchainKHR _swapChain;	///< Handle to a vulkan swap chain
+	uint32_t _swapImageCount;	///< Image count
+	VkImage* _swapChainImageArray; ///< Array of generated swap images
+	VkImageView* _swapChainImageViewArray; ///< Array of generated swap images views
+	VkFormat _swapChainImageFormat;	///< The chosen image format
+	VkExtent2D _swapChainExtent;	///< The current extend
 };
 
 }

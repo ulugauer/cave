@@ -19,7 +19,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineDefines.h"
 #include "halInstance.h"
 #include "Memory/allocatorBase.h"
-#include "Vulkan/vk_platform.h"
 
 #include <iostream>		// includes exception handling
 #include <memory>
@@ -32,26 +31,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
-
-/**
-* swap chain creation info
-*/
-typedef struct SwapChainInfo
-{
-	uint32_t surfaceWidth;	///< Surface width
-	uint32_t surfaceHeight;	///< Surface height
-	uint32_t colorBits;		///< Amount of total colorbits (24, 32)
-	uint32_t depthBits;		///< Amount of total depthbits (24, 32)
-	bool fullscreen;	///< Create fullscreen window
-#ifdef VK_USE_PLATFORM_WIN32_KHR
-	HINSTANCE hInstance;	///< Filled in at CreateOsWindow call
-	HWND hWindow;	///< Filled in at CreateOsWindow call
-#else
-	xcb_connection_t* connection;		///< xcb connection. Filled in at CreateOsWindow call
-	xcb_visualid_t visualId;		///< xcb visual id. Filled in at CreateOsWindow call
-	xcb_window_t window;		///< Window id. Filled in at CreateOsWindow call
-#endif
-}SwapChainInfo;
 
 /**
 * Abstraction type of a device instance

@@ -61,10 +61,11 @@ public:
 	* @brief Create a hardware render device
 	*
 	* @param[in] allocator	Engine global allocator
+	* @param[in] swapChainInfo	Swap chain creation info
 	*
 	* @return Pointer to a hardware render device
 	*/
-	HalRenderDevice* CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator) override;
+	HalRenderDevice* CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator, SwapChainInfo& swapChainInfo) override;
 
 	/**
 	* @brief Get vulkan instance handle
@@ -79,6 +80,16 @@ public:
 	* @return Pointer Engine allocator
 	*/
 	std::shared_ptr<AllocatorBase> GetEngineAllocator() { return _allocator; }
+
+private:
+	/**
+	* @brief Create a presentation surface
+	*
+	* @param[in] swapChainInfo	Swap chain creation info
+	*
+	* @return Vulkan handle to surface
+	*/
+	VkSurfaceKHR CreatePresentaionSurface(SwapChainInfo& swapChainInfo);
 
 private:
 	std::shared_ptr<AllocatorBase> _allocator;	///< Pointer to global allocator

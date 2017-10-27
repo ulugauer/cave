@@ -57,6 +57,7 @@ typedef struct FrontendWindowInfo
 	uint32_t depthBits;		///< Amount of total depthbits (24, 32)
 	bool borderLess;	///< No window border
 	bool fullscreen;	///< Create fullscreen window
+	bool offscreen;		///< We do not render to a window surface
 #ifdef _WIN32
 	HINSTANCE hInstance;	///< Filled in at CreateOsWindow call
 	HWND hWindow;	///< Filled in at CreateOsWindow call

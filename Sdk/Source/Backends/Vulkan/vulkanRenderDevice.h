@@ -43,11 +43,12 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param instance	Pointer to instance object
-	* @param physicalDevice	Pointer to physical device
+	* @param[in] instance	Pointer to instance object
+	* @param[in] physicalDevice	Pointer to physical device
+	* @param[in] surface	Handle to presentation surface [optional]
 	*
 	*/
-	VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice);
+	VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice, VkSurfaceKHR surface);
 
 	/** @brief Destructor */
 	virtual ~VulkanRenderDevice();
@@ -60,6 +61,13 @@ public:
 	VkDevice GetDeviceHandle() { return _vkDevice; }
 
 	/**
+	* @brief Get vulkan surface handle
+	*
+	* @return Lowlevel vulkan handle
+	*/
+	VkSurfaceKHR GetPresentationSurfaceHandle() { return _presentationSurface; }
+
+	/**
 	* @brief Create a vulkan swap chain
 	*
 	* @param[in] swapChainInfo	Swap chain creation info
@@ -70,7 +78,9 @@ public:
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
+	VkSurfaceKHR _presentationSurface; ///< Handle to presentation surface
 	VkDevice _vkDevice;	///< Handle to vulkan device
+	VkQueue _presentQueue;	///< Handle to vulkan queue used for presentations
 	VulkanSwapChain* _pSwapChain;	///< Handle to a swap chain
 };
 

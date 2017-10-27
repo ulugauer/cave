@@ -23,14 +23,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-RenderDevice::RenderDevice(RenderInstance* renderInstance, HalInstance* halInstance)
+RenderDevice::RenderDevice(RenderInstance* renderInstance, HalInstance* halInstance, FrontendWindowInfo& windowInfo)
 	: _pRenderInstance(renderInstance)
 	, _pHalInstance(halInstance)
 	, _pHalRenderDevice(nullptr)
 {
+	// first copy data
+	_swapChainInfo.colorBits = windowInfo.colorBits;
+	_swapChainInfo.depthBits = windowInfo.depthBits;
+	_swapChainInfo.fullscreen = windowInfo.fullscreen;
+	_swapChainInfo.offscreen = windowInfo.offscreen;
+	_swapChainInfo.surfaceHeight = windowInfo.windowHeight;
+	_swapChainInfo.surfaceWidth = windowInfo.windowWidth;
+#ifdef _WIN32
+	_swapChainInfo.hInstance = windowInfo.hInstance;
+	_swapChainInfo.hWindow = windowInfo.hWindow;
+#else
+	_swapChainInfo.connection = windowInfo.connection;
+	_swapChainInfo.visualId = windowInfo.visualId;
+	_swapChainInfo.window = windowInfo.window;
+#endif
+
 	try
 	{
-		_pHalRenderDevice = halInstance->CreateRenderDevice(renderInstance->GetEngineAllocator());
+		_pHalRenderDevice = halInstance->CreateRenderDevice(renderInstance->GetEngineAllocator(), _swapChainInfo);
 	}
 	catch (std::exception& e)
 	{
@@ -45,30 +61,14 @@ RenderDevice::~RenderDevice()
 		DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *_pHalRenderDevice);
 }
 
-void RenderDevice::CreateSwapChain(FrontendWindowInfo& windowInfo)
+void RenderDevice::CreateSwapChain()
 {
 	if (!_pHalRenderDevice || !_pRenderInstance || !_pHalInstance)
 		throw EngineError("Render device not properly setup");
 
-	// first copy data
-	SwapChainInfo swapChainInfo;
-	swapChainInfo.colorBits = windowInfo.colorBits;
-	swapChainInfo.depthBits = windowInfo.depthBits;
-	swapChainInfo.fullscreen = windowInfo.fullscreen;
-	swapChainInfo.surfaceHeight = windowInfo.windowHeight;
-	swapChainInfo.surfaceWidth = windowInfo.windowWidth;
-#ifdef _WIN32
-	swapChainInfo.hInstance = windowInfo.hInstance;
-	swapChainInfo.hWindow = windowInfo.hWindow;
-#else
-	swapChainInfo.connection = windowInfo.connection;
-	swapChainInfo.visualId = windowInfo.visualId;
-	swapChainInfo.window = windowInfo.window;
-#endif
-
 	try
 	{
-		_pHalRenderDevice->CreateSwapChain(swapChainInfo);
+		_pHalRenderDevice->CreateSwapChain(_swapChainInfo);
 	}
 	catch (std::exception& e)
 	{

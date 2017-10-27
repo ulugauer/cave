@@ -65,11 +65,11 @@ RenderInstance::GetEngineAllocator()
 	return _pEngineInstance->GetEngineAllocator();
 }
 
-RenderDevice* RenderInstance::CreateRenderDevice()
+RenderDevice* RenderInstance::CreateRenderDevice(FrontendWindowInfo& windowInfo)
 {
 	RenderDevice* renderDevice = nullptr;
 	if (_pHalInstance)
-		renderDevice = AllocateObject<RenderDevice>(*_pEngineInstance->GetEngineAllocator(), this, _pHalInstance);
+		renderDevice = AllocateObject<RenderDevice>(*_pEngineInstance->GetEngineAllocator(), this, _pHalInstance, windowInfo);
 
 	return renderDevice;
 }

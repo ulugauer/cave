@@ -19,9 +19,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanApi.h"
 
 #include <limits>
+#include <vector>
 
 namespace cave
 {
+
+/**
+* @brief Helper class to find extension names
+*
+* @pram[in] extensionName	Extension name to search for
+* @pram[in] deviceExtensions	Arrary of available extensions
+*
+* @return true if found
+*/
+static bool CheckExtensionAvailability(const char *extensionName, const std::vector<VkExtensionProperties> &deviceExtensions)
+{
+	for (size_t i = 0; i < deviceExtensions.size(); ++i)
+	{
+		if (strcmp(deviceExtensions[i].extensionName, extensionName) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
 VulkanPhysicalDevice::VulkanPhysicalDevice()
 	: _vkPhysicalDevice(nullptr)
@@ -57,15 +78,50 @@ void VulkanPhysicalDevice::SetPhysicalDeviceHandle(std::shared_ptr<AllocatorBase
 	}
 }
 
-bool VulkanPhysicalDevice::HasQueueCapabilites(VkQueueFlags flags)
+bool VulkanPhysicalDevice::HasQueueCapabilites(VkQueueFlags flags, VkSurfaceKHR presentationSurface)
 {
 	for (uint32_t i = 0; i < _physicalDeviceQueueFamilyCount; ++ i)
 	{
+		VkBool32 presentSupport = true;
+		if (presentationSurface)
+			VulkanApi::GetApi()->vkGetPhysicalDeviceSurfaceSupportKHR(_vkPhysicalDevice, i, presentationSurface, &presentSupport);
+
 		if (_physicalDeviceQueueFamilyArray[i].queueFlags & flags)
 			return true;
 	}
 
 	return false;
+}
+
+bool VulkanPhysicalDevice::HasSwapChainSupport()
+{
+	if (!_vkPhysicalDevice)
+		return false;
+
+	// extensions
+	uint32_t deviceExtensionCount = 0;
+	if (VulkanApi::GetApi()->vkEnumerateDeviceExtensionProperties(_vkPhysicalDevice, nullptr, &deviceExtensionCount, nullptr) != VK_SUCCESS)
+	{
+		return false;
+	}
+	std::vector<VkExtensionProperties> deviceExtensions(deviceExtensionCount);
+	if (VulkanApi::GetApi()->vkEnumerateDeviceExtensionProperties(_vkPhysicalDevice, nullptr, &deviceExtensionCount, &deviceExtensions[0]) != VK_SUCCESS)
+	{
+		return false;
+	}
+
+	std::vector<const char*> extensions;
+	extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
+	for (size_t i = 0; i < extensions.size(); ++i)
+	{
+		if (!CheckExtensionAvailability(extensions[i], deviceExtensions))
+		{
+			return false;
+		}
+	}
+
+	return  true;
 }
 
 uint32_t VulkanPhysicalDevice::GetQueueFamilyIndex(VkQueueFlagBits queueBit)
@@ -86,7 +142,33 @@ uint32_t VulkanPhysicalDevice::GetQueueFamilyIndex(VkQueueFlagBits queueBit)
 	return index;
 }
 
-bool VulkanPhysicalDevice::PresentationQueueSupported(SwapChainInfo& swapChainInfo, uint32_t &familiyQueueIndex)
+uint32_t VulkanPhysicalDevice::GetPresentationQueueFamilyIndex(uint32_t graphisIndex, VkSurfaceKHR presentationSurface)
+{
+	bool findMatchingQueueIndex = (std::numeric_limits<uint32_t>::max)() != graphisIndex;
+	uint32_t queueIndex = (std::numeric_limits<uint32_t>::max)();
+	for (uint32_t i = 0; i < _physicalDeviceQueueFamilyCount; ++i)
+	{
+		VkBool32 presentSupport = false;
+		if (presentationSurface)
+			VulkanApi::GetApi()->vkGetPhysicalDeviceSurfaceSupportKHR(_vkPhysicalDevice, i, presentationSurface, &presentSupport);
+
+		if (_physicalDeviceQueueFamilyArray[i].queueCount > 0 && presentSupport)
+		{
+			// Store the first one which supports presntation
+			if ((std::numeric_limits<uint32_t>::max)() == queueIndex)
+				queueIndex = i;
+
+			if (findMatchingQueueIndex && graphisIndex == i)
+				break;
+			else if (!findMatchingQueueIndex)
+				break;
+		}
+	}
+
+	return queueIndex;
+}
+
+bool VulkanPhysicalDevice::PresentationQueueSupported(SwapChainInfo& swapChainInfo, uint32_t &familyQueueIndex)
 {
 	bool supported = false;
 
@@ -94,6 +176,7 @@ bool VulkanPhysicalDevice::PresentationQueueSupported(SwapChainInfo& swapChainIn
 	{
 		VkBool32 retVal = VK_FALSE;
 #ifdef VK_USE_PLATFORM_WIN32_KHR
+		UNREFERENCED_PARAMETER(swapChainInfo);
 		retVal = VulkanApi::GetApi()->vkGetPhysicalDeviceWin32PresentationSupportKHR(_vkPhysicalDevice, i);
 #else
 		retVal = VulkanApi::GetApi()->vkGetPhysicalDeviceXcbPresentationSupportKHR(_vkPhysicalDevice, i, swapChainInfo.connection, swapChainInfo.visualId);
@@ -101,7 +184,7 @@ bool VulkanPhysicalDevice::PresentationQueueSupported(SwapChainInfo& swapChainIn
 		if (retVal)
 		{
 			// we take the first queue which fullfills the request
-			familiyQueueIndex = i;
+			familyQueueIndex = i;
 			supported = true;
 			break;
 		}

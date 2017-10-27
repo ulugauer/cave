@@ -75,11 +75,19 @@ public:
 	* @brief Check if this physical device supportes the
 	*		 requested queues.
 	*
-	* @param flags	Handle global allocator
+	* @param[in] flags	Handle global allocator
+	* @param[in] presentationSurface	Handle to surface. If not null the queue must ber able to serve presents
 	*
 	* @return true if physical devices matchees
 	*/
-	bool HasQueueCapabilites(VkQueueFlags flags);
+	bool HasQueueCapabilites(VkQueueFlags flags, VkSurfaceKHR presentationSurface=nullptr);
+
+	/**
+	* @brief Check if this physical device supportes swap chains
+	*
+	* @return true if physical devices supports swwap chains
+	*/
+	bool HasSwapChainSupport();
 
 	/**
 	* @brief Query queue familiy index
@@ -89,6 +97,17 @@ public:
 	* @return Index of queue familiy
 	*/
 	uint32_t GetQueueFamilyIndex(VkQueueFlagBits queueBit);
+
+	/**
+	* @brief Query queue presentation familiy index.
+	*		 If graphicsIndex != MAX_UINT try to find a queue which matches this index 
+	*
+	* @param[in] graphicsIndex	graphics queue index
+	* @param[in] presentationSurface	Handle to surface.
+	*
+	* @return Index of queue presentation familiy
+	*/
+	uint32_t GetPresentationQueueFamilyIndex(uint32_t graphicsIndex, VkSurfaceKHR presentationSurface);
 
 	/**
 	* @brief Query supported device features
@@ -101,11 +120,11 @@ public:
 	* @brief Query supported device features
 	*
 	* @param[in] swapChainInfo	Swap chain creation info
-	* @param familiyQueueIndex[out]	Filled with family queue index supporting presentation
+	* @param[out] familyQueueIndex	Filled with family queue index supporting presentation
 	*
 	* @return true if any queue familiy supports presentation
 	*/
-	bool PresentationQueueSupported(SwapChainInfo& swapChainInfo, uint32_t &familiyQueueIndex);
+	bool PresentationQueueSupported(SwapChainInfo& swapChainInfo, uint32_t &familyQueueIndex);
 
 private:
 	VkPhysicalDevice _vkPhysicalDevice;	///< Handle to vulkan device

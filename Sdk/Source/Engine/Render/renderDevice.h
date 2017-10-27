@@ -44,24 +44,24 @@ public:
 	*
 	* @param[in] renderInstance	Pointer to render instance
 	* @param[in] halInstance	Pointer to HAL render instance
+	* @param[in] windowInfo	Window creation info
 	*
 	*/
-	RenderDevice(RenderInstance* renderInstance, HalInstance* halInstance);
+	RenderDevice(RenderInstance* renderInstance, HalInstance* halInstance, FrontendWindowInfo& windowInfo);
 	/** @brief Destructor */
 	~RenderDevice();
 
 	/**
 	* @brief Create a swap chain
 	*
-	* @param[in] windowInfo	Window creation info
-	*
 	*/
-	void CreateSwapChain(FrontendWindowInfo& windowInfo);
+	void CreateSwapChain();
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to
 	HalInstance* _pHalInstance;	///< Pointer to HAL Instance
 	HalRenderDevice* _pHalRenderDevice;	///< Pointer to HAL render device
+	SwapChainInfo _swapChainInfo;	///< swap chain info
 	
 };
 

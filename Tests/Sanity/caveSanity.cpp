@@ -34,6 +34,7 @@ int main(int argc, char* argv[])
 	windowInfo.windowHeight = 600;
 	windowInfo.fullscreen = false;
 	windowInfo.borderLess = false;
+	windowInfo.offscreen = false;
 	windowInfo.colorBits = 32;
 	windowInfo.depthBits = 24;
 	windowInfo.windowTitle = "caveSanity";
@@ -52,11 +53,11 @@ int main(int argc, char* argv[])
 		frontend->CreateOsWindow(windowInfo);
 
 		// Create a render device
-		renderDevice = renderInstance->CreateRenderDevice();
-		// Create a swap chain fro this device.
 		// Note the windowInfo should be properly filled by the CreateOsWindow call
-		// before a swap chain is created
-		renderDevice->CreateSwapChain(windowInfo);
+		// before a device is created
+		renderDevice = renderInstance->CreateRenderDevice(windowInfo);
+		// Create a swap chain fro this device.
+		renderDevice->CreateSwapChain();
 	}
 	catch (cave::EngineError err)
 	{

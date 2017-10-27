@@ -19,6 +19,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halInstance.h"
 #include "engineTypes.h"
 #include "Memory/allocatorGlobal.h"
+#include "frontend.h"
 
 #include <memory>
 
@@ -62,9 +63,11 @@ public:
 	/**
 	* @brief Create a render device
 	*
+	* @param[in] windowInfo	Window creation info
+	*
 	* @return Pointer to a render device
 	*/
-	RenderDevice* CreateRenderDevice();
+	RenderDevice* CreateRenderDevice(FrontendWindowInfo& windowInfo);
 
 	/**
 	* @brief Release a render device

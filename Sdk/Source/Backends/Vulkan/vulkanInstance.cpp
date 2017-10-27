@@ -177,8 +177,17 @@ bool VulkanInstance::QueryPhysicalDevices()
 	return success;
 }
 
-HalRenderDevice* VulkanInstance::CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator)
+HalRenderDevice* VulkanInstance::CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator, SwapChainInfo& swapChainInfo)
 {
+	// Create a presentation surface if required
+	VkSurfaceKHR presentationSurface = nullptr;
+	if (!swapChainInfo.offscreen)
+	{
+		presentationSurface = CreatePresentaionSurface(swapChainInfo);
+		if (!presentationSurface)
+			throw BackendException("Error at presentation surface generation");
+	}
+
 	// We want to create a render device.
 	// Check if we have a physical device which matches our needs
 	VulkanPhysicalDevice* physicalDevice = nullptr;
@@ -188,7 +197,8 @@ HalRenderDevice* VulkanInstance::CreateRenderDevice(std::shared_ptr<AllocatorBas
 
 	for (uint32_t i = 0; i < _physicalDeviceCount; ++i)
 	{
-		if (_physicalDeviceArray[i].HasQueueCapabilites(flags))
+		if (_physicalDeviceArray[i].HasQueueCapabilites(flags, presentationSurface) &&
+			(!swapChainInfo.offscreen || _physicalDeviceArray[i].HasSwapChainSupport()))
 		{
 			physicalDevice = &_physicalDeviceArray[i];
 			break;
@@ -199,9 +209,37 @@ HalRenderDevice* VulkanInstance::CreateRenderDevice(std::shared_ptr<AllocatorBas
 		throw BackendException("CreateRenderDevice: no suitable device found");
 
 	// Found something suitable -> create device
-	VulkanRenderDevice* renderDevice = AllocateObject<VulkanRenderDevice>(*allocator, this, physicalDevice);
+	VulkanRenderDevice* renderDevice = AllocateObject<VulkanRenderDevice>(*allocator, this, physicalDevice, presentationSurface);
 
 	return renderDevice;
+}
+
+VkSurfaceKHR VulkanInstance::CreatePresentaionSurface(SwapChainInfo& swapChainInfo)
+{
+	VkSurfaceKHR presentationSurface = nullptr;
+	VkResult success = VK_SUCCESS;
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	surfaceCreateInfo.pNext = nullptr;
+	surfaceCreateInfo.flags = 0;
+	surfaceCreateInfo.hinstance = swapChainInfo.hInstance;
+	surfaceCreateInfo.hwnd = swapChainInfo.hWindow;
+	success = VulkanApi::GetApi()->vkCreateWin32SurfaceKHR(_vkInstance, &surfaceCreateInfo, nullptr, &presentationSurface);
+#else
+	VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+	surfaceCreateInfo.pNext = nullptr;
+	surfaceCreateInfo.flags = 0;
+	surfaceCreateInfo.connection = swapChainInfo.connection;
+	surfaceCreateInfo.window = swapChainInfo.window;
+	success = VulkanApi::GetApi()->vkCreateXcbSurfaceKHR(instance->GetInstanceHandle(), &surfaceCreateInfo, nullptr, &_presentationSurface);
+#endif
+
+	if (success != VK_SUCCESS)
+		return nullptr;
+
+	return presentationSurface;
 }
 
 }
