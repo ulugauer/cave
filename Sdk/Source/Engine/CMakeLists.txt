@@ -35,14 +35,20 @@ set(MEMORY_SOURCE Memory/allocatorBase.h
 				  Memory/allocatorGlobal.h
 				  Memory/allocatorGlobal.cpp )
 
+set(RESOURCE_SOURCE Resource/resourceManagerPrivate.h 
+					Resource/resourceManagerPrivate.cpp
+					Resource/resourceManager.h 
+					Resource/resourceManager.cpp )
+
 # Create named folders for the sources within the .vcproj
 # Empty name lists them directly under the .vcproj
 source_group("engine" FILES ${ENGINE_SOURCE})
 source_group("engine\\memory" FILES ${MEMORY_SOURCE})
 source_group("engine\\render" FILES ${RENDER_SOURCE})
+source_group("engine\\resource" FILES ${RESOURCE_SOURCE})
 
 #Generate the shared library from the sources
-add_library(cave SHARED ${ENGINE_SOURCE} ${RENDER_SOURCE} ${MEMORY_SOURCE} 
+add_library(cave SHARED ${ENGINE_SOURCE} ${RENDER_SOURCE} ${RESOURCE_SOURCE} ${MEMORY_SOURCE} 
 			$<TARGET_OBJECTS:os> 
 			$<TARGET_OBJECTS:backends> 
 			$<TARGET_OBJECTS:frontends> )

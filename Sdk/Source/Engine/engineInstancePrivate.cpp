@@ -24,12 +24,16 @@ EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
 	: _pAllocator(nullptr)
 	, _pRenderInstance(nullptr)
 	, _pFrontend(nullptr)
+	, _pResourceManager(nullptr)
+	, _pEngineLog(nullptr)
 	, _ApplicationName(engineCreate.applicationName)
 {
 	// Create our engine wide allocate interface
 	_pAllocator = std::make_shared<AllocatorGlobal>(0);
 	if (_pAllocator)
 	{
+		// create our resource manager
+		_pResourceManager = AllocateObject<ResourceManager>(*_pAllocator, this, engineCreate.applicationName);
 		// Create our logger. By default no logging
 		_pEngineLog = AllocateObject<EngineLog>(*_pAllocator, EngineLog::WARNING_LEVEL_NOENE, EngineLog::MESSAGE_LEVEL_NOENE, true);
 	}
@@ -39,6 +43,9 @@ EngineInstancePrivate::~EngineInstancePrivate()
 {
 	if (_pEngineLog && _pAllocator)
 		DeallocateDelete(*_pAllocator, *_pEngineLog);
+
+	if (_pResourceManager && _pAllocator)
+		DeallocateDelete(*_pAllocator, *_pResourceManager);
 
 	if (_pFrontend)
 	{

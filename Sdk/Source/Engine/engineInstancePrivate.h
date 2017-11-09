@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "Render/renderInstance.h"
 #include "Render/renderDevice.h"
+#include "Resource/resourceManager.h"
 #include "Memory/allocatorGlobal.h"
 #include "frontend.h"
 #include "engineTypes.h"
@@ -94,8 +95,9 @@ private:
 	std::shared_ptr<AllocatorGlobal>    _pAllocator;	///< Pointer to engine custom allocations
 	RenderInstance* _pRenderInstance;	///< Pointer to render instance
 	IFrontend* _pFrontend;	///< Interface pointer to widow frontend
-	std::string _ApplicationName;	///< Optional specified at creation time
+	ResourceManager* _pResourceManager;	///< Our engine wide resource manager
 	EngineLog* _pEngineLog;	///< Our engine wide message logger
+	std::string _ApplicationName;	///< Optional specified at creation time
 };
 
 }
