@@ -13,56 +13,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file resourceManager.h
-///       Handle all kind of resources (images, shaders,...)
+/// @file materialResource.h
+///       Handles material assets
 
 #include "resourceManagerPrivate.h"
 
 /** \addtogroup engine
 *  @{
-*		This module contains all code related to resource handling
+*	
 */
 
 namespace cave
 {
 
 /**
-* Interface to Global Resource Manager
+* Load material assets
 */
-class CAVE_INTERFACE ResourceManager
+class CAVE_INTERFACE MaterialResource
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] engine	Pointer to engine instance
-	* @param[in] applicationPath	Path to application
-	* @param[in] projectPath	Path to project
+	* @param[in] rm	Pointer to resource manager
 	*
 	*/
-	ResourceManager(EngineInstancePrivate* engine, const char* applicationPath, const char* projectPath);
+	MaterialResource(ResourceManagerPrivate* rm);
 	/** @brief Destructor */
-	~ResourceManager();
-	/** @brief copy constructor */
-	ResourceManager(const ResourceManager&) = delete; // no copy constructor
-	ResourceManager& operator=(const ResourceManager&) = delete; // no assignment operator
+	~MaterialResource();
 
-	/**
-	* @brief GetAllocator
-	*
-	* @return Pointer Engine allocator
-	*/
-	std::shared_ptr<AllocatorGlobal> GetEngineAllocator();
 
 	/**
 	* @brief Load a material asset
 	*
-	* @param file String to file
+	* @param objectFinder	Helper class to find resource
+	* @param file			String to file
 	*
 	* @return true if successful
 	*/
-	virtual bool LoadMaterialAsset(const char* file);
+	virtual bool LoadMaterialAsset(ResourceObjectFinder& objectFinder, const char* file);
 
+private:
+
+	/**
+	* @brief Load a material asset from a json file
+	*
+	* @param fileStream	File stream where we read from
+	*
+	* @return true if successful
+	*/
+	bool LoadMaterialJson(std::ifstream& fileStream);
 
 private:
 	ResourceManagerPrivate* _pResourceManagerPrivate;	///< Pointer to private resource manger
@@ -71,3 +71,4 @@ private:
 }
 
 /** @}*/
+

@@ -47,6 +47,9 @@ public:
 	/** @brief Destructor */
 	~EngineInstance();
 
+	EngineInstance(const EngineInstance&) = delete; // no copy constructor
+	EngineInstance& operator=(const EngineInstance&) = delete; // no assignment operator
+
 	/**
 	* @brief Enable logging
 	*
@@ -76,6 +79,16 @@ public:
 	IFrontend* CreateFrontend()
 	{
 		return _pEnginePrivate->CreateFrontend();
+	}
+
+	/**
+	* @brief Get Resource manager
+	*
+	* @return ResourceManager Object
+	*/
+	ResourceManager& GetResourceManager() 
+	{ 
+		return _pEnginePrivate->GetResourceManager();
 	}
 
 private:

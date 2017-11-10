@@ -1,0 +1,14 @@
+{
+   "material": {
+            "name": "ColoredMaterial",
+            "values": {
+                "opacity": 1.0
+            }
+        },
+
+    "program": {
+        "name": "SimpleColor",
+        "vertexShader": "Shader/Color_vtx.spv",
+        "fragmentShader": "Shader/Color_frg.spv"
+    }
+ }

@@ -49,4 +49,12 @@ ResourceManager::GetEngineAllocator()
 	return _pResourceManagerPrivate->GetEngineAllocator();
 }
 
+bool ResourceManager::LoadMaterialAsset(const char* file)
+{
+	if (!file)
+		return false;
+
+	return _pResourceManagerPrivate->LoadMaterialAsset(file);
+}
+
 }

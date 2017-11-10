@@ -135,6 +135,9 @@ int main(int argc, char* argv[])
 	// Initialization went successful dispaly window
 	frontend->DisplayWindow();
 
+	// load resources
+	ResourceManager& rm = engineInstance->GetResourceManager();
+	rm.LoadMaterialAsset("ColoredMaterial.asset");
 
 	do {
 

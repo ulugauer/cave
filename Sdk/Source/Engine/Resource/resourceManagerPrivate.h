@@ -34,6 +34,77 @@ namespace cave
 /// forward declaration
 class EngineInstancePrivate;
 
+// forwards
+class ResourceManagerPrivate;
+class MaterialResource;
+
+/**
+* A helper class to find resources
+*/
+class ResourceObjectFinder
+{
+public:
+	std::string _projectContentPath;			///< Project path
+	std::string _appContentPath;				///< Application binary path
+	std::vector<std::string> _localSearchPath;	///< A string array for local search path
+
+	/**
+	* @brief Constructor
+	*
+	* @param[in] rm ResourceManagerPrivate object
+	*
+	*/
+	ResourceObjectFinder(ResourceManagerPrivate& rm);
+
+	/**
+	* @brief Open the file in ascii read mode
+	*
+	* @param[in] file File name string
+	* @param[in] fileStream The stream we use for reading
+	*
+	* @return true if successful
+	*/
+	bool OpenFileAscii(const char* file, std::ifstream& fileStream);
+
+	/**
+	* @brief Extract filename from an input string
+	*
+	* @param[in] file File name string may include path
+	*
+	* @return filename string
+	*/
+	std::string GetFileName(const char* file);
+
+	/**
+	* @brief Extract filename suffix from an input string
+	*
+	* @param[in] file File name string may include path
+	*
+	* @return filename suffix
+	*/
+	std::string GetFileExt(const char* file);
+
+	/**
+	* @brief Extract directory from an input string
+	*
+	* @param[in] file File name string may include path
+	*
+	* @return path string
+	*/
+	std::string GetDirectory(const char* file);
+
+	/**
+	* @brief Compare two strings case insensitive
+	*
+	* @param[in] str1 String 1 to compare
+	* @param[in] str2 String 2 to compare
+	*
+	* @return true if equal
+	*/
+	bool CaseInsensitiveStringCompare(const std::string& str1, const std::string& str2);
+};
+
+
 /**
 * Global Resource Manager
 */
@@ -50,7 +121,9 @@ public:
 	* @param[in] projectPath	Path to project
 	*
 	*/
-	ResourceManagerPrivate(EngineInstancePrivate* engine, const char* applicationPath, const char* projectPath);
+	ResourceManagerPrivate(EngineInstancePrivate* engine
+							, const char* applicationPath
+							, const char* projectPath);
 	/** @brief Destructor */
 	~ResourceManagerPrivate();
 	/** @brief copy constructor */
@@ -64,6 +137,28 @@ public:
 	*/
 	std::shared_ptr<AllocatorGlobal> GetEngineAllocator();
 
+	/**
+	* @brief Get application path string
+	*
+	* @return string
+	*/
+	const std::string GetApplicationPath() { return _appPath; }
+
+	/**
+	* @brief Get project path string
+	*
+	* @return string
+	*/
+	const std::string GetProjectPath() { return _projectPath; }
+
+	/**
+	* @brief Load a material asset
+	*
+	* @param file String to file
+	*
+	* @return true if successful
+	*/
+	bool LoadMaterialAsset(const char* file);
 
 private:
 	EngineInstancePrivate* _pEngineInstance;	///< Pointer to the engine instance we belong to

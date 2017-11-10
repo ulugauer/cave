@@ -92,6 +92,14 @@ public:
 	*/
 	std::shared_ptr<AllocatorGlobal> GetEngineAllocator() { return _pAllocator; }
 
+	/**
+	* @brief Get Resource manager
+	*
+	* @return ResourceManager Object
+	*/
+	ResourceManager& GetResourceManager() { return *_pResourceManager; }
+	
+
 private:
 	std::shared_ptr<AllocatorGlobal>    _pAllocator;	///< Pointer to engine custom allocations
 	RenderInstance* _pRenderInstance;	///< Pointer to render instance
