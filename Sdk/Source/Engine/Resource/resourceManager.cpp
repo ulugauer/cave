@@ -22,11 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-ResourceManager::ResourceManager(EngineInstancePrivate* engine, const char* applicationPath)
+ResourceManager::ResourceManager(EngineInstancePrivate* engine, const char* applicationPath, const char* projectPath)
 	: _pResourceManagerPrivate(nullptr)
 {
 	// Create our logger. By default no logging
-	_pResourceManagerPrivate = AllocateObject<ResourceManagerPrivate>(*engine->GetEngineAllocator(), engine, applicationPath);
+	_pResourceManagerPrivate = AllocateObject<ResourceManagerPrivate>(*engine->GetEngineAllocator(), engine, applicationPath, projectPath);
 
 	if (!_pResourceManagerPrivate && engine->GetEngineLog())
 	{

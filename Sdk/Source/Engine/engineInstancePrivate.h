@@ -42,6 +42,7 @@ struct EngineCreateStruct
 {
 	uint32_t 		flags; 				///< currently unused
 	const char*		applicationName; 	///< application name
+	const char*		projectPath; 		///< project path
 };
 
 /**

@@ -20,6 +20,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+/**
+* @brief Helper function to get runtime path
+*
+* @return application runtime path string
+*/
+static std::string GetAppPath()
+{
+	static std::string theAppDir;
+#if defined(_WIN32)
+	char theBuf[_MAX_PATH];
+	GetModuleFileName(0, theBuf, _MAX_PATH);
+	theAppDir.assign(theBuf);
+	size_t theSlashPos = theAppDir.find_last_of("\\/");
+	if (theSlashPos != std::string::npos)
+	{
+		theAppDir.resize(theSlashPos);
+	}
+
+#elif defined(__linux__)
+	char theBuf[2048] = { 0 };
+	int  rc = readlink("/proc/self/exe", theBuf, sizeof(theBuf) - 1);
+	if (rc > 0)
+	{
+		theAppDir.assign(theBuf);
+		size_t lastSlash = theAppDir.find_last_of("/");
+		if (lastSlash != eastl::string::npos)
+		{
+			theAppDir.resize(lastSlash);
+		}
+	}
+
+#elif defined(__QNXNTO__)
+	char  theBuf[1024] = { 0 };
+	FILE* exefile = fopen("/proc/self/exefile", "r");
+	if (exefile != NULL)
+	{
+		fgets(theBuf, sizeof(theBuf), exefile);
+		fclose(exefile);
+		theAppDir.assign(theBuf);
+	}
+
+#endif
+	return theAppDir;
+}
+
 EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
 	: _pAllocator(nullptr)
 	, _pRenderInstance(nullptr)
@@ -32,8 +77,10 @@ EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
 	_pAllocator = std::make_shared<AllocatorGlobal>(0);
 	if (_pAllocator)
 	{
+		// get runtime binary path
+		std::string appPath = GetAppPath();
 		// create our resource manager
-		_pResourceManager = AllocateObject<ResourceManager>(*_pAllocator, this, engineCreate.applicationName);
+		_pResourceManager = AllocateObject<ResourceManager>(*_pAllocator, this, appPath.c_str(), engineCreate.projectPath);
 		// Create our logger. By default no logging
 		_pEngineLog = AllocateObject<EngineLog>(*_pAllocator, EngineLog::WARNING_LEVEL_NOENE, EngineLog::MESSAGE_LEVEL_NOENE, true);
 	}

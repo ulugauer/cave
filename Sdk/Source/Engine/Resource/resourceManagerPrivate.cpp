@@ -22,10 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-ResourceManagerPrivate::ResourceManagerPrivate(EngineInstancePrivate* engine, const char* applicationPath)
+ResourceManagerPrivate::ResourceManagerPrivate(EngineInstancePrivate* engine, const char* applicationPath, const char* projectPath)
 	: _pEngineInstance(engine)
 	, _appPath(applicationPath)
-	, _projectPath("")
+	, _projectPath(projectPath)
 {
 
 }

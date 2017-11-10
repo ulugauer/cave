@@ -47,9 +47,10 @@ public:
 	*
 	* @param[in] engine	Pointer to engine instance
 	* @param[in] applicationPath	Path to application
+	* @param[in] projectPath	Path to project
 	*
 	*/
-	ResourceManagerPrivate(EngineInstancePrivate* engine, const char* applicationPath);
+	ResourceManagerPrivate(EngineInstancePrivate* engine, const char* applicationPath, const char* projectPath);
 	/** @brief Destructor */
 	~ResourceManagerPrivate();
 	/** @brief copy constructor */

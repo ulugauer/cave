@@ -16,9 +16,65 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineError.h"
 
 #include <iostream>
+#include <sstream>
 #include <memory>
 
 using namespace cave;
+
+typedef std::basic_string<char> string_type;
+
+string_type			g_ProjectPath;  ///< path to project content
+int32_t				g_WinWidth;		/// window width
+int32_t				g_WinHeight;	/// window height
+
+static void
+printHelpMessage()
+{
+	string_type MsgStr = "NDDPathFinder display point clouds.\n\n";
+	MsgStr += " -h			 - prints this help message\n";
+	MsgStr += " -r			 - path to resource files\n";
+	MsgStr += " -winSize x y - Set window size\n";
+
+	std::cerr << MsgStr.c_str();
+}
+
+bool getComdLineArguments(int argc, char** argv)
+{
+	string_type::size_type index;
+
+	if (argc < 2)
+	{
+		printHelpMessage();
+		return false;
+	}
+
+	string_type pArgStr;
+	for (int theIndex = 0; theIndex < argc; ++theIndex)
+	{
+		pArgStr = argv[theIndex];
+
+		// get resource directory
+		index = pArgStr.find("-r");
+		if (index != string_type::npos && argv[theIndex + 1] != NULL)
+		{
+			pArgStr = argv[theIndex + 1];
+			g_ProjectPath = pArgStr;
+		}
+
+		// get window size
+		index = pArgStr.find("-winSize");
+		if (index != string_type::npos && argv[theIndex + 1] != NULL && argv[theIndex + 2] != NULL)
+		{
+			pArgStr = argv[theIndex + 1];
+			std::istringstream(pArgStr) >> g_WinWidth;
+			pArgStr = argv[theIndex + 2];
+			std::istringstream(pArgStr) >> g_WinHeight;
+		}
+	}
+
+	return true;
+}
+
 
 int main(int argc, char* argv[])
 {  
@@ -26,12 +82,18 @@ int main(int argc, char* argv[])
 	RenderInstance* renderInstance = nullptr;
 	RenderDevice* renderDevice = nullptr;
 	IFrontend* frontend = nullptr;
+	g_WinWidth = 1280;
+	g_WinHeight = 768;
+
+	// get commaqnd line arguments
+	if (!getComdLineArguments(argc, argv))
+		return 1;
 
 	// window cration info
 	FrontendWindowInfo windowInfo = {};
 	windowInfo.xOffset = windowInfo.yOffset = 50;
-	windowInfo.windowWidth = 800;
-	windowInfo.windowHeight = 600;
+	windowInfo.windowWidth = g_WinWidth;
+	windowInfo.windowHeight = g_WinHeight;
 	windowInfo.fullscreen = false;
 	windowInfo.borderLess = false;
 	windowInfo.offscreen = false;
@@ -42,7 +104,7 @@ int main(int argc, char* argv[])
 	try
 	{
 		// Create engine instance which we use to create all other things
-		EngineCreateStruct engineInfo = { 0, "caveSanity" };
+		EngineCreateStruct engineInfo = { 0, "caveSanity", g_ProjectPath.c_str() };
 		engineInstance = std::unique_ptr<EngineInstance>(new EngineInstance(engineInfo));
 
 		// Create render instance. Basically the door to the hardware device.
