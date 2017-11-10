@@ -17,6 +17,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineInstancePrivate.h"
 
+#ifdef __GNUC__
+#include <unistd.h>	// Needed for readlink
+#include <limits.h>
+#endif
+
 namespace cave
 {
 
@@ -39,13 +44,13 @@ static std::string GetAppPath()
 	}
 
 #elif defined(__linux__)
-	char theBuf[2048] = { 0 };
+	char theBuf[PATH_MAX] = { 0 };
 	int  rc = readlink("/proc/self/exe", theBuf, sizeof(theBuf) - 1);
 	if (rc > 0)
 	{
 		theAppDir.assign(theBuf);
 		size_t lastSlash = theAppDir.find_last_of("/");
-		if (lastSlash != eastl::string::npos)
+		if (lastSlash != std::string::npos)
 		{
 			theAppDir.resize(lastSlash);
 		}
