@@ -16,7 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file engineTypes.h
 ///       Shared types
 
-/** \defgroup engine Engine
+/** @defgroup engine Engine
 *  @{
 *		This module contains all code related to the engine
 */

@@ -23,10 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <iostream>		// includes exception handling
 #include <memory>
 
-/** \defgroup backend Backend 
+/** \addtogroup backend
 *  @{
-*		This module handles the hardware abstractions of
-*		various rendering API like DirectX, Vulkan
+*
 */
 
 namespace cave

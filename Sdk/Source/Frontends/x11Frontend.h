@@ -26,6 +26,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+/**
+* X11 frontend  implementation
+*/
 class CAVE_INTERFACE X11Frontend : public IFrontend
 {
 public:
@@ -65,3 +68,5 @@ private:
 };
 
 }
+
+/** @}*/

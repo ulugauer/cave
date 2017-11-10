@@ -69,6 +69,9 @@ typedef struct FrontendWindowInfo
 	const char* windowTitle;		///< Window Title
 }RenderWindowInfo;
 
+/**
+* Window frontend abstract  interface
+*/
 class CAVE_INTERFACE IFrontend
 {
 public:
@@ -108,3 +111,5 @@ public:
 }; 
 
 }
+
+/** @}*/

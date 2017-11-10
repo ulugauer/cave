@@ -26,6 +26,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+/**
+* Win32 frontend  implementation
+*/
 class CAVE_INTERFACE WindowFrontend : public IFrontend
 {
 public:
@@ -62,3 +65,5 @@ private:
 };
 
 }
+
+/** @}*/

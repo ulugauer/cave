@@ -17,7 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       handle engine allocations
 
 
-/** \addtogroup engine 
+/** @addtogroup engine 
 *  @{
 *       
 */
@@ -27,6 +27,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+/**
+* Engine internal global allocation Handling
+*/
 class AllocatorGlobal : public AllocatorBase
 {
 public:
@@ -71,3 +74,5 @@ private:
 }; 
 
 }
+
+/** @}*/

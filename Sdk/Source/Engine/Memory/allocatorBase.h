@@ -17,11 +17,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       handle engine allocations
 
 
-/** \addtogroup engine 
+/** @addtogroup engine 
 *  @{
 *       
 */
 
+#include "engineTypes.h"
 #include "engineError.h"
 
 #include <cassert>
@@ -29,7 +30,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-///< see http://www.gamedev.net/page/resources/_/technical/general-programming/c-custom-memory-allocation-r3010 
+// see http://www.gamedev.net/page/resources/_/technical/general-programming/c-custom-memory-allocation-r3010 
 
 /**
 * Engine internal allocation Handling
@@ -224,3 +225,5 @@ void DeallocateArray(AllocatorBase& allocator, T* array)
 }
 
 }
+
+/** @}*/

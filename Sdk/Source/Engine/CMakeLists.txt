@@ -59,6 +59,8 @@ target_include_directories(cave PRIVATE Render)
 target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Os)
 target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Backends)
 target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Frontends)
+# 3rd party libs
+target_include_directories(cave PRIVATE ${PROJECT_3RDPARTY_JSON_DIR})
 
 # Creates folder "cave" and adds target project (cave.vcproj)
 set_property(TARGET cave PROPERTY FOLDER "sdk")

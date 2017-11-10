@@ -44,7 +44,8 @@ ENDIF()
 #-------------------------------------------------------------------------------
 # 3rdparty Dependencies
 #-------------------------------------------------------------------------------
-
+set(PROJECT_3RDPARTY_SHARED_DIR ${PROJECT_SOURCE_DIR}/3rdparty/Shared)
+set(PROJECT_3RDPARTY_JSON_DIR ${PROJECT_3RDPARTY_SHARED_DIR}/Json)
 
 #-------------------------------------------------------------------------------
 # Platform defines

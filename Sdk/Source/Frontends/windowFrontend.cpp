@@ -23,10 +23,10 @@ namespace cave
 /**
 * @brief Static window event handling function
 *
-* @param[hWnd] hWnd 	Window handle
-* @param[hWnd] message 	Window message id
-* @param[hWnd] wParam 	Window message param
-* @param[hWnd] lParam 	Window message param
+* @param[in] hWnd 	Window handle
+* @param[in] message 	Window message id
+* @param[in] wParam 	Window message param
+* @param[in] lParam 	Window message param
 *
 * @return  callback result
 */

@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineTypes.h"
 #include "frontend.h"
 
-/** \addtogroup engine
+/** @addtogroup engine
 *  @{
 *		This module contains all code related to the engine
 */
