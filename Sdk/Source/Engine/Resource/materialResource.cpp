@@ -18,13 +18,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "materialResource.h"
 #include "shaderResource.h"
 #include "engineError.h"
+#include "vector3.h"
 
 #include "json.hpp"
 
 #include <fstream>
 #include <iostream>
 
-using json = nlohmann::json;
+using json = nlohmann::json;	///< convenience shortcut
 
 namespace cave
 {
@@ -73,7 +74,8 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 	fileStream >> asset;
 	std::string materialName("");
 	float opacity = 0.0f;
-	std::vector<float> diffuse;
+	std::vector<float> diffuseValue;
+	Vector3f diffuseColor(0,0,0);
 
 	// find material entry
 	if (asset.find("material") != asset.end())
@@ -94,7 +96,15 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 				if (materialValues.count("opacity") > 0)
 					opacity = materialValues["opacity"].get<float>();
 				if (materialValues.count("diffuse") > 0)
-					diffuse = materialValues["diffuse"].get< std::vector<float> >();
+				{
+					diffuseValue = materialValues["diffuse"].get< std::vector<float> >();
+					if (diffuseValue.size() == 3)
+					{
+						diffuseColor._x = diffuseValue[0];
+						diffuseColor._y = diffuseValue[1];
+						diffuseColor._z = diffuseValue[2];
+					}
+				}
 			}
 		}
 	}
@@ -103,6 +113,7 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 
 	// clamp values
 	opacity = std::min(0.0f, opacity);
+	Magnitude(diffuseColor);
 
 	// find program entry
 	std::string programName("");

@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <fstream>
 #include <iostream>
 
-using json = nlohmann::json;
+using json = nlohmann::json;	///< convenience shortcut
 
 namespace cave
 {
