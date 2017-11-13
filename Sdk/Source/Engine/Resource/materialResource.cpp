@@ -29,7 +29,7 @@ namespace cave
 {
 
 // our default relative locations for materials
-static const char* g_materialLocation = "materials/";
+static const char* g_materialLocation = "Materials/";
 
 
 MaterialResource::MaterialResource(ResourceManagerPrivate* rm)

@@ -26,7 +26,7 @@ namespace cave
 {
 
 // our default relative locations
-static const char* g_contentLocation = "/content/";
+static const char* g_contentLocation = "/Content/";
 
 //-----------------------------------------------------------------------------
 // ResourceObjectFinder class
@@ -82,11 +82,6 @@ bool ResourceObjectFinder::OpenFileAscii(const char* file, std::ifstream& inStre
 			}
 		}
 	}
-
-	std::string errorPath(_projectContentPath);
-	errorPath.append(file);
-	std::cerr << "FILE: " << errorPath << " " << errorPath.length() << std::endl;
-	std::cerr << "FILE Open Error: " << strerror(errno) << std::endl;
 
 	return false;
 }
