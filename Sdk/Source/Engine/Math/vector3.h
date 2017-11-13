@@ -69,12 +69,12 @@ public:
 	/** operator + */
 	Vector3<T> operator+(const Vector3<T>& v) const
 	{
-		return Vector3<T>(_x + v._x, _y + v._y, z + v._z);
+		return Vector3<T>(_x + v._x, _y + v._y, _z + v._z);
 	}
 	/** operator - */
 	Vector3<T> operator-(const Vector3<T>& v) const
 	{
-		return Vector3<T>(_x - v._x, _y - v._y, z - v._z);
+		return Vector3<T>(_x - v._x, _y - v._y, _z - v._z);
 	}
 	/** operator scalar mul */
 	Vector3<T> operator*(T s) const
