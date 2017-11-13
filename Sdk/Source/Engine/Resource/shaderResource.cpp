@@ -58,6 +58,7 @@ bool ShaderResource::LoadShaderAsset(ResourceObjectFinder& objectFinder, const c
 
 	// add default local serach path
 	objectFinder._localSearchPath.push_back(g_shaderLocation);
+	objectFinder._localSearchPath.push_back(g_shaderLocationSpirv);
 
 	std::ifstream stream;
 	if (!objectFinder.OpenFileBinary(fileString.c_str(), stream))

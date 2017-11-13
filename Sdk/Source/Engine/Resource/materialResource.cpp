@@ -101,6 +101,9 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 	else
 		return false;
 
+	// clamp values
+	opacity = std::min(0.0f, opacity);
+
 	// find program entry
 	std::string programName("");
 	std::string language("");
