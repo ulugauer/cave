@@ -137,7 +137,15 @@ int main(int argc, char* argv[])
 
 	// load resources
 	ResourceManager& rm = engineInstance->GetResourceManager();
-	rm.LoadMaterialAsset("ColoredMaterial.asset");
+	try
+	{
+		rm.LoadMaterialAsset("ColoredMaterial.asset");
+	}
+	catch (cave::EngineError err)
+	{
+		std::cerr << err.what();
+		return -1;
+	}
 
 	do {
 

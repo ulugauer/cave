@@ -13,14 +13,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file materialResource.h
-///       Handles material assets
+/// @file shaderResource.h
+///       Handles shader assets
 
 #include "resourceManagerPrivate.h"
 
 /** \addtogroup engine
 *  @{
-*	
+*
 */
 
 namespace cave
@@ -29,7 +29,7 @@ namespace cave
 /**
 * Load material assets
 */
-class CAVE_INTERFACE MaterialResource
+class CAVE_INTERFACE ShaderResource
 {
 public:
 	/**
@@ -38,32 +38,51 @@ public:
 	* @param[in] rm	Pointer to resource manager
 	*
 	*/
-	MaterialResource(ResourceManagerPrivate* rm);
+	ShaderResource(ResourceManagerPrivate* rm);
 	/** @brief Destructor */
-	~MaterialResource();
+	~ShaderResource();
 
 
 	/**
-	* @brief Load a material asset
+	* @brief Load a shader asset
 	*
 	* @param objectFinder	Helper class to find resource
-	* @param file			String to json file
+	* @param shaderFile		String to shader file including path
+	* @param language		Language type string (glsl, hlsl, spirv)
+	* @param type			Shader type string (vertex, fragment, geometry, tessellation)
 	*
 	* @return true if successful
 	*/
-	virtual bool LoadMaterialAsset(ResourceObjectFinder& objectFinder, const char* file);
+	virtual bool LoadShaderAsset(ResourceObjectFinder& objectFinder, const char* shaderFile, const char* language, const char* type);
 
 private:
 
 	/**
-	* @brief Load a material asset from a json file
+	* @brief Load a shader code from file
 	*
-	* @param objectFinder	Helper class to find resource
 	* @param fileStream	File stream where we read from
 	*
 	* @return true if successful
 	*/
-	bool LoadMaterialJson(ResourceObjectFinder& objectFinder, std::ifstream& fileStream);
+	bool ParseShader(std::ifstream& fileStream);
+
+	/**
+	* @brief Check if shader languge is supported
+	*
+	* @param language	Shader language string (glsl, spirv, hlsl)
+	*
+	* @return true if supported
+	*/
+	bool IsLanguageSupported(const char* language);
+
+	/**
+	* @brief Check if program type is supported
+	*
+	* @param type	Program type string (vertex, fragment)
+	*
+	* @return true if supported
+	*/
+	bool IsProgramTypeSupported(const char* type);
 
 private:
 	ResourceManagerPrivate* _pResourceManagerPrivate;	///< Pointer to private resource manger
@@ -72,4 +91,5 @@ private:
 }
 
 /** @}*/
+
 

@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///        Handles material assets
 
 #include "materialResource.h"
+#include "shaderResource.h"
 #include "engineError.h"
 
 #include "json.hpp"
@@ -60,24 +61,91 @@ bool MaterialResource::LoadMaterialAsset(ResourceObjectFinder& objectFinder, con
 		return false;
 	}
 
-	LoadMaterialJson(fileStream);
+	bool success = LoadMaterialJson(objectFinder, fileStream);
+	fileStream.close();
 
-	return  false;
+	return success;
 }
 
-bool MaterialResource::LoadMaterialJson(std::ifstream& fileStream)
+bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std::ifstream& fileStream)
 {
-	json materialJson;
-	fileStream >> materialJson;
+	json asset;
+	fileStream >> asset;
+	std::string materialName("");
+	float opacity = 0.0f;
+	std::vector<float> diffuse;
 
-	// find an entry
-	if (materialJson.find("material") != materialJson.end())
+	// find material entry
+	if (asset.find("material") != asset.end())
 	{
-		// there is an entry with key "foo"
-		json::iterator it = materialJson.find("material");
-		std::cerr << it.value();
-	}
+		// there is an entry with key "material"
+		json::iterator itM = asset.find("material");
+		if (itM != asset.end() && itM.value().is_object())
+		{
+			json material = itM.value();
+			if (material.count("name") > 0)
+				materialName = material["name"].get<std::string>();
 
+			// read material value object
+			json::iterator itV = material.find("values");
+			if (itV != material.end() && itV.value().is_object())
+			{
+				json materialValues = itV.value();
+				if (materialValues.count("opacity") > 0)
+					opacity = materialValues["opacity"].get<float>();
+				if (materialValues.count("diffuse") > 0)
+					diffuse = materialValues["diffuse"].get< std::vector<float> >();
+			}
+		}
+	}
+	else
+		return false;
+
+	// find program entry
+	std::string programName("");
+	std::string language("");
+	std::string vertexShaderName("");
+	std::string vertexShaderType("");
+	std::string fragmentShaderName("");
+	std::string fragmentShaderType("");
+	if (asset.find("program") != asset.end())
+	{
+		// there is an entry with key "program"
+		json::iterator itP = asset.find("program");
+		if (itP != asset.end() && itP.value().is_object())
+		{
+			json program = itP.value();
+			if (program.count("name") > 0)
+				programName = program["name"].get<std::string>();
+			if (program.count("language") > 0)
+				language = program["language"].get<std::string>();
+
+			// read vertex shader
+			json::iterator itVertex = program.find("vertex");
+			if (itVertex != program.end() && itVertex.value().is_object())
+			{
+				json vertexValues = itVertex.value();
+				if (vertexValues.count("source") > 0)
+					vertexShaderName = vertexValues["source"].get<std::string>();
+				if (vertexValues.count("type") > 0)
+					vertexShaderType = vertexValues["type"].get<std::string>();
+			}
+			// read fragment shader
+			json::iterator itFragment = program.find("fragment");
+			if (itFragment != program.end() && itFragment.value().is_object())
+			{
+				json fragmentValues = itFragment.value();
+				if (fragmentValues.count("source") > 0)
+					fragmentShaderName = fragmentValues["source"].get<std::string>();
+				if (fragmentValues.count("type") > 0)
+					fragmentShaderType = fragmentValues["type"].get<std::string>();
+			}
+		}
+
+		ShaderResource sr(_pResourceManagerPrivate);
+		sr.LoadShaderAsset(objectFinder, fragmentShaderName.c_str(), language.c_str(), vertexShaderType.c_str());
+		sr.LoadShaderAsset(objectFinder, vertexShaderName.c_str(), language.c_str(), fragmentShaderType.c_str());
+	}
 
 	return true;
 }

@@ -67,6 +67,16 @@ public:
 	bool OpenFileAscii(const char* file, std::ifstream& fileStream);
 
 	/**
+	* @brief Open the file in binary read mode
+	*
+	* @param[in] file File name string
+	* @param[in] fileStream The stream we use for reading
+	*
+	* @return true if successful
+	*/
+	bool OpenFileBinary(const char* file, std::ifstream& fileStream);
+
+	/**
 	* @brief Extract filename from an input string
 	*
 	* @param[in] file File name string may include path

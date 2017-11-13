@@ -54,7 +54,15 @@ bool ResourceManager::LoadMaterialAsset(const char* file)
 	if (!file)
 		return false;
 
-	return _pResourceManagerPrivate->LoadMaterialAsset(file);
+	if (!_pResourceManagerPrivate->LoadMaterialAsset(file))
+	{
+		std::string msg("Failed to load material asset: ");
+		msg.append(file);
+		_pResourceManagerPrivate->_pEngineInstance->GetEngineLog()->Error("Failed to load material asset %s", file);
+		throw EngineError(msg);
+	}
+
+	return true;
 }
 
 }

@@ -86,6 +86,43 @@ bool ResourceObjectFinder::OpenFileAscii(const char* file, std::ifstream& inStre
 	return false;
 }
 
+bool ResourceObjectFinder::OpenFileBinary(const char* file, std::ifstream& fileStream)
+{
+	// first search in project dir if available
+	if (!_projectContentPath.empty())
+	{
+		for (size_t i = 0; i < _localSearchPath.size(); i++)
+		{
+			std::string projPath(_projectContentPath);
+			projPath.append(_localSearchPath[i]);
+			projPath.append(file);
+			// we open the from the end to get the file content size
+			fileStream.open(projPath.c_str(), std::ios::in | std::ios::binary);
+			if (fileStream.is_open())
+			{
+				return true;
+			}
+		}
+	}
+
+	if (!_appContentPath.empty())
+	{
+		for (size_t i = 0; i < _localSearchPath.size(); i++)
+		{
+			std::string appPath(_appContentPath);
+			appPath.append(_localSearchPath[i]);
+			appPath.append(file);
+			fileStream.open(appPath.c_str(), std::ios::in | std::ios::binary);
+			if (fileStream.is_open())
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 std::string ResourceObjectFinder::GetFileName(const char* file)
 {
 	std::string input(file);
@@ -171,7 +208,6 @@ bool ResourceManagerPrivate::LoadMaterialAsset(const char* file)
 	MaterialResource mr(this);
 
 	return mr.LoadMaterialAsset(objectFinder, file);
-
 }
 
 
