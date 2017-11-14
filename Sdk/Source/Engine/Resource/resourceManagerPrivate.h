@@ -162,6 +162,13 @@ public:
 	const std::string GetProjectPath() { return _projectPath; }
 
 	/**
+	* @brief Get render device
+	*
+	* @return RenderDevice object
+	*/
+	RenderDevice* GetRenderDevice() { return _pRenderDevice; }
+
+	/**
 	* @brief Load a material asset
 	*
 	* @param file String to file

@@ -44,7 +44,10 @@ struct CAVE_INTERFACE RenderMaterialDataStruct
 	float _opacity;		///< Material opacity
 	float _padding[3];	///< structure padding
 
+	/** default constructor */
 	RenderMaterialDataStruct() {}
+
+	/** copy ctor */
 	RenderMaterialDataStruct(const RenderMaterialDataStruct& rhs)
 	{
 		_ambient = rhs._ambient;
@@ -53,6 +56,7 @@ struct CAVE_INTERFACE RenderMaterialDataStruct
 		_opacity = rhs._opacity;
 	}
 
+	/** assigment operator */
 	RenderMaterialDataStruct& operator=(const RenderMaterialDataStruct& rhs)
 	{
 		_ambient = rhs._ambient;
@@ -67,7 +71,7 @@ struct CAVE_INTERFACE RenderMaterialDataStruct
 
 
 /**
-* Interface of renderer materials
+* @brief Interface for render materials
 */
 class CAVE_INTERFACE RenderMaterial
 {
@@ -96,12 +100,34 @@ public:
 	/**
 	* @brief Set ambient color
 	*
-	* @param[in] ambient	Ambient color vector
+	* @param[in] diffuse	Diffuse color vector
 	*
 	*/
 	void SetDiffuseColor(Vector4f diffuse)
 	{
 		_materialData._diffuse = diffuse;
+	}
+
+	/**
+	* @brief Set emissive color
+	*
+	* @param[in] emissive	Emissive color vector
+	*
+	*/
+	void SetEmissiveColor(Vector4f emissive)
+	{
+		_materialData._emissive = emissive;
+	}
+
+	/**
+	* @brief Set material opacity
+	*
+	* @param[in] opacity	Material opacity
+	*
+	*/
+	void SetOpacity(float opacity)
+	{
+		_materialData._opacity = opacity;
 	}
 
 private:

@@ -17,8 +17,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "materialResource.h"
 #include "shaderResource.h"
+#include "renderMaterial.h"
 #include "engineError.h"
-#include "Math/vector3.h"
+#include "Math/vector4.h"
 
 #include "json.hpp"
 
@@ -74,8 +75,10 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 	fileStream >> asset;
 	std::string materialName("");
 	float opacity = 0.0f;
+	Vector4f ambientColor(0, 0, 0, 1);
+	Vector4f diffuseColor(1,1,1,1);
+	Vector4f emissiveColor(0, 0, 0, 0);
 	std::vector<float> diffuseValue;
-	Vector3f diffuseColor(0,0,0);
 
 	// find material entry
 	if (asset.find("material") != asset.end())
@@ -111,9 +114,11 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 	else
 		return false;
 
-	// clamp values
-	opacity = std::min(0.0f, opacity);
-	Magnitude(diffuseColor);
+	RenderMaterial material(*_pResourceManagerPrivate->GetRenderDevice());
+	material.SetAmbientColor(ambientColor);
+	material.SetDiffuseColor(diffuseColor);
+	material.SetEmissiveColor(emissiveColor);
+	material.SetOpacity(opacity);
 
 	// find program entry
 	std::string programName("");

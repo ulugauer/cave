@@ -39,7 +39,7 @@ public:
 	T _z;	///< z componente
 	T _w;	///< w componente
 
-			/** default constructor */
+	/** default constructor */
 	Vector4<T>() {};
 
 	/** constructor
