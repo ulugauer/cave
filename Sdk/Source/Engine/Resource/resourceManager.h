@@ -26,6 +26,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+// forwards
+class RenderDevice;
+
 /**
 * Interface to Global Resource Manager
 */
@@ -35,12 +38,12 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] engine	Pointer to engine instance
+	* @param[in] device	Pointer to render device
 	* @param[in] applicationPath	Path to application
 	* @param[in] projectPath	Path to project
 	*
 	*/
-	ResourceManager(EngineInstancePrivate* engine, const char* applicationPath, const char* projectPath);
+	ResourceManager(RenderDevice* device, const char* applicationPath, const char* projectPath);
 	/** @brief Destructor */
 	~ResourceManager();
 	/** @brief copy constructor */
@@ -57,7 +60,7 @@ public:
 	/**
 	* @brief Load a material asset
 	*
-	* @param file String to file
+	* @param[in] file					String to file
 	*
 	* @return true if successful
 	*/

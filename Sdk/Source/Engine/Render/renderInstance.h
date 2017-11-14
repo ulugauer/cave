@@ -34,6 +34,7 @@ namespace cave
 /// forward declaration
 class EngineInstancePrivate;
 class RenderDevice;
+class EngineLog;
 
 /**
 * Abstraction type of a device instance
@@ -61,6 +62,13 @@ public:
 	std::shared_ptr<AllocatorGlobal> GetEngineAllocator();
 
 	/**
+	* @brief GetEngineLog
+	*
+	* @return Pointer to engine logging
+	*/
+	EngineLog* GetEngineLog() const;
+
+	/**
 	* @brief Create a render device
 	*
 	* @param[in] windowInfo	Window creation info
@@ -75,6 +83,20 @@ public:
 	* @param[in] renderDevice Pointer to a render device
 	*/
 	void ReleaseRenderDevice(RenderDevice* renderDevice);
+
+	/**
+	* @brief Get Ppoject path
+	*
+	* @return path string
+	*/
+	const char* GetProjectPath() const;
+
+	/**
+	* @brief Get application path
+	*
+	* @return path string
+	*/
+	const char* GetApplicationPath() const;
 
 private:
 	EngineInstancePrivate* _pEngineInstance;	///< Pointer to the engine instance we belong to

@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file renderDevice.h
 ///       Render device interface
 
+#include "Resource/resourceManager.h"
 #include "halRenderDevice.h"
 #include "engineTypes.h"
 #include "frontend.h"
@@ -32,6 +33,7 @@ namespace cave
 class HalInstance;
 class HalRenderDevice;
 class RenderInstance;
+class EngineLog;
 
 /**
 * Abstraction type of a device instance
@@ -52,17 +54,41 @@ public:
 	~RenderDevice();
 
 	/**
+	* @brief GetAllocator
+	*
+	* @return Pointer Engine allocator
+	*/
+	std::shared_ptr<AllocatorGlobal> GetEngineAllocator();
+
+	/**
+	* @brief GetEngineLog
+	*
+	* @return Pointer to engine logging
+	*/
+	EngineLog* GetEngineLog() const;
+
+	/**
 	* @brief Create a swap chain
 	*
 	*/
 	void CreateSwapChain();
 
+	/**
+	* @brief Get Resource manager
+	*
+	* @return ResourceManager Object
+	*/
+	ResourceManager& GetResourceManager()
+	{
+		return *_pResourceManager;
+	}
+
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to
 	HalInstance* _pHalInstance;	///< Pointer to HAL Instance
 	HalRenderDevice* _pHalRenderDevice;	///< Pointer to HAL render device
+	ResourceManager* _pResourceManager;	///< Our device resource manager
 	SwapChainInfo _swapChainInfo;	///< swap chain info
-	
 };
 
 }

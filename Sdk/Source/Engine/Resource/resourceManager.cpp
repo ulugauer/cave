@@ -18,21 +18,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "resourceManager.h"
 #include "engineInstancePrivate.h"
 #include "engineError.h"
+#include "renderDevice.h"
 
 #include "json.hpp"
 
 namespace cave
 {
 
-ResourceManager::ResourceManager(EngineInstancePrivate* engine, const char* applicationPath, const char* projectPath)
+ResourceManager::ResourceManager(RenderDevice* device, const char* applicationPath, const char* projectPath)
 	: _pResourceManagerPrivate(nullptr)
 {
 	// Create our logger. By default no logging
-	_pResourceManagerPrivate = AllocateObject<ResourceManagerPrivate>(*engine->GetEngineAllocator(), engine, applicationPath, projectPath);
+	_pResourceManagerPrivate = AllocateObject<ResourceManagerPrivate>(*device->GetEngineAllocator(), device, applicationPath, projectPath);
 
-	if (!_pResourceManagerPrivate && engine->GetEngineLog())
+	if (!_pResourceManagerPrivate && device->GetEngineLog())
 	{
-		engine->GetEngineLog()->Error("Failed to create resource manager");
+		device->GetEngineLog()->Error("Failed to create resource manager");
 		throw EngineError("Failed to resource manager");
 	}
 }
@@ -58,7 +59,7 @@ bool ResourceManager::LoadMaterialAsset(const char* file)
 	{
 		std::string msg("Failed to load material asset: ");
 		msg.append(file);
-		_pResourceManagerPrivate->_pEngineInstance->GetEngineLog()->Error("Failed to load material asset %s", file);
+		_pResourceManagerPrivate->_pRenderDevice->GetEngineLog()->Error("Failed to load material asset %s", file);
 		throw EngineError(msg);
 	}
 

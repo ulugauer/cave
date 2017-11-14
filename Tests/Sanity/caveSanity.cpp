@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
 	frontend->DisplayWindow();
 
 	// load resources
-	ResourceManager& rm = engineInstance->GetResourceManager();
+	ResourceManager& rm = renderDevice->GetResourceManager();
 	try
 	{
 		rm.LoadMaterialAsset("ColoredMaterial.asset");

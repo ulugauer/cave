@@ -92,21 +92,29 @@ public:
 	*/
 	std::shared_ptr<AllocatorGlobal> GetEngineAllocator() { return _pAllocator; }
 
-	/**
-	* @brief Get Resource manager
-	*
-	* @return ResourceManager Object
-	*/
-	ResourceManager& GetResourceManager() { return *_pResourceManager; }
 	
+	/**
+	* @brief Get Ppoject path
+	*
+	* @return path string
+	*/
+	const char* GetProjectPath() const { return _ProjectPath.c_str(); }
+
+	/**
+	* @brief Get application path
+	*
+	* @return path string
+	*/
+	const char* GetApplicationPath() const { return _ApplicationPath.c_str(); }
 
 private:
 	std::shared_ptr<AllocatorGlobal>    _pAllocator;	///< Pointer to engine custom allocations
 	RenderInstance* _pRenderInstance;	///< Pointer to render instance
 	IFrontend* _pFrontend;	///< Interface pointer to widow frontend
-	ResourceManager* _pResourceManager;	///< Our engine wide resource manager
 	EngineLog* _pEngineLog;	///< Our engine wide message logger
 	std::string _ApplicationName;	///< Optional specified at creation time
+	std::string _ProjectPath;	///< Path to project provided by the caller
+	std::string _ApplicationPath;	///< Path to runtime binary
 };
 
 }

@@ -183,9 +183,9 @@ bool ResourceObjectFinder::CaseInsensitiveStringCompare(const std::string& str1,
 //-----------------------------------------------------------------------------
 // ResourceManagerPrivate class
 //-----------------------------------------------------------------------------
-ResourceManagerPrivate::ResourceManagerPrivate(EngineInstancePrivate* engine
+ResourceManagerPrivate::ResourceManagerPrivate(RenderDevice* device
 	, const char* applicationPath, const char* projectPath)
-	: _pEngineInstance(engine)
+	: _pRenderDevice(device)
 	, _appPath(applicationPath)
 	, _projectPath(projectPath)
 {
@@ -199,7 +199,7 @@ ResourceManagerPrivate::~ResourceManagerPrivate()
 std::shared_ptr<AllocatorGlobal>
 ResourceManagerPrivate::GetEngineAllocator()
 {
-	return _pEngineInstance->GetEngineAllocator();
+	return _pRenderDevice->GetEngineAllocator();
 }
 
 bool ResourceManagerPrivate::LoadMaterialAsset(const char* file)

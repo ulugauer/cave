@@ -32,7 +32,7 @@ namespace cave
 {
 
 /// forward declaration
-class EngineInstancePrivate;
+class RenderDevice;
 
 // forwards
 class ResourceManagerPrivate;
@@ -126,12 +126,12 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] engine	Pointer to engine instance
+	* @param[in] device				Pointer to render device
 	* @param[in] applicationPath	Path to application
-	* @param[in] projectPath	Path to project
+	* @param[in] projectPath		Path to project
 	*
 	*/
-	ResourceManagerPrivate(EngineInstancePrivate* engine
+	ResourceManagerPrivate(RenderDevice* device
 							, const char* applicationPath
 							, const char* projectPath);
 	/** @brief Destructor */
@@ -171,7 +171,7 @@ public:
 	bool LoadMaterialAsset(const char* file);
 
 private:
-	EngineInstancePrivate* _pEngineInstance;	///< Pointer to the engine instance we belong to
+	RenderDevice* _pRenderDevice;	///< Pointer to the render device we belong to
 	std::string _appPath;		///< Application runtime path
 	std::string _projectPath;	///< Project root path
 };

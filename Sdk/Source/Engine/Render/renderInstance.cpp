@@ -65,6 +65,11 @@ RenderInstance::GetEngineAllocator()
 	return _pEngineInstance->GetEngineAllocator();
 }
 
+EngineLog* RenderInstance::GetEngineLog() const
+{
+	return _pEngineInstance->GetEngineLog();
+}
+
 RenderDevice* RenderInstance::CreateRenderDevice(FrontendWindowInfo& windowInfo)
 {
 	RenderDevice* renderDevice = nullptr;
@@ -77,6 +82,16 @@ RenderDevice* RenderInstance::CreateRenderDevice(FrontendWindowInfo& windowInfo)
 void RenderInstance::ReleaseRenderDevice(RenderDevice* renderDevice)
 {
 	DeallocateDelete(*_pEngineInstance->GetEngineAllocator(), *renderDevice);
+}
+
+const char* RenderInstance::GetProjectPath() const
+{ 
+	return _pEngineInstance->GetProjectPath(); 
+}
+
+const char* RenderInstance::GetApplicationPath() const
+{
+	return _pEngineInstance->GetApplicationPath();
 }
 
 }

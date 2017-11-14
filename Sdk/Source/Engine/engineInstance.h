@@ -81,16 +81,6 @@ public:
 		return _pEnginePrivate->CreateFrontend();
 	}
 
-	/**
-	* @brief Get Resource manager
-	*
-	* @return ResourceManager Object
-	*/
-	ResourceManager& GetResourceManager() 
-	{ 
-		return _pEnginePrivate->GetResourceManager();
-	}
-
 private:
 	EngineInstancePrivate* _pEnginePrivate;		///< Pointer to not exported engine instance
 };

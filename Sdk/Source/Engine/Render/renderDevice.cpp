@@ -27,6 +27,7 @@ RenderDevice::RenderDevice(RenderInstance* renderInstance, HalInstance* halInsta
 	: _pRenderInstance(renderInstance)
 	, _pHalInstance(halInstance)
 	, _pHalRenderDevice(nullptr)
+	, _pResourceManager(nullptr)
 {
 	// first copy data
 	_swapChainInfo.colorBits = windowInfo.colorBits;
@@ -47,6 +48,10 @@ RenderDevice::RenderDevice(RenderInstance* renderInstance, HalInstance* halInsta
 	try
 	{
 		_pHalRenderDevice = halInstance->CreateRenderDevice(renderInstance->GetEngineAllocator(), _swapChainInfo);
+		_pResourceManager = AllocateObject<ResourceManager>(*renderInstance->GetEngineAllocator()
+				, this
+				, renderInstance->GetApplicationPath()
+				, renderInstance->GetProjectPath() );
 	}
 	catch (std::exception& e)
 	{
@@ -57,8 +62,22 @@ RenderDevice::RenderDevice(RenderInstance* renderInstance, HalInstance* halInsta
 
 RenderDevice::~RenderDevice()
 {
+	if (_pResourceManager)
+		DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *_pResourceManager);
+
 	if (_pHalRenderDevice)
 		DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *_pHalRenderDevice);
+}
+
+std::shared_ptr<AllocatorGlobal>
+RenderDevice::GetEngineAllocator()
+{
+	return _pRenderInstance->GetEngineAllocator();
+}
+
+EngineLog* RenderDevice::GetEngineLog() const
+{
+	return _pRenderInstance->GetEngineLog();
 }
 
 void RenderDevice::CreateSwapChain()
