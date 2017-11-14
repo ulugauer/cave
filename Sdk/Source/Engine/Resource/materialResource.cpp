@@ -18,7 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "materialResource.h"
 #include "shaderResource.h"
 #include "engineError.h"
-#include "vector3.h"
+#include "Math/vector3.h"
 
 #include "json.hpp"
 

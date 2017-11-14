@@ -13,11 +13,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file vector3.h
+/// @file vector4.h
 ///       Handles material assets
 
-#include <limits>
-#include <cmath>
+#include "vector3.h"
 
 /** \addtogroup engine
 *  @{
@@ -29,91 +28,101 @@ namespace cave
 
 
 /**
-* @brief Vector 3 implementation
+* @brief Vector 4 implementation
 */
 template<typename T>
-class CAVE_INTERFACE Vector3
+class CAVE_INTERFACE Vector4
 {
 public:
 	T _x;	///< x componente
 	T _y;	///< y componente
 	T _z;	///< z componente
+	T _w;	///< w componente
 
-	/** default constructor */
-	Vector3<T>() {};
+			/** default constructor */
+	Vector4<T>() {};
 
 	/** constructor
 	* param[in] x	x value
 	* param[in] y	y value
 	* param[in] z	z value
+	* param[in] w	w value
 	*/
-	Vector3<T>(T x, T y, T z)
-		: _x(x), _y(y), _z(z)
+	Vector4<T>(T x, T y, T z, T w)
+		: _x(x), _y(y), _z(z), _w(w)
+	{}
+
+	/** constructor
+	* param[in] v	3D vector
+	*/
+	Vector4<T>(const Vector3<T>& v)
+		: _x(v._x), _y(v._y), _z(v._z), _w(1)
 	{}
 
 	/** destructor */
-	~Vector3<T>() {}
+	~Vector4<T>() {}
 
 	/** copy ctor */
-	Vector3<T>(const Vector3<T>& v)
-		: _x(v._x), _y(v._y), _z(v._z)
+	Vector4<T>(const Vector4<T>& v)
+		: _x(v._x), _y(v._y), _z(v._z), _w(v._w)
 	{}
 
 	/** assignemnt operator */
-	Vector3<T>& operator=(const Vector3<T>& v)
+	Vector4<T>& operator=(const Vector4<T>& v)
 	{
-		_x = v._x; _y = v._y; _z = v._z;
+		_x = v._x; _y = v._y; _z = v._z; _w = v._w;
 		return *this;
 	}
 
 	/** operator + */
-	Vector3<T> operator+(const Vector3<T>& v) const
+	Vector4<T> operator+(const Vector4<T>& v) const
 	{
-		return Vector3<T>(_x + v._x, _y + v._y, _z + v._z);
+		return Vector3<T>(_x + v._x, _y + v._y, _z + v._z, _w + v._w);
 	}
 	/** operator - */
-	Vector3<T> operator-(const Vector3<T>& v) const
+	Vector4<T> operator-(const Vector4<T>& v) const
 	{
-		return Vector3<T>(_x - v._x, _y - v._y, _z - v._z);
+		return Vector3<T>(_x - v._x, _y - v._y, _z - v._z, _w - v._w);
 	}
 	/** operator scalar mul */
-	Vector3<T> operator*(T s) const
+	Vector4<T> operator*(T s) const
 	{
-		return Vector3<T>(_x*s, _y*s, _z*s);
+		return Vector4<T>(_x*s, _y*s, _z*s, _w*s);
 	}
 	/** operator scalar div */
-	Vector3<T> operator/(T s) const
+	Vector4<T> operator/(T s) const
 	{
 		T inverseS = 1.0 / s;
-		return Vector3<T>(_x*inverseS, _y*inverseS, _z*inverseS);
+		return Vector4<T>(_x*inverseS, _y*inverseS, _z*inverseS, _w*inverseS);
 	}
 
 	/** inline vector normalization */
 	void Normalize()
 	{
-		T magSquared = _x*_x + _y*_y + _z*_z;
+		T magSquared = _x*_x + _y*_y + _z*_z + _w*_w;
 		if (magSquared > 0)
 		{
 			T inverseMag = 1.0 / std::sqrt(magSquared);
 			_x *= inverseMag;
 			_y *= inverseMag;
 			_z *= inverseMag;
+			_w *= inverseMag;
 		}
 	}
 
 };
 
-typedef Vector3<float> Vector3f;	///< type specialization
-typedef Vector3<double> Vector3d;	///< type specialization
+typedef Vector4<float> Vector4f;	///< type specialization
+typedef Vector4<double> Vector4d;	///< type specialization
 
 /**
 * @brief Compute vector magniture (specialized template)
 *
 * @param[in] v	Pointer to vector
 */
-inline float Magnitude(const Vector3f& v)
+inline float Magnitude(const Vector4f& v)
 {
-	return std::sqrt(v._x * v._x + v._y * v._y + v._z * v._z);
+	return std::sqrt(v._x * v._x + v._y * v._y + v._z * v._z + v._w * v._w);
 }
 
 /**
@@ -121,11 +130,12 @@ inline float Magnitude(const Vector3f& v)
 *
 * @param[in] v	Pointer to vector
 */
-inline double Magnitude(const Vector3d& v)
+inline double Magnitude(const Vector4d& v)
 {
-	return std::sqrt(v._x * v._x + v._y * v._y + v._z * v._z);
+	return std::sqrt(v._x * v._x + v._y * v._y + v._z * v._z + v._w * v._w);
 }
 
 }
 
 /** @}*/
+

@@ -29,7 +29,11 @@ set(ENGINE_SOURCE engineDefines.h
 set(RENDER_SOURCE Render/renderInstance.h 
 				  Render/renderInstance.cpp 
 				  Render/renderDevice.h 
-				  Render/renderDevice.cpp)
+				  Render/renderDevice.cpp 
+				  Render/renderMaterial.h 
+				  Render/renderMaterial.cpp 
+				  Render/renderShader.h 
+				  Render/renderShader.cpp )
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h
