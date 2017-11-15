@@ -16,7 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file resourceManager.h
 ///       Handle all kind of resources (images, shaders,...)
 
-#include "renderMaterial.h"
+#include "Render/renderMaterial.h"
 #include "resourceManagerPrivate.h"
 
 /** \addtogroup engine

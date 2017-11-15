@@ -46,7 +46,7 @@ public:
 	* param[in] x	x value
 	*/
 	Vector3<T>(T x)
-		: _x(x), _y(x), _z(x), _w(x)
+		: _x(x), _y(x), _z(x)
 	{}
 
 	/** constructor
