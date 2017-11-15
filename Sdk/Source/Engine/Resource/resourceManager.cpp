@@ -50,20 +50,17 @@ ResourceManager::GetEngineAllocator()
 	return _pResourceManagerPrivate->GetEngineAllocator();
 }
 
-bool ResourceManager::LoadMaterialAsset(const char* file)
+RenderMaterial ResourceManager::LoadMaterialAsset(const char* file)
 {
 	if (!file)
-		return false;
-
-	if (!_pResourceManagerPrivate->LoadMaterialAsset(file))
 	{
-		std::string msg("Failed to load material asset: ");
-		msg.append(file);
-		_pResourceManagerPrivate->_pRenderDevice->GetEngineLog()->Error("Failed to load material asset %s", file);
-		throw EngineError(msg);
+		_pResourceManagerPrivate->_pRenderDevice->GetEngineLog()->Error("Could not find file %s", file);
+		return RenderMaterial(*_pResourceManagerPrivate->GetRenderDevice());
 	}
 
-	return true;
+	RenderMaterial* material = _pResourceManagerPrivate->LoadMaterialAsset(file);
+
+	return RenderMaterial(*material);
 }
 
 }

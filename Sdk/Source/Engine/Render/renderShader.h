@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Memory/allocatorGlobal.h"
 
 #include <memory>
+#include <mutex>
 
 /** \addtogroup engine
 *  @{
@@ -50,6 +51,8 @@ public:
 
 private:
 	RenderDevice& _renderDevice;	///< Render device object
+	int32_t _refCount;	///< Our reference count
+	class CAVE_INTERFACE std::mutex _refCountMutex; ///< mutex object for ref counter
 };
 
 }

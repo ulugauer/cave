@@ -137,15 +137,7 @@ int main(int argc, char* argv[])
 
 	// load resources
 	ResourceManager& rm = renderDevice->GetResourceManager();
-	try
-	{
-		rm.LoadMaterialAsset("ColoredMaterial.asset");
-	}
-	catch (cave::EngineError err)
-	{
-		std::cerr << err.what();
-		return -1;
-	}
+	RenderMaterial material = rm.LoadMaterialAsset("ColoredMaterial.asset");
 
 	do {
 

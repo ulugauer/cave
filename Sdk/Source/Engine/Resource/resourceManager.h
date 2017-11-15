@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// @file resourceManager.h
 ///       Handle all kind of resources (images, shaders,...)
 
+#include "renderMaterial.h"
 #include "resourceManagerPrivate.h"
 
 /** \addtogroup engine
@@ -64,7 +65,7 @@ public:
 	*
 	* @return true if successful
 	*/
-	virtual bool LoadMaterialAsset(const char* file);
+	virtual RenderMaterial LoadMaterialAsset(const char* file);
 
 
 private:

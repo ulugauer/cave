@@ -32,4 +32,21 @@ RenderMaterial::~RenderMaterial()
 
 }
 
+RenderMaterial::RenderMaterial(const RenderMaterial& rhs)
+	: _renderDevice(rhs._renderDevice)
+{
+	_materialData = rhs._materialData;
+}
+
+RenderMaterial& RenderMaterial::operator=(const RenderMaterial& rhs)
+{
+	_renderDevice = rhs._renderDevice;
+
+	// copy data
+	_materialData = rhs._materialData;
+
+	return *this;
+}
+
+
 }

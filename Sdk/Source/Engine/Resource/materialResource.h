@@ -26,6 +26,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+// forwards
+class RenderMaterial;
+
 /**
 * Load material assets
 */
@@ -46,24 +49,25 @@ public:
 	/**
 	* @brief Load a material asset
 	*
-	* @param objectFinder	Helper class to find resource
-	* @param file			String to json file
+	* @param[in] objectFinder	Helper class to find resource
+	* @param[in] file			String to json file
 	*
-	* @return true if successful
+	* @return RenderMaterial object
 	*/
-	virtual bool LoadMaterialAsset(ResourceObjectFinder& objectFinder, const char* file);
+	virtual RenderMaterial* LoadMaterialAsset(ResourceObjectFinder& objectFinder, const char* file);
 
 private:
 
 	/**
 	* @brief Load a material asset from a json file
 	*
-	* @param objectFinder	Helper class to find resource
-	* @param fileStream	File stream where we read from
+	* @param[in] objectFinder	Helper class to find resource
+	* @param[in] fileStream	File stream where we read from
+	* @param[in|out] material	Pointer to material we fill with data
 	*
 	* @return true if successful
 	*/
-	bool LoadMaterialJson(ResourceObjectFinder& objectFinder, std::ifstream& fileStream);
+	bool LoadMaterialJson(ResourceObjectFinder& objectFinder, std::ifstream& fileStream, RenderMaterial* material);
 
 private:
 	ResourceManagerPrivate* _pResourceManagerPrivate;	///< Pointer to private resource manger

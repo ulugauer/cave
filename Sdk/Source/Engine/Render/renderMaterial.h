@@ -45,7 +45,13 @@ struct CAVE_INTERFACE RenderMaterialDataStruct
 	float _padding[3];	///< structure padding
 
 	/** default constructor */
-	RenderMaterialDataStruct() {}
+	RenderMaterialDataStruct()
+	{
+		_ambient = Vector4f(0);
+		_diffuse = Vector4f(0,0,0,1);
+		_emissive = Vector4f(0);
+		_opacity = 1;
+	}
 
 	/** copy ctor */
 	RenderMaterialDataStruct(const RenderMaterialDataStruct& rhs)
@@ -84,7 +90,11 @@ public:
 	*/
 	RenderMaterial(RenderDevice& renderDevice);
 	/** @brief Destructor */
-	~RenderMaterial();
+	virtual ~RenderMaterial();
+	/** @brief copy constructor */
+	RenderMaterial(const RenderMaterial& rhs);
+	/** assigment operator */
+	RenderMaterial& operator=(const RenderMaterial& rhs);
 
 	/**
 	* @brief Set ambient color

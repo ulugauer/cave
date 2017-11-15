@@ -44,6 +44,13 @@ public:
 
 	/** constructor
 	* param[in] x	x value
+	*/
+	Vector4<T>(T x)
+		: _x(x), _y(x), _z(x), _w(x)
+	{}
+
+	/** constructor
+	* param[in] x	x value
 	* param[in] y	y value
 	* param[in] z	z value
 	* param[in] w	w value

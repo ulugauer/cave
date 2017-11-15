@@ -45,7 +45,7 @@ MaterialResource::~MaterialResource()
 {
 }
 
-bool MaterialResource::LoadMaterialAsset(ResourceObjectFinder& objectFinder, const char* file)
+RenderMaterial* MaterialResource::LoadMaterialAsset(ResourceObjectFinder& objectFinder, const char* file)
 {
 	std::string fileString = objectFinder.GetFileName(file);
 	std::string directory = objectFinder.GetDirectory(file);
@@ -57,19 +57,25 @@ bool MaterialResource::LoadMaterialAsset(ResourceObjectFinder& objectFinder, con
 	// add default local serach path
 	objectFinder._localSearchPath.push_back(g_materialLocation);
 
+	// create a new material
+	RenderMaterial* newMaterial = AllocateObject<RenderMaterial>(*_pResourceManagerPrivate->GetEngineAllocator(), *_pResourceManagerPrivate->GetRenderDevice());
+
 	std::ifstream fileStream;
 	if (!objectFinder.OpenFileAscii(fileString.c_str(), fileStream))
 	{
-		return false;
+		return newMaterial;
 	}
 
-	bool success = LoadMaterialJson(objectFinder, fileStream);
-	fileStream.close();
+	if (newMaterial)
+	{
+		LoadMaterialJson(objectFinder, fileStream, newMaterial);
+		fileStream.close();
+	}
 
-	return success;
+	return newMaterial;
 }
 
-bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std::ifstream& fileStream)
+bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std::ifstream& fileStream, RenderMaterial* material)
 {
 	json asset;
 	fileStream >> asset;
@@ -87,13 +93,13 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 		json::iterator itM = asset.find("material");
 		if (itM != asset.end() && itM.value().is_object())
 		{
-			json material = itM.value();
-			if (material.count("name") > 0)
-				materialName = material["name"].get<std::string>();
+			json materialJson = itM.value();
+			if (materialJson.count("name") > 0)
+				materialName = materialJson["name"].get<std::string>();
 
 			// read material value object
-			json::iterator itV = material.find("values");
-			if (itV != material.end() && itV.value().is_object())
+			json::iterator itV = materialJson.find("values");
+			if (itV != materialJson.end() && itV.value().is_object())
 			{
 				json materialValues = itV.value();
 				if (materialValues.count("opacity") > 0)
@@ -111,14 +117,11 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 			}
 		}
 	}
-	else
-		return false;
 
-	RenderMaterial material(*_pResourceManagerPrivate->GetRenderDevice());
-	material.SetAmbientColor(ambientColor);
-	material.SetDiffuseColor(diffuseColor);
-	material.SetEmissiveColor(emissiveColor);
-	material.SetOpacity(opacity);
+	material->SetAmbientColor(ambientColor);
+	material->SetDiffuseColor(diffuseColor);
+	material->SetEmissiveColor(emissiveColor);
+	material->SetOpacity(opacity);
 
 	// find program entry
 	std::string programName("");
@@ -133,15 +136,15 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 		json::iterator itP = asset.find("program");
 		if (itP != asset.end() && itP.value().is_object())
 		{
-			json program = itP.value();
-			if (program.count("name") > 0)
-				programName = program["name"].get<std::string>();
-			if (program.count("language") > 0)
-				language = program["language"].get<std::string>();
+			json programJson = itP.value();
+			if (programJson.count("name") > 0)
+				programName = programJson["name"].get<std::string>();
+			if (programJson.count("language") > 0)
+				language = programJson["language"].get<std::string>();
 
 			// read vertex shader
-			json::iterator itVertex = program.find("vertex");
-			if (itVertex != program.end() && itVertex.value().is_object())
+			json::iterator itVertex = programJson.find("vertex");
+			if (itVertex != programJson.end() && itVertex.value().is_object())
 			{
 				json vertexValues = itVertex.value();
 				if (vertexValues.count("source") > 0)
@@ -150,8 +153,8 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 					vertexShaderType = vertexValues["type"].get<std::string>();
 			}
 			// read fragment shader
-			json::iterator itFragment = program.find("fragment");
-			if (itFragment != program.end() && itFragment.value().is_object())
+			json::iterator itFragment = programJson.find("fragment");
+			if (itFragment != programJson.end() && itFragment.value().is_object())
 			{
 				json fragmentValues = itFragment.value();
 				if (fragmentValues.count("source") > 0)

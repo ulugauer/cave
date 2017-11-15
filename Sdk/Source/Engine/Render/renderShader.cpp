@@ -23,6 +23,7 @@ namespace cave
 {
 RenderShader::RenderShader(RenderDevice& renderDevice)
 	: _renderDevice(renderDevice)
+	, _refCount(0)
 {
 
 }

@@ -19,6 +19,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "materialResource.h"
 #include "engineInstancePrivate.h"
 #include "engineError.h"
+#include "renderMaterial.h"
 
 #include <fstream>
 
@@ -194,6 +195,15 @@ ResourceManagerPrivate::ResourceManagerPrivate(RenderDevice* device
 
 ResourceManagerPrivate::~ResourceManagerPrivate()
 {
+	TResourceMaterialMap::iterator matIter;
+	for (matIter = _materialMap.begin(); matIter != _materialMap.end(); ++matIter)
+	{
+		if (matIter->second)
+			DeallocateDelete(*_pRenderDevice->GetEngineAllocator(), *matIter->second);
+	}
+
+	_materialMap.clear();
+
 }
 
 std::shared_ptr<AllocatorGlobal>
@@ -202,12 +212,22 @@ ResourceManagerPrivate::GetEngineAllocator()
 	return _pRenderDevice->GetEngineAllocator();
 }
 
-bool ResourceManagerPrivate::LoadMaterialAsset(const char* file)
+RenderMaterial* ResourceManagerPrivate::LoadMaterialAsset(const char* file)
 {
 	ResourceObjectFinder objectFinder(*this);
 	MaterialResource mr(this);
 
-	return mr.LoadMaterialAsset(objectFinder, file);
+	std::string stringKey(file);
+	// check if material already exists
+	TResourceMaterialMap::const_iterator entry = _materialMap.find(stringKey);
+	if (entry != _materialMap.end())
+		return entry->second;
+
+
+	RenderMaterial* material = mr.LoadMaterialAsset(objectFinder, file);
+	_materialMap.insert(TResourceMaterialMap::value_type(stringKey, material));
+
+	return material;
 }
 
 

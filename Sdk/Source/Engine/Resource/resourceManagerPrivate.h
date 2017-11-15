@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 /** \addtogroup engine
 *  @{
@@ -33,6 +34,7 @@ namespace cave
 
 /// forward declaration
 class RenderDevice;
+class RenderMaterial;
 
 // forwards
 class ResourceManagerPrivate;
@@ -115,6 +117,8 @@ public:
 };
 
 
+typedef std::map<std::string, RenderMaterial*> TResourceMaterialMap;	///< Material objects map
+
 /**
 * Global Resource Manager
 */
@@ -175,12 +179,13 @@ public:
 	*
 	* @return true if successful
 	*/
-	bool LoadMaterialAsset(const char* file);
+	RenderMaterial* LoadMaterialAsset(const char* file);
 
 private:
 	RenderDevice* _pRenderDevice;	///< Pointer to the render device we belong to
 	std::string _appPath;		///< Application runtime path
 	std::string _projectPath;	///< Project root path
+	TResourceMaterialMap _materialMap;	///< RenderMaterial object map
 };
 
 }
