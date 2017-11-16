@@ -44,9 +44,7 @@ set(RESOURCE_SOURCE Resource/resourceManagerPrivate.h
 					Resource/resourceManager.h 
 					Resource/resourceManager.cpp 
 					Resource/materialResource.h 
-					Resource/materialResource.cpp 
-					Resource/shaderResource.h 
-					Resource/shaderResource.cpp )
+					Resource/materialResource.cpp )
 
 # Create named folders for the sources within the .vcproj
 # Empty name lists them directly under the .vcproj

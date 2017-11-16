@@ -16,8 +16,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///        Handles material assets
 
 #include "materialResource.h"
-#include "shaderResource.h"
-#include "renderMaterial.h"
+#include "Render/renderMaterial.h"
+#include "Render/renderShader.h"
 #include "engineError.h"
 #include "Math/vector4.h"
 
@@ -31,9 +31,10 @@ using json = nlohmann::json;	///< convenience shortcut
 namespace cave
 {
 
-// our default relative locations for materials
+// our default relative locations for materials and shaders
 static const char* g_materialLocation = "Materials/";
-
+static const char* g_shaderLocation = "Shader/";
+static const char* g_shaderLocationSpirv = "Shader/Spirv";
 
 MaterialResource::MaterialResource(ResourceManagerPrivate* rm)
 	: _pResourceManagerPrivate(rm)
@@ -43,6 +44,58 @@ MaterialResource::MaterialResource(ResourceManagerPrivate* rm)
 
 MaterialResource::~MaterialResource()
 {
+}
+
+bool MaterialResource::IsLanguageSupported(const char* language)
+{
+	std::string lang(language);
+	if (lang.compare("spirv") == 0)
+		return true;
+
+	return false;
+}
+
+bool MaterialResource::IsProgramTypeSupported(const char* type)
+{
+	std::string program(type);
+	if (program.compare("vertex") == 0)
+		return true;
+	if (program.compare("fragment") == 0)
+		return true;
+
+	return false;
+}
+
+bool MaterialResource::LoadShader(ResourceObjectFinder& objectFinder, std::string& filename, RenderShader* shader)
+{
+	// get file and path
+	std::string fileString = objectFinder.GetFileName(filename.c_str());
+
+	std::string shaderDir = objectFinder.GetDirectory(filename.c_str());
+	// add local search path
+	if (!shaderDir.empty())
+		objectFinder._localSearchPath.push_back(shaderDir);
+
+	std::ifstream fileStream;
+	if (!objectFinder.OpenFileBinary(fileString.c_str(), fileStream))
+	{
+		return false;
+	}
+
+	// get content size
+	std::streampos begin, end;
+	begin = fileStream.tellg();
+	fileStream.seekg(0, std::ios::end);
+	end = fileStream.tellg();
+
+	std::vector<char> code(static_cast<size_t>(end - begin));
+	fileStream.seekg(0, std::ios::beg);
+	fileStream.read(&code[0], end - begin);
+	fileStream.close();
+
+	shader->SetShaderSource(code);
+
+	return true;
 }
 
 RenderMaterial* MaterialResource::LoadMaterialAsset(ResourceObjectFinder& objectFinder, const char* file)
@@ -56,6 +109,8 @@ RenderMaterial* MaterialResource::LoadMaterialAsset(ResourceObjectFinder& object
 
 	// add default local serach path
 	objectFinder._localSearchPath.push_back(g_materialLocation);
+	objectFinder._localSearchPath.push_back(g_shaderLocation);
+	objectFinder._localSearchPath.push_back(g_shaderLocationSpirv);
 
 	// create a new material
 	RenderMaterial* newMaterial = AllocateObject<RenderMaterial>(*_pResourceManagerPrivate->GetEngineAllocator(), *_pResourceManagerPrivate->GetRenderDevice());
@@ -164,9 +219,40 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 			}
 		}
 
-		ShaderResource sr(_pResourceManagerPrivate);
-		sr.LoadShaderAsset(objectFinder, fragmentShaderName.c_str(), language.c_str(), vertexShaderType.c_str());
-		sr.LoadShaderAsset(objectFinder, vertexShaderName.c_str(), language.c_str(), fragmentShaderType.c_str());
+		if (!vertexShaderName.empty())
+		{
+			// check if material already exists
+			RenderShader* vertexShader = _pResourceManagerPrivate->FindRenderShaderResource(vertexShaderName.c_str());
+			if (!vertexShader)
+			{
+				// create new shader object
+				vertexShader = AllocateObject<RenderShader>(*_pResourceManagerPrivate->GetEngineAllocator(), *_pResourceManagerPrivate->GetRenderDevice());
+				if (vertexShader)
+				{
+					LoadShader(objectFinder, vertexShaderName, vertexShader);
+					// Insert new shader into our map
+					_pResourceManagerPrivate->InsertRenderShaderResource(vertexShaderName.c_str(), vertexShader);
+				}
+			}
+			material->_vertexShader = vertexShader;
+		}
+		if (!fragmentShaderName.empty())
+		{
+			// check if material already exists
+			RenderShader* fragmentShader = _pResourceManagerPrivate->FindRenderShaderResource(fragmentShaderName.c_str());
+			if (!fragmentShader)
+			{
+				// create new shader object
+				fragmentShader = AllocateObject<RenderShader>(*_pResourceManagerPrivate->GetEngineAllocator(), *_pResourceManagerPrivate->GetRenderDevice());
+				if (fragmentShader)
+				{
+					LoadShader(objectFinder, fragmentShaderName, fragmentShader);
+					// Insert new shader into our map
+					_pResourceManagerPrivate->InsertRenderShaderResource(fragmentShaderName.c_str(), fragmentShader);
+				}
+			}
+			material->_fragmentShader = fragmentShader;
+		}
 	}
 
 	return true;

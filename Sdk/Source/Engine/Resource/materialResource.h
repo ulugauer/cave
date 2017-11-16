@@ -45,6 +45,23 @@ public:
 	/** @brief Destructor */
 	~MaterialResource();
 
+	/**
+	* @brief Check if shader languge is supported
+	*
+	* @param language	Shader language string (glsl, spirv, hlsl)
+	*
+	* @return true if supported
+	*/
+	bool IsLanguageSupported(const char* language);
+
+	/**
+	* @brief Check if program type is supported
+	*
+	* @param type	Program type string (vertex, fragment)
+	*
+	* @return true if supported
+	*/
+	bool IsProgramTypeSupported(const char* type);
 
 	/**
 	* @brief Load a material asset
@@ -61,13 +78,24 @@ private:
 	/**
 	* @brief Load a material asset from a json file
 	*
-	* @param[in] objectFinder	Helper class to find resource
-	* @param[in] fileStream	File stream where we read from
-	* @param[in|out] material	Pointer to material we fill with data
+	* @param[in] objectFinder		Helper class to find resource
+	* @param[in] fileStream	File	stream where we read from
+	* @param[in|out] material		Pointer to material we fill with data
 	*
 	* @return true if successful
 	*/
 	bool LoadMaterialJson(ResourceObjectFinder& objectFinder, std::ifstream& fileStream, RenderMaterial* material);
+
+	/**
+	* @brief Load a shader code from file
+	*
+	* @param[in] objectFinder	Helper class to find resource
+	* @param[in] filename		File name
+	* @param[in|out] shader		RenderShader object we fill in
+	*
+	* @return true if successful
+	*/
+	bool LoadShader(ResourceObjectFinder& objectFinder, std::string& filename, RenderShader* shader);
 
 private:
 	ResourceManagerPrivate* _pResourceManagerPrivate;	///< Pointer to private resource manger

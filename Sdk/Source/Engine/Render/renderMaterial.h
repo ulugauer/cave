@@ -32,6 +32,7 @@ namespace cave
 
 /// forward declaration
 class RenderDevice;
+class RenderShader;
 
 /**
 * Material data
@@ -82,6 +83,8 @@ struct CAVE_INTERFACE RenderMaterialDataStruct
 class CAVE_INTERFACE RenderMaterial
 {
 public:
+	RenderShader* _vertexShader;
+	RenderShader* _fragmentShader;
 	/**
 	* @brief Constructor
 	*

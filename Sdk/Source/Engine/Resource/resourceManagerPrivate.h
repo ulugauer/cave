@@ -35,6 +35,7 @@ namespace cave
 /// forward declaration
 class RenderDevice;
 class RenderMaterial;
+class RenderShader;
 
 // forwards
 class ResourceManagerPrivate;
@@ -118,6 +119,7 @@ public:
 
 
 typedef std::map<std::string, RenderMaterial*> TResourceMaterialMap;	///< Material objects map
+typedef std::map<std::string, RenderShader*> TResourceShaderMap;	///< Shader objects map
 
 /**
 * Global Resource Manager
@@ -173,9 +175,28 @@ public:
 	RenderDevice* GetRenderDevice() { return _pRenderDevice; }
 
 	/**
+	* @brief Find an already loaded shader resource
+	*
+	* @param[in] fileName	Resource name (should include path)
+	*
+	* @return RenderShader object
+	*/
+	RenderShader* FindRenderShaderResource(const char* fileName);
+
+	/**
+	* @brief Insert a new shader resource
+	*
+	* @param[in] fileName	Resource name (should include path)
+	* @param[in] shader		Pointer RenderShader object
+	*
+	* @return true on success. Returns false if already exists
+	*/
+	bool InsertRenderShaderResource(const char* fileName, RenderShader* shader);
+
+	/**
 	* @brief Load a material asset
 	*
-	* @param file String to file
+	* @param[in] file String to file
 	*
 	* @return true if successful
 	*/
@@ -186,6 +207,7 @@ private:
 	std::string _appPath;		///< Application runtime path
 	std::string _projectPath;	///< Project root path
 	TResourceMaterialMap _materialMap;	///< RenderMaterial object map
+	TResourceShaderMap _shaderMap;	///< ShaderMaterial object map
 };
 
 }

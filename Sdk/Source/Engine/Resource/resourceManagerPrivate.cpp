@@ -19,7 +19,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "materialResource.h"
 #include "engineInstancePrivate.h"
 #include "engineError.h"
-#include "renderMaterial.h"
+#include "Render/renderMaterial.h"
+#include "Render/renderShader.h"
 
 #include <fstream>
 
@@ -195,13 +196,23 @@ ResourceManagerPrivate::ResourceManagerPrivate(RenderDevice* device
 
 ResourceManagerPrivate::~ResourceManagerPrivate()
 {
+	// release shader
+	TResourceShaderMap::iterator shaderIter;
+	for (shaderIter = _shaderMap.begin(); shaderIter != _shaderMap.end(); ++shaderIter)
+	{
+		DeallocateDelete(*_pRenderDevice->GetEngineAllocator(), *shaderIter->second);
+	}
+	_shaderMap.clear();
+
+	// release materials
 	TResourceMaterialMap::iterator matIter;
 	for (matIter = _materialMap.begin(); matIter != _materialMap.end(); ++matIter)
 	{
 		if (matIter->second)
+		{
 			DeallocateDelete(*_pRenderDevice->GetEngineAllocator(), *matIter->second);
+		}
 	}
-
 	_materialMap.clear();
 
 }
@@ -210,6 +221,27 @@ std::shared_ptr<AllocatorGlobal>
 ResourceManagerPrivate::GetEngineAllocator()
 {
 	return _pRenderDevice->GetEngineAllocator();
+}
+
+RenderShader* ResourceManagerPrivate::FindRenderShaderResource(const char* fileName)
+{
+	std::string stringKey(fileName);
+	TResourceShaderMap::const_iterator entry = _shaderMap.find(stringKey);
+	if (entry != _shaderMap.end())
+		return entry->second;
+
+	return nullptr;
+}
+
+bool ResourceManagerPrivate::InsertRenderShaderResource(const char* fileName, RenderShader* shader)
+{
+	if (FindRenderShaderResource(fileName) || !shader || !fileName)
+		return false;
+
+	std::string stringKey(fileName);
+	_shaderMap.insert(TResourceShaderMap::value_type(stringKey, shader));
+
+	return true;
 }
 
 RenderMaterial* ResourceManagerPrivate::LoadMaterialAsset(const char* file)

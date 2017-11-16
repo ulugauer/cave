@@ -16,13 +16,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Render material interface
 
 #include "renderMaterial.h"
+#include "renderShader.h"
 #include "renderDevice.h"
 #include "engineError.h"
 
 namespace cave
 {
 RenderMaterial::RenderMaterial(RenderDevice& renderDevice)
-	: _renderDevice(renderDevice)
+	: _vertexShader(nullptr)
+	, _fragmentShader(nullptr)
+	, _renderDevice(renderDevice)
 {
 
 }

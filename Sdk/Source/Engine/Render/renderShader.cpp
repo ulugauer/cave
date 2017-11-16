@@ -18,11 +18,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderShader.h"
 #include "renderDevice.h"
 #include "engineError.h"
+#include "engineLog.h"
+
+#include <cstring>
 
 namespace cave
 {
 RenderShader::RenderShader(RenderDevice& renderDevice)
 	: _renderDevice(renderDevice)
+	, _sourceSize(0)
+	, _source(nullptr)
 	, _refCount(0)
 {
 
@@ -30,7 +35,44 @@ RenderShader::RenderShader(RenderDevice& renderDevice)
 
 RenderShader::~RenderShader()
 {
+	if (_source)
+		_renderDevice.GetEngineAllocator()->Deallocate(_source);
+}
 
+void RenderShader::IncrementUsageCount()
+{
+	std::lock_guard<std::mutex> lock(_refCountMutex);
+	_refCount++;
+}
+
+void RenderShader::DecrementUsageCount()
+{
+	std::lock_guard<std::mutex> lock(_refCountMutex);
+	_refCount--;
+}
+
+void RenderShader::SetShaderSource(const std::vector<char>& code)
+{
+	if (_sourceSize > 0 || _source)
+	{
+		// we already have the source
+		_renderDevice.GetEngineLog()->Error("Warning: Source code alread set");
+		return;
+	}
+
+	if (code.empty())
+	{
+		// no code
+		_renderDevice.GetEngineLog()->Error("Warning: No source code provided");
+		return;
+	}
+
+	_source = (char *)_renderDevice.GetEngineAllocator()->Allocate(code.size(), 4);
+	if (_source)
+	{
+		_sourceSize = code.size();
+		memcpy(_source, code.data(), _sourceSize);
+	}
 }
 
 }

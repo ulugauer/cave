@@ -21,6 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include <memory>
 #include <mutex>
+#include <atomic>
+#include <vector>
 
 /** \addtogroup engine
 *  @{
@@ -48,9 +50,34 @@ public:
 	RenderShader(RenderDevice& renderDevice);
 	/** @brief Destructor */
 	~RenderShader();
+	/** @brief copy constructor */
+	RenderShader(const RenderShader& rhs) = delete;
+	/** assigment operator */
+	RenderShader& operator=(const RenderShader& rhs) = delete;
+
+	/**
+	* @brief Increment usage count of this shader module
+	*
+	*/
+	void IncrementUsageCount();
+	/**
+	* @brief Decrement usage count of this shader module
+	*
+	*/
+	void DecrementUsageCount();
+
+	/**
+	* @brief Set shader source code
+	*
+	* @param[in] code	Pointer to source code (Readable shader code or byte code)
+	*
+	*/
+	void SetShaderSource(const std::vector<char>& code);
 
 private:
 	RenderDevice& _renderDevice;	///< Render device object
+	size_t _sourceSize;	///< Size of source code in bytes
+	char* _source;	///< Pointer to source code might be a readable string or byte code
 	int32_t _refCount;	///< Our reference count
 	class CAVE_INTERFACE std::mutex _refCountMutex; ///< mutex object for ref counter
 };
