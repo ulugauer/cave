@@ -75,6 +75,16 @@ public:
 	*/
 	void CreateSwapChain(SwapChainInfo& swapChainInfo) override;
 
+	/**
+	* @brief Create a low level shader
+	*
+	* @param[in] type		Shader type
+	* @param[in] language	Shader language
+	*
+	* @return shader abstraction interface
+	*/
+	HalShader* CreateShader(ShaderType type, ShaderLanguage language) override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

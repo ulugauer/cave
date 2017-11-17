@@ -83,8 +83,8 @@ struct CAVE_INTERFACE RenderMaterialDataStruct
 class CAVE_INTERFACE RenderMaterial
 {
 public:
-	RenderShader* _vertexShader;
-	RenderShader* _fragmentShader;
+	RenderShader* _vertexShader;		///< Vertex shader used for this material
+	RenderShader* _fragmentShader;		///< Fragment shader used for this material
 	/**
 	* @brief Constructor
 	*

@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "vulkanInstance.h"
 #include "vulkanRenderDevice.h"
+#include "vulkanShader.h"
 #include "vulkanPhysicalDevice.h"
 #include "vulkanSwapChain.h"
 #include "vulkanApi.h"
@@ -145,6 +146,16 @@ void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
 		return;
 
 	_pSwapChain = AllocateObject<VulkanSwapChain>(*_pInstance->GetEngineAllocator(), _pInstance, _pPhysicalDevice, this);
+}
+
+HalShader* VulkanRenderDevice::CreateShader(ShaderType type, ShaderLanguage language)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanShader* shader = AllocateObject<VulkanShader>(*_pInstance->GetEngineAllocator(), this, type, language);
+
+	return shader;
 }
 
 }

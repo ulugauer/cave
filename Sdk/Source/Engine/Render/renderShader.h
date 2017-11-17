@@ -33,6 +33,7 @@ namespace cave
 {
 
 /// forward declaration
+class HalShader;
 class RenderDevice;
 
 /**
@@ -45,11 +46,13 @@ public:
 	* @brief Constructor
 	*
 	* @param[in] renderDevice	Pointer to render device
+	* @param[in] shaderType		Shader type string
+	* @param[in] shaderLanguage	Shader language string
 	*
 	*/
-	RenderShader(RenderDevice& renderDevice);
+	RenderShader(RenderDevice& renderDevice, const char* shaderType, const char* shaderLanguage);
 	/** @brief Destructor */
-	~RenderShader();
+	virtual ~RenderShader();
 	/** @brief copy constructor */
 	RenderShader(const RenderShader& rhs) = delete;
 	/** assigment operator */
@@ -74,8 +77,16 @@ public:
 	*/
 	void SetShaderSource(const std::vector<char>& code);
 
+	/**
+	* @brief[in] Compile a shader and create a vulkan shader module
+	*
+	* @return true if compiling was successful
+	*/
+	bool CompileShader();
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
+	HalShader* _halShader;	///< Pointer to low level shader object
 	size_t _sourceSize;	///< Size of source code in bytes
 	char* _source;	///< Pointer to source code might be a readable string or byte code
 	int32_t _refCount;	///< Our reference count

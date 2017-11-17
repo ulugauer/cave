@@ -46,26 +46,6 @@ MaterialResource::~MaterialResource()
 {
 }
 
-bool MaterialResource::IsLanguageSupported(const char* language)
-{
-	std::string lang(language);
-	if (lang.compare("spirv") == 0)
-		return true;
-
-	return false;
-}
-
-bool MaterialResource::IsProgramTypeSupported(const char* type)
-{
-	std::string program(type);
-	if (program.compare("vertex") == 0)
-		return true;
-	if (program.compare("fragment") == 0)
-		return true;
-
-	return false;
-}
-
 bool MaterialResource::LoadShader(ResourceObjectFinder& objectFinder, std::string& filename, RenderShader* shader)
 {
 	// get file and path
@@ -226,7 +206,8 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 			if (!vertexShader)
 			{
 				// create new shader object
-				vertexShader = AllocateObject<RenderShader>(*_pResourceManagerPrivate->GetEngineAllocator(), *_pResourceManagerPrivate->GetRenderDevice());
+				vertexShader = AllocateObject<RenderShader>(*_pResourceManagerPrivate->GetEngineAllocator()
+								, *_pResourceManagerPrivate->GetRenderDevice(), "vertex", language.c_str());
 				if (vertexShader)
 				{
 					LoadShader(objectFinder, vertexShaderName, vertexShader);
@@ -243,7 +224,8 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 			if (!fragmentShader)
 			{
 				// create new shader object
-				fragmentShader = AllocateObject<RenderShader>(*_pResourceManagerPrivate->GetEngineAllocator(), *_pResourceManagerPrivate->GetRenderDevice());
+				fragmentShader = AllocateObject<RenderShader>(*_pResourceManagerPrivate->GetEngineAllocator()
+								, *_pResourceManagerPrivate->GetRenderDevice(), "fragment", language.c_str());
 				if (fragmentShader)
 				{
 					LoadShader(objectFinder, fragmentShaderName, fragmentShader);

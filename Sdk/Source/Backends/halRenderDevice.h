@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineDefines.h"
 #include "halInstance.h"
+#include "halShader.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -53,6 +54,16 @@ public:
 	*
 	*/
 	virtual void CreateSwapChain(SwapChainInfo& swapChainInfo) = 0;
+
+	/**
+	* @brief Create a low level shader
+	*
+	* @param[in] type		Shader type
+	* @param[in] language	Shader language
+	*
+	* @return shader abstraction interface
+	*/
+	virtual HalShader* CreateShader(ShaderType type, ShaderLanguage language) = 0;
 };
 
 }

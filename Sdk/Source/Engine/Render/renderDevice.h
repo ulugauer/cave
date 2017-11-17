@@ -83,6 +83,16 @@ public:
 		return *_pResourceManager;
 	}
 
+	/**
+	* @brief Get pointer to HAL render device
+	*
+	* @return Low level HAL Object
+	*/
+	HalRenderDevice* GetHalRenderDevice()
+	{
+		return _pHalRenderDevice;
+	}
+
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to
 	HalInstance* _pHalInstance;	///< Pointer to HAL Instance
