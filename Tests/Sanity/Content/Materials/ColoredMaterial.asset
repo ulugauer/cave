@@ -15,12 +15,12 @@
     "name": "SimpleColor",
     "language": "spirv",
     "vertex": {
-      "source": "Shader/triangle_vtx.spv",
-      "type": "vertex"
+      "source": "Shader/triangle_vert.spv",
+      "entry": "main"
     },
     "fragment": {
       "source": "Shader/triangle_frag.spv",
-      "type": "fragment"
+      "entry": "main"
     }
   }
  }

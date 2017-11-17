@@ -60,7 +60,7 @@ public:
 
 
 	/**
-	* @brief[in] Compile a shader and create a vulkan shader module
+	* @brief Compile a shader and create a vulkan shader module
 	*
 	* @param[in] code	Source code must be 4 byte aligned for vulkan
 	* @param[in] count	Source code size in bytes
@@ -68,6 +68,15 @@ public:
 	* @return true if compiling was successful
 	*/
 	bool CompileShader(const char* code, size_t count) override;
+
+	/**
+	* @brief Fill structure with matching values
+	*
+	* @param[in|out] info	Vulkan structure to fill in
+	*
+	* @return true if succssfuly filled in
+	*/
+	bool GetShaderStageInfo(VkPipelineShaderStageCreateInfo& info);
 
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object

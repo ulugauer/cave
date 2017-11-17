@@ -91,6 +91,14 @@ void RenderShader::SetShaderSource(const std::vector<char>& code)
 	}
 }
 
+void RenderShader::SetShaderEntryFunc(const char* funcName)
+{
+	if (!_halShader)
+		return;
+
+	_halShader->SetShaderEntryFunc(funcName);
+}
+
 bool RenderShader::CompileShader()
 {
 	if (!_halShader || !_source || !_sourceSize)

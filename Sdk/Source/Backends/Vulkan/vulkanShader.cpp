@@ -25,6 +25,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+static VkShaderStageFlagBits ConvertShaderStageToVulkan(ShaderType type)
+{
+	VkShaderStageFlagBits shaderStageFlag = VK_SHADER_STAGE_VERTEX_BIT;
+	switch (type)
+	{
+	case ShaderType::Vertex:
+		shaderStageFlag = VK_SHADER_STAGE_VERTEX_BIT;
+		break;
+	case ShaderType::TessControl:
+		shaderStageFlag = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+		break;
+	case ShaderType::TessEval:
+		shaderStageFlag = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+		break;
+	case ShaderType::Geometry:
+		shaderStageFlag = VK_SHADER_STAGE_GEOMETRY_BIT;
+		break;
+	case ShaderType::Fragment:
+		shaderStageFlag = VK_SHADER_STAGE_FRAGMENT_BIT;
+		break;
+	case ShaderType::Compute:
+		shaderStageFlag = VK_SHADER_STAGE_COMPUTE_BIT;
+		break;
+	default:
+		shaderStageFlag = VK_SHADER_STAGE_VERTEX_BIT;
+		break;
+	}
+
+	return shaderStageFlag;
+}
+
 VulkanShader::VulkanShader(VulkanRenderDevice* device, ShaderType type, ShaderLanguage language)
 	: HalShader(type, language)
 	, _pDevice(device)
@@ -40,6 +71,10 @@ VulkanShader::~VulkanShader()
 
 bool VulkanShader::CompileShader(const char* code, size_t count)
 {
+	// code size must be modulo 4
+	if (count % 4)
+		return false;
+
 	// setup create info
 	VkShaderModuleCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -51,6 +86,22 @@ bool VulkanShader::CompileShader(const char* code, size_t count)
 	{
 		return false;
 	}
+
+	return true;
+}
+
+bool VulkanShader::GetShaderStageInfo(VkPipelineShaderStageCreateInfo& info)
+{
+	if (_vkShader == VK_NULL_HANDLE)
+		return false;
+
+	info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	info.pNext = nullptr;
+	info.flags = 0;
+	info.stage = ConvertShaderStageToVulkan(_type);
+	info.module = _vkShader;
+	info.pName = _entryFunc.c_str();
+	info.pSpecializationInfo = nullptr;
 
 	return true;
 }

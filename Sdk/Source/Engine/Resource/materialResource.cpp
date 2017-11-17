@@ -162,9 +162,9 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 	std::string programName("");
 	std::string language("");
 	std::string vertexShaderName("");
-	std::string vertexShaderType("");
+	std::string vertexShaderEntry("");
 	std::string fragmentShaderName("");
-	std::string fragmentShaderType("");
+	std::string fragmentShaderEntry("");
 	if (asset.find("program") != asset.end())
 	{
 		// there is an entry with key "program"
@@ -184,8 +184,8 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 				json vertexValues = itVertex.value();
 				if (vertexValues.count("source") > 0)
 					vertexShaderName = vertexValues["source"].get<std::string>();
-				if (vertexValues.count("type") > 0)
-					vertexShaderType = vertexValues["type"].get<std::string>();
+				if (vertexValues.count("entry") > 0)
+					vertexShaderEntry = vertexValues["entry"].get<std::string>();
 			}
 			// read fragment shader
 			json::iterator itFragment = programJson.find("fragment");
@@ -194,8 +194,8 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 				json fragmentValues = itFragment.value();
 				if (fragmentValues.count("source") > 0)
 					fragmentShaderName = fragmentValues["source"].get<std::string>();
-				if (fragmentValues.count("type") > 0)
-					fragmentShaderType = fragmentValues["type"].get<std::string>();
+				if (fragmentValues.count("entry") > 0)
+					fragmentShaderEntry = fragmentValues["entry"].get<std::string>();
 			}
 		}
 
@@ -211,6 +211,10 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 				if (vertexShader)
 				{
 					LoadShader(objectFinder, vertexShaderName, vertexShader);
+					// set shader entry function if available
+					if (!vertexShaderEntry.empty())
+						vertexShader->SetShaderEntryFunc(vertexShaderEntry.c_str());
+
 					// Insert new shader into our map
 					_pResourceManagerPrivate->InsertRenderShaderResource(vertexShaderName.c_str(), vertexShader);
 				}
@@ -229,6 +233,10 @@ bool MaterialResource::LoadMaterialJson(ResourceObjectFinder& objectFinder, std:
 				if (fragmentShader)
 				{
 					LoadShader(objectFinder, fragmentShaderName, fragmentShader);
+					// set shader entry function if available
+					if (!fragmentShaderEntry.empty())
+						fragmentShader->SetShaderEntryFunc(fragmentShaderEntry.c_str());
+
 					// Insert new shader into our map
 					_pResourceManagerPrivate->InsertRenderShaderResource(fragmentShaderName.c_str(), fragmentShader);
 				}

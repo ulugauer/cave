@@ -78,6 +78,14 @@ public:
 	void SetShaderSource(const std::vector<char>& code);
 
 	/**
+	* @brief Set shader entry function
+	*
+	* @param[in] funcName	Name of the shader module entry point
+	*
+	*/
+	void SetShaderEntryFunc(const char* funcName);
+
+	/**
 	* @brief[in] Compile a shader and create a vulkan shader module
 	*
 	* @return true if compiling was successful

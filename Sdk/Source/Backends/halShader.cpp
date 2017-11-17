@@ -25,6 +25,7 @@ namespace cave
 HalShader::HalShader(ShaderType type, ShaderLanguage language)
 	: _type(type)
 	, _language(language)
+	, _entryFunc("main")	// default name
 {
 
 }
@@ -63,6 +64,11 @@ ShaderLanguage HalShader::ConvertToShaderLanguage(const char* languageString)
 		language = ShaderLanguage::Spirv;
 
 	return language;
+}
+
+void HalShader::SetShaderEntryFunc(const char* funcName)
+{
+	_entryFunc = funcName;
 }
 
 }

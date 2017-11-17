@@ -90,6 +90,16 @@ public:
 	static ShaderLanguage ConvertToShaderLanguage(const char* languageString);
 
 	/**
+	* @brief Set shader entry function
+	* Note that vulkan would support multiple entry points per module.
+	* However we currently support only one.
+	*
+	* @param[in] funcName	Name of the shader module entry point
+	*
+	*/
+	virtual void SetShaderEntryFunc(const char* funcName);
+
+	/**
 	* @brief[in] Compile a shader and create a shader module
 	*
 	* @param[in] code	Source code must be 4 byte aligned for vulkan
@@ -102,6 +112,7 @@ public:
 protected:
 	ShaderType _type;				///< Shader type
 	ShaderLanguage _language;		///< Shader language
+	std::string _entryFunc;			///< Name of shader module entry func
 };
 
 }
