@@ -29,7 +29,7 @@ namespace cave
 {
 
 // load a library
-osLibraryHandle OsPlatformLib::OsLoadLibrary(const char *name)
+osLibraryHandle OsPlatformLib::OsLoadLibrary(const char *name, const char* )
 {
     // build name
     std::string dllName;

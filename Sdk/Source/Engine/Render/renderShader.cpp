@@ -86,8 +86,6 @@ void RenderShader::SetShaderSource(const std::vector<char>& code)
 	{
 		_sourceSize = code.size();
 		memcpy(_source, code.data(), _sourceSize);
-
-		CompileShader();
 	}
 }
 

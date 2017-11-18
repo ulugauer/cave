@@ -24,12 +24,13 @@ namespace cave
 {
 
 // load a library
-osLibraryHandle OsPlatformLib::OsLoadLibrary(const char *name)
+osLibraryHandle OsPlatformLib::OsLoadLibrary(const char *name, const char* numSuffix)
 {
     std::string soName;
     soName = "lib";
     soName += name;
-    soName += ".so.1"; 
+    soName += ".so"; 
+	soName += numSuffix;
     osLibraryHandle handle = dlopen(soName.c_str(), RTLD_LAZY);
 
     return handle;

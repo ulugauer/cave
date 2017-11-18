@@ -119,9 +119,9 @@ private:
 	VulkanApi() 
 	{
 #if defined(_WIN32)		
-		_hVulkan = OsPlatformLib::OsLoadLibrary("vulkan-1");
+		_hVulkan = OsPlatformLib::OsLoadLibrary("vulkan-1", "");
 #else
-		_hVulkan = OsPlatformLib::OsLoadLibrary("vulkan");
+		_hVulkan = OsPlatformLib::OsLoadLibrary("vulkan",".1");
 #endif
 	}
 	/** @brief Destructor */

@@ -43,11 +43,12 @@ class OsPlatformLib
 	/**
 	* @brief Load a library
 	*
-	* @param[in] name Name of the library to load
+	* @param[in] name		Name of the library to load
+	* @param[in] numSuffix	Add suffix to lib name
 	*
 	* @returns a handle to a library
 	*/
-	static osLibraryHandle OsLoadLibrary(const char *name);
+	static osLibraryHandle OsLoadLibrary(const char *name, const char* numSuffix);
 
 	/**
 	* @brief Unload a library
