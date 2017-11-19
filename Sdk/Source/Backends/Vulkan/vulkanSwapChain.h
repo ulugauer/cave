@@ -69,6 +69,12 @@ private:
 	void CreateImageViews();
 
 	/**
+	* @brief Create swap presentsation semaphores
+	*
+	*/
+	void CreatePresentationSemaphores();
+
+	/**
 	* @brief Get swap image count supported by the device
 	*
 	* @param[in] surfaceCapabilities	Surface capabilites
@@ -134,6 +140,8 @@ private:
 	VkImageView* _swapChainImageViewArray; ///< Array of generated swap images views
 	VkFormat _swapChainImageFormat;	///< The chosen image format
 	VkExtent2D _swapChainExtent;	///< The current extend
+	VkSemaphore _ImageAvailableSemaphore; ///< present semaphore
+	
 };
 
 }

@@ -166,6 +166,16 @@ void VulkanSwapChain::CreateImageViews()
 	}
 }
 
+void VulkanSwapChain::CreatePresentationSemaphores()
+{
+	VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	semaphoreCreateInfo.flags = 0;;
+	
+
+	VulkanApi::GetApi()->vkCreateSemaphore(_pRenderDevice->GetDeviceHandle(), &semaphoreCreateInfo, nullptr, &_ImageAvailableSemaphore);
+}
+
 uint32_t VulkanSwapChain::GetSwapChainNumImages(VkSurfaceCapabilitiesKHR &surfaceCapabilities)
 {
 	// Set of images defined in a swap chain may not always be available for application to render to:
