@@ -92,6 +92,9 @@ private:
 	VkDevice _vkDevice;	///< Handle to vulkan device
 	VkQueue _presentQueue;	///< Handle to vulkan queue used for presentations
 	VulkanSwapChain* _pSwapChain;	///< Handle to a swap chain
+	VkCommandPool _presentQueueCommandPool;	///< Command pool used for presentations
+	VkCommandBuffer* _presentCommandBufferArray;	///< Presentation command buffer
+	uint32_t _presentationQueueFamilyIndex; ///< Index of present queue familiy
 };
 
 }

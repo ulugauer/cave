@@ -35,9 +35,12 @@ VulkanSwapChain::VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice*
 	, _swapImageCount(0)
 	, _swapChainImageArray(nullptr)
 	, _swapChainImageViewArray(nullptr)
+	, _ImageAvailableSemaphore(VK_NULL_HANDLE)
+	, _RenderingFinishedSemaphore(VK_NULL_HANDLE)
 {
 	CreateSwapChain();
 	CreateImageViews();
+	CreatePresentationSemaphores();
 }
 
 VulkanSwapChain::~VulkanSwapChain()
@@ -51,6 +54,11 @@ VulkanSwapChain::~VulkanSwapChain()
 
 		DeallocateArray<VkImageView>(*_pInstance->GetEngineAllocator(), _swapChainImageViewArray);
 	}
+
+	if (_ImageAvailableSemaphore)
+		VulkanApi::GetApi()->vkDestroySemaphore(_pRenderDevice->GetDeviceHandle(), _ImageAvailableSemaphore, nullptr);
+	if (_RenderingFinishedSemaphore)
+		VulkanApi::GetApi()->vkDestroySemaphore(_pRenderDevice->GetDeviceHandle(), _RenderingFinishedSemaphore, nullptr);
 
 	if (_swapChainImageArray)
 		DeallocateArray<VkImage>(*_pInstance->GetEngineAllocator(), _swapChainImageArray);
@@ -174,6 +182,11 @@ void VulkanSwapChain::CreatePresentationSemaphores()
 	
 
 	VulkanApi::GetApi()->vkCreateSemaphore(_pRenderDevice->GetDeviceHandle(), &semaphoreCreateInfo, nullptr, &_ImageAvailableSemaphore);
+	VulkanApi::GetApi()->vkCreateSemaphore(_pRenderDevice->GetDeviceHandle(), &semaphoreCreateInfo, nullptr, &_RenderingFinishedSemaphore);
+	if (_ImageAvailableSemaphore == VK_NULL_HANDLE || _RenderingFinishedSemaphore == VK_NULL_HANDLE)
+	{
+		throw BackendException("Failed to create presentation semaphores!");
+	}
 }
 
 uint32_t VulkanSwapChain::GetSwapChainNumImages(VkSurfaceCapabilitiesKHR &surfaceCapabilities)

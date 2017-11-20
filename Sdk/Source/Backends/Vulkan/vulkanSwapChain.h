@@ -55,6 +55,8 @@ public:
 	/** @brief Destructor */
 	virtual ~VulkanSwapChain();
 
+	const uint32_t GetSwapChainImageCount() const { return _swapImageCount; }
+
 private:
 	/**
 	* @brief Create a swap chain for the device
@@ -140,7 +142,8 @@ private:
 	VkImageView* _swapChainImageViewArray; ///< Array of generated swap images views
 	VkFormat _swapChainImageFormat;	///< The chosen image format
 	VkExtent2D _swapChainExtent;	///< The current extend
-	VkSemaphore _ImageAvailableSemaphore; ///< present semaphore
+	VkSemaphore _ImageAvailableSemaphore; ///< Next image available semaphore
+	VkSemaphore _RenderingFinishedSemaphore; ///< Rendering done semaphore
 	
 };
 

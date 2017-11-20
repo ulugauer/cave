@@ -33,9 +33,11 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	, _pInstance(instance)
 	, _pPhysicalDevice(physicalDevice)
 	, _presentationSurface(surface)
-	, _vkDevice(nullptr)
-	, _presentQueue(nullptr)
+	, _vkDevice(VK_NULL_HANDLE)
+	, _presentQueue(VK_NULL_HANDLE)
 	, _pSwapChain(nullptr)
+	, _presentQueueCommandPool(VK_NULL_HANDLE)
+	, _presentCommandBufferArray(nullptr)
 {
 	std::set<int> uniqueQueueFamilies;
 	// First query the graphics queue index
@@ -45,11 +47,11 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 
 	uniqueQueueFamilies.insert(graphicsQueueFamilyIndex);
 
-	uint32_t presentationQueueFamilyIndex = (std::numeric_limits<uint32_t>::max)();
+	_presentationQueueFamilyIndex = (std::numeric_limits<uint32_t>::max)();
 	if (surface)
 	{
-		presentationQueueFamilyIndex = physicalDevice->GetPresentationQueueFamilyIndex(graphicsQueueFamilyIndex, surface);
-		if (presentationQueueFamilyIndex == (std::numeric_limits<uint32_t>::max)())
+		_presentationQueueFamilyIndex = physicalDevice->GetPresentationQueueFamilyIndex(graphicsQueueFamilyIndex, surface);
+		if (_presentationQueueFamilyIndex == (std::numeric_limits<uint32_t>::max)())
 			throw BackendException("CreateRenderDevice: no suitable device queues found");
 
 		uniqueQueueFamilies.insert(graphicsQueueFamilyIndex);
@@ -110,14 +112,45 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 		throw BackendException("Failed to create vulkan device");
 	}
 
+	// allocate presentation queue
 	if (surface)
-		VulkanApi::GetApi()->vkGetDeviceQueue(_vkDevice, presentationQueueFamilyIndex, 0, &_presentQueue);
+		VulkanApi::GetApi()->vkGetDeviceQueue(_vkDevice, _presentationQueueFamilyIndex, 0, &_presentQueue);
+
+	// Create presentation command pool
+	VkCommandPoolCreateInfo CreateCommandPoolInfo = {};
+	CreateCommandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	CreateCommandPoolInfo.pNext = nullptr;
+	CreateCommandPoolInfo.flags = 0;
+	CreateCommandPoolInfo.queueFamilyIndex = _presentationQueueFamilyIndex;
+	result = VulkanApi::GetApi()->vkCreateCommandPool(_vkDevice, &CreateCommandPoolInfo, nullptr, &_presentQueueCommandPool);
+	if (result != VK_SUCCESS)
+	{
+		throw BackendException("Failed to create vulkan present command queue");
+	}
 }
 
 VulkanRenderDevice::~VulkanRenderDevice()
 {
+	if (_vkDevice)
+	{
+		// Shutdown savely. Wait that the device is idle
+		VulkanApi::GetApi()->vkDeviceWaitIdle(_vkDevice);
+	}
+
+	if (_presentCommandBufferArray)
+	{
+		const uint32_t imageCount = _pSwapChain->GetSwapChainImageCount();
+		if (_presentCommandBufferArray[0] != nullptr)
+			VulkanApi::GetApi()->vkFreeCommandBuffers(_vkDevice, _presentQueueCommandPool, imageCount, &_presentCommandBufferArray[0]);
+
+		DeallocateArray<VkCommandBuffer>(*_pInstance->GetEngineAllocator(), _presentCommandBufferArray);
+	}
+
 	if (_presentationSurface)
 		VulkanApi::GetApi()->vkDestroySurfaceKHR(_pInstance->GetInstanceHandle(), _presentationSurface, nullptr);
+
+	if (_presentQueueCommandPool)
+		VulkanApi::GetApi()->vkDestroyCommandPool(_vkDevice, _presentQueueCommandPool, nullptr);
 
 	if (_pSwapChain)
 	{
@@ -126,8 +159,6 @@ VulkanRenderDevice::~VulkanRenderDevice()
 
 	if (_vkDevice)
 	{
-		// Shutdown savely. Wait that the device is idle
-		VulkanApi::GetApi()->vkDeviceWaitIdle(_vkDevice);
 		VulkanApi::GetApi()->vkDestroyDevice(_vkDevice, nullptr);
 		_vkDevice = nullptr;
 	}
@@ -146,6 +177,28 @@ void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
 		return;
 
 	_pSwapChain = AllocateObject<VulkanSwapChain>(*_pInstance->GetEngineAllocator(), _pInstance, _pPhysicalDevice, this);
+
+	// allocate command buffer
+	if (_pSwapChain && _presentQueueCommandPool)
+	{
+		const uint32_t imageCount = _pSwapChain->GetSwapChainImageCount();
+		_presentCommandBufferArray = AllocateArray<VkCommandBuffer>(*_pInstance->GetEngineAllocator(), imageCount);
+		if (!_presentCommandBufferArray)
+			throw BackendException("Failed to allocate presentation command buffers memory");
+
+		VkCommandBufferAllocateInfo commandBufferAllocInfo = {};
+		commandBufferAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		commandBufferAllocInfo.pNext = nullptr;
+		commandBufferAllocInfo.commandPool = _presentQueueCommandPool;
+		commandBufferAllocInfo.commandBufferCount = imageCount;
+		commandBufferAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+		VkResult result = VulkanApi::GetApi()->vkAllocateCommandBuffers(_vkDevice, &commandBufferAllocInfo, &_presentCommandBufferArray[0]);
+		if (result != VK_SUCCESS)
+		{
+			throw BackendException("Failed to allocate vulkan presentation command buffers");
+		}
+	}
 }
 
 HalShader* VulkanRenderDevice::CreateShader(ShaderType type, ShaderLanguage language)
