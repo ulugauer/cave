@@ -55,7 +55,19 @@ public:
 	/** @brief Destructor */
 	virtual ~VulkanSwapChain();
 
+	/**
+	* @brief Get swap image count
+	*
+	* @return swap image count
+	*/
 	const uint32_t GetSwapChainImageCount() const { return _swapImageCount; }
+
+	/**
+	* @brief Get swap image size
+	*
+	* @return 2D extension rect
+	*/
+	const VkExtent2D GetSwapChainImageExtend() const { return _swapChainExtent; }
 
 private:
 	/**

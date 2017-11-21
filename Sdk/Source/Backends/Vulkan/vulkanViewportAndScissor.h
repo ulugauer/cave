@@ -13,10 +13,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file vulkanShader.h
-///       Vulkan shader module
+/// @file vulkanViewportAndScissor.h
+///       Vulkan viewport and scissor state
 
-#include "halShader.h"
+#include "halViewportAndScissor.h"
 #include "osPlatformLib.h"
 
 #include "vulkan.h"
@@ -33,54 +33,29 @@ namespace cave
 class VulkanRenderDevice;
 
 /**
-* Vulkan render device
+* @brief Vulkan viewport and scissor state
 */
-class VulkanShader : public HalShader
+class VulkanViewportAndScissor : public HalViewportAndScissor
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] device	Pointer to device object
-	* @param[in] type		Shader type
-	* @param[in] language	Shader language
+	* @param[in] device		Pointer to device object
+	* @param[in] viewport	Viewport dimension
+	* @param[in] scissor	Scissor dimension
 	*
 	*/
-	VulkanShader(VulkanRenderDevice* device, ShaderType type, ShaderLanguage language);
+	VulkanViewportAndScissor(VulkanRenderDevice* device, HalViewport& viewport, HalScissor& scissor);
 
 	/** @brief Destructor */
-	virtual ~VulkanShader();
-
-	/**
-	* @brief Get vulkan logical device handle
-	*
-	* @return Lowlevel vulkan handle
-	*/
-	VkShaderModule GetShaderHandle() { return _vkShader; }
-
-
-	/**
-	* @brief Compile a shader and create a vulkan shader module
-	*
-	* @param[in] code	Source code must be 4 byte aligned for vulkan
-	* @param[in] count	Source code size in bytes
-	*
-	* @return true if compiling was successful
-	*/
-	bool CompileShader(const char* code, size_t count) override;
-
-	/**
-	* @brief Fill structure with matching values
-	*
-	* @param[in,out] info	Vulkan structure to fill in
-	*
-	* @return true if succssfuly filled in
-	*/
-	bool GetShaderStageInfo(VkPipelineShaderStageCreateInfo& info);
+	virtual ~VulkanViewportAndScissor();
 
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkShaderModule _vkShader;	///< Handle to vulkan shader module
+	VkViewport _vkViewport;			///< Vulkan viewport struct
+	VkRect2D _vkScissorRect2D;		///< Vulkan scissor rect
+	VkPipelineViewportStateCreateInfo _ViewportStateInfo;	///< Viewport and scissor setup state
 };
 
 }

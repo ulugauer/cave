@@ -80,7 +80,7 @@ private:
 	*
 	* @param[in] objectFinder		Helper class to find resource
 	* @param[in] fileStream	File	stream where we read from
-	* @param[in|out] material		Pointer to material we fill with data
+	* @param[in,out] material		Pointer to material we fill with data
 	*
 	* @return true if successful
 	*/
@@ -91,7 +91,7 @@ private:
 	*
 	* @param[in] objectFinder	Helper class to find resource
 	* @param[in] filename		File name
-	* @param[in|out] shader		RenderShader object we fill in
+	* @param[in,out] shader		RenderShader object we fill in
 	*
 	* @return true if successful
 	*/
