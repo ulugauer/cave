@@ -284,15 +284,15 @@ private:
 
 			if (_capacity < 16)
 			{
-				newSize = _allocated + 1;
+				newSize = _capacity + 1;
 			}
 			else
 			{
 				static const size_type maxVectorIncrement = 512;
-				if (_allocated < maxVectorIncrement)
-					newSize = _allocated * 2;
+				if (_capacity < maxVectorIncrement)
+					newSize = _capacity * 2;
 				else
-					newSize = _allocated + maxVectorIncrement;
+					newSize = _capacity + maxVectorIncrement;
 			}
 
 			Reserve(newSize);

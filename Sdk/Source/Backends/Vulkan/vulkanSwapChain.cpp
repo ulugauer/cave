@@ -60,7 +60,6 @@ VulkanSwapChain::~VulkanSwapChain()
 	if (_RenderingFinishedSemaphore)
 		VulkanApi::GetApi()->vkDestroySemaphore(_pRenderDevice->GetDeviceHandle(), _RenderingFinishedSemaphore, nullptr);
 
-
 	if (_swapChain)
 		VulkanApi::GetApi()->vkDestroySwapchainKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, nullptr);
 }
