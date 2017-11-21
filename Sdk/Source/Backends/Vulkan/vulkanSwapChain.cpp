@@ -33,7 +33,7 @@ VulkanSwapChain::VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice*
 	, _pRenderDevice(renderDevice)
 	, _swapChain(nullptr)
 	, _swapImageCount(0)
-	, _swapChainImageArray(nullptr)
+	, _swapChainImageVector(instance->GetEngineAllocator())
 	, _swapChainImageViewArray(nullptr)
 	, _ImageAvailableSemaphore(VK_NULL_HANDLE)
 	, _RenderingFinishedSemaphore(VK_NULL_HANDLE)
@@ -60,8 +60,7 @@ VulkanSwapChain::~VulkanSwapChain()
 	if (_RenderingFinishedSemaphore)
 		VulkanApi::GetApi()->vkDestroySemaphore(_pRenderDevice->GetDeviceHandle(), _RenderingFinishedSemaphore, nullptr);
 
-	if (_swapChainImageArray)
-		DeallocateArray<VkImage>(*_pInstance->GetEngineAllocator(), _swapChainImageArray);
+	_swapChainImageVector.Clear();
 
 	if (_swapChain)
 		VulkanApi::GetApi()->vkDestroySwapchainKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, nullptr);
@@ -133,11 +132,11 @@ void VulkanSwapChain::CreateSwapChain()
 	if (!_swapImageCount)
 		throw BackendException("Failed to get swap chain images");
 
-	_swapChainImageArray = AllocateArray<VkImage>(*_pInstance->GetEngineAllocator(), _swapImageCount);
-	if (!_swapChainImageArray)
+	_swapChainImageVector.Resize(_swapImageCount);
+	if (!_swapChainImageVector.Size())
 		throw BackendException("Failed to allocate memory for swap chain images");
 
-	VulkanApi::GetApi()->vkGetSwapchainImagesKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, &_swapImageCount, _swapChainImageArray);
+	VulkanApi::GetApi()->vkGetSwapchainImagesKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, &_swapImageCount, _swapChainImageVector.Data());
 
 	// save for later usage
 	_swapChainImageFormat = surfaceFormat.format;
@@ -154,7 +153,7 @@ void VulkanSwapChain::CreateImageViews()
 	{
 		VkImageViewCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		createInfo.image = _swapChainImageArray[i];
+		createInfo.image = _swapChainImageVector[i];
 		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 		createInfo.format = _swapChainImageFormat;
 		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;

@@ -17,7 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Vulkan swapchain
 
 #include "halRenderDevice.h"
-
+#include "Common/caveVector.h"
 #include "vulkan.h"
 
 #include <vector>
@@ -150,8 +150,8 @@ private:
 	VulkanRenderDevice* _pRenderDevice;	///< Handle to render device
 	VkSwapchainKHR _swapChain;	///< Handle to a vulkan swap chain
 	uint32_t _swapImageCount;	///< Image count
-	VkImage* _swapChainImageArray; ///< Array of generated swap images
 	VkImageView* _swapChainImageViewArray; ///< Array of generated swap images views
+	caveVector<VkImage> _swapChainImageVector;
 	VkFormat _swapChainImageFormat;	///< The chosen image format
 	VkExtent2D _swapChainExtent;	///< The current extend
 	VkSemaphore _ImageAvailableSemaphore; ///< Next image available semaphore
