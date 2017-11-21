@@ -60,7 +60,7 @@ public:
 	*
 	* @return swap image count
 	*/
-	const uint32_t GetSwapChainImageCount() const { return _swapImageCount; }
+	const uint32_t GetSwapChainImageCount() const { return static_cast<uint32_t>(_swapChainImageVector.Size()); }
 
 	/**
 	* @brief Get swap image size
@@ -149,9 +149,8 @@ private:
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
 	VulkanRenderDevice* _pRenderDevice;	///< Handle to render device
 	VkSwapchainKHR _swapChain;	///< Handle to a vulkan swap chain
-	uint32_t _swapImageCount;	///< Image count
-	VkImageView* _swapChainImageViewArray; ///< Array of generated swap images views
-	caveVector<VkImage> _swapChainImageVector;
+	caveVector<VkImage> _swapChainImageVector; ///< Vector of swap chain images
+	caveVector<VkImageView> _swapChainImageViewVector; ///< Array of generated swap images views
 	VkFormat _swapChainImageFormat;	///< The chosen image format
 	VkExtent2D _swapChainExtent;	///< The current extend
 	VkSemaphore _ImageAvailableSemaphore; ///< Next image available semaphore

@@ -32,9 +32,8 @@ VulkanSwapChain::VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice*
 	, _pPhysicalDevice(physicalDevice)
 	, _pRenderDevice(renderDevice)
 	, _swapChain(nullptr)
-	, _swapImageCount(0)
 	, _swapChainImageVector(instance->GetEngineAllocator())
-	, _swapChainImageViewArray(nullptr)
+	, _swapChainImageViewVector(instance->GetEngineAllocator())
 	, _ImageAvailableSemaphore(VK_NULL_HANDLE)
 	, _RenderingFinishedSemaphore(VK_NULL_HANDLE)
 {
@@ -47,20 +46,20 @@ VulkanSwapChain::~VulkanSwapChain()
 {
 	VulkanApi::GetApi()->vkDeviceWaitIdle(_pRenderDevice->GetDeviceHandle());
 
-	if (_swapChainImageViewArray)
+	if (!_swapChainImageViewVector.Empty())
 	{
-		for (size_t i = 0; i < _swapImageCount; i++)
-			VulkanApi::GetApi()->vkDestroyImageView(_pRenderDevice->GetDeviceHandle(), _swapChainImageViewArray[i], nullptr);
-
-		DeallocateArray<VkImageView>(*_pInstance->GetEngineAllocator(), _swapChainImageViewArray);
+		for (size_t i = 0; i < _swapChainImageViewVector.Size(); i++)
+			VulkanApi::GetApi()->vkDestroyImageView(_pRenderDevice->GetDeviceHandle(), _swapChainImageViewVector[i], nullptr);
 	}
+
+	_swapChainImageViewVector.Clear();
+	_swapChainImageVector.Clear();
 
 	if (_ImageAvailableSemaphore)
 		VulkanApi::GetApi()->vkDestroySemaphore(_pRenderDevice->GetDeviceHandle(), _ImageAvailableSemaphore, nullptr);
 	if (_RenderingFinishedSemaphore)
 		VulkanApi::GetApi()->vkDestroySemaphore(_pRenderDevice->GetDeviceHandle(), _RenderingFinishedSemaphore, nullptr);
 
-	_swapChainImageVector.Clear();
 
 	if (_swapChain)
 		VulkanApi::GetApi()->vkDestroySwapchainKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, nullptr);
@@ -127,16 +126,16 @@ void VulkanSwapChain::CreateSwapChain()
 		VulkanApi::GetApi()->vkDestroySwapchainKHR(_pRenderDevice->GetDeviceHandle(), swapChainCreateInfo.oldSwapchain, nullptr);
 
 	// retrieve images
-	_swapImageCount = 0;
-	VulkanApi::GetApi()->vkGetSwapchainImagesKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, &_swapImageCount, nullptr);
-	if (!_swapImageCount)
+	uint32_t swapImageCount = 0;
+	VulkanApi::GetApi()->vkGetSwapchainImagesKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, &swapImageCount, nullptr);
+	if (!swapImageCount)
 		throw BackendException("Failed to get swap chain images");
 
-	_swapChainImageVector.Resize(_swapImageCount);
+	_swapChainImageVector.Resize(swapImageCount);
 	if (!_swapChainImageVector.Size())
 		throw BackendException("Failed to allocate memory for swap chain images");
 
-	VulkanApi::GetApi()->vkGetSwapchainImagesKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, &_swapImageCount, _swapChainImageVector.Data());
+	VulkanApi::GetApi()->vkGetSwapchainImagesKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, &swapImageCount, _swapChainImageVector.Data());
 
 	// save for later usage
 	_swapChainImageFormat = surfaceFormat.format;
@@ -145,11 +144,11 @@ void VulkanSwapChain::CreateSwapChain()
 
 void VulkanSwapChain::CreateImageViews()
 {
-	_swapChainImageViewArray = AllocateArray<VkImageView>(*_pInstance->GetEngineAllocator(), _swapImageCount);
-	if (!_swapChainImageViewArray)
+	_swapChainImageViewVector.Resize(_swapChainImageVector.Size());
+	if (!_swapChainImageViewVector.Size())
 		throw BackendException("Failed to allocate memory for swap chain image views");
 
-	for (uint32_t i = 0; i < _swapImageCount; ++i)
+	for (uint32_t i = 0; i < _swapChainImageVector.Size(); ++i)
 	{
 		VkImageViewCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -166,7 +165,7 @@ void VulkanSwapChain::CreateImageViews()
 		createInfo.subresourceRange.baseArrayLayer = 0;
 		createInfo.subresourceRange.layerCount = 1;
 
-		if (VulkanApi::GetApi()->vkCreateImageView(_pRenderDevice->GetDeviceHandle(), &createInfo, nullptr, &_swapChainImageViewArray[i]) != VK_SUCCESS)
+		if (VulkanApi::GetApi()->vkCreateImageView(_pRenderDevice->GetDeviceHandle(), &createInfo, nullptr, &_swapChainImageViewVector[i]) != VK_SUCCESS)
 		{
 			throw BackendException("Failed to create image views!");
 		}

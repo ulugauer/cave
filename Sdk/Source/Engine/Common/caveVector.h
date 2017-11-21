@@ -96,6 +96,26 @@ public:
 	}
 
 	/**
+	* @brief Adds an element to the end of the vector
+	*
+	* @param[in] value	The element added to the end of the vector
+	*
+	*/
+	inline void Push(const T& value)
+	{
+		CheckAlloc();
+		_data[_size++] = value;
+	}
+
+	/** @brief Deletes the element at the end of the vector */
+	inline void Pop()
+	{
+		if (_size > 0)
+			_size--;
+	}
+
+
+	/**
 	* @brief Returns a reference to the vector element at a specified position
 	*
 	* @param[in] index he position of the vector element
@@ -110,7 +130,7 @@ public:
 		return _data[index];
 	}
 
-	/*
+	/**
 	* @brief Returns a reference to the vector element at a specified position
 	*
 	* @param[in] index	The position of the vector element
@@ -153,7 +173,7 @@ public:
 	/// @brief Tests if the vector is empty
 	///
 	/// @return true if the vector is empty; false if the vector is not empty
-	inline bool empty() const
+	inline bool Empty() const
 	{
 		return (_size == 0);
 	}
@@ -255,6 +275,31 @@ public:
 
 
 private:
+
+	inline void CheckAlloc()
+	{
+		if ((_size + 1) > _capacity)
+		{
+			size_type newSize;
+
+			if (_capacity < 16)
+			{
+				newSize = _allocated + 1;
+			}
+			else
+			{
+				static const size_type maxVectorIncrement = 512;
+				if (_allocated < maxVectorIncrement)
+					newSize = _allocated * 2;
+				else
+					newSize = _allocated + maxVectorIncrement;
+			}
+
+			Reserve(newSize);
+		}
+	}
+
+
 	std::shared_ptr<AllocatorBase> _allocator;	///< Pointer to global allocator
 	T*     _data;			///< Pointer to data
 	size_type _size;		///< Current used size
