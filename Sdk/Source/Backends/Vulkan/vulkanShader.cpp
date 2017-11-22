@@ -25,6 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+/**
+* @brief Convert from generic shader type to vulkan shader type
+*
+* @param[in] type	Generic shader type
+*
+* @return Vulkan shader type
+*/
 static VkShaderStageFlagBits ConvertShaderStageToVulkan(ShaderType type)
 {
 	VkShaderStageFlagBits shaderStageFlag = VK_SHADER_STAGE_VERTEX_BIT;
