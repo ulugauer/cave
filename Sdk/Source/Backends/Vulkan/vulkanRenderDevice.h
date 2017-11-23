@@ -61,6 +61,13 @@ public:
 	VkDevice GetDeviceHandle() { return _vkDevice; }
 
 	/**
+	* @brief GetAllocator
+	*
+	* @return Pointer Engine allocator
+	*/
+	std::shared_ptr<AllocatorBase> GetEngineAllocator();
+
+	/**
 	* @brief Get vulkan surface handle
 	*
 	* @return Lowlevel vulkan handle

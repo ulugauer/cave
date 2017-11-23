@@ -164,6 +164,11 @@ VulkanRenderDevice::~VulkanRenderDevice()
 	}
 }
 
+std::shared_ptr<AllocatorBase> VulkanRenderDevice::GetEngineAllocator()
+{ 
+	return _pInstance->GetEngineAllocator(); 
+}
+
 void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
 {
 	if (!_pPhysicalDevice || !_vkDevice)

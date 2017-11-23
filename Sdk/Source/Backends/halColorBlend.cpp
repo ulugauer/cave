@@ -12,20 +12,20 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file halMultisample.cpp
-///       Hardware multisample state abstraction
+/// @file halColorBlend.cpp
+///       Hardware color blending state abstraction
 
-#include "halMultisample.h"
+#include "halColorBlend.h"
 
 namespace cave
 {
 
-HalMultisample::HalMultisample(HalMultisampleState& multisampleState)
-	: _multisampleState(multisampleState)
+HalColorBlend::HalColorBlend(HalColorBlendState& colorBlendState)
+	: _colorBlendState(colorBlendState)
 {
 }
 
-HalMultisample::~HalMultisample()
+HalColorBlend::~HalColorBlend()
 {
 
 }

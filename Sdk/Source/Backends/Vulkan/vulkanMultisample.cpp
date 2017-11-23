@@ -66,19 +66,19 @@ static VkSampleCountFlagBits ConvertCullModeToVulkan(SampleCount samples)
 	return sampleCount;
 }
 
-VulkanMultisample::VulkanMultisample(VulkanRenderDevice* device, HalMultisampleData& multisampleData)
-	: HalMultisample(multisampleData)
+VulkanMultisample::VulkanMultisample(VulkanRenderDevice* device, HalMultisampleState& multisampleState)
+	: HalMultisample(multisampleState)
 	, _pDevice(device)
 {
 	_multisampleStateStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	_multisampleStateStateInfo.pNext = nullptr;
 	_multisampleStateStateInfo.flags = 0;
-	_multisampleStateStateInfo.alphaToCoverageEnable = multisampleData._alphaToCoverageEnable;
-	_multisampleStateStateInfo.alphaToOneEnable = multisampleData._alphaToOneEnable;
-	_multisampleStateStateInfo.minSampleShading = multisampleData._minSampleShading;
-	_multisampleStateStateInfo.pSampleMask = static_cast<VkSampleMask*>(multisampleData._pSampleMask);
-	_multisampleStateStateInfo.rasterizationSamples = ConvertCullModeToVulkan(multisampleData._rasterizationSamples);
-	_multisampleStateStateInfo.sampleShadingEnable = multisampleData._sampleShadingEnable;
+	_multisampleStateStateInfo.alphaToCoverageEnable = multisampleState._alphaToCoverageEnable;
+	_multisampleStateStateInfo.alphaToOneEnable = multisampleState._alphaToOneEnable;
+	_multisampleStateStateInfo.minSampleShading = multisampleState._minSampleShading;
+	_multisampleStateStateInfo.pSampleMask = static_cast<VkSampleMask*>(multisampleState._pSampleMask);
+	_multisampleStateStateInfo.rasterizationSamples = ConvertCullModeToVulkan(multisampleState._rasterizationSamples);
+	_multisampleStateStateInfo.sampleShadingEnable = multisampleState._sampleShadingEnable;
 }
 
 VulkanMultisample::~VulkanMultisample()

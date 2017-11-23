@@ -13,15 +13,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halMultisample.h
-///       Hardware multisample state abstraction
+/// @file vulkanColorBlend.h
+///       Vulkan color blending state
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "Memory/allocatorBase.h"
+#include "halColorBlend.h"
+#include "osPlatformLib.h"
 
-#include <iostream>		// includes exception handling
-#include <memory>
+#include "vulkan.h"
 
 /** \addtogroup backend
 *  @{
@@ -31,54 +29,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-/**
-*  @brief A strongly typed enum class representing polygon cull mode
-*/
-enum class SampleCount
-{
-	SampleCount1 = 0,
-	SampleCount2,
-	SampleCount4,
-	SampleCount8,
-	SampleCount16,
-	SampleCount32,
-	SampleCount64
-};
+///< forwards
+class VulkanRenderDevice;
 
 /**
-* @brief Multisample state data
+* @brief Vulkan color blend state
 */
-struct HalMultisampleState
-{
-	bool _alphaToCoverageEnable;		///< Enable temporary coverage value based on the alpha value
-	bool _alphaToOneEnable;				///< Enable replacing alpah output to one
-	float _minSampleShading;			///< Minimum fraction value
-	uint32_t* _pSampleMask;				///< Coverage bitmask
-	SampleCount _rasterizationSamples;	///< Sample count
-	bool _sampleShadingEnable;			///< Enable per sample fragment execution
-};
-
-/**
-* @brief Describes the multisample state
-*/
-class HalMultisample
+class VulkanColorBlend : public HalColorBlend
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] multisampleState	Multisample state
+	* @param[in] device				Pointer to device object
+	* @param[in] colorBlendState	Color blending state data
 	*/
-	HalMultisample(HalMultisampleState& multisampleState);
+	VulkanColorBlend(VulkanRenderDevice* device, HalColorBlendState& colorBlendState, caveVector<HalColorBlendAttachment>& blendAttachments);
 
 	/** @brief Destructor */
-	virtual ~HalMultisample();
+	virtual ~VulkanColorBlend();
+
 
 private:
-	HalMultisampleState _multisampleState;	///< Multisample state
+	VulkanRenderDevice* _pDevice;	///< Pointer to device object
+	caveVector<VkPipelineColorBlendAttachmentState> _colorBlendAttachments;	///< Array of blending attachment states
+	VkPipelineColorBlendStateCreateInfo	_colorBlendStateStateInfo;		///< Color blend state info
 };
 
 }
 
 /** @}*/
+
 

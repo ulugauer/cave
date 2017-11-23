@@ -42,9 +42,9 @@ public:
 	* @brief Constructor
 	*
 	* @param[in] device				Pointer to device object
-	* @param[in] multisampleData	Multisample state data
+	* @param[in] multisampleState	Multisample state 
 	*/
-	VulkanMultisample(VulkanRenderDevice* device, HalMultisampleData& multisampleData);
+	VulkanMultisample(VulkanRenderDevice* device, HalMultisampleState& multisampleState);
 
 	/** @brief Destructor */
 	virtual ~VulkanMultisample();
