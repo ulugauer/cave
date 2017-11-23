@@ -29,7 +29,7 @@ namespace cave
 {
 
 VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice, VkSurfaceKHR surface)
-	: HalRenderDevice()
+	: HalRenderDevice(instance)
 	, _pInstance(instance)
 	, _pPhysicalDevice(physicalDevice)
 	, _presentationSurface(surface)
@@ -162,11 +162,6 @@ VulkanRenderDevice::~VulkanRenderDevice()
 		VulkanApi::GetApi()->vkDestroyDevice(_vkDevice, nullptr);
 		_vkDevice = nullptr;
 	}
-}
-
-std::shared_ptr<AllocatorBase> VulkanRenderDevice::GetEngineAllocator()
-{ 
-	return _pInstance->GetEngineAllocator(); 
 }
 
 void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )

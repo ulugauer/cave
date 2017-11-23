@@ -23,8 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-HalInstance::HalInstance(BackendInstanceTypes type)
-	: _type(type)
+HalInstance::HalInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type)
+	: _allocator(allocator)
+	, _type(type)
 {
 
 }

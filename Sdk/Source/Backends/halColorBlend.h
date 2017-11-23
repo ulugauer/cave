@@ -17,7 +17,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Hardware color blending state abstraction
 
 #include "engineDefines.h"
-#include "halInstance.h"
 #include "Memory/allocatorBase.h"
 #include "Common/caveVector.h"
 
@@ -31,6 +30,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
+
+///< forwards
+class HalRenderDevice;
 
 /**
 *  @brief A strongly typed enum class representing blending factors
@@ -81,7 +83,7 @@ enum class ColorComponents
 	Alpha = 8
 };
 
-typedef uint32_t ColorComponentFlags;
+typedef uint32_t ColorComponentFlags;	///< Combined color component flags
 
 /**
 *  @brief A strongly typed enum class representing logic operations
@@ -140,15 +142,20 @@ public:
 	/**
 	* @brief Constructor
 	*
+	* @param[in] renderDevice		Pointer to render device object
 	* @param[in] colorBlendState	Color blending state data
+	* @param[in] blendAttachments	Color blend attachment state
 	*/
-	HalColorBlend(HalColorBlendState& colorBlendState);
+	HalColorBlend(HalRenderDevice* renderDevice, HalColorBlendState& colorBlendState
+				, caveVector<HalColorBlendAttachment>& blendAttachments);
 
 	/** @brief Destructor */
 	virtual ~HalColorBlend();
 
 private:
+	HalRenderDevice* _pDevice;	///< Pointer to device object
 	HalColorBlendState _colorBlendState;	///< Color blend state state
+	caveVector<HalColorBlendAttachment> _colorBlendAttachments;	///< Color blend attachment state
 };
 
 }

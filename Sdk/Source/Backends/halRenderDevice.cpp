@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-HalRenderDevice::HalRenderDevice()
+HalRenderDevice::HalRenderDevice(HalInstance* instance)
+	: _pInstance(instance)
 {
 
 }

@@ -42,10 +42,19 @@ public:
 	* @brief Constructor
 	*
 	*/
-	HalRenderDevice();
+	HalRenderDevice(HalInstance* instance);
 
 	/** @brief Destructor */
 	virtual ~HalRenderDevice();
+
+	/**
+	* @brief GetAllocator
+	*
+	* @return Pointer Engine allocator
+	*/
+	std::shared_ptr<AllocatorBase> GetEngineAllocator() {
+		return _pInstance->GetEngineAllocator();
+	}
 
 	/**
 	* @brief Create a swap chain
@@ -64,6 +73,9 @@ public:
 	* @return shader abstraction interface
 	*/
 	virtual HalShader* CreateShader(ShaderType type, ShaderLanguage language) = 0;
+
+private:
+	HalInstance* _pInstance;	///< Pointer to instance object
 };
 
 }

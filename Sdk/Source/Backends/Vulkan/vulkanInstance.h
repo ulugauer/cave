@@ -74,13 +74,6 @@ public:
 	*/
 	VkInstance GetInstanceHandle() { return _vkInstance; }
 
-	/**
-	* @brief GetAllocator
-	*
-	* @return Pointer Engine allocator
-	*/
-	std::shared_ptr<AllocatorBase> GetEngineAllocator() { return _allocator; }
-
 private:
 	/**
 	* @brief Create a presentation surface
@@ -92,7 +85,6 @@ private:
 	VkSurfaceKHR CreatePresentaionSurface(SwapChainInfo& swapChainInfo);
 
 private:
-	std::shared_ptr<AllocatorBase> _allocator;	///< Pointer to global allocator
 	VkInstance _vkInstance;	///< Handle to vulkan instance
 	uint32_t _physicalDeviceCount;	///< Physical devices accessible by this instance
 	VulkanPhysicalDevice* _physicalDeviceArray;	///< Pointer to array of physical devices

@@ -42,13 +42,24 @@ public:
 	* @brief Constructor
 	*
 	* @param[in] device				Pointer to device object
-	* @param[in] colorBlendState	Color blending state data
+	* @param[in] colorBlendState	Color blending state
+	* @param[in] blendAttachments	Color blend attachment state
 	*/
-	VulkanColorBlend(VulkanRenderDevice* device, HalColorBlendState& colorBlendState, caveVector<HalColorBlendAttachment>& blendAttachments);
+	VulkanColorBlend(VulkanRenderDevice* device, HalColorBlendState& colorBlendState
+					, caveVector<HalColorBlendAttachment>& blendAttachments);
 
 	/** @brief Destructor */
 	virtual ~VulkanColorBlend();
 
+	/**
+	* @brief Get color blend state info
+	*
+	* @return Vulkan VkPipelineColorBlendStateCreateInfo
+	*/
+	const VkPipelineColorBlendStateCreateInfo& GetColorBlendStateInfo() const
+	{
+		return _colorBlendStateStateInfo;
+	}
 
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object

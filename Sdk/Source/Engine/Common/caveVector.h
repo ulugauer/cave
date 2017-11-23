@@ -69,11 +69,11 @@ public:
 	{
 		_allocator = rhs._allocator;
 
-		Reserve(rhs.size());
-		for (size_t i = 0; i < rhs.size(); i++)
+		Reserve(rhs.Size());
+		for (size_t i = 0; i < rhs.Size(); i++)
 			_data[i] = rhs[i];
 
-		_size = rhs.size();
+		_size = rhs.Size();
 	}
 
 	/** @brief Destructor */
@@ -86,8 +86,8 @@ public:
 	inline caveVector& operator=(const caveVector& rhs)
 	{
 		Clear();
-		Reserve(rhs.size());
-		for (size_t i = 0; i < rhs.size(); i++)
+		Reserve(rhs.Size());
+		for (size_t i = 0; i < rhs.Size(); i++)
 			_data[i] = rhs[i];
 
 		_size = rhs.Size();

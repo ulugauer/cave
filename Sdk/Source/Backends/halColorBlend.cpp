@@ -16,18 +16,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Hardware color blending state abstraction
 
 #include "halColorBlend.h"
+#include "halRenderDevice.h"
 
 namespace cave
 {
 
-HalColorBlend::HalColorBlend(HalColorBlendState& colorBlendState)
-	: _colorBlendState(colorBlendState)
+HalColorBlend::HalColorBlend(HalRenderDevice* renderDevice, HalColorBlendState& colorBlendState
+							, caveVector<HalColorBlendAttachment>& blendAttachments)
+	: _pDevice(renderDevice)
+	, _colorBlendState(colorBlendState)
+	, _colorBlendAttachments(renderDevice->GetEngineAllocator())
 {
+	// copy elements
+	_colorBlendAttachments = blendAttachments;
 }
 
 HalColorBlend::~HalColorBlend()
 {
-
+	if (!_colorBlendAttachments.Empty())
+		_colorBlendAttachments.Clear();
 }
 
 }

@@ -106,10 +106,11 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] type	Instance type
+	* @param[in] allocator		Pointer to global allocator
+	* @param[in] type			Instance type
 	*
 	*/
-	HalInstance(BackendInstanceTypes type);
+	HalInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type);
 
 	/** @brief Destructor */
 	virtual ~HalInstance();
@@ -120,7 +121,14 @@ public:
 	* @return Hardware instance type
 	*
 	*/
-	const BackendInstanceTypes GetInstanceType() const { return _type; }
+	virtual const BackendInstanceTypes GetInstanceType() const { return _type; }
+
+	/**
+	* @brief GetAllocator
+	*
+	* @return Pointer Engine allocator
+	*/
+	virtual std::shared_ptr<AllocatorBase> GetEngineAllocator() { return _allocator; }
 
 	/**
 	* @brief Create a list of physical devices supported by this instance
@@ -160,7 +168,7 @@ public:
 	static void ReleaseInstance(std::shared_ptr<AllocatorBase> allocator, HalInstance* instance);
 
 
-private:
+protected:
 	std::shared_ptr<AllocatorBase> _allocator; ///< Global allocator
 	BackendInstanceTypes _type;	///< Instance type
 };

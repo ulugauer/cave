@@ -231,7 +231,7 @@ static VkColorComponentFlags ConvertColorComponentToVulkan(ColorComponentFlags c
 VulkanColorBlend::VulkanColorBlend(VulkanRenderDevice* device
 								, HalColorBlendState& colorBlendState
 								, caveVector<HalColorBlendAttachment>& blendAttachments)
-	: HalColorBlend(colorBlendState)
+	: HalColorBlend(device, colorBlendState, blendAttachments)
 	, _pDevice(device)
 	, _colorBlendAttachments(device->GetEngineAllocator())
 {

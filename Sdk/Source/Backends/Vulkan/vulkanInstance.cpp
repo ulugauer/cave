@@ -49,8 +49,7 @@ static bool CheckExtensionAvailability(const char *extension_name, const std::ve
 
 
 VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName)
-	: HalInstance(type)
-	, _allocator(allocator)
+	: HalInstance(allocator, type)
 	, _physicalDeviceCount(0)
 	, _physicalDeviceArray(nullptr)
 {
