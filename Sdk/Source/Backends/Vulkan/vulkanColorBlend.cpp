@@ -232,8 +232,8 @@ VulkanColorBlend::VulkanColorBlend(VulkanRenderDevice* device
 								, HalColorBlendState& colorBlendState
 								, caveVector<HalColorBlendAttachment>& blendAttachments)
 	: HalColorBlend(colorBlendState)
-	, _colorBlendAttachments(device->GetEngineAllocator())
 	, _pDevice(device)
+	, _colorBlendAttachments(device->GetEngineAllocator())
 {
 	// first convert attachments
 	if (!blendAttachments.Empty())
@@ -250,6 +250,8 @@ VulkanColorBlend::VulkanColorBlend(VulkanRenderDevice* device
 			attachment.dstColorBlendFactor = ConvertBlendFactorToVulkan(blendAttachments[i]._dstColorBlendFactor);
 			attachment.srcAlphaBlendFactor = ConvertBlendFactorToVulkan(blendAttachments[i]._srcAlphaBlendFactor);
 			attachment.srcColorBlendFactor = ConvertBlendFactorToVulkan(blendAttachments[i]._srcColorBlendFactor);
+
+			_colorBlendAttachments.Push(attachment);
 		}
 	}
 
@@ -259,7 +261,7 @@ VulkanColorBlend::VulkanColorBlend(VulkanRenderDevice* device
 	_colorBlendStateStateInfo.logicOpEnable = colorBlendState._logicOpEnable;
 	_colorBlendStateStateInfo.logicOp = ConvertLogicOpToVulkan(colorBlendState._logicOp);
 	_colorBlendStateStateInfo.attachmentCount = static_cast<uint32_t>(blendAttachments.Size());
-	_colorBlendStateStateInfo.pAttachments = nullptr;
+	_colorBlendStateStateInfo.pAttachments = _colorBlendAttachments.Data();
 	_colorBlendStateStateInfo.blendConstants[0] = colorBlendState._blendConstants[0];
 	_colorBlendStateStateInfo.blendConstants[1] = colorBlendState._blendConstants[1];
 	_colorBlendStateStateInfo.blendConstants[2] = colorBlendState._blendConstants[2];
@@ -268,6 +270,8 @@ VulkanColorBlend::VulkanColorBlend(VulkanRenderDevice* device
 
 VulkanColorBlend::~VulkanColorBlend()
 {
+	if (!_colorBlendAttachments.Empty())
+		_colorBlendAttachments.Clear();
 }
 
 
