@@ -108,6 +108,9 @@ VulkanPipelineLayout::~VulkanPipelineLayout()
 		_vkPushConstantRange.Clear();
 	if (!_vkDescriptorLayouts.Empty())
 		_vkDescriptorLayouts.Clear();
+
+	if (_vkPipelineLayout != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkDestroyPipelineLayout(_pDevice->GetDeviceHandle(), _vkPipelineLayout, nullptr);
 }
 
 VkPipelineLayout VulkanPipelineLayout::GetPipelineLayout()
