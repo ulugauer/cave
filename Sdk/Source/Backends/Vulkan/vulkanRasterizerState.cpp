@@ -114,23 +114,23 @@ static VkPolygonMode ConvertPolygonModeToVulkan(PolygonMode mode)
 	return polyMode;
 }
 
-VulkanRasterizerState::VulkanRasterizerState(VulkanRenderDevice* device, HalRasterizerData& rasterizerData)
-	: HalRasterizerState(rasterizerData)
+VulkanRasterizerState::VulkanRasterizerState(VulkanRenderDevice* device, HalRasterizerSetup& rasterizerState)
+	: HalRasterizerState(rasterizerState)
 	, _pDevice(device)
 {
 	_rasterizerStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	_rasterizerStateInfo.pNext = nullptr;
 	_rasterizerStateInfo.flags = 0;
-	_rasterizerStateInfo.cullMode = ConvertCullModeToVulkan(rasterizerData._cullMode);
-	_rasterizerStateInfo.depthBiasClamp = rasterizerData._depthBiasClamp;
-	_rasterizerStateInfo.depthBiasConstantFactor = rasterizerData._depthBiasConstantFactor;
-	_rasterizerStateInfo.depthBiasEnable = rasterizerData._depthBiasEnable;
-	_rasterizerStateInfo.depthBiasSlopeFactor = rasterizerData._depthBiasSlopeFactor;
-	_rasterizerStateInfo.depthClampEnable = rasterizerData._depthClampEnable;
-	_rasterizerStateInfo.frontFace = ConvertFrontFaceToVulkan(rasterizerData._frontFace);
-	_rasterizerStateInfo.lineWidth = rasterizerData._lineWidth;
-	_rasterizerStateInfo.polygonMode = ConvertPolygonModeToVulkan(rasterizerData._polygonMode);
-	_rasterizerStateInfo.rasterizerDiscardEnable = rasterizerData._rasterizerDiscardEnable;
+	_rasterizerStateInfo.cullMode = ConvertCullModeToVulkan(rasterizerState._cullMode);
+	_rasterizerStateInfo.depthBiasClamp = rasterizerState._depthBiasClamp;
+	_rasterizerStateInfo.depthBiasConstantFactor = rasterizerState._depthBiasConstantFactor;
+	_rasterizerStateInfo.depthBiasEnable = rasterizerState._depthBiasEnable;
+	_rasterizerStateInfo.depthBiasSlopeFactor = rasterizerState._depthBiasSlopeFactor;
+	_rasterizerStateInfo.depthClampEnable = rasterizerState._depthClampEnable;
+	_rasterizerStateInfo.frontFace = ConvertFrontFaceToVulkan(rasterizerState._frontFace);
+	_rasterizerStateInfo.lineWidth = rasterizerState._lineWidth;
+	_rasterizerStateInfo.polygonMode = ConvertPolygonModeToVulkan(rasterizerState._polygonMode);
+	_rasterizerStateInfo.rasterizerDiscardEnable = rasterizerState._rasterizerDiscardEnable;
 }
 
 VulkanRasterizerState::~VulkanRasterizerState()

@@ -11,62 +11,28 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file vulkanRasterizerState.h
-///       Vulkan rasterizer state
+/// @file halDynamicState.cpp
+///       Hardware dynamic abstraction
 
-#include "halRasterizerState.h"
-#include "osPlatformLib.h"
-
-#include "vulkan.h"
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include "halDynamicState.h"
+#include "halRenderDevice.h"
 
 namespace cave
 {
 
-///< forwards
-class VulkanRenderDevice;
-
-/**
-* @brief Vulkan vertex input state
-*/
-class VulkanRasterizerState : public HalRasterizerState
+HalDynamicState::HalDynamicState(HalRenderDevice* renderDevice, caveVector<DynamicState>& dynamicStates)
+	: _pDevice(renderDevice)
+	, _dynamicStates(renderDevice->GetEngineAllocator())
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] device				Pointer to device object
-	* @param[in] rasterizerState	Rasterizer setup struct
-	*
-	*/
-	VulkanRasterizerState(VulkanRenderDevice* device, HalRasterizerSetup& rasterizerState);
-
-	/** @brief Destructor */
-	virtual ~VulkanRasterizerState();
-
-	/**
-	* @brief Get rasterizer state info
-	*
-	* @return Vulkan VkPipelineRasterizationStateCreateInfo
-	*/
-	const VkPipelineRasterizationStateCreateInfo& GetRasterizerStateInfo() const 
-	{ 
-		return _rasterizerStateInfo;  
-	}
-
-private:
-	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineRasterizationStateCreateInfo  _rasterizerStateInfo;		///< Rasterizer setup state info
-};
-
+	// copy elements
+	_dynamicStates = dynamicStates;
 }
 
-/** @}*/
+HalDynamicState::~HalDynamicState()
+{
+	if (!_dynamicStates.Empty())
+		_dynamicStates.Clear();
+}
 
-
+}

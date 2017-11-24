@@ -16,7 +16,9 @@ set(BACKENDS_SOURCE halInstance.h halInstance.cpp
 					halViewportAndScissor.h halViewportAndScissor.cpp 
 					halRasterizerState.h halRasterizerState.cpp 
 					halMultisample.h halMultisample.cpp 
-					halColorBlend.h halColorBlend.cpp )
+					halColorBlend.h halColorBlend.cpp 
+					halDynamicState.h halDynamicState.cpp 
+					halDepthStencil.h halDepthStencil.cpp )
 # vulkan source
 set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h 
 					 	   Vulkan/vulkanInstance.h Vulkan/vulkanInstance.cpp 
@@ -29,7 +31,9 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 						   Vulkan/vulkanViewportAndScissor.h Vulkan/vulkanViewportAndScissor.cpp 
 						   Vulkan/vulkanRasterizerState.h Vulkan/vulkanRasterizerState.cpp 
 						   Vulkan/vulkanMultisample.h Vulkan/vulkanMultisample.cpp 
-						   Vulkan/vulkanColorBlend.h Vulkan/vulkanColorBlend.cpp )
+						   Vulkan/vulkanColorBlend.h Vulkan/vulkanColorBlend.cpp 
+						   Vulkan/vulkanDynamicState.h Vulkan/vulkanDynamicState.cpp 
+						   Vulkan/vulkanDepthStencil.h Vulkan/vulkanDepthStencil.cpp )
 
 
 # Create named folders for the sources within the .vcproj

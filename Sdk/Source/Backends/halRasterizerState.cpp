@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-HalRasterizerState::HalRasterizerState(HalRasterizerData& rasterizerData)
-	: _rasterizerState(rasterizerData)
+HalRasterizerState::HalRasterizerState(HalRasterizerSetup& rasterizerState)
+	: _rasterizerState(rasterizerState)
 {
 
 }

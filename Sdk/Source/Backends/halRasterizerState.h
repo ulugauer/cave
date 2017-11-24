@@ -62,9 +62,9 @@ enum class PolygonMode
 };
 
 /**
-* @brief Rasterizer state data
+* @brief Rasterizer state setup
 */
-struct HalRasterizerData
+struct HalRasterizerSetup
 {
 	CullMode _cullMode;				///< Polygon culling mode
 	FrontFace _frontFace;			///< Front face mode
@@ -87,14 +87,15 @@ public:
 	/**
 	* @brief Constructor
 	*
+	* @param[in] rasterizerState	Rasterizer setup struct
 	*/
-	HalRasterizerState(HalRasterizerData& rasterizerData);
+	HalRasterizerState(HalRasterizerSetup& rasterizerState);
 
 	/** @brief Destructor */
 	virtual ~HalRasterizerState();
 
 private:
-	HalRasterizerData _rasterizerState;	///< Rasterizer state
+	HalRasterizerSetup _rasterizerState;	///< Rasterizer state
 };
 
 }

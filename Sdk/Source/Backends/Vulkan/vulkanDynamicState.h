@@ -13,11 +13,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file vulkanRasterizerState.h
-///       Vulkan rasterizer state
+/// @file vulkanDynamicState.h
+///       Vulkan dynamic pipeline state
 
-#include "halRasterizerState.h"
-#include "osPlatformLib.h"
+#include "halDynamicState.h"
 
 #include "vulkan.h"
 
@@ -35,34 +34,34 @@ class VulkanRenderDevice;
 /**
 * @brief Vulkan vertex input state
 */
-class VulkanRasterizerState : public HalRasterizerState
+class VulkanDynamicState : public HalDynamicState
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] device				Pointer to device object
-	* @param[in] rasterizerState	Rasterizer setup struct
-	*
+	* @param[in] device			Pointer to render device object
+	* @param[in] dynamicStates	Array of dynamic states
 	*/
-	VulkanRasterizerState(VulkanRenderDevice* device, HalRasterizerSetup& rasterizerState);
+	VulkanDynamicState(VulkanRenderDevice* device, caveVector<DynamicState>& dynamicStates);
 
 	/** @brief Destructor */
-	virtual ~VulkanRasterizerState();
+	virtual ~VulkanDynamicState();
 
 	/**
-	* @brief Get rasterizer state info
+	* @brief Get color blend state info
 	*
-	* @return Vulkan VkPipelineRasterizationStateCreateInfo
+	* @return Vulkan VkPipelineColorBlendStateCreateInfo
 	*/
-	const VkPipelineRasterizationStateCreateInfo& GetRasterizerStateInfo() const 
-	{ 
-		return _rasterizerStateInfo;  
+	const VkPipelineDynamicStateCreateInfo& GetColorBlendStateInfo() const
+	{
+		return _dynamicStateInfo;
 	}
 
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineRasterizationStateCreateInfo  _rasterizerStateInfo;		///< Rasterizer setup state info
+	caveVector<VkDynamicState> _dynamicStates;	///< Array of dynamic states
+	VkPipelineDynamicStateCreateInfo _dynamicStateInfo;		///< Dynamic state info
 };
 
 }

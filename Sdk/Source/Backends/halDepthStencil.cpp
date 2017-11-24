@@ -11,62 +11,24 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file vulkanRasterizerState.h
-///       Vulkan rasterizer state
+/// @file halDepthStencil.cpp
+///       Hardware render device abstraction
 
-#include "halRasterizerState.h"
-#include "osPlatformLib.h"
-
-#include "vulkan.h"
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include "halDepthStencil.h"
 
 namespace cave
 {
 
-///< forwards
-class VulkanRenderDevice;
-
-/**
-* @brief Vulkan vertex input state
-*/
-class VulkanRasterizerState : public HalRasterizerState
+HalDepthStencil::HalDepthStencil(HalDepthStencilSetup& depthStencilSetup)
+	: _depthStencilState(depthStencilSetup)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] device				Pointer to device object
-	* @param[in] rasterizerState	Rasterizer setup struct
-	*
-	*/
-	VulkanRasterizerState(VulkanRenderDevice* device, HalRasterizerSetup& rasterizerState);
-
-	/** @brief Destructor */
-	virtual ~VulkanRasterizerState();
-
-	/**
-	* @brief Get rasterizer state info
-	*
-	* @return Vulkan VkPipelineRasterizationStateCreateInfo
-	*/
-	const VkPipelineRasterizationStateCreateInfo& GetRasterizerStateInfo() const 
-	{ 
-		return _rasterizerStateInfo;  
-	}
-
-private:
-	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineRasterizationStateCreateInfo  _rasterizerStateInfo;		///< Rasterizer setup state info
-};
 
 }
 
-/** @}*/
+HalDepthStencil::~HalDepthStencil()
+{
 
+}
 
+}

@@ -13,13 +13,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file vulkanRasterizerState.h
-///       Vulkan rasterizer state
+/// @file halDynamicState.h
+///       Hardware dynamic abstraction
 
-#include "halRasterizerState.h"
-#include "osPlatformLib.h"
+#include "engineDefines.h"
+#include "halInstance.h"
+#include "Memory/allocatorBase.h"
+#include "Common/caveVector.h"
 
-#include "vulkan.h"
+#include <iostream>		// includes exception handling
+#include <memory>
 
 /** \addtogroup backend
 *  @{
@@ -30,43 +33,47 @@ namespace cave
 {
 
 ///< forwards
-class VulkanRenderDevice;
+class HalRenderDevice;
 
 /**
-* @brief Vulkan vertex input state
+*  @brief A strongly typed enum class representing dynamic states
 */
-class VulkanRasterizerState : public HalRasterizerState
+enum class DynamicState
+{
+	Viewport = 0,
+	Scissor,
+	LineWidth,
+	DepthBias,
+	BlendConstants,
+	DepthBounds,
+	StencilCompareMask,
+	StencilWriteMask,
+	StencilReference
+};
+
+/**
+* @brief Tracks what of the pipeline is a dynamic state
+*/
+class HalDynamicState
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] device				Pointer to device object
-	* @param[in] rasterizerState	Rasterizer setup struct
-	*
+	* @param[in] renderDevice		Pointer to render device object
+	* @param[in] dynamicStates		Array of dynamic states
 	*/
-	VulkanRasterizerState(VulkanRenderDevice* device, HalRasterizerSetup& rasterizerState);
+	HalDynamicState(HalRenderDevice* renderDevice, caveVector<DynamicState>& dynamicStates);
 
 	/** @brief Destructor */
-	virtual ~VulkanRasterizerState();
-
-	/**
-	* @brief Get rasterizer state info
-	*
-	* @return Vulkan VkPipelineRasterizationStateCreateInfo
-	*/
-	const VkPipelineRasterizationStateCreateInfo& GetRasterizerStateInfo() const 
-	{ 
-		return _rasterizerStateInfo;  
-	}
+	virtual ~HalDynamicState();
 
 private:
-	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineRasterizationStateCreateInfo  _rasterizerStateInfo;		///< Rasterizer setup state info
+	HalRenderDevice* _pDevice;	///< Pointer to device object
+	caveVector<DynamicState> _dynamicStates;	///< Array of dynamic tracked states
 };
 
 }
 
 /** @}*/
-
 

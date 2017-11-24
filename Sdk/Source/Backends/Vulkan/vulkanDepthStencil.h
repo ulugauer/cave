@@ -13,11 +13,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file vulkanRasterizerState.h
-///       Vulkan rasterizer state
+/// @file vulkanDepthStencil.h
+///       Vulkan depth stencil state
 
-#include "halRasterizerState.h"
-#include "osPlatformLib.h"
+#include "halDepthStencil.h"
 
 #include "vulkan.h"
 
@@ -33,36 +32,27 @@ namespace cave
 class VulkanRenderDevice;
 
 /**
-* @brief Vulkan vertex input state
+* @brief Vulkan depth stencil state
 */
-class VulkanRasterizerState : public HalRasterizerState
+class VulkanDepthStencil : public HalDepthStencil
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] device				Pointer to device object
-	* @param[in] rasterizerState	Rasterizer setup struct
+	* @param[in] device	Pointer to device object
+	* @param[in] depthStencilSetup	Depth Stencil setup struct
 	*
 	*/
-	VulkanRasterizerState(VulkanRenderDevice* device, HalRasterizerSetup& rasterizerState);
+	VulkanDepthStencil(VulkanRenderDevice* device, HalDepthStencilSetup& depthStencilSetup);
 
 	/** @brief Destructor */
-	virtual ~VulkanRasterizerState();
+	virtual ~VulkanDepthStencil();
 
-	/**
-	* @brief Get rasterizer state info
-	*
-	* @return Vulkan VkPipelineRasterizationStateCreateInfo
-	*/
-	const VkPipelineRasterizationStateCreateInfo& GetRasterizerStateInfo() const 
-	{ 
-		return _rasterizerStateInfo;  
-	}
 
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineRasterizationStateCreateInfo  _rasterizerStateInfo;		///< Rasterizer setup state info
+	VkPipelineDepthStencilStateCreateInfo _depthStencilStateInfo;	///< Depth stencil state
 };
 
 }
