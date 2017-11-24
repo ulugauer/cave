@@ -216,13 +216,13 @@ static VkColorComponentFlags ConvertColorComponentToVulkan(ColorComponentFlags c
 {
 	VkColorComponentFlags flags = 0;
 
-	if (colorComponentFlags | static_cast<uint32_t>(ColorComponents::Red))
+	if (colorComponentFlags & static_cast<uint32_t>(ColorComponents::Red))
 		flags |= VK_COLOR_COMPONENT_R_BIT;
-	if (colorComponentFlags | static_cast<uint32_t>(ColorComponents::Green))
+	if (colorComponentFlags & static_cast<uint32_t>(ColorComponents::Green))
 		flags |= VK_COLOR_COMPONENT_G_BIT;
-	if (colorComponentFlags | static_cast<uint32_t>(ColorComponents::Blue))
+	if (colorComponentFlags & static_cast<uint32_t>(ColorComponents::Blue))
 		flags |= VK_COLOR_COMPONENT_B_BIT;
-	if (colorComponentFlags | static_cast<uint32_t>(ColorComponents::Alpha))
+	if (colorComponentFlags & static_cast<uint32_t>(ColorComponents::Alpha))
 		flags |= VK_COLOR_COMPONENT_A_BIT;
 
 	return flags;

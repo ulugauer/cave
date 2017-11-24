@@ -11,61 +11,33 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file vulkanDepthStencil.h
-///       Vulkan depth stencil state
+/// @file halPipelineLayout.cpp
+///       Hardware pipeline layout abstraction
 
-#include "halDepthStencil.h"
-
-#include "vulkan.h"
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include "halPipelineLayout.h"
+#include "halRenderDevice.h"
 
 namespace cave
 {
 
-///< forwards
-class VulkanRenderDevice;
-
-/**
-* @brief Vulkan depth stencil state
-*/
-class VulkanDepthStencil : public HalDepthStencil
+HalPipelineLayout::HalPipelineLayout(HalRenderDevice* renderDevice
+	, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+	, caveVector<HalPushConstantRange>& pushConstants)
+	: _pDevice(renderDevice)
+	, _descriptorSetLayouts(renderDevice->GetEngineAllocator())
+	, _pushConstants(renderDevice->GetEngineAllocator())
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] device	Pointer to device object
-	* @param[in] depthStencilSetup	Depth Stencil setup struct
-	*
-	*/
-	VulkanDepthStencil(VulkanRenderDevice* device, HalDepthStencilSetup& depthStencilSetup);
-
-	/** @brief Destructor */
-	virtual ~VulkanDepthStencil();
-
-	/**
-	* @brief Get depth stencil state info
-	*
-	* @return Vulkan VkPipelineRasterizationStateCreateInfo
-	*/
-	const VkPipelineDepthStencilStateCreateInfo& GetDepthStencilStateInfo() const
-	{
-		return _depthStencilStateInfo;
-	}
-
-private:
-	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineDepthStencilStateCreateInfo _depthStencilStateInfo;	///< Depth stencil state
-};
-
+	_descriptorSetLayouts = descriptorSetLayouts;
+	_pushConstants = pushConstants;
 }
 
-/** @}*/
+HalPipelineLayout::~HalPipelineLayout()
+{
+	if (!_descriptorSetLayouts.Empty())
+		_descriptorSetLayouts.Clear();
+	if (!_pushConstants.Empty())
+		_pushConstants.Clear();
+}
 
-
+}

@@ -13,10 +13,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file vulkanDepthStencil.h
-///       Vulkan depth stencil state
+/// @file vulkanPipelineLayout.h
+///       Vulkan pipeline layout
 
-#include "halDepthStencil.h"
+#include "halPipelineLayout.h"
 
 #include "vulkan.h"
 
@@ -32,36 +32,39 @@ namespace cave
 class VulkanRenderDevice;
 
 /**
-* @brief Vulkan depth stencil state
+* @brief Vulkan layout sets
 */
-class VulkanDepthStencil : public HalDepthStencil
+class VulkanPipelineLayout : public HalPipelineLayout
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] device	Pointer to device object
-	* @param[in] depthStencilSetup	Depth Stencil setup struct
-	*
+	* @param[in] device				Pointer to device object
+	* @param[in] descriptorSetLayouts	Pipeline set layouts array
+	* @param[in] pushConstants			Pipeline push constant ranges array
 	*/
-	VulkanDepthStencil(VulkanRenderDevice* device, HalDepthStencilSetup& depthStencilSetup);
+	VulkanPipelineLayout(VulkanRenderDevice* device
+		, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+		, caveVector<HalPushConstantRange>& pushConstants);
 
 	/** @brief Destructor */
-	virtual ~VulkanDepthStencil();
+	virtual ~VulkanPipelineLayout();
 
 	/**
-	* @brief Get depth stencil state info
+	* @brief Get pipeline layout object
+	*		 This function creates the object if not yet done
 	*
-	* @return Vulkan VkPipelineRasterizationStateCreateInfo
+	* @return Vulkan VkPipelineLayout object
 	*/
-	const VkPipelineDepthStencilStateCreateInfo& GetDepthStencilStateInfo() const
-	{
-		return _depthStencilStateInfo;
-	}
+	VkPipelineLayout GetPipelineLayout();
 
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineDepthStencilStateCreateInfo _depthStencilStateInfo;	///< Depth stencil state
+	caveVector<VkDescriptorSetLayout> _vkDescriptorLayouts;	///< Array of vulkan descriptor layouts
+	caveVector<VkPushConstantRange> _vkPushConstantRange;	///< Array of vulkan push constant ranges
+	VkPipelineLayout _vkPipelineLayout;	///< Vulkan pipeline layout handle
+	VkPipelineLayoutCreateInfo _vkPipelineLayoutInfo;	///< Vulkan layoute set setup
 };
 
 }
