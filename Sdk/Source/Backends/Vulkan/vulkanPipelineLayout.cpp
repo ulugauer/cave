@@ -89,6 +89,7 @@ VulkanPipelineLayout::VulkanPipelineLayout(VulkanRenderDevice* device
 		{
 			VkDescriptorSetLayout setLayout;
 			setLayout = (VkDescriptorSetLayout)(descriptorSetLayouts[i]._descriptorLayoutSet);
+			_vkDescriptorLayouts.Push(setLayout);
 		}
 	}
 
