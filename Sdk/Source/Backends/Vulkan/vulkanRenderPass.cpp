@@ -12,12 +12,14 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file vulkanMultisample.cpp
-///       Vulkan multisample state
+/// @file vulkanRenderPass.cpp
+///       Hardware render pass abstraction
 
-#include "vulkanMultisample.h"
+#include "vulkanRenderPass.h"
 #include "vulkanRenderDevice.h"
 #include "vulkanConversion.h"
+#include "Memory/allocatorBase.h"
+
 #include "vulkanApi.h"
 
 #include<limits>
@@ -25,23 +27,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-VulkanMultisample::VulkanMultisample(VulkanRenderDevice* device, HalMultisampleState& multisampleState)
-	: HalMultisample(multisampleState)
+
+VulkanRenderPass::VulkanRenderPass(VulkanRenderDevice* device, HalRenderPassInfo& renderPassInfo)
+	: HalRenderPass(device, renderPassInfo)
 	, _pDevice(device)
 {
-	_multisampleStateStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-	_multisampleStateStateInfo.pNext = nullptr;
-	_multisampleStateStateInfo.flags = 0;
-	_multisampleStateStateInfo.alphaToCoverageEnable = multisampleState._alphaToCoverageEnable;
-	_multisampleStateStateInfo.alphaToOneEnable = multisampleState._alphaToOneEnable;
-	_multisampleStateStateInfo.minSampleShading = multisampleState._minSampleShading;
-	_multisampleStateStateInfo.pSampleMask = static_cast<VkSampleMask*>(multisampleState._pSampleMask);
-	_multisampleStateStateInfo.rasterizationSamples = VulkanTypeConversion::ConvertSampleCountToVulkan(multisampleState._rasterizationSamples);
-	_multisampleStateStateInfo.sampleShadingEnable = multisampleState._sampleShadingEnable;
+	// Setup render pass struct
+	_vkRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	_vkRenderPassInfo.pNext = nullptr;
+	_vkRenderPassInfo.flags = 0;
+
+	// Convert attachments to native
+	_vkRenderPassInfo.attachmentCount = renderPassInfo._attachmentCount;
+	if (renderPassInfo._attachmentCount > 0)
+	{
+		// allocte memory
+		size_t attachmentArraySize = renderPassInfo._attachmentCount * sizeof(VkAttachmentDescription);
+		_vkRenderPassInfo.pAttachments = static_cast<VkAttachmentDescription*>(device->GetEngineAllocator()->Allocate(attachmentArraySize, 4));
+		if (_vkRenderPassInfo.pAttachments)
+		{
+			for (size_t i = 0; i < renderPassInfo._attachmentCount; ++i)
+			{
+
+			}
+		}
+	}
+
 }
 
-VulkanMultisample::~VulkanMultisample()
+VulkanRenderPass::~VulkanRenderPass()
 {
+	if (_vkRenderPassInfo.pAttachments != nullptr)
+		_pDevice->GetEngineAllocator()->Deallocate((void *)_vkRenderPassInfo.pAttachments);
 }
 
 

@@ -13,56 +13,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halMultisample.h
-///       Hardware multisample state abstraction
-
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
-
-#include <iostream>		// includes exception handling
-#include <memory>
+/// @file vulkanConversion.h
+///       Hal types to vulkan types
 
 /** \addtogroup backend
 *  @{
 *
 */
 
+#include "halTypes.h"
+
+#include "vulkan.h"
+
 namespace cave
 {
 
-/**
-* @brief Multisample state data
-*/
-struct HalMultisampleState
-{
-	bool _alphaToCoverageEnable;			///< Enable temporary coverage value based on the alpha value
-	bool _alphaToOneEnable;					///< Enable replacing alpah output to one
-	float _minSampleShading;				///< Minimum fraction value
-	uint32_t* _pSampleMask;					///< Coverage bitmask
-	HalSampleCount _rasterizationSamples;	///< Sample count
-	bool _sampleShadingEnable;				///< Enable per sample fragment execution
-};
+///< forwards
+class VulkanRenderDevice;
 
 /**
-* @brief Describes the multisample state
+* @brief This class converts Hal types to vulkan types
 */
-class HalMultisample
+class VulkanTypeConversion
 {
 public:
+
 	/**
-	* @brief Constructor
+	* @brief Convert from generic pipeline bind point to vulkan pipeline bind point
 	*
-	* @param[in] multisampleState	Multisample state
+	* @param[in] pipelineBindPoint	Generic pipeline bind point
+	*
+	* @return Vulkan pipeline bind point
 	*/
-	HalMultisample(HalMultisampleState& multisampleState);
+	static VkPipelineBindPoint ConvertPipelineBindPointToVulkan(HalPipelineBindPoints pipelineBindPoint);
 
-	/** @brief Destructor */
-	virtual ~HalMultisample();
+	/**
+	* @brief Convert from generic image format to vulkan image format
+	*
+	* @param[in] imageFormat	Generic image format
+	*
+	* @return Vulkan image format
+	*/
+	static VkFormat ConvertImageFormatToVulkan(HalImageFormat imageFormat);
 
-private:
-	HalMultisampleState _multisampleState;	///< Multisample state
+	/**
+	* @brief Convert from generic sample count to vulkan sample count
+	*
+	* @param[in] sampleCount	Generic sample count
+	*
+	* @return Vulkan sample count flags
+	*/
+	static VkSampleCountFlagBits ConvertSampleCountToVulkan(HalSampleCount sampleCount);
+
 };
 
 }

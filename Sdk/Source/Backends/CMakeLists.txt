@@ -8,7 +8,8 @@ ENDIF()
 add_definitions(-DCAVE_EXPORTS) 
 
 # Add sources
-set(BACKENDS_SOURCE halInstance.h halInstance.cpp 
+set(BACKENDS_SOURCE halTypes.h 
+					halInstance.h halInstance.cpp 
 					halRenderDevice.h halRenderDevice.cpp 
 					halShader.h halShader.cpp 
 					halVertexInput.h halVertexInput.cpp 
@@ -19,9 +20,11 @@ set(BACKENDS_SOURCE halInstance.h halInstance.cpp
 					halColorBlend.h halColorBlend.cpp 
 					halDynamicState.h halDynamicState.cpp 
 					halDepthStencil.h halDepthStencil.cpp 
-					halPipelineLayout.h halPipelineLayout.cpp)
+					halPipelineLayout.h halPipelineLayout.cpp 
+					halRenderPass.h halRenderPass.cpp )
 # vulkan source
 set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h 
+						   Vulkan/vulkanConversion.h Vulkan/vulkanConversion.cpp 
 					 	   Vulkan/vulkanInstance.h Vulkan/vulkanInstance.cpp 
 					 	   Vulkan/vulkanPhysicalDevice.h Vulkan/vulkanPhysicalDevice.cpp
 					 	   Vulkan/vulkanRenderDevice.h Vulkan/vulkanRenderDevice.cpp 
@@ -35,7 +38,8 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 						   Vulkan/vulkanColorBlend.h Vulkan/vulkanColorBlend.cpp 
 						   Vulkan/vulkanDynamicState.h Vulkan/vulkanDynamicState.cpp 
 						   Vulkan/vulkanDepthStencil.h Vulkan/vulkanDepthStencil.cpp 
-						   Vulkan/vulkanPipelineLayout.h Vulkan/vulkanPipelineLayout.cpp )
+						   Vulkan/vulkanPipelineLayout.h Vulkan/vulkanPipelineLayout.cpp 
+						   Vulkan/vulkanRenderPass.h Vulkan/vulkanRenderPass.cpp )
 
 
 # Create named folders for the sources within the .vcproj
