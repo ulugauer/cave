@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanInstance.h"
 #include "vulkanRenderDevice.h"
 #include "vulkanShader.h"
+#include "vulkanVertexInput.h"
 #include "vulkanPhysicalDevice.h"
 #include "vulkanSwapChain.h"
 #include "vulkanApi.h"
@@ -209,6 +210,16 @@ HalShader* VulkanRenderDevice::CreateShader(ShaderType type, ShaderLanguage lang
 	VulkanShader* shader = AllocateObject<VulkanShader>(*_pInstance->GetEngineAllocator(), this, type, language);
 
 	return shader;
+}
+
+HalVertexInput* VulkanRenderDevice::CreateVertexInput()
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanVertexInput* vertexInput = AllocateObject<VulkanVertexInput>(*_pInstance->GetEngineAllocator(), this);
+
+	return vertexInput;
 }
 
 }

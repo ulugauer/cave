@@ -11,37 +11,68 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file vulkanVertexInput.cpp
-///        Vulkan vertex input state
+/// @file caveRefCount.h
+///       ref counting objects interface
 
-#include "vulkanVertexInput.h"
-#include "vulkanRenderDevice.h"
-#include "vulkanApi.h"
+/** \addtogroup engine
+*  @{
+*
+*/
 
-#include<limits>
+#include "engineDefines.h"
+#include "Memory/allocatorBase.h"
+
+#include <memory>
+#include <mutex>
 
 namespace cave
 {
 
+/**
+* @brief Interface for ref counting objects
+*/
 
-VulkanVertexInput::VulkanVertexInput(VulkanRenderDevice* device)
-	: HalVertexInput()
-	, _pDevice(device)
+/**
+* Interface of renderer materials
+*/
+class CAVE_INTERFACE CaveRefCount
 {
-	// Setup a default state
-	_vkVertexInputStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	_vkVertexInputStateInfo.pNext = nullptr;
-	_vkVertexInputStateInfo.flags = 0;
-	_vkVertexInputStateInfo.vertexBindingDescriptionCount = 0;
-	_vkVertexInputStateInfo.pVertexBindingDescriptions = nullptr;
-	_vkVertexInputStateInfo.vertexAttributeDescriptionCount = 0;
-	_vkVertexInputStateInfo.pVertexAttributeDescriptions = nullptr;
+public:
+	/** @brief Destructor */
+	CaveRefCount() : _refCount(0) {}
+	/** @brief Destructor */
+	virtual ~CaveRefCount() {}
+
+	/**
+	* @brief Increment usage count of this shader module
+	*
+	* @return new ref count value
+	*/
+	int32_t IncrementUsageCount()
+	{
+		std::lock_guard<std::mutex> lock(_refCountMutex);
+		_refCount++;
+		return _refCount;
+	}
+	/**
+	* @brief Decrement usage count of this shader module
+	*
+	* @return new ref count value
+	*/
+	int32_t DecrementUsageCount()
+	{
+		std::lock_guard<std::mutex> lock(_refCountMutex);
+		_refCount--;
+		return _refCount;
+	}
+
+protected:
+	int32_t _refCount;	///< Our reference count
+	class CAVE_INTERFACE std::mutex _refCountMutex; ///< mutex object for ref counter
+};
+
 }
 
-VulkanVertexInput::~VulkanVertexInput()
-{
-}
-
-
-}
+/** @}*/

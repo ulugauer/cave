@@ -19,6 +19,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineDefines.h"
 #include "halInstance.h"
 #include "halShader.h"
+#include "halVertexInput.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -73,6 +74,13 @@ public:
 	* @return shader abstraction interface
 	*/
 	virtual HalShader* CreateShader(ShaderType type, ShaderLanguage language) = 0;
+
+	/**
+	* @brief Create a low level vertex input state
+	*
+	* @return Vertex input abstraction interface
+	*/
+	virtual HalVertexInput* CreateVertexInput() = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

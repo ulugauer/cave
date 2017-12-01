@@ -49,10 +49,19 @@ public:
 	/** @brief Destructor */
 	virtual ~VulkanVertexInput();
 
+	/**
+	* @brief Get vertex input state info
+	*
+	* @return Vulkan VkPipelineRasterizationStateCreateInfo
+	*/
+	const VkPipelineVertexInputStateCreateInfo& GetVertexInputStateInfo() const
+	{
+		return _vkVertexInputStateInfo;
+	}
 	
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineVertexInputStateCreateInfo _VertexInputStateInfo;		///< Vertex setup state info
+	VkPipelineVertexInputStateCreateInfo _vkVertexInputStateInfo;		///< Vertex setup state info
 };
 
 }

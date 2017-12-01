@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "renderDevice.h"
 #include "renderInstance.h"
+#include "renderVertexInput.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -93,6 +94,25 @@ void RenderDevice::CreateSwapChain()
 	{
 		std::string msg(e.what());
 		throw EngineError(msg);
+	}
+}
+
+RenderVertexInput* RenderDevice::CreateVertexInput()
+{
+	RenderVertexInput* vertexInput = AllocateObject<RenderVertexInput>(*_pRenderInstance->GetEngineAllocator(), *this);
+	if (vertexInput)
+		vertexInput->IncrementUsageCount();
+
+	return vertexInput;
+}
+
+void RenderDevice::ReleaseVertexInput(RenderVertexInput* vertexInput)
+{
+	if (vertexInput)
+	{
+		int32_t refCount = vertexInput->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *vertexInput);
 	}
 }
 

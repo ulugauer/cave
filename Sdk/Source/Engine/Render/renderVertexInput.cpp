@@ -12,36 +12,30 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file vulkanVertexInput.cpp
-///        Vulkan vertex input state
+/// @file renderVertexInput.cpp
+///       Render vertex inout interface
 
-#include "vulkanVertexInput.h"
-#include "vulkanRenderDevice.h"
-#include "vulkanApi.h"
+#include "renderVertexInput.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halVertexInput.h"
 
-#include<limits>
+#include <cassert>
 
 namespace cave
 {
-
-
-VulkanVertexInput::VulkanVertexInput(VulkanRenderDevice* device)
-	: HalVertexInput()
-	, _pDevice(device)
+RenderVertexInput::RenderVertexInput(RenderDevice& renderDevice)
+	: _renderDevice(renderDevice)
 {
-	// Setup a default state
-	_vkVertexInputStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	_vkVertexInputStateInfo.pNext = nullptr;
-	_vkVertexInputStateInfo.flags = 0;
-	_vkVertexInputStateInfo.vertexBindingDescriptionCount = 0;
-	_vkVertexInputStateInfo.pVertexBindingDescriptions = nullptr;
-	_vkVertexInputStateInfo.vertexAttributeDescriptionCount = 0;
-	_vkVertexInputStateInfo.pVertexAttributeDescriptions = nullptr;
+	// Allocate low level object
+	_halVertexInput = renderDevice.GetHalRenderDevice()->CreateVertexInput();
+	assert(_halVertexInput);
 }
 
-VulkanVertexInput::~VulkanVertexInput()
+RenderVertexInput::~RenderVertexInput()
 {
+	if (_halVertexInput)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halVertexInput);
 }
-
 
 }

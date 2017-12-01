@@ -138,13 +138,14 @@ int main(int argc, char* argv[])
 	// load resources
 	ResourceManager& rm = renderDevice->GetResourceManager();
 	RenderMaterial material = rm.LoadMaterialAsset("ColoredMaterial.asset");
+	RenderVertexInput* vertexInput = renderDevice->CreateVertexInput();
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
 
-	
+	renderDevice->ReleaseVertexInput(vertexInput);
 	renderInstance->ReleaseRenderDevice(renderDevice);
 
 	return 0;

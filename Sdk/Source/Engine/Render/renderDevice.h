@@ -33,6 +33,7 @@ namespace cave
 class HalInstance;
 class HalRenderDevice;
 class RenderInstance;
+class RenderVertexInput;
 class EngineLog;
 
 /**
@@ -86,12 +87,26 @@ public:
 	/**
 	* @brief Get pointer to HAL render device
 	*
-	* @return Low level HAL Object
+	* @return Low level HAL device object
 	*/
 	HalRenderDevice* GetHalRenderDevice()
 	{
 		return _pHalRenderDevice;
 	}
+
+	/**
+	* @brief Get pointer to HAL render device
+	*
+	* @return Vertex input object
+	*/
+	RenderVertexInput* CreateVertexInput();
+
+	/**
+	* @brief Release a vertex input object
+	*
+	* @param[in] vertexInput	Vertex input object to release
+	*/
+	void ReleaseVertexInput(RenderVertexInput* vertexInput);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

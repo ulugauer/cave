@@ -81,9 +81,16 @@ public:
 	* @param[in] type		Shader type
 	* @param[in] language	Shader language
 	*
-	* @return shader abstraction interface
+	* @return shader interface
 	*/
 	HalShader* CreateShader(ShaderType type, ShaderLanguage language) override;
+
+	/**
+	* @brief Create a low level vertex input state
+	*
+	* @return Vertex input interface
+	*/
+	HalVertexInput* CreateVertexInput() override;
 
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object

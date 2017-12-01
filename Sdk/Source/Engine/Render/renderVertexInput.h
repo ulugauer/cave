@@ -11,37 +11,50 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file vulkanVertexInput.cpp
-///        Vulkan vertex input state
+/// @file renderVertexInput.h
+///       Render vertex inout interface
 
-#include "vulkanVertexInput.h"
-#include "vulkanRenderDevice.h"
-#include "vulkanApi.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 
-#include<limits>
+#include <memory>
+
+/** \addtogroup engine
+*  @{
+*		This module contains all code related to the engine
+*/
 
 namespace cave
 {
 
+/// forward declaration
+class RenderDevice;
+class HalVertexInput;
 
-VulkanVertexInput::VulkanVertexInput(VulkanRenderDevice* device)
-	: HalVertexInput()
-	, _pDevice(device)
+/**
+* @brief Interface for vertex input setup
+*/
+class CAVE_INTERFACE RenderVertexInput : public CaveRefCount
 {
-	// Setup a default state
-	_vkVertexInputStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	_vkVertexInputStateInfo.pNext = nullptr;
-	_vkVertexInputStateInfo.flags = 0;
-	_vkVertexInputStateInfo.vertexBindingDescriptionCount = 0;
-	_vkVertexInputStateInfo.pVertexBindingDescriptions = nullptr;
-	_vkVertexInputStateInfo.vertexAttributeDescriptionCount = 0;
-	_vkVertexInputStateInfo.pVertexAttributeDescriptions = nullptr;
-}
+public:
 
-VulkanVertexInput::~VulkanVertexInput()
-{
-}
+	/**
+	* @brief Constructor
+	*
+	* @param[in] renderDevice	Pointer to render device
+	*
+	*/
+	RenderVertexInput(RenderDevice& renderDevice);
+	/** @brief copy constructor */
+	virtual ~RenderVertexInput();
 
+private:
+	RenderDevice& _renderDevice;	///< Render device object
+	HalVertexInput* _halVertexInput;	///< Pointer to low level shader object
+};
 
 }
+/** @}*/
+

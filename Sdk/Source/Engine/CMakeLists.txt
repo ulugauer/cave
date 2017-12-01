@@ -26,14 +26,11 @@ set(ENGINE_SOURCE engineDefines.h
 				  engineLog.h 
 				  engineLog.cpp )
 
-set(RENDER_SOURCE Render/renderInstance.h 
-				  Render/renderInstance.cpp 
-				  Render/renderDevice.h 
-				  Render/renderDevice.cpp 
-				  Render/renderMaterial.h 
-				  Render/renderMaterial.cpp 
-				  Render/renderShader.h 
-				  Render/renderShader.cpp )
+set(RENDER_SOURCE Render/renderInstance.h Render/renderInstance.cpp 
+				  Render/renderDevice.h Render/renderDevice.cpp 
+				  Render/renderMaterial.h Render/renderMaterial.cpp 
+				  Render/renderShader.h Render/renderShader.cpp 
+				  Render/renderVertexInput.h Render/renderVertexInput.cpp )
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h
@@ -42,6 +39,9 @@ set(MEMORY_SOURCE Memory/allocatorBase.h
 set(MATH_SOURCE Math/vector2.h
 				Math/vector3.h
 				Math/vector4.h )
+
+set(COMMON_SOURCE Common/caveRefCount.h
+				  Common/caveVector.h )
 
 set(RESOURCE_SOURCE Resource/resourceManagerPrivate.h 
 					Resource/resourceManagerPrivate.cpp
