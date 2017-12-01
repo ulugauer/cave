@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderDevice.h"
 #include "renderInstance.h"
 #include "renderVertexInput.h"
+#include "renderInputAssembly.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -113,6 +114,25 @@ void RenderDevice::ReleaseVertexInput(RenderVertexInput* vertexInput)
 		int32_t refCount = vertexInput->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *vertexInput);
+	}
+}
+
+RenderInputAssembly* RenderDevice::CreateInputAssembly()
+{
+	RenderInputAssembly* inputAssembly = AllocateObject<RenderInputAssembly>(*_pRenderInstance->GetEngineAllocator(), *this);
+	if (inputAssembly)
+		inputAssembly->IncrementUsageCount();
+
+	return inputAssembly;
+}
+
+void RenderDevice::ReleaseInputAssembly(RenderInputAssembly* inputAssembly)
+{
+	if (inputAssembly)
+	{
+		int32_t refCount = inputAssembly->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *inputAssembly);
 	}
 }
 

@@ -13,60 +13,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file vulkanInputAssembly.h
-///       Vulkan input assembly state
+/// @file renderInputAssembly.h
+///       Render input assembly interface
 
-#include "halInputAssembly.h"
-#include "osPlatformLib.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 
-#include "vulkan.h"
+#include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-///< forwards
-class VulkanRenderDevice;
+/// forward declaration
+class RenderDevice;
+class HalInputAssembly;
 
 /**
-* @brief Vulkan input assembly state
+* @brief Interface for input assembly setup
 */
-class VulkanInputAssembly : public HalInputAssembly
+class CAVE_INTERFACE RenderInputAssembly : public CaveRefCount
 {
 public:
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] device	Pointer to device object
+	* @param[in] renderDevice	Pointer to render device
 	*
 	*/
-	VulkanInputAssembly(VulkanRenderDevice* device);
-
-	/** @brief Destructor */
-	virtual ~VulkanInputAssembly();
-
-	/**
-	* @brief Get input assembly state info
-	*
-	* @return Vulkan VkPipelineInputAssemblyStateCreateInfo
-	*/
-	const VkPipelineInputAssemblyStateCreateInfo& GetVertexInputStateInfo() const
-	{
-		return _vkInputAssemblyStateInfo;
-	}
+	RenderInputAssembly(RenderDevice& renderDevice);
+	/** @brief copy constructor */
+	virtual ~RenderInputAssembly();
 
 private:
-	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineInputAssemblyStateCreateInfo  _vkInputAssemblyStateInfo;		///< Vertex input assembly state info
+	RenderDevice& _renderDevice;	///< Render device object
+	HalInputAssembly* _halInputAssembly;	///< Pointer to low level input assembly object
 };
 
 }
-
 /** @}*/
-
-
 

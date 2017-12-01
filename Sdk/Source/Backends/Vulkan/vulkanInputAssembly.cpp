@@ -30,11 +30,11 @@ VulkanInputAssembly::VulkanInputAssembly(VulkanRenderDevice* device)
 	, _pDevice(device)
 {
 	// Setup a default assembly state
-	_InputAssemblyStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	_InputAssemblyStateInfo.pNext = nullptr;
-	_InputAssemblyStateInfo.flags = 0;
-	_InputAssemblyStateInfo.primitiveRestartEnable = VK_FALSE;
-	_InputAssemblyStateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;	
+	_vkInputAssemblyStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	_vkInputAssemblyStateInfo.pNext = nullptr;
+	_vkInputAssemblyStateInfo.flags = 0;
+	_vkInputAssemblyStateInfo.primitiveRestartEnable = VK_FALSE;
+	_vkInputAssemblyStateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 }
 
 VulkanInputAssembly::~VulkanInputAssembly()

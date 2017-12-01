@@ -14,6 +14,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineInstance.h"
 #include "engineError.h"
+#include "Render/renderVertexInput.h"
+#include "Render/renderInputAssembly.h"
 
 #include <iostream>
 #include <sstream>
@@ -139,12 +141,14 @@ int main(int argc, char* argv[])
 	ResourceManager& rm = renderDevice->GetResourceManager();
 	RenderMaterial material = rm.LoadMaterialAsset("ColoredMaterial.asset");
 	RenderVertexInput* vertexInput = renderDevice->CreateVertexInput();
+	RenderInputAssembly* inputAssembly = renderDevice->CreateInputAssembly();
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
 
+	renderDevice->ReleaseInputAssembly(inputAssembly);
 	renderDevice->ReleaseVertexInput(vertexInput);
 	renderInstance->ReleaseRenderDevice(renderDevice);
 

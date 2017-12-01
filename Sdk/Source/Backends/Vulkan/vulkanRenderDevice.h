@@ -92,6 +92,13 @@ public:
 	*/
 	HalVertexInput* CreateVertexInput() override;
 
+	/**
+	* @brief Create a low level input assembly state
+	*
+	* @return Input assembly interface
+	*/
+	virtual HalInputAssembly* CreateInputAssembly() override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

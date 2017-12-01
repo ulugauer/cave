@@ -19,6 +19,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanRenderDevice.h"
 #include "vulkanShader.h"
 #include "vulkanVertexInput.h"
+#include "vulkanInputAssembly.h"
 #include "vulkanPhysicalDevice.h"
 #include "vulkanSwapChain.h"
 #include "vulkanApi.h"
@@ -220,6 +221,16 @@ HalVertexInput* VulkanRenderDevice::CreateVertexInput()
 	VulkanVertexInput* vertexInput = AllocateObject<VulkanVertexInput>(*_pInstance->GetEngineAllocator(), this);
 
 	return vertexInput;
+}
+
+HalInputAssembly* VulkanRenderDevice::CreateInputAssembly()
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanInputAssembly* inputAssembly = AllocateObject<VulkanInputAssembly>(*_pInstance->GetEngineAllocator(), this);
+
+	return inputAssembly;
 }
 
 }

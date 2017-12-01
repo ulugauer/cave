@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halInstance.h"
 #include "halShader.h"
 #include "halVertexInput.h"
+#include "halInputAssembly.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -32,6 +33,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
+
 
 /**
 * Abstraction type of a device instance
@@ -81,6 +83,13 @@ public:
 	* @return Vertex input abstraction interface
 	*/
 	virtual HalVertexInput* CreateVertexInput() = 0;
+
+	/**
+	* @brief Create a low level input assembly state
+	*
+	* @return Input assembly abstraction interface
+	*/
+	virtual HalInputAssembly* CreateInputAssembly() = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

@@ -34,6 +34,7 @@ class HalInstance;
 class HalRenderDevice;
 class RenderInstance;
 class RenderVertexInput;
+class RenderInputAssembly;
 class EngineLog;
 
 /**
@@ -95,7 +96,7 @@ public:
 	}
 
 	/**
-	* @brief Get pointer to HAL render device
+	* @brief Create a vertex input object
 	*
 	* @return Vertex input object
 	*/
@@ -107,6 +108,20 @@ public:
 	* @param[in] vertexInput	Vertex input object to release
 	*/
 	void ReleaseVertexInput(RenderVertexInput* vertexInput);
+
+	/**
+	* @brief Create an input assembly object
+	*
+	* @return Input assembly object
+	*/
+	RenderInputAssembly* CreateInputAssembly();
+
+	/**
+	* @brief Release an input assembly object
+	*
+	* @param[in] inputAssembly	 Input assembly object to release
+	*/
+	void ReleaseInputAssembly(RenderInputAssembly* inputAssembly);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

@@ -11,62 +11,31 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file vulkanInputAssembly.h
-///       Vulkan input assembly state
+/// @file renderInputAssembly.cpp
+///       Render input assembly interface
 
+#include "renderInputAssembly.h"
+#include "renderDevice.h"
+#include "engineError.h"
 #include "halInputAssembly.h"
-#include "osPlatformLib.h"
 
-#include "vulkan.h"
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include <cassert>
 
 namespace cave
 {
-
-///< forwards
-class VulkanRenderDevice;
-
-/**
-* @brief Vulkan input assembly state
-*/
-class VulkanInputAssembly : public HalInputAssembly
+RenderInputAssembly::RenderInputAssembly(RenderDevice& renderDevice)
+	: _renderDevice(renderDevice)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] device	Pointer to device object
-	*
-	*/
-	VulkanInputAssembly(VulkanRenderDevice* device);
-
-	/** @brief Destructor */
-	virtual ~VulkanInputAssembly();
-
-	/**
-	* @brief Get input assembly state info
-	*
-	* @return Vulkan VkPipelineInputAssemblyStateCreateInfo
-	*/
-	const VkPipelineInputAssemblyStateCreateInfo& GetVertexInputStateInfo() const
-	{
-		return _vkInputAssemblyStateInfo;
-	}
-
-private:
-	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	VkPipelineInputAssemblyStateCreateInfo  _vkInputAssemblyStateInfo;		///< Vertex input assembly state info
-};
-
+	// Allocate low level object
+	_halInputAssembly = renderDevice.GetHalRenderDevice()->CreateInputAssembly();
+	assert(_halInputAssembly);
 }
 
-/** @}*/
+RenderInputAssembly::~RenderInputAssembly()
+{
+	if (_halInputAssembly)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halInputAssembly);
+}
 
-
-
+}
