@@ -19,6 +19,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderInstance.h"
 #include "renderVertexInput.h"
 #include "renderInputAssembly.h"
+#include "renderLayerSection.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -134,6 +135,19 @@ void RenderDevice::ReleaseInputAssembly(RenderInputAssembly* inputAssembly)
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *inputAssembly);
 	}
+}
+
+RenderLayerSection* RenderDevice::CreateLayerSection(RenderLayerSectionInfo& sectionInfo)
+{
+	RenderLayerSection* layerSection = AllocateObject<RenderLayerSection>(*_pRenderInstance->GetEngineAllocator(), *this, sectionInfo);
+
+	return layerSection;
+}
+
+void RenderDevice::ReleaseLayerSection(RenderLayerSection* layerSection)
+{
+	if (layerSection)
+		DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *layerSection);
 }
 
 }

@@ -13,68 +13,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halViewportAndScissor.h
-///       Hardware viewport ande scissor abstraction
+/// @file renderViewportScissor.h
+///       Render viewport and scissor interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "Memory/allocatorBase.h"
-#include "Math/vector2.h"
+#include "halViewportAndScissor.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-/**
-* @brief Describes viewport dimensions
-*/
-struct HalViewport
-{
-	Vector2f _offset;	///< xy offset
-	Vector2f _extend;	///< width, height
-	Vector2f _depthRange;	///< viewport min/max depth range
-};
+/// forward declaration
+class RenderDevice;
+struct RenderLayerSectionInfo;
 
 /**
-* @brief Describes scissor dimensions
+* @brief Interface viewport and scissor setup
 */
-struct HalScissor
-{
-	Vector2i _offset;	///< xy offset
-	Vector2ui _extend;	///< width, height
-};
-
-/**
-* @brief Describes viewport and scissor settings
-*/
-class HalViewportAndScissor
+class CAVE_INTERFACE RenderViewportScissor
 {
 public:
+
 	/**
-	* @brief default Constructor
+	* @brief Constructor
 	*
-	* @param[in] viewport	Viewport dimension
-	* @param[in] scissor	Scissor dimension
+	* @param[in] renderDevice	Pointer to render device
+	* @param[in] sectionInfo	Section setup info
 	*
 	*/
-	HalViewportAndScissor(HalViewport& viewport, HalScissor& scissor);
+	RenderViewportScissor(RenderDevice& renderDevice, RenderLayerSectionInfo& sectionInfo);
+	/** @brief copy constructor */
+	virtual ~RenderViewportScissor();
 
-	/** @brief Destructor */
-	virtual ~HalViewportAndScissor();
 private:
-	HalViewport _viewport; ///< Viewport dimension
-	HalScissor _scissor; ///< Scissor dimension
+	RenderDevice& _renderDevice;	///< Render device object
+	HalViewportAndScissor* _halViewportAndScissor;	///< Pointer to low level viewport and scissor object
 };
 
 }
-
 /** @}*/
-
 

@@ -31,7 +31,9 @@ set(RENDER_SOURCE Render/renderInstance.h Render/renderInstance.cpp
 				  Render/renderMaterial.h Render/renderMaterial.cpp 
 				  Render/renderShader.h Render/renderShader.cpp 
 				  Render/renderVertexInput.h Render/renderVertexInput.cpp 
-				  Render/renderInputAssembly.h Render/renderInputAssembly.cpp )
+				  Render/renderInputAssembly.h Render/renderInputAssembly.cpp 
+				  Render/renderViewportScissor.h Render/renderViewportScissor.cpp
+				  Render/renderLayerSection.h Render/renderLayerSection.cpp )
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h

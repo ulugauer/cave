@@ -17,11 +17,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "vulkanInstance.h"
 #include "vulkanRenderDevice.h"
+#include "vulkanPhysicalDevice.h"
+#include "vulkanSwapChain.h"
 #include "vulkanShader.h"
 #include "vulkanVertexInput.h"
 #include "vulkanInputAssembly.h"
-#include "vulkanPhysicalDevice.h"
-#include "vulkanSwapChain.h"
+#include "vulkanViewportAndScissor.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -231,6 +232,16 @@ HalInputAssembly* VulkanRenderDevice::CreateInputAssembly()
 	VulkanInputAssembly* inputAssembly = AllocateObject<VulkanInputAssembly>(*_pInstance->GetEngineAllocator(), this);
 
 	return inputAssembly;
+}
+
+HalViewportAndScissor* VulkanRenderDevice::CreateViewportAndScissor(HalViewport& viewport, HalScissor& scissor)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanViewportAndScissor* viewportAndScissor = AllocateObject<VulkanViewportAndScissor>(*_pInstance->GetEngineAllocator(), this, viewport, scissor);
+
+	return viewportAndScissor;
 }
 
 }

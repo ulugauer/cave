@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineError.h"
 #include "Render/renderVertexInput.h"
 #include "Render/renderInputAssembly.h"
+#include "Render/renderLayerSection.h"
 
 #include <iostream>
 #include <sstream>
@@ -137,6 +138,12 @@ int main(int argc, char* argv[])
 	// Initialization went successful dispaly window
 	frontend->DisplayWindow();
 
+	// Render section
+	RenderLayerSectionInfo sectionInfo;
+	sectionInfo.x = sectionInfo.y = 0;
+	sectionInfo.width = windowInfo.windowWidth;
+	sectionInfo.height = windowInfo.windowHeight;
+	RenderLayerSection* layerSection = renderDevice->CreateLayerSection(sectionInfo);
 	// load resources
 	ResourceManager& rm = renderDevice->GetResourceManager();
 	RenderMaterial material = rm.LoadMaterialAsset("ColoredMaterial.asset");
@@ -150,6 +157,8 @@ int main(int argc, char* argv[])
 
 	renderDevice->ReleaseInputAssembly(inputAssembly);
 	renderDevice->ReleaseVertexInput(vertexInput);
+	renderDevice->ReleaseLayerSection(layerSection);
+	// release at last
 	renderInstance->ReleaseRenderDevice(renderDevice);
 
 	return 0;

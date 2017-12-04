@@ -13,68 +13,62 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halViewportAndScissor.h
-///       Hardware viewport ande scissor abstraction
+/// @file renderLayerSection.h
+///       Describes a partial layer section
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "Memory/allocatorBase.h"
-#include "Math/vector2.h"
+#include "renderViewportScissor.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-/**
-* @brief Describes viewport dimensions
-*/
-struct HalViewport
-{
-	Vector2f _offset;	///< xy offset
-	Vector2f _extend;	///< width, height
-	Vector2f _depthRange;	///< viewport min/max depth range
-};
+/// forward declaration
+class RenderDevice;
 
 /**
-* @brief Describes scissor dimensions
+* @brief Layer section setup
 */
-struct HalScissor
+struct CAVE_INTERFACE RenderLayerSectionInfo
 {
-	Vector2i _offset;	///< xy offset
-	Vector2ui _extend;	///< width, height
+	int32_t x;			///< section x offset
+	int32_t y;			///< section y offset
+	uint32_t width;		///< section width
+	uint32_t height;	///< section height
 };
 
+
 /**
-* @brief Describes viewport and scissor settings
+* @brief Interface layer section setup
 */
-class HalViewportAndScissor
+class CAVE_INTERFACE RenderLayerSection
 {
 public:
+
 	/**
-	* @brief default Constructor
+	* @brief Constructor
 	*
-	* @param[in] viewport	Viewport dimension
-	* @param[in] scissor	Scissor dimension
+	* @param[in] renderDevice	Pointer to render device
+	* @param[in] sectionInfo	Section setup info
 	*
 	*/
-	HalViewportAndScissor(HalViewport& viewport, HalScissor& scissor);
+	RenderLayerSection(RenderDevice& renderDevice, RenderLayerSectionInfo& sectionInfo);
+	/** @brief copy constructor */
+	virtual ~RenderLayerSection();
 
-	/** @brief Destructor */
-	virtual ~HalViewportAndScissor();
 private:
-	HalViewport _viewport; ///< Viewport dimension
-	HalScissor _scissor; ///< Scissor dimension
+	RenderDevice& _renderDevice;	///< Render device object
+	RenderLayerSectionInfo _renderSection;	///< Render section info
+	RenderViewportScissor _renderViewportAndScissor;	///< Pointer to viewport and scissor object
 };
 
 }
-
 /** @}*/
-
 

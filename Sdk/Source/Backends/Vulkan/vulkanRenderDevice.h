@@ -97,7 +97,17 @@ public:
 	*
 	* @return Input assembly interface
 	*/
-	virtual HalInputAssembly* CreateInputAssembly() override;
+	HalInputAssembly* CreateInputAssembly() override;
+
+	/**
+	* @brief Create a low level viewport, scissor state
+	*
+	* @param[in] viewport	Viewport setup
+	* @param[in] scissor	Scissor setup
+	*
+	* @return  Viewport, scissor abstraction interface
+	*/
+	HalViewportAndScissor* CreateViewportAndScissor(HalViewport& viewport, HalScissor& scissor) override;
 
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object

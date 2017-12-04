@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halShader.h"
 #include "halVertexInput.h"
 #include "halInputAssembly.h"
+#include "halViewportAndScissor.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -90,6 +91,16 @@ public:
 	* @return Input assembly abstraction interface
 	*/
 	virtual HalInputAssembly* CreateInputAssembly() = 0;
+
+	/**
+	* @brief Create a low level viewport, scissor state
+	*
+	* @param[in] viewport	Viewport setup
+	* @param[in] scissor	Scissor setup
+	*
+	* @return  Viewport, scissor abstraction interface
+	*/
+	virtual HalViewportAndScissor* CreateViewportAndScissor(HalViewport& viewport, HalScissor& scissor) = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

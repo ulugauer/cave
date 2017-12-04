@@ -108,6 +108,7 @@ public:
 };
 
 typedef Vector2<float> Vector2f;		///< type specialization
+typedef Vector2<int32_t> Vector2i;	///< type specialization
 typedef Vector2<uint32_t> Vector2ui;	///< type specialization
 
 

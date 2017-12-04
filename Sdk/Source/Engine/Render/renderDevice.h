@@ -35,6 +35,8 @@ class HalRenderDevice;
 class RenderInstance;
 class RenderVertexInput;
 class RenderInputAssembly;
+struct RenderLayerSectionInfo;
+class RenderLayerSection;
 class EngineLog;
 
 /**
@@ -122,6 +124,22 @@ public:
 	* @param[in] inputAssembly	 Input assembly object to release
 	*/
 	void ReleaseInputAssembly(RenderInputAssembly* inputAssembly);
+
+	/**
+	* @brief Create an input assembly object
+	*
+	* @param[in] sectionInfo	 Section setup info
+
+	* @return RenderLayerSection object
+	*/
+	RenderLayerSection* CreateLayerSection(RenderLayerSectionInfo& sectionInfo);
+
+	/**
+	* @brief Release an input assembly object
+	*
+	* @param[in] layerSection	 RenderLayerSectionInfo object to release
+	*/
+	void ReleaseLayerSection(RenderLayerSection* layerSection);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to
