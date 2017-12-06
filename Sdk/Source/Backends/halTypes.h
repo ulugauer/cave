@@ -165,31 +165,31 @@ typedef uint32_t HalDependencyFlags;		///< Combined dependency flags
 /**
 *  @brief A strongly typed enum class representing polygon cull mode
 */
-enum class CullMode
+enum class HalCullMode
 {
-	None = 0,
-	Front,
-	Back,
-	FrontAndBack
+	NoCull = 0,
+	Front = 1,
+	Back = 2,
+	FrontAndBack = 3
 };
 
 /**
 *  @brief A strongly typed enum class representing polygons front face
 */
-enum class FrontFace
+enum class HalFrontFace
 {
 	CounterClockwise = 0,
-	Clockwise,
+	Clockwise = 1
 };
 
 /**
 *  @brief A strongly typed enum class representing polygon render mode
 */
-enum class PolygonMode
+enum class HalPolygonMode
 {
 	Fill = 0,
-	Line,
-	Point
+	Line = 1,
+	Point = 2
 };
 
 
@@ -198,29 +198,29 @@ enum class PolygonMode
 */
 struct CAVE_INTERFACE HalRasterizerSetup
 {
-	CullMode _cullMode;				///< Polygon culling mode
-	FrontFace _frontFace;			///< Front face mode
+	HalCullMode _cullMode;			///< Polygon culling mode
+	HalFrontFace _frontFace;		///< Front face mode
 	bool _depthClampEnable;			///< Clamp depth values to depth range
 	bool _depthBiasEnable;			///< Add constant value to depth
 	float _depthBiasConstantFactor;	///< Constant bias value
 	float _depthBiasClamp;			///< Depth bias clamp value
 	float _depthBiasSlopeFactor;	///< Depth bias slope
 	float _lineWidth;				///< Line thickness
-	PolygonMode _polygonMode;		///< Polygon render mode
+	HalPolygonMode _polygonMode;	///< Polygon render mode
 	bool _rasterizerDiscardEnable;	///< Disable rasterizer state
 
 	HalRasterizerSetup()
 	{
 		// defaults
-		_cullMode = CullMode::Back;
-		_frontFace = FrontFace::CounterClockwise;
+		_cullMode = HalCullMode::Back;
+		_frontFace = HalFrontFace::CounterClockwise;
 		_depthClampEnable = false;
 		_depthBiasEnable = false;
 		_depthBiasConstantFactor = 0;
 		_depthBiasClamp = 0;
 		_depthBiasSlopeFactor = 0;
 		_lineWidth = 1;
-		_polygonMode = PolygonMode::Fill;
+		_polygonMode = HalPolygonMode::Fill;
 		_rasterizerDiscardEnable = false;
 	}
 };

@@ -106,22 +106,22 @@ VulkanTypeConversion::ConvertSampleCountToVulkan(HalSampleCount sampleCount)
 }
 
 VkCullModeFlagBits 
-VulkanTypeConversion::ConvertCullModeToVulkan(CullMode mode)
+VulkanTypeConversion::ConvertCullModeToVulkan(HalCullMode mode)
 {
 	VkCullModeFlagBits modeFlag = VK_CULL_MODE_NONE;
 
 	switch (mode)
 	{
-	case CullMode::Front:
+	case HalCullMode::Front:
 		modeFlag = VK_CULL_MODE_FRONT_BIT;
 		break;
-	case CullMode::Back:
+	case HalCullMode::Back:
 		modeFlag = VK_CULL_MODE_BACK_BIT;
 		break;
-	case CullMode::FrontAndBack:
+	case HalCullMode::FrontAndBack:
 		modeFlag = VK_CULL_MODE_FRONT_AND_BACK;
 		break;
-	case CullMode::None:
+	case HalCullMode::NoCull:
 		modeFlag = VK_CULL_MODE_NONE;
 		break;
 	default:
@@ -133,16 +133,16 @@ VulkanTypeConversion::ConvertCullModeToVulkan(CullMode mode)
 }
 
 VkFrontFace 
-VulkanTypeConversion::ConvertFrontFaceToVulkan(FrontFace face)
+VulkanTypeConversion::ConvertFrontFaceToVulkan(HalFrontFace face)
 {
 	VkFrontFace frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 
 	switch (face)
 	{
-	case FrontFace::CounterClockwise:
+	case HalFrontFace::CounterClockwise:
 		frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		break;
-	case FrontFace::Clockwise:
+	case HalFrontFace::Clockwise:
 		frontFace = VK_FRONT_FACE_CLOCKWISE;
 		break;
 	default:
@@ -154,19 +154,19 @@ VulkanTypeConversion::ConvertFrontFaceToVulkan(FrontFace face)
 }
 
 VkPolygonMode 
-VulkanTypeConversion::ConvertPolygonModeToVulkan(PolygonMode mode)
+VulkanTypeConversion::ConvertPolygonModeToVulkan(HalPolygonMode mode)
 {
 	VkPolygonMode polyMode = VK_POLYGON_MODE_FILL;
 
 	switch (mode)
 	{
-	case PolygonMode::Fill:
+	case HalPolygonMode::Fill:
 		polyMode = VK_POLYGON_MODE_FILL;
 		break;
-	case PolygonMode::Line:
+	case HalPolygonMode::Line:
 		polyMode = VK_POLYGON_MODE_LINE;
 		break;
-	case PolygonMode::Point:
+	case HalPolygonMode::Point:
 		polyMode = VK_POLYGON_MODE_POINT;
 		break;
 	default:

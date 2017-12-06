@@ -72,7 +72,7 @@ public:
 	*
 	* @return Vulkan cull mode
 	*/
-	static VkCullModeFlagBits ConvertCullModeToVulkan(CullMode mode);
+	static VkCullModeFlagBits ConvertCullModeToVulkan(HalCullMode mode);
 
 	/**
 	* @brief Convert from generic front face to vulkan front face
@@ -81,7 +81,7 @@ public:
 	*
 	* @return Vulkan front face
 	*/
-	static VkFrontFace ConvertFrontFaceToVulkan(FrontFace face);
+	static VkFrontFace ConvertFrontFaceToVulkan(HalFrontFace face);
 
 	/**
 	* @brief Convert from generic polygon mode to vulkan polygon mode
@@ -90,7 +90,7 @@ public:
 	*
 	* @return Vulkan polygon mode
 	*/
-	static VkPolygonMode ConvertPolygonModeToVulkan(PolygonMode mode);
+	static VkPolygonMode ConvertPolygonModeToVulkan(HalPolygonMode mode);
 };
 
 }
