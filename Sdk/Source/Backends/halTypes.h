@@ -296,6 +296,21 @@ enum class HalLogicOp
 	Set = 15
 };
 
+/**
+*  @brief A strongly typed enum class representing dynamic states
+*/
+enum class HalDynamicStates
+{
+	Viewport = 0,
+	Scissor = 1,
+	LineWidth = 2,
+	DepthBias = 3,
+	BlendConstants = 4,
+	DepthBounds = 5,
+	StencilCompareMask = 6,
+	StencilWriteMask = 7,
+	StencilReference = 8
+};
 
 /**
 * @brief Rasterizer state setup
@@ -372,6 +387,7 @@ struct CAVE_INTERFACE HalStencilOpSetup
 		_passOp = HalStencilOp::Keep;
 		_depthFailOp = HalStencilOp::Keep;
 		_depthPassOp = HalStencilOp::Keep;
+		_compareOp = HalCompareOp::AlwaysPass;
 		_compareMask = 0;
 		_writeMask = 0;
 		_reference = 0;

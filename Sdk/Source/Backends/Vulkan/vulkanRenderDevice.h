@@ -147,6 +147,15 @@ public:
 	HalColorBlend* CreateColorBlendState(HalColorBlendState& colorBlendInfo
 		, caveVector<HalColorBlendAttachment>& blendAttachments) override;
 
+	/**
+	* @brief Create a low level dynamic state
+	*
+	* @param[in] dynamicStates		Dynamic states array
+	*
+	* @return  HalDynamicState abstraction interface
+	*/
+	HalDynamicState* CreateDynamicState(caveVector<HalDynamicStates>& dynamicStates) override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

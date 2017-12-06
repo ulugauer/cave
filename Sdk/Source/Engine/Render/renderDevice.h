@@ -42,6 +42,7 @@ class RenderDepthStencil;
 class EngineLog;
 class RenderMultisample;
 class RenderColorBlend;
+class RenderDynamicState;
 
 /**
 * Abstraction type of a device instance
@@ -210,6 +211,22 @@ public:
 	* @param[in] colorBlendState	 RenderColorBlend object to release
 	*/
 	void ReleaseColorBlendState(RenderColorBlend* colorBlendState);
+
+	/**
+	* @brief Create a dynamic state object
+	*
+	* @param[in] dynamicStates		Dynamic states array
+	*
+	* @return RenderDynamicState object
+	*/
+	RenderDynamicState* CreateDynamicState(caveVector<HalDynamicStates>& dynamicStates);
+
+	/**
+	* @brief Release a dynamic object
+	*
+	* @param[in] dynamicState	 RenderDynamicState object to release
+	*/
+	void ReleaseDynamicState(RenderDynamicState* dynamicState);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

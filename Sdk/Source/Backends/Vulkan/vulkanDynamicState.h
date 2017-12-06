@@ -43,7 +43,7 @@ public:
 	* @param[in] device			Pointer to render device object
 	* @param[in] dynamicStates	Array of dynamic states
 	*/
-	VulkanDynamicState(VulkanRenderDevice* device, caveVector<DynamicState>& dynamicStates);
+	VulkanDynamicState(VulkanRenderDevice* device, caveVector<HalDynamicStates>& dynamicStates);
 
 	/** @brief Destructor */
 	virtual ~VulkanDynamicState();

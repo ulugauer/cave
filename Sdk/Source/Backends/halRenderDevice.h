@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halMultisample.h"
 #include "halDepthStencil.h"
 #include "halColorBlend.h"
+#include "halDynamicState.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -143,6 +144,15 @@ public:
 	*/
 	virtual HalColorBlend* CreateColorBlendState(HalColorBlendState& colorBlendInfo
 			, caveVector<HalColorBlendAttachment>& blendAttachments) = 0;
+
+	/**
+	* @brief Create a low level dynamic state
+	*
+	* @param[in] dynamicStates		Dynamic states array
+	*
+	* @return  HalDynamicState abstraction interface
+	*/
+	virtual HalDynamicState* CreateDynamicState(caveVector<HalDynamicStates>& dynamicStates) = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

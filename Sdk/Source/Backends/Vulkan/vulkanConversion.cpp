@@ -41,6 +41,7 @@ VulkanTypeConversion::ConvertPipelineBindPointToVulkan(HalPipelineBindPoints pip
 		break;
 	default:
 		vkBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		assert(false);
 		break;
 	}
 
@@ -62,6 +63,7 @@ VulkanTypeConversion::ConvertImageFormatToVulkan(HalImageFormat imageFormat)
 		break;
 	default:
 		vkImageFormat = VK_FORMAT_UNDEFINED;
+		assert(false);
 		break;
 	}
 
@@ -99,6 +101,7 @@ VulkanTypeConversion::ConvertSampleCountToVulkan(HalSampleCount sampleCount)
 		break;
 	default:
 		vkSampleCount = VK_SAMPLE_COUNT_1_BIT;
+		assert(false);
 		break;
 	}
 
@@ -126,6 +129,7 @@ VulkanTypeConversion::ConvertCullModeToVulkan(HalCullMode mode)
 		break;
 	default:
 		modeFlag = VK_CULL_MODE_NONE;
+		assert(false);
 		break;
 	}
 
@@ -147,6 +151,7 @@ VulkanTypeConversion::ConvertFrontFaceToVulkan(HalFrontFace face)
 		break;
 	default:
 		frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+		assert(false);
 		break;
 	}
 
@@ -171,6 +176,7 @@ VulkanTypeConversion::ConvertPolygonModeToVulkan(HalPolygonMode mode)
 		break;
 	default:
 		polyMode = VK_POLYGON_MODE_FILL;
+		assert(false);
 		break;
 	}
 
@@ -210,6 +216,7 @@ VulkanTypeConversion::ConvertStencilOpToVulkan(HalStencilOp op)
 		break;
 	default:
 		stencilOp = VK_STENCIL_OP_KEEP;
+		assert(false);
 		break;
 	}
 
@@ -249,6 +256,7 @@ VulkanTypeConversion::ConvertDepthCompareOpToVulkan(HalCompareOp compOp)
 		break;
 	default:
 		compareOp = VK_COMPARE_OP_NEVER;
+		assert(false);
 		break;
 	}
 
@@ -439,6 +447,49 @@ VulkanTypeConversion::ConvertColorComponentToVulkan(HalColorComponentFlags color
 
 	assert(flags != 0);
 	return flags;
+}
+
+VkDynamicState 
+VulkanTypeConversion::ConvertDynamicStateToVulkan(HalDynamicStates state)
+{
+	VkDynamicState dynamicState = VK_DYNAMIC_STATE_VIEWPORT;
+
+	switch (state)
+	{
+	case HalDynamicStates::Viewport:
+		dynamicState = VK_DYNAMIC_STATE_VIEWPORT;
+		break;
+	case HalDynamicStates::Scissor:
+		dynamicState = VK_DYNAMIC_STATE_SCISSOR;
+		break;
+	case HalDynamicStates::LineWidth:
+		dynamicState = VK_DYNAMIC_STATE_LINE_WIDTH;
+		break;
+	case HalDynamicStates::DepthBias:
+		dynamicState = VK_DYNAMIC_STATE_DEPTH_BIAS;
+		break;
+	case HalDynamicStates::BlendConstants:
+		dynamicState = VK_DYNAMIC_STATE_BLEND_CONSTANTS;
+		break;
+	case HalDynamicStates::DepthBounds:
+		dynamicState = VK_DYNAMIC_STATE_DEPTH_BOUNDS;
+		break;
+	case HalDynamicStates::StencilCompareMask:
+		dynamicState = VK_DYNAMIC_STATE_STENCIL_COMPARE_MASK;
+		break;
+	case HalDynamicStates::StencilWriteMask:
+		dynamicState = VK_DYNAMIC_STATE_STENCIL_WRITE_MASK;
+		break;
+	case HalDynamicStates::StencilReference:
+		dynamicState = VK_DYNAMIC_STATE_STENCIL_REFERENCE;
+		break;
+	default:
+		dynamicState = VK_DYNAMIC_STATE_VIEWPORT;
+		assert(false);
+		break;
+	}
+
+	return dynamicState;
 }
 
 }

@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanMultisample.h"
 #include "vulkanDepthStencil.h"
 #include "vulkanColorBlend.h"
+#include "vulkanDynamicState.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -287,6 +288,16 @@ HalColorBlend* VulkanRenderDevice::CreateColorBlendState(HalColorBlendState& col
 	VulkanColorBlend* colorBlendState = AllocateObject<VulkanColorBlend>(*_pInstance->GetEngineAllocator(), this, colorBlendInfo, blendAttachments);
 
 	return colorBlendState;
+}
+
+HalDynamicState* VulkanRenderDevice::CreateDynamicState(caveVector<HalDynamicStates>& dynamicStates)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanDynamicState* dynamicState = AllocateObject<VulkanDynamicState>(*_pInstance->GetEngineAllocator(), this, dynamicStates);
+
+	return dynamicState;
 }
 
 }

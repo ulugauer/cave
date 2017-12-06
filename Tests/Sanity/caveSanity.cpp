@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderMultisample.h"
 #include "Render/renderDepthStencil.h"
 #include "Render/renderColorBlend.h"
+#include "Render/renderDynamicState.h"
 
 #include <iostream>
 #include <sstream>
@@ -168,12 +169,19 @@ int main(int argc, char* argv[])
 	blendAttachmentArray.Push(blendAttachment);
 	RenderColorBlend* colorBlendState = renderDevice->CreateColorBlendState(colorBlendInfo, blendAttachmentArray);
 	blendAttachmentArray.Clear();
+	// dynamic state
+	caveVector<HalDynamicStates> dynamicStates(renderDevice->GetEngineAllocator());
+	dynamicStates.Push(HalDynamicStates::Viewport);
+	dynamicStates.Push(HalDynamicStates::Scissor);
+	RenderDynamicState* dynamicState = renderDevice->CreateDynamicState(dynamicStates);
+	dynamicStates.Clear();
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
 
+	renderDevice->ReleaseDynamicState(dynamicState);
 	renderDevice->ReleaseColorBlendState(colorBlendState);
 	renderDevice->ReleaseDepthStencilState(depthStencilState);
 	renderDevice->ReleaseMultisampleState(multisampleState);

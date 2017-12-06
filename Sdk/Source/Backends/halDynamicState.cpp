@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-HalDynamicState::HalDynamicState(HalRenderDevice* renderDevice, caveVector<DynamicState>& dynamicStates)
+HalDynamicState::HalDynamicState(HalRenderDevice* renderDevice, caveVector<HalDynamicStates>& dynamicStates)
 	: _pDevice(renderDevice)
 	, _dynamicStates(renderDevice->GetEngineAllocator())
 {

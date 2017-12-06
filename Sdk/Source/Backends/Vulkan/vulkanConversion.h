@@ -145,6 +145,15 @@ public:
 	* @return Vulkan color components
 	*/
 	static VkColorComponentFlags ConvertColorComponentToVulkan(HalColorComponentFlags colorComponentFlags);
+
+	/**
+	* @brief Convert from generic dynamic state to vulkan bdynamic state
+	*
+	* @param[in] state		Generic dynamic state
+	*
+	* @return Vulkan dynamic state value
+	*/
+	static VkDynamicState ConvertDynamicStateToVulkan(HalDynamicStates state);
 };
 
 }

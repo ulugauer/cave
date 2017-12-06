@@ -11,54 +11,32 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file halDynamicState.h
-///       Hardware dynamic abstraction
+/// @file renderDynamicState.cpp
+///       Render dynamic state interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
-#include "Common/caveVector.h"
+#include "renderDynamicState.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halDynamicState.h"
 
-#include <iostream>		// includes exception handling
-#include <memory>
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include <cassert>
 
 namespace cave
 {
-
-///< forwards
-class HalRenderDevice;
-
-/**
-* @brief Tracks what of the pipeline is a dynamic state
-*/
-class HalDynamicState
+RenderDynamicState::RenderDynamicState(RenderDevice& renderDevice
+	, caveVector<HalDynamicStates>& dynamicStates)
+	: _renderDevice(renderDevice)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice		Pointer to render device object
-	* @param[in] dynamicStates		Array of dynamic states
-	*/
-	HalDynamicState(HalRenderDevice* renderDevice, caveVector<HalDynamicStates>& dynamicStates);
-
-	/** @brief Destructor */
-	virtual ~HalDynamicState();
-
-private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
-	caveVector<HalDynamicStates> _dynamicStates;	///< Array of dynamic tracked states
-};
-
+	// Allocate low level object
+	_halDynamicState = renderDevice.GetHalRenderDevice()->CreateDynamicState(dynamicStates);
+	assert(_halDynamicState);
 }
 
-/** @}*/
+RenderDynamicState::~RenderDynamicState()
+{
+	if (_halDynamicState)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halDynamicState);
+}
 
+}

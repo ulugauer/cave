@@ -17,62 +17,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "vulkanDynamicState.h"
 #include "vulkanRenderDevice.h"
-#include "vulkanApi.h"
+#include "vulkanConversion.h"
+
 
 #include<limits>
 
 namespace cave
 {
 
-/**
-* @brief Convert from generic dynamic state to vulkan bdynamic state
-*
-* @param[in] op		Generic bdynamic state
-*
-* @return Vulkan dynamic state value
-*/
-static VkDynamicState ConvertDynamicStateToVulkan(DynamicState state)
-{
-	VkDynamicState dynamicState = VK_DYNAMIC_STATE_VIEWPORT;
-
-	switch (state)
-	{
-	case DynamicState::Viewport:
-		dynamicState = VK_DYNAMIC_STATE_VIEWPORT;
-		break;
-	case DynamicState::Scissor:
-		dynamicState = VK_DYNAMIC_STATE_SCISSOR;
-		break;
-	case DynamicState::LineWidth:
-		dynamicState = VK_DYNAMIC_STATE_LINE_WIDTH;
-		break;
-	case DynamicState::DepthBias:
-		dynamicState = VK_DYNAMIC_STATE_DEPTH_BIAS;
-		break;
-	case DynamicState::BlendConstants:
-		dynamicState = VK_DYNAMIC_STATE_BLEND_CONSTANTS;
-		break;
-	case DynamicState::DepthBounds:
-		dynamicState = VK_DYNAMIC_STATE_DEPTH_BOUNDS;
-		break;
-	case DynamicState::StencilCompareMask:
-		dynamicState = VK_DYNAMIC_STATE_STENCIL_COMPARE_MASK;
-		break;
-	case DynamicState::StencilWriteMask:
-		dynamicState = VK_DYNAMIC_STATE_STENCIL_WRITE_MASK;
-		break;
-	case DynamicState::StencilReference:
-		dynamicState = VK_DYNAMIC_STATE_STENCIL_REFERENCE;
-		break;
-	default:
-		dynamicState = VK_DYNAMIC_STATE_VIEWPORT;
-		break;
-	}
-
-	return dynamicState;
-}
-
-VulkanDynamicState::VulkanDynamicState(VulkanRenderDevice* device, caveVector<DynamicState>& dynamicStates)
+VulkanDynamicState::VulkanDynamicState(VulkanRenderDevice* device, caveVector<HalDynamicStates>& dynamicStates)
 	: HalDynamicState(device, dynamicStates)
 	, _pDevice(device)
 	, _dynamicStates(device->GetEngineAllocator())
@@ -83,7 +36,7 @@ VulkanDynamicState::VulkanDynamicState(VulkanRenderDevice* device, caveVector<Dy
 		_dynamicStates.Reserve(dynamicStates.Size());
 		for (size_t i = 0; i < dynamicStates.Size(); ++i)
 		{
-			VkDynamicState vkDynamicState = ConvertDynamicStateToVulkan(dynamicStates[i]);
+			VkDynamicState vkDynamicState = VulkanTypeConversion::ConvertDynamicStateToVulkan(dynamicStates[i]);
 			_dynamicStates.Push(vkDynamicState);
 		}
 	}

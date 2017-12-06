@@ -13,52 +13,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halDynamicState.h
-///       Hardware dynamic abstraction
+/// @file renderDynamicState.h
+///       Render dynamic state interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "Common/caveVector.h"
+#include "halTypes.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-///< forwards
-class HalRenderDevice;
+/// forward declaration
+class RenderDevice;
+class HalDynamicState;
 
 /**
-* @brief Tracks what of the pipeline is a dynamic state
+* @brief Interface for dynamic state setup
 */
-class HalDynamicState
+class CAVE_INTERFACE RenderDynamicState : public CaveRefCount
 {
 public:
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device object
-	* @param[in] dynamicStates		Array of dynamic states
+	* @param[in] renderDevice		Pointer to render device
+	* @param[in] dynamicStates		Dynamic states array
+	*
 	*/
-	HalDynamicState(HalRenderDevice* renderDevice, caveVector<HalDynamicStates>& dynamicStates);
-
-	/** @brief Destructor */
-	virtual ~HalDynamicState();
+	RenderDynamicState(RenderDevice& renderDevice
+		, caveVector<HalDynamicStates>& dynamicStates);
+	/** @brief destructor */
+	virtual ~RenderDynamicState();
 
 private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
-	caveVector<HalDynamicStates> _dynamicStates;	///< Array of dynamic tracked states
+	RenderDevice& _renderDevice;	///< Render device object
+	HalDynamicState* _halDynamicState;	///< Pointer to low level dynamic state object
 };
 
 }
-
 /** @}*/
+
 

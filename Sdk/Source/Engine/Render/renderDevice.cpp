@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderMultisample.h"
 #include "renderDepthStencil.h"
 #include "renderColorBlend.h"
+#include "renderDynamicState.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -228,6 +229,25 @@ void RenderDevice::ReleaseColorBlendState(RenderColorBlend* colorBlendState)
 		int32_t refCount = colorBlendState->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *colorBlendState);
+	}
+}
+
+RenderDynamicState* RenderDevice::CreateDynamicState(caveVector<HalDynamicStates>& dynamicStates)
+{
+	RenderDynamicState* dynamicState = AllocateObject<RenderDynamicState>(*_pRenderInstance->GetEngineAllocator(), *this, dynamicStates);
+	if (dynamicState)
+		dynamicState->IncrementUsageCount();
+
+	return dynamicState;
+}
+
+void RenderDevice::ReleaseDynamicState(RenderDynamicState* dynamicState)
+{
+	if (dynamicState)
+	{
+		int32_t refCount = dynamicState->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *dynamicState);
 	}
 }
 
