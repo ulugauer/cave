@@ -244,7 +244,7 @@ VulkanTypeConversion::ConvertDepthCompareOpToVulkan(HalCompareOp compOp)
 	case HalCompareOp::GreaterEqual:
 		compareOp = VK_COMPARE_OP_GREATER_OR_EQUAL;
 		break;
-	case HalCompareOp::Always:
+	case HalCompareOp::AlwaysPass:
 		compareOp = VK_COMPARE_OP_ALWAYS;
 		break;
 	default:

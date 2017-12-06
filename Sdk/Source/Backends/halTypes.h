@@ -198,13 +198,13 @@ enum class HalPolygonMode
 enum class HalStencilOp
 {
 	Keep = 0,
-	Zero,
-	Replace,
-	IncrementClamp,
-	DecrementClamp,
-	Invert,
-	IncrementWarp,
-	DecrementWarp,
+	Zero = 1,
+	Replace = 2,
+	IncrementClamp = 3,
+	DecrementClamp = 4,
+	Invert = 5,
+	IncrementWarp = 6,
+	DecrementWarp = 7
 };
 
 /**
@@ -213,13 +213,13 @@ enum class HalStencilOp
 enum class HalCompareOp
 {
 	Never = 0,
-	Less,
-	Equal,
-	LessEqual,
-	Greater,
-	NotEqual,
-	GreaterEqual,
-	Always
+	Less = 1,
+	Equal = 2,
+	LessEqual = 3,
+	Greater = 4,
+	NotEqual = 5,
+	GreaterEqual = 6,
+	AlwaysPass = 7
 };
 
 /**
@@ -280,7 +280,7 @@ struct CAVE_INTERFACE HalMultisampleState
 /**
 * @brief Stencil operation state setup
 */
-struct HalStencilOpSetup
+struct CAVE_INTERFACE HalStencilOpSetup
 {
 	HalStencilOp _failOp;		///< Operation on failing stencil test samples
 	HalStencilOp _passOp;		///< Operation on passing stencil test samples
@@ -306,7 +306,7 @@ struct HalStencilOpSetup
 /**
 * @brief Depth stencil state setup
 */
-struct HalDepthStencilSetup
+struct CAVE_INTERFACE HalDepthStencilSetup
 {
 	bool _depthTestEnable;			///< Enable depth testing
 	bool _depthWriteEnable;			///< Enable depth writes
