@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halRasterizerState.h"
 #include "halMultisample.h"
 #include "halDepthStencil.h"
+#include "halColorBlend.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -131,6 +132,17 @@ public:
 	* @return  DepthStencil abstraction interface
 	*/
 	virtual HalDepthStencil* CreateDepthStencilState(HalDepthStencilSetup& depthStencilInfo) = 0;
+
+	/**
+	* @brief Create a low level depth stencil state
+	*
+	* @param[in] colorBlendInfo		Color blending state data
+	* @param[in] blendAttachments	Color blend attachment state
+	*
+	* @return  DepthStencil abstraction interface
+	*/
+	virtual HalColorBlend* CreateColorBlendState(HalColorBlendState& colorBlendInfo
+			, caveVector<HalColorBlendAttachment>& blendAttachments) = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

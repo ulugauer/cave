@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderRasterizerState.h"
 #include "renderMultisample.h"
 #include "renderDepthStencil.h"
+#include "renderColorBlend.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -207,6 +208,26 @@ void RenderDevice::ReleaseDepthStencilState(RenderDepthStencil* depthStencilStat
 		int32_t refCount = depthStencilState->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *depthStencilState);
+	}
+}
+
+RenderColorBlend* RenderDevice::CreateColorBlendState(HalColorBlendState& colorBlendInfo
+	, caveVector<HalColorBlendAttachment>& blendAttachments)
+{
+	RenderColorBlend* colorBlendState = AllocateObject<RenderColorBlend>(*_pRenderInstance->GetEngineAllocator(), *this, colorBlendInfo, blendAttachments);
+	if (colorBlendState)
+		colorBlendState->IncrementUsageCount();
+
+	return colorBlendState;
+}
+
+void RenderDevice::ReleaseColorBlendState(RenderColorBlend* colorBlendState)
+{
+	if (colorBlendState)
+	{
+		int32_t refCount = colorBlendState->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *colorBlendState);
 	}
 }
 

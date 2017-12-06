@@ -13,54 +13,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halColorBlend.h
-///       Hardware color blending state abstraction
+/// @file renderColorBlend.h
+///       Render color blending state interface
 
-#include "engineDefines.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "Common/caveVector.h"
+#include "halTypes.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-///< forwards
-class HalRenderDevice;
+/// forward declaration
+class RenderDevice;
+class HalColorBlend;
 
 /**
-* @brief Describes the color blend state
+* @brief Interface for color blending setup
 */
-class HalColorBlend
+class CAVE_INTERFACE RenderColorBlend : public CaveRefCount
 {
 public:
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device object
-	* @param[in] colorBlendState	Color blending state data
+	* @param[in] renderDevice		Pointer to render device
+	* @param[in] colorBlendInfo		Color blending state data
 	* @param[in] blendAttachments	Color blend attachment state
+	*
 	*/
-	HalColorBlend(HalRenderDevice* renderDevice, HalColorBlendState& colorBlendState
-				, caveVector<HalColorBlendAttachment>& blendAttachments);
-
-	/** @brief Destructor */
-	virtual ~HalColorBlend();
+	RenderColorBlend(RenderDevice& renderDevice
+		, HalColorBlendState& colorBlendInfo
+		, caveVector<HalColorBlendAttachment>& blendAttachments);
+	/** @brief destructor */
+	virtual ~RenderColorBlend();
 
 private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
-	HalColorBlendState _colorBlendState;	///< Color blend state state
-	caveVector<HalColorBlendAttachment> _colorBlendAttachments;	///< Color blend attachment state
+	RenderDevice& _renderDevice;	///< Render device object
+	HalColorBlend* _halColorBlend;	///< Pointer to low level color blend state object
 };
 
 }
-
 /** @}*/
+
 

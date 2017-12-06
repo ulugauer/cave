@@ -223,6 +223,81 @@ enum class HalCompareOp
 };
 
 /**
+*  @brief A strongly typed enum class representing blending factors
+*/
+enum class HalBlendFactor
+{
+	Zero = 0,
+	One = 1,
+	SrcColor = 2,
+	OneMinusSrcColor = 3,
+	DstColor = 4,
+	OneMinusDstColor = 5,
+	SrcAlpha = 6,
+	OneMinusSrcAlpha = 7,
+	DstAlpha = 8,
+	OneMinusDstAlpha = 9,
+	ConstantColor = 10,
+	OneMinusConstantColor = 11,
+	ConstantAlpha = 12,
+	OneMinusConstantAlpha = 13,	
+	SrcAlphaSaturate = 14,
+	Src1Color = 15,
+	OneMinusSrc1Color = 16,
+	Src1Alpha = 17,
+	OneMinusSrc1Alpha = 18
+};
+
+/**
+*  @brief A strongly typed enum class representing blending operations
+*/
+enum class HalBlendOp
+{
+	Add = 0,
+	Subtract = 1,
+	ReverseSubtract = 2,
+	Min = 3,
+	Max = 4
+};
+
+/**
+*  @brief A strongly typed enum class representing color write mask
+*/
+enum class HalColorComponents
+{
+	Red = 0x1,
+	Green = 0x2,
+	Blue = 0x4,
+	Alpha = 0x8
+};
+
+typedef uint32_t HalColorComponentFlags;	///< Combined color component flags
+
+/**
+*  @brief A strongly typed enum class representing logic operations
+*/
+enum class HalLogicOp
+{
+	Clear = 0,
+	And = 1,
+	AndReverse = 2,
+	Copy = 3,
+	AndInverted = 4,
+	NoOp = 5,
+	Xor = 6,
+	Or = 7,
+	Nor = 8,
+	Equivalent = 9,
+	Invert = 10,
+	OrReverse = 11,
+	CopyInverted = 12,
+	OrInverted = 13,
+	Nand = 14,
+	Set = 15
+};
+
+
+/**
 * @brief Rasterizer state setup
 */
 struct CAVE_INTERFACE HalRasterizerSetup
@@ -327,6 +402,56 @@ struct CAVE_INTERFACE HalDepthStencilSetup
 		_stencilTestEnable = false;
 		_minDepthBounds = 0;
 		_maxDepthBounds = 1;
+	}
+};
+
+/**
+* @brief Color blending attachment data
+*/
+struct CAVE_INTERFACE HalColorBlendAttachment
+{
+	bool _blendEnable;							///< Enable blending for this attachment
+	HalBlendFactor _srcColorBlendFactor;		///< Select source blend factor
+	HalBlendFactor _dstColorBlendFactor;		///< Select dest blend factor
+	HalBlendOp _colorBlendOp;					///< Select blend operation applied to color values
+	HalBlendFactor _srcAlphaBlendFactor;		///<  Select source alpha blend factor
+	HalBlendFactor _dstAlphaBlendFactor;		///< Select cdst alpha blend factor
+	HalBlendOp _alphaBlendOp;					///< Select blend operation applied to alpha values
+	HalColorComponentFlags _colorWriteMask;		///< Determines to which color compoent we are writing
+
+	HalColorBlendAttachment()
+	{
+		_blendEnable = false;
+		_srcColorBlendFactor = HalBlendFactor::One;
+		_dstColorBlendFactor = HalBlendFactor::Zero;
+		_colorBlendOp = HalBlendOp::Add;
+		_srcAlphaBlendFactor = HalBlendFactor::One;
+		_dstAlphaBlendFactor = HalBlendFactor::Zero;
+		_alphaBlendOp = HalBlendOp::Add;
+		_colorWriteMask = static_cast<uint32_t>(HalColorComponents::Red) 
+			| static_cast<uint32_t>(HalColorComponents::Green)
+			| static_cast<uint32_t>(HalColorComponents::Blue)
+			| static_cast<uint32_t>(HalColorComponents::Alpha);
+	}
+};
+
+/**
+* @brief Color blending state
+*/
+struct CAVE_INTERFACE HalColorBlendState
+{
+	bool _logicOpEnable;		///< Enable logical operations
+	HalLogicOp _logicOp;		///< Select logical operation
+	float _blendConstants[4];	///< RGBA constant values used for blending
+
+	HalColorBlendState()
+	{
+		_logicOpEnable = false;
+		_logicOp = HalLogicOp::Copy;
+		_blendConstants[0] = 0;
+		_blendConstants[1] = 0;
+		_blendConstants[2] = 0;
+		_blendConstants[3] = 0;
 	}
 };
 

@@ -11,56 +11,33 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file halColorBlend.h
-///       Hardware color blending state abstraction
+/// @file renderColorBlend.cpp
+///       Render color blending state interface
 
-#include "engineDefines.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
-#include "Common/caveVector.h"
+#include "renderColorBlend.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halColorBlend.h"
 
-#include <iostream>		// includes exception handling
-#include <memory>
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include <cassert>
 
 namespace cave
 {
-
-///< forwards
-class HalRenderDevice;
-
-/**
-* @brief Describes the color blend state
-*/
-class HalColorBlend
+RenderColorBlend::RenderColorBlend(RenderDevice& renderDevice
+		, HalColorBlendState& colorBlendInfo
+		, caveVector<HalColorBlendAttachment>& blendAttachments)
+	: _renderDevice(renderDevice)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice		Pointer to render device object
-	* @param[in] colorBlendState	Color blending state data
-	* @param[in] blendAttachments	Color blend attachment state
-	*/
-	HalColorBlend(HalRenderDevice* renderDevice, HalColorBlendState& colorBlendState
-				, caveVector<HalColorBlendAttachment>& blendAttachments);
-
-	/** @brief Destructor */
-	virtual ~HalColorBlend();
-
-private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
-	HalColorBlendState _colorBlendState;	///< Color blend state state
-	caveVector<HalColorBlendAttachment> _colorBlendAttachments;	///< Color blend attachment state
-};
-
+	// Allocate low level object
+	_halColorBlend = renderDevice.GetHalRenderDevice()->CreateColorBlendState(colorBlendInfo, blendAttachments);
+	assert(_halColorBlend);
 }
 
-/** @}*/
+RenderColorBlend::~RenderColorBlend()
+{
+	if (_halColorBlend)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halColorBlend);
+}
 
+}

@@ -36,7 +36,8 @@ set(RENDER_SOURCE Render/renderInstance.h Render/renderInstance.cpp
 				  Render/renderLayerSection.h Render/renderLayerSection.cpp 
 				  Render/renderRasterizerState.h Render/renderRasterizerState.cpp 
 				  Render/renderMultisample.h Render/renderMultisample.cpp 
-				  Render/renderDepthStencil.h Render/renderDepthStencil.cpp )
+				  Render/renderDepthStencil.h Render/renderDepthStencil.cpp 
+				  Render/renderColorBlend.h Render/renderColorBlend.cpp )
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h

@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanRasterizerState.h"
 #include "vulkanMultisample.h"
 #include "vulkanDepthStencil.h"
+#include "vulkanColorBlend.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -275,6 +276,17 @@ HalDepthStencil* VulkanRenderDevice::CreateDepthStencilState(HalDepthStencilSetu
 	VulkanDepthStencil* depthStencilState = AllocateObject<VulkanDepthStencil>(*_pInstance->GetEngineAllocator(), this, depthStencilInfo);
 
 	return depthStencilState;
+}
+
+HalColorBlend* VulkanRenderDevice::CreateColorBlendState(HalColorBlendState& colorBlendInfo
+	, caveVector<HalColorBlendAttachment>& blendAttachments)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanColorBlend* colorBlendState = AllocateObject<VulkanColorBlend>(*_pInstance->GetEngineAllocator(), this, colorBlendInfo, blendAttachments);
+
+	return colorBlendState;
 }
 
 }

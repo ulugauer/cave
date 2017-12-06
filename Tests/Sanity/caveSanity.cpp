@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderRasterizerState.h"
 #include "Render/renderMultisample.h"
 #include "Render/renderDepthStencil.h"
+#include "Render/renderColorBlend.h"
 
 #include <iostream>
 #include <sstream>
@@ -161,12 +162,19 @@ int main(int argc, char* argv[])
 	// depth stencil state
 	HalDepthStencilSetup depthStencilInfo;
 	RenderDepthStencil* depthStencilState = renderDevice->CreateDepthStencilState(depthStencilInfo);
+	HalColorBlendState colorBlendInfo;
+	HalColorBlendAttachment blendAttachment;
+	caveVector<HalColorBlendAttachment> blendAttachmentArray(renderDevice->GetEngineAllocator());
+	blendAttachmentArray.Push(blendAttachment);
+	RenderColorBlend* colorBlendState = renderDevice->CreateColorBlendState(colorBlendInfo, blendAttachmentArray);
+	blendAttachmentArray.Clear();
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
 
+	renderDevice->ReleaseColorBlendState(colorBlendState);
 	renderDevice->ReleaseDepthStencilState(depthStencilState);
 	renderDevice->ReleaseMultisampleState(multisampleState);
 	renderDevice->ReleaseRasterizerState(rasterizerState);

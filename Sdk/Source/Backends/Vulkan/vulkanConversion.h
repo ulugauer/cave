@@ -109,6 +109,42 @@ public:
 	* @return Vulkan compare operation
 	*/
 	static VkCompareOp ConvertDepthCompareOpToVulkan(HalCompareOp compOp);
+
+	/**
+	* @brief Convert from generic blend factor to vulkan blend factor
+	*
+	* @param[in] factor	Generic blend factor
+	*
+	* @return Vulkan blend factor
+	*/
+	static VkBlendFactor ConvertBlendFactorToVulkan(HalBlendFactor factor);
+
+	/**
+	* @brief Convert from generic logical operation to vulkan logical operationr
+	*
+	* @param[in] op		Generic logical operation
+	*
+	* @return Vulkan logical operation
+	*/
+	static VkLogicOp ConvertLogicOpToVulkan(HalLogicOp op);
+
+	/**
+	* @brief Convert from generic blend operation to vulkan blend operationr
+	*
+	* @param[in] op		Generic blend operation
+	*
+	* @return Vulkan blend operation
+	*/
+	static VkBlendOp ConvertBlendOpToVulkan(HalBlendOp op);
+
+	/**
+	* @brief Convert from generic color components to vulkan color components
+	*
+	* @param[in] colorComponentFlags	Generic color components
+	*
+	* @return Vulkan color components
+	*/
+	static VkColorComponentFlags ConvertColorComponentToVulkan(HalColorComponentFlags colorComponentFlags);
 };
 
 }

@@ -41,6 +41,7 @@ class RenderRasterizerState;
 class RenderDepthStencil;
 class EngineLog;
 class RenderMultisample;
+class RenderColorBlend;
 
 /**
 * Abstraction type of a device instance
@@ -132,7 +133,7 @@ public:
 	* @brief Create a layer section object
 	*
 	* @param[in] sectionInfo	 Section setup info
-
+	*
 	* @return RenderLayerSection object
 	*/
 	RenderLayerSection* CreateLayerSection(RenderLayerSectionInfo& sectionInfo);
@@ -148,7 +149,7 @@ public:
 	* @brief Create a rasterizer state object
 	*
 	* @param[in] rasterizerInfo	 Rasterizer setup info
-
+	*
 	* @return RenderRasterizerState object
 	*/
 	RenderRasterizerState* CreateRasterizerState(HalRasterizerSetup& rasterizerInfo);
@@ -164,7 +165,7 @@ public:
 	* @brief Create a multisample state object
 	*
 	* @param[in] multisampleInfo	 Multisample setup info
-
+	*
 	* @return RenderMultisample object
 	*/
 	RenderMultisample* CreateMultisampleState(HalMultisampleState& multisampleInfo);
@@ -180,7 +181,7 @@ public:
 	* @brief Create a depth stencil state object
 	*
 	* @param[in] depthStencilInfo	 Depth stencil setup info
-
+	*
 	* @return RenderDepthStencil object
 	*/
 	RenderDepthStencil* CreateDepthStencilState(HalDepthStencilSetup& depthStencilInfo);
@@ -191,6 +192,24 @@ public:
 	* @param[in] depthStencilState	 RenderDepthStencil object to release
 	*/
 	void ReleaseDepthStencilState(RenderDepthStencil* depthStencilState);
+
+	/**
+	* @brief Create a color blend state object
+	*
+	* @param[in] colorBlendInfo		Color blending state data
+	* @param[in] blendAttachments	Color blend attachment state
+	*
+	* @return RenderColorBlend object
+	*/
+	RenderColorBlend* CreateColorBlendState(HalColorBlendState& colorBlendInfo
+			, caveVector<HalColorBlendAttachment>& blendAttachments);
+
+	/**
+	* @brief Release a  color blend object
+	*
+	* @param[in] colorBlendState	 RenderColorBlend object to release
+	*/
+	void ReleaseColorBlendState(RenderColorBlend* colorBlendState);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

@@ -136,6 +136,17 @@ public:
 	*/
 	HalDepthStencil* CreateDepthStencilState(HalDepthStencilSetup& depthStencilInfo) override;
 
+	/**
+	* @brief Create a low level depth stencil state
+	*
+	* @param[in] colorBlendInfo		Color blending state data
+	* @param[in] blendAttachments	Color blend attachment state
+	*
+	* @return  DepthStencil abstraction interface
+	*/
+	HalColorBlend* CreateColorBlendState(HalColorBlendState& colorBlendInfo
+		, caveVector<HalColorBlendAttachment>& blendAttachments) override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

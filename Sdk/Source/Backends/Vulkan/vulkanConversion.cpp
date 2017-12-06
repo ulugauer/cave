@@ -255,4 +255,190 @@ VulkanTypeConversion::ConvertDepthCompareOpToVulkan(HalCompareOp compOp)
 	return compareOp;
 }
 
+VkBlendFactor 
+VulkanTypeConversion::ConvertBlendFactorToVulkan(HalBlendFactor factor)
+{
+	VkBlendFactor blendFactor = VK_BLEND_FACTOR_ZERO;
+
+	switch (factor)
+	{
+	case HalBlendFactor::Zero:
+		blendFactor = VK_BLEND_FACTOR_ZERO;
+		break;
+	case HalBlendFactor::One:
+		blendFactor = VK_BLEND_FACTOR_ONE;
+		break;
+	case HalBlendFactor::SrcColor:
+		blendFactor = VK_BLEND_FACTOR_SRC_COLOR;
+		break;
+	case HalBlendFactor::OneMinusSrcColor:
+		blendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
+		break;
+	case HalBlendFactor::DstColor:
+		blendFactor = VK_BLEND_FACTOR_DST_COLOR;
+		break;
+	case HalBlendFactor::OneMinusDstColor:
+		blendFactor = VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR;
+		break;
+	case HalBlendFactor::SrcAlpha:
+		blendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		break;
+	case HalBlendFactor::OneMinusSrcAlpha:
+		blendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		break;
+	case HalBlendFactor::DstAlpha:
+		blendFactor = VK_BLEND_FACTOR_DST_ALPHA;
+		break;
+	case HalBlendFactor::OneMinusDstAlpha:
+		blendFactor = VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
+		break;
+	case HalBlendFactor::ConstantColor:
+		blendFactor = VK_BLEND_FACTOR_CONSTANT_COLOR;
+		break;
+	case HalBlendFactor::OneMinusConstantColor:
+		blendFactor = VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR;
+		break;
+	case HalBlendFactor::ConstantAlpha:
+		blendFactor = VK_BLEND_FACTOR_CONSTANT_ALPHA;
+		break;
+	case HalBlendFactor::OneMinusConstantAlpha:
+		blendFactor = VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA;
+		break;
+	case HalBlendFactor::SrcAlphaSaturate:
+		blendFactor = VK_BLEND_FACTOR_SRC_ALPHA_SATURATE;
+		break;
+	case HalBlendFactor::Src1Color:
+		blendFactor = VK_BLEND_FACTOR_SRC1_COLOR;
+		break;
+	case HalBlendFactor::OneMinusSrc1Color:
+		blendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR;
+		break;
+	case HalBlendFactor::Src1Alpha:
+		blendFactor = VK_BLEND_FACTOR_SRC1_ALPHA;
+		break;
+	case HalBlendFactor::OneMinusSrc1Alpha:
+		blendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
+		break;
+	default:
+		blendFactor = VK_BLEND_FACTOR_ZERO;
+		assert(false);
+		break;
+	}
+
+	return blendFactor;
+}
+
+VkLogicOp 
+VulkanTypeConversion::ConvertLogicOpToVulkan(HalLogicOp op)
+{
+	VkLogicOp logicOp = VK_LOGIC_OP_CLEAR;
+
+	switch (op)
+	{
+	case HalLogicOp::Clear:
+		logicOp = VK_LOGIC_OP_CLEAR;
+		break;
+	case HalLogicOp::And:
+		logicOp = VK_LOGIC_OP_AND;
+		break;
+	case HalLogicOp::AndReverse:
+		logicOp = VK_LOGIC_OP_AND_REVERSE;
+		break;
+	case HalLogicOp::Copy:
+		logicOp = VK_LOGIC_OP_COPY;
+		break;
+	case HalLogicOp::AndInverted:
+		logicOp = VK_LOGIC_OP_AND_INVERTED;
+		break;
+	case HalLogicOp::NoOp:
+		logicOp = VK_LOGIC_OP_NO_OP;
+		break;
+	case HalLogicOp::Xor:
+		logicOp = VK_LOGIC_OP_XOR;
+		break;
+	case HalLogicOp::Or:
+		logicOp = VK_LOGIC_OP_OR;
+		break;
+	case HalLogicOp::Nor:
+		logicOp = VK_LOGIC_OP_NOR;
+		break;
+	case HalLogicOp::Equivalent:
+		logicOp = VK_LOGIC_OP_EQUIVALENT;
+		break;
+	case HalLogicOp::Invert:
+		logicOp = VK_LOGIC_OP_INVERT;
+		break;
+	case HalLogicOp::OrReverse:
+		logicOp = VK_LOGIC_OP_OR_REVERSE;
+		break;
+	case HalLogicOp::CopyInverted:
+		logicOp = VK_LOGIC_OP_COPY_INVERTED;
+		break;
+	case HalLogicOp::OrInverted:
+		logicOp = VK_LOGIC_OP_OR_INVERTED;
+		break;
+	case HalLogicOp::Nand:
+		logicOp = VK_LOGIC_OP_NAND;
+		break;
+	case HalLogicOp::Set:
+		logicOp = VK_LOGIC_OP_SET;
+		break;
+	default:
+		logicOp = VK_LOGIC_OP_CLEAR;
+		assert(false);
+		break;
+	}
+
+	return logicOp;
+}
+
+VkBlendOp 
+VulkanTypeConversion::ConvertBlendOpToVulkan(HalBlendOp op)
+{
+	VkBlendOp blendOp = VK_BLEND_OP_ADD;
+
+	switch (op)
+	{
+	case HalBlendOp::Add:
+		blendOp = VK_BLEND_OP_ADD;
+		break;
+	case HalBlendOp::Subtract:
+		blendOp = VK_BLEND_OP_SUBTRACT;
+		break;
+	case HalBlendOp::ReverseSubtract:
+		blendOp = VK_BLEND_OP_REVERSE_SUBTRACT;
+		break;
+	case HalBlendOp::Min:
+		blendOp = VK_BLEND_OP_MIN;
+		break;
+	case HalBlendOp::Max:
+		blendOp = VK_BLEND_OP_MAX;
+		break;
+	default:
+		blendOp = VK_BLEND_OP_ADD;
+		assert(false);
+		break;
+	}
+
+	return blendOp;
+}
+
+VkColorComponentFlags 
+VulkanTypeConversion::ConvertColorComponentToVulkan(HalColorComponentFlags colorComponentFlags)
+{
+	VkColorComponentFlags flags = 0;
+
+	if (colorComponentFlags & static_cast<uint32_t>(HalColorComponents::Red))
+		flags |= VK_COLOR_COMPONENT_R_BIT;
+	if (colorComponentFlags & static_cast<uint32_t>(HalColorComponents::Green))
+		flags |= VK_COLOR_COMPONENT_G_BIT;
+	if (colorComponentFlags & static_cast<uint32_t>(HalColorComponents::Blue))
+		flags |= VK_COLOR_COMPONENT_B_BIT;
+	if (colorComponentFlags & static_cast<uint32_t>(HalColorComponents::Alpha))
+		flags |= VK_COLOR_COMPONENT_A_BIT;
+
+	assert(flags != 0);
+	return flags;
+}
+
 }
