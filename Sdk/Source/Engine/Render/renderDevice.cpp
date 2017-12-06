@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderInputAssembly.h"
 #include "renderLayerSection.h"
 #include "renderRasterizerState.h"
+#include "renderMultisample.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -167,6 +168,26 @@ void RenderDevice::ReleaseRasterizerState(RenderRasterizerState* rasterizerState
 		int32_t refCount = rasterizerState->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *rasterizerState);
+	}
+}
+
+
+RenderMultisample* RenderDevice::CreateMultisampleState(HalMultisampleState& multisampleInfo)
+{
+	RenderMultisample* multisampleState = AllocateObject<RenderMultisample>(*_pRenderInstance->GetEngineAllocator(), *this, multisampleInfo);
+	if (multisampleState)
+		multisampleState->IncrementUsageCount();
+
+	return multisampleState;
+}
+
+void RenderDevice::ReleaseMultisampleState(RenderMultisample* multisampleState)
+{
+	if (multisampleState)
+	{
+		int32_t refCount = multisampleState->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *multisampleState);
 	}
 }
 

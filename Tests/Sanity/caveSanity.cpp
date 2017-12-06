@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderInputAssembly.h"
 #include "Render/renderLayerSection.h"
 #include "Render/renderRasterizerState.h"
+#include "Render/renderMultisample.h"
 
 #include <iostream>
 #include <sstream>
@@ -153,12 +154,16 @@ int main(int argc, char* argv[])
 	// rasterizer state
 	HalRasterizerSetup rasterizerInfo;
 	RenderRasterizerState* rasterizerState = renderDevice->CreateRasterizerState(rasterizerInfo);
+	// multisample state
+	HalMultisampleState multisampleInfo;
+	RenderMultisample* multisampleState = renderDevice->CreateMultisampleState(multisampleInfo);
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
 
+	renderDevice->ReleaseMultisampleState(multisampleState);
 	renderDevice->ReleaseRasterizerState(rasterizerState);
 	renderDevice->ReleaseInputAssembly(inputAssembly);
 	renderDevice->ReleaseVertexInput(vertexInput);

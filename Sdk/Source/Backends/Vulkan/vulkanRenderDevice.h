@@ -118,6 +118,15 @@ public:
 	*/
 	HalRasterizerState* CreateRasterizerState(HalRasterizerSetup& rasterizerStateInfo) override;
 
+	/**
+	* @brief Create a low level multisample state
+	*
+	* @param[in] multisampleStateInfo	Multisample setup info
+	*
+	* @return  Multisample abstraction interface
+	*/
+	HalMultisample* CreateMultisampleState(HalMultisampleState& multisampleStateInfo) override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

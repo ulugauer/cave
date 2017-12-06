@@ -11,49 +11,31 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file halMultisample.h
-///       Hardware multisample state abstraction
+/// @file renderMultisample.cpp
+///       Render multisample state interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "renderMultisample.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halMultisample.h"
 
-#include <iostream>		// includes exception handling
-#include <memory>
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include <cassert>
 
 namespace cave
 {
-
-
-/**
-* @brief Describes the multisample state
-*/
-class HalMultisample
+RenderMultisample::RenderMultisample(RenderDevice& renderDevice, HalMultisampleState& multisampleInfo)
+	: _renderDevice(renderDevice)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] multisampleState	Multisample state
-	*/
-	HalMultisample(HalMultisampleState& multisampleState);
-
-	/** @brief Destructor */
-	virtual ~HalMultisample();
-
-private:
-	HalMultisampleState _multisampleState;	///< Multisample state
-};
-
+	// Allocate low level object
+	_halMultisample = renderDevice.GetHalRenderDevice()->CreateMultisampleState(multisampleInfo);
+	assert(_halMultisample);
 }
 
-/** @}*/
+RenderMultisample::~RenderMultisample()
+{
+	if (_halMultisample)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halMultisample);
+}
 
+}

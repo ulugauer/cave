@@ -13,47 +13,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halMultisample.h
-///       Hardware multisample state abstraction
+/// @file renderMultisample.h
+///       Render multisample state interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "halTypes.h"
-#include "Memory/allocatorBase.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
+/// forward declaration
+class RenderDevice;
+class HalMultisample;
 
 /**
-* @brief Describes the multisample state
+* @brief Interface for multisample setup
 */
-class HalMultisample
+class CAVE_INTERFACE RenderMultisample : public CaveRefCount
 {
 public:
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] multisampleState	Multisample state
+	* @param[in] renderDevice		Pointer to render device
+	* @param[in] multisampleInfo	Multisample state info
+	*
 	*/
-	HalMultisample(HalMultisampleState& multisampleState);
-
-	/** @brief Destructor */
-	virtual ~HalMultisample();
+	RenderMultisample(RenderDevice& renderDevice, HalMultisampleState& multisampleInfo);
+	/** @brief destructor */
+	virtual ~RenderMultisample();
 
 private:
-	HalMultisampleState _multisampleState;	///< Multisample state
+	RenderDevice& _renderDevice;	///< Render device object
+	HalMultisample* _halMultisample;	///< Pointer to low level multisample state object
 };
 
 }
-
 /** @}*/
 

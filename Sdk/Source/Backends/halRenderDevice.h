@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halInputAssembly.h"
 #include "halViewportAndScissor.h"
 #include "halRasterizerState.h"
+#include "halMultisample.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -111,6 +112,15 @@ public:
 	* @return  rasterizer abstraction interface
 	*/
 	virtual HalRasterizerState* CreateRasterizerState(HalRasterizerSetup& rasterizerStateInfo) = 0;
+
+	/**
+	* @brief Create a low level multisample state
+	*
+	* @param[in] multisampleStateInfo	Multisample setup info
+	*
+	* @return  Multisample abstraction interface
+	*/
+	virtual HalMultisample* CreateMultisampleState(HalMultisampleState& multisampleStateInfo) = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

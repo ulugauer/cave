@@ -37,9 +37,9 @@ class RenderVertexInput;
 class RenderInputAssembly;
 struct RenderLayerSectionInfo;
 class RenderLayerSection;
-struct RasterizerInfo;
 class RenderRasterizerState;
 class EngineLog;
+class RenderMultisample;
 
 /**
 * Abstraction type of a device instance
@@ -128,7 +128,7 @@ public:
 	void ReleaseInputAssembly(RenderInputAssembly* inputAssembly);
 
 	/**
-	* @brief Create an input assembly object
+	* @brief Create a layer section object
 	*
 	* @param[in] sectionInfo	 Section setup info
 
@@ -137,7 +137,7 @@ public:
 	RenderLayerSection* CreateLayerSection(RenderLayerSectionInfo& sectionInfo);
 
 	/**
-	* @brief Release an input assembly object
+	* @brief Release a layer section object
 	*
 	* @param[in] layerSection	 RenderLayerSectionInfo object to release
 	*/
@@ -153,11 +153,27 @@ public:
 	RenderRasterizerState* CreateRasterizerState(HalRasterizerSetup& rasterizerInfo);
 
 	/**
-	* @brief Release an input assembly object
+	* @brief Release a rasterizer object
 	*
 	* @param[in] rasterizerState	 RenderRasterizerState object to release
 	*/
 	void ReleaseRasterizerState(RenderRasterizerState* rasterizerState);
+
+	/**
+	* @brief Create a multisample state object
+	*
+	* @param[in] multisampleInfo	 Multisample setup info
+
+	* @return RenderMultisample object
+	*/
+	RenderMultisample* CreateMultisampleState(HalMultisampleState& multisampleInfo);
+
+	/**
+	* @brief Release a multisample object
+	*
+	* @param[in] multisampleState	 RenderMultisample object to release
+	*/
+	void ReleaseMultisampleState(RenderMultisample* multisampleState);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

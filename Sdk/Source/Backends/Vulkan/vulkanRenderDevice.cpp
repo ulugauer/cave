@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanInputAssembly.h"
 #include "vulkanViewportAndScissor.h"
 #include "vulkanRasterizerState.h"
+#include "vulkanMultisample.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -253,6 +254,16 @@ HalRasterizerState* VulkanRenderDevice::CreateRasterizerState(HalRasterizerSetup
 	VulkanRasterizerState* rasterizerState = AllocateObject<VulkanRasterizerState>(*_pInstance->GetEngineAllocator(), this, rasterizerStateInfo);
 
 	return rasterizerState;
+}
+
+HalMultisample* VulkanRenderDevice::CreateMultisampleState(HalMultisampleState& multisampleStateInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanMultisample* multisampleState = AllocateObject<VulkanMultisample>(*_pInstance->GetEngineAllocator(), this, multisampleStateInfo);
+
+	return multisampleState;
 }
 
 }

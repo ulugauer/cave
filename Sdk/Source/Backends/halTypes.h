@@ -225,6 +225,29 @@ struct CAVE_INTERFACE HalRasterizerSetup
 	}
 };
 
+/**
+* @brief Multisample state 
+*/
+struct CAVE_INTERFACE HalMultisampleState
+{
+	bool _alphaToCoverageEnable;			///< Enable temporary coverage value based on the alpha value
+	bool _alphaToOneEnable;					///< Enable replacing alpah output to one
+	float _minSampleShading;				///< Minimum fraction value
+	uint32_t* _pSampleMask;					///< Coverage bitmask
+	HalSampleCount _rasterizationSamples;	///< Sample count
+	bool _sampleShadingEnable;				///< Enable per sample fragment execution
+
+	HalMultisampleState()
+	{
+		_alphaToCoverageEnable = false;
+		_alphaToOneEnable = false;
+		_minSampleShading = 1;
+		_pSampleMask = nullptr;
+		_rasterizationSamples = HalSampleCount::SampleCount1;
+		_sampleShadingEnable = false;
+	}
+};
+
 }
 
 /** @}*/
