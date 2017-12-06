@@ -154,6 +154,15 @@ public:
 	* @return Vulkan dynamic state value
 	*/
 	static VkDynamicState ConvertDynamicStateToVulkan(HalDynamicStates state);
+
+	/**
+	* @brief Convert from generic shader stage flags to vulkan blend shader stage flags
+	*
+	* @param[in] flags		Generic shader stage flags
+	*
+	* @return Vulkan shader stage flags
+	*/
+	static VkShaderStageFlags ConvertBlendOpToVulkan(HalShaderStagesFlags flags);
 };
 
 }

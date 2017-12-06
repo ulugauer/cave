@@ -13,55 +13,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halPipelineLayout.h
-///       Hardware pipeline layout abstraction
+/// @file renderPipelineLayout.h
+///       Render pipeline layout interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "Common/caveVector.h"
+#include "halTypes.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
+/// forward declaration
+class RenderDevice;
+class HalPipelineLayout;
+
 /**
-* @brief Describes the pipeline layout
+* @brief Interface for pipeline layout setup
 */
-class HalPipelineLayout
+class CAVE_INTERFACE RenderPipelineLayout : public CaveRefCount
 {
 public:
-	
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice			Pointer to render device object
+	* @param[in] renderDevice		Pointer to render device
 	* @param[in] descriptorSetLayouts	Pipeline set layouts array
 	* @param[in] pushConstants			Pipeline push constant ranges array
+	*
 	*/
-	HalPipelineLayout(HalRenderDevice* renderDevice
-					, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
-					, caveVector<HalPushConstantRange>& pushConstants);
+	RenderPipelineLayout(RenderDevice& renderDevice
+		, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+		, caveVector<HalPushConstantRange>& pushConstants);
 
-	/** @brief Destructor */
-	virtual ~HalPipelineLayout();
+	/** @brief destructor */
+	virtual ~RenderPipelineLayout();
 
 private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
-	caveVector<HalDescriptorSetLayout> _descriptorSetLayouts;	///< Pipeline set layouts array
-	caveVector<HalPushConstantRange> _pushConstants;	///< Pipeline push constant ranges array
+	RenderDevice& _renderDevice;	///< Render device object
+	HalPipelineLayout* _halPipelineLayout;	///< Pointer to low level pipeline layout object
 };
 
 }
-
 /** @}*/
 
-#pragma once
+

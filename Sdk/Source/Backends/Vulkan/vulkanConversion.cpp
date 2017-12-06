@@ -492,4 +492,26 @@ VulkanTypeConversion::ConvertDynamicStateToVulkan(HalDynamicStates state)
 	return dynamicState;
 }
 
+VkShaderStageFlags 
+VulkanTypeConversion::ConvertBlendOpToVulkan(HalShaderStagesFlags flags)
+{
+	VkShaderStageFlags shaderStageFlags = 0;
+
+	if (flags & static_cast<uint32_t>(HalShaderStages::Vertex))
+		shaderStageFlags |= VK_SHADER_STAGE_VERTEX_BIT;
+	if (flags & static_cast<uint32_t>(HalShaderStages::TessellationControl))
+		shaderStageFlags |= VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+	if (flags & static_cast<uint32_t>(HalShaderStages::TessellationEvaluation))
+		shaderStageFlags |= VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+	if (flags & static_cast<uint32_t>(HalShaderStages::Geometry))
+		shaderStageFlags |= VK_SHADER_STAGE_GEOMETRY_BIT;
+	if (flags & static_cast<uint32_t>(HalShaderStages::Fragment))
+		shaderStageFlags |= VK_SHADER_STAGE_FRAGMENT_BIT;
+	if (flags & static_cast<uint32_t>(HalShaderStages::Compute))
+		shaderStageFlags |= VK_SHADER_STAGE_COMPUTE_BIT;
+
+	assert(shaderStageFlags);
+	return shaderStageFlags;
+}
+
 }

@@ -28,6 +28,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanDepthStencil.h"
 #include "vulkanColorBlend.h"
 #include "vulkanDynamicState.h"
+#include "vulkanPipelineLayout.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -298,6 +299,17 @@ HalDynamicState* VulkanRenderDevice::CreateDynamicState(caveVector<HalDynamicSta
 	VulkanDynamicState* dynamicState = AllocateObject<VulkanDynamicState>(*_pInstance->GetEngineAllocator(), this, dynamicStates);
 
 	return dynamicState;
+}
+
+HalPipelineLayout* VulkanRenderDevice::CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+	, caveVector<HalPushConstantRange>& pushConstants)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanPipelineLayout* pipelineLayout = AllocateObject<VulkanPipelineLayout>(*_pInstance->GetEngineAllocator(), this, descriptorSetLayouts, pushConstants);
+
+	return pipelineLayout;
 }
 
 }

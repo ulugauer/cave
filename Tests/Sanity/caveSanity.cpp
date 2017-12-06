@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderDepthStencil.h"
 #include "Render/renderColorBlend.h"
 #include "Render/renderDynamicState.h"
+#include "Render/renderPipelineLayout.h"
 
 #include <iostream>
 #include <sstream>
@@ -175,12 +176,17 @@ int main(int argc, char* argv[])
 	dynamicStates.Push(HalDynamicStates::Scissor);
 	RenderDynamicState* dynamicState = renderDevice->CreateDynamicState(dynamicStates);
 	dynamicStates.Clear();
+	// pipeline layout
+	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(renderDevice->GetEngineAllocator());
+	caveVector<HalPushConstantRange> pushConstants(renderDevice->GetEngineAllocator());
+	RenderPipelineLayout* pipelineLayout = renderDevice->CreatePipelineLayout(descriptorSetLayouts, pushConstants);
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
 
+	renderDevice->ReleasePipelineLayout(pipelineLayout);
 	renderDevice->ReleaseDynamicState(dynamicState);
 	renderDevice->ReleaseColorBlendState(colorBlendState);
 	renderDevice->ReleaseDepthStencilState(depthStencilState);

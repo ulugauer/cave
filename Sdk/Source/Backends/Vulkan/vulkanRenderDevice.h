@@ -156,6 +156,17 @@ public:
 	*/
 	HalDynamicState* CreateDynamicState(caveVector<HalDynamicStates>& dynamicStates) override;
 
+	/**
+	* @brief Create a pipeline layout object
+	*
+	* @param[in] descriptorSetLayouts	Pipeline set layouts array
+	* @param[in] pushConstants			Pipeline push constant ranges array
+	*
+	* @return  HalPipelineLayout abstraction interface
+	*/
+	HalPipelineLayout* CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+		, caveVector<HalPushConstantRange>& pushConstants) override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

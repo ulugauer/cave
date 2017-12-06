@@ -45,7 +45,7 @@ VulkanDynamicState::VulkanDynamicState(VulkanRenderDevice* device, caveVector<Ha
 	_dynamicStateInfo.pNext = nullptr;
 	_dynamicStateInfo.flags = 0;
 	_dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(_dynamicStates.Size());
-	_dynamicStateInfo.pDynamicStates = _dynamicStates.Data();
+	_dynamicStateInfo.pDynamicStates = (dynamicStates.Empty()) ? nullptr : _dynamicStates.Data();
 }
 
 VulkanDynamicState::~VulkanDynamicState()

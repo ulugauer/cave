@@ -43,6 +43,7 @@ class EngineLog;
 class RenderMultisample;
 class RenderColorBlend;
 class RenderDynamicState;
+class RenderPipelineLayout;
 
 /**
 * Abstraction type of a device instance
@@ -227,6 +228,24 @@ public:
 	* @param[in] dynamicState	 RenderDynamicState object to release
 	*/
 	void ReleaseDynamicState(RenderDynamicState* dynamicState);
+
+	/**
+	* @brief Create a pipeline layout object
+	*
+	* @param[in] descriptorSetLayouts	Pipeline set layouts array
+	* @param[in] pushConstants			Pipeline push constant ranges array
+	*
+	* @return RenderPipelineLayout object
+	*/
+	RenderPipelineLayout* CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+		, caveVector<HalPushConstantRange>& pushConstants);
+
+	/**
+	* @brief Release a pipeline layout object
+	*
+	* @param[in] pipelineLayout	 RenderColorBlend object to release
+	*/
+	void ReleasePipelineLayout(RenderPipelineLayout* pipelineLayout);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

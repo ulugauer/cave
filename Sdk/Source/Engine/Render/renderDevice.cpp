@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderDepthStencil.h"
 #include "renderColorBlend.h"
 #include "renderDynamicState.h"
+#include "renderPipelineLayout.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -248,6 +249,26 @@ void RenderDevice::ReleaseDynamicState(RenderDynamicState* dynamicState)
 		int32_t refCount = dynamicState->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *dynamicState);
+	}
+}
+
+RenderPipelineLayout* RenderDevice::CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+	, caveVector<HalPushConstantRange>& pushConstants)
+{
+	RenderPipelineLayout* pipelineLayout = AllocateObject<RenderPipelineLayout>(*_pRenderInstance->GetEngineAllocator(), *this, descriptorSetLayouts, pushConstants);
+	if (pipelineLayout)
+		pipelineLayout->IncrementUsageCount();
+
+	return pipelineLayout;
+}
+
+void RenderDevice::ReleasePipelineLayout(RenderPipelineLayout* pipelineLayout)
+{
+	if (pipelineLayout)
+	{
+		int32_t refCount = pipelineLayout->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *pipelineLayout);
 	}
 }
 

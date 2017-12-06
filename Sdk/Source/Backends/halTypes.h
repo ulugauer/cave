@@ -313,6 +313,23 @@ enum class HalDynamicStates
 };
 
 /**
+*  @brief A strongly typed enum class representing the shader stages
+*/
+enum class HalShaderStages
+{
+	Vertex = 0x1,
+	TessellationControl = 0x2,
+	TessellationEvaluation = 0x4,
+	Geometry = 0x8,
+	Fragment = 0x10,
+	Compute = 0x20
+};
+
+typedef uint32_t HalShaderStagesFlags;	///< Shader stages flags
+
+typedef struct DescriptorSetLayout_T *setLayout;	///< Opqaue handle
+
+/**
 * @brief Rasterizer state setup
 */
 struct CAVE_INTERFACE HalRasterizerSetup
@@ -469,6 +486,24 @@ struct CAVE_INTERFACE HalColorBlendState
 		_blendConstants[2] = 0;
 		_blendConstants[3] = 0;
 	}
+};
+
+/**
+* @brief Pipeline descriptor set layout
+*/
+struct CAVE_INTERFACE HalDescriptorSetLayout
+{
+	setLayout _descriptorLayoutSet; ///< dummy for now
+};
+
+/**
+* @brief Pipeline push constants setup
+*/
+struct CAVE_INTERFACE HalPushConstantRange
+{
+	HalShaderStagesFlags _shaderStagesFlags; ///< Enabled shader stages
+	uint32_t _offset;	///< Range offset in bytes (must be a multiple of 4)
+	uint32_t _size;		///< Range size on bytes (must be a multiple of 4)
 };
 
 }

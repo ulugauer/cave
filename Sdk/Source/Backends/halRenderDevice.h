@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halDepthStencil.h"
 #include "halColorBlend.h"
 #include "halDynamicState.h"
+#include "halPipelineLayout.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -153,6 +154,17 @@ public:
 	* @return  HalDynamicState abstraction interface
 	*/
 	virtual HalDynamicState* CreateDynamicState(caveVector<HalDynamicStates>& dynamicStates) = 0;
+
+	/**
+	* @brief Create a pipeline layout object
+	*
+	* @param[in] descriptorSetLayouts	Pipeline set layouts array
+	* @param[in] pushConstants			Pipeline push constant ranges array
+	*
+	* @return  HalPipelineLayout abstraction interface
+	*/
+	virtual HalPipelineLayout* CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+		, caveVector<HalPushConstantRange>& pushConstants) = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

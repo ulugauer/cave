@@ -38,7 +38,8 @@ set(RENDER_SOURCE Render/renderInstance.h Render/renderInstance.cpp
 				  Render/renderMultisample.h Render/renderMultisample.cpp 
 				  Render/renderDepthStencil.h Render/renderDepthStencil.cpp 
 				  Render/renderColorBlend.h Render/renderColorBlend.cpp 
-				  Render/renderDynamicState.h Render/renderDynamicState.cpp )
+				  Render/renderDynamicState.h Render/renderDynamicState.cpp 
+				  Render/renderPipelineLayout.h Render/renderPipelineLayout.cpp )
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h

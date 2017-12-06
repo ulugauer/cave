@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "vulkanPipelineLayout.h"
 #include "vulkanRenderDevice.h"
+#include "vulkanConversion.h"
 
 #include "vulkanApi.h"
 
@@ -25,35 +26,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
-
-
-/**
-* @brief Convert from generic shader stage flags to vulkan blend shader stage flags
-*
-* @param[in] flags		Generic shader stage flags
-*
-* @return Vulkan shader stage flags
-*/
-static VkShaderStageFlags ConvertBlendOpToVulkan(ShaderStagesFlags flags)
-{
-	VkShaderStageFlags shaderStageFlags = 0;
-
-	if (flags & static_cast<uint32_t>(ShaderStages::Vertex))
-		shaderStageFlags |= VK_SHADER_STAGE_VERTEX_BIT;
-	if (flags & static_cast<uint32_t>(ShaderStages::TessellationControl))
-		shaderStageFlags |= VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-	if (flags & static_cast<uint32_t>(ShaderStages::TessellationEvaluation))
-		shaderStageFlags |= VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-	if (flags & static_cast<uint32_t>(ShaderStages::Geometry))
-		shaderStageFlags |= VK_SHADER_STAGE_GEOMETRY_BIT;
-	if (flags & static_cast<uint32_t>(ShaderStages::Fragment))
-		shaderStageFlags |= VK_SHADER_STAGE_FRAGMENT_BIT;
-	if (flags & static_cast<uint32_t>(ShaderStages::Compute))
-		shaderStageFlags |= VK_SHADER_STAGE_COMPUTE_BIT;
-
-	assert(shaderStageFlags);
-	return shaderStageFlags;
-}
 
 VulkanPipelineLayout::VulkanPipelineLayout(VulkanRenderDevice* device
 		, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
@@ -74,7 +46,7 @@ VulkanPipelineLayout::VulkanPipelineLayout(VulkanRenderDevice* device
 			assert((pushConstants[i]._size % 4) == 0);
 			assert((pushConstants[i]._offset % 4) == 0);
 			VkPushConstantRange constantRange;
-			constantRange.stageFlags = ConvertBlendOpToVulkan(pushConstants[i]._shaderStagesFlags);
+			constantRange.stageFlags = VulkanTypeConversion::ConvertBlendOpToVulkan(pushConstants[i]._shaderStagesFlags);
 			constantRange.offset = pushConstants[i]._offset;
 			constantRange.size = pushConstants[i]._size;
 			_vkPushConstantRange.Push(constantRange);
