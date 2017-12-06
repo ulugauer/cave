@@ -37,6 +37,8 @@ class RenderVertexInput;
 class RenderInputAssembly;
 struct RenderLayerSectionInfo;
 class RenderLayerSection;
+struct RasterizerInfo;
+class RenderRasterizerState;
 class EngineLog;
 
 /**
@@ -140,6 +142,22 @@ public:
 	* @param[in] layerSection	 RenderLayerSectionInfo object to release
 	*/
 	void ReleaseLayerSection(RenderLayerSection* layerSection);
+
+	/**
+	* @brief Create a rasterizer state object
+	*
+	* @param[in] rasterizerInfo	 Rasterizer setup info
+
+	* @return RenderRasterizerState object
+	*/
+	RenderRasterizerState* CreateRasterizerState(HalRasterizerSetup& rasterizerInfo);
+
+	/**
+	* @brief Release an input assembly object
+	*
+	* @param[in] rasterizerState	 RenderRasterizerState object to release
+	*/
+	void ReleaseRasterizerState(RenderRasterizerState* rasterizerState);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

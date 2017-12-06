@@ -17,102 +17,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "vulkanRasterizerState.h"
 #include "vulkanRenderDevice.h"
+#include "vulkanConversion.h"
 #include "vulkanApi.h"
 
 #include<limits>
 
 namespace cave
 {
-
-/**
-* @brief Convert from generic cull mode to vulkan cull mode
-*
-* @param[in] mode	Generic cull mode
-*
-* @return Vulkan cull mode
-*/
-static VkCullModeFlagBits ConvertCullModeToVulkan(CullMode mode)
-{
-	VkCullModeFlagBits modeFlag = VK_CULL_MODE_NONE;
-
-	switch (mode)
-	{
-	case CullMode::Front:
-		modeFlag = VK_CULL_MODE_FRONT_BIT;
-		break;
-	case CullMode::Back:
-		modeFlag = VK_CULL_MODE_BACK_BIT;
-		break;
-	case CullMode::FrontAndBack:
-		modeFlag = VK_CULL_MODE_FRONT_AND_BACK;
-		break;
-	case CullMode::None:
-		modeFlag = VK_CULL_MODE_NONE;
-		break;
-	default:
-		modeFlag = VK_CULL_MODE_NONE;
-		break;
-	}
-
-	return modeFlag;
-}
-
-/**
-* @brief Convert from generic front face to vulkan front face
-*
-* @param[in] face	Generic front face value
-*
-* @return Vulkan front face
-*/
-static VkFrontFace ConvertFrontFaceToVulkan(FrontFace face)
-{
-	VkFrontFace frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-
-	switch (face)
-	{
-	case FrontFace::CounterClockwise:
-		frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-		break;
-	case FrontFace::Clockwise:
-		frontFace = VK_FRONT_FACE_CLOCKWISE;
-		break;
-	default:
-		frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-		break;
-	}
-
-	return frontFace;
-}
-
-/**
-* @brief Convert from generic polygon mode to vulkan polygon mode
-*
-* @param[in] face	Generic polygon mode
-*
-* @return Vulkan polygon mode
-*/
-static VkPolygonMode ConvertPolygonModeToVulkan(PolygonMode mode)
-{
-	VkPolygonMode polyMode = VK_POLYGON_MODE_FILL;
-
-	switch (mode)
-	{
-	case PolygonMode::Fill:
-		polyMode = VK_POLYGON_MODE_FILL;
-		break;
-	case PolygonMode::Line:
-		polyMode = VK_POLYGON_MODE_LINE;
-		break;
-	case PolygonMode::Point:
-		polyMode = VK_POLYGON_MODE_POINT;
-		break;
-	default:
-		polyMode = VK_POLYGON_MODE_FILL;
-		break;
-	}
-
-	return polyMode;
-}
 
 VulkanRasterizerState::VulkanRasterizerState(VulkanRenderDevice* device, HalRasterizerSetup& rasterizerState)
 	: HalRasterizerState(rasterizerState)
@@ -121,15 +32,15 @@ VulkanRasterizerState::VulkanRasterizerState(VulkanRenderDevice* device, HalRast
 	_rasterizerStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	_rasterizerStateInfo.pNext = nullptr;
 	_rasterizerStateInfo.flags = 0;
-	_rasterizerStateInfo.cullMode = ConvertCullModeToVulkan(rasterizerState._cullMode);
+	_rasterizerStateInfo.cullMode = VulkanTypeConversion::ConvertCullModeToVulkan(rasterizerState._cullMode);
 	_rasterizerStateInfo.depthBiasClamp = rasterizerState._depthBiasClamp;
 	_rasterizerStateInfo.depthBiasConstantFactor = rasterizerState._depthBiasConstantFactor;
 	_rasterizerStateInfo.depthBiasEnable = rasterizerState._depthBiasEnable;
 	_rasterizerStateInfo.depthBiasSlopeFactor = rasterizerState._depthBiasSlopeFactor;
 	_rasterizerStateInfo.depthClampEnable = rasterizerState._depthClampEnable;
-	_rasterizerStateInfo.frontFace = ConvertFrontFaceToVulkan(rasterizerState._frontFace);
+	_rasterizerStateInfo.frontFace = VulkanTypeConversion::ConvertFrontFaceToVulkan(rasterizerState._frontFace);
 	_rasterizerStateInfo.lineWidth = rasterizerState._lineWidth;
-	_rasterizerStateInfo.polygonMode = ConvertPolygonModeToVulkan(rasterizerState._polygonMode);
+	_rasterizerStateInfo.polygonMode = VulkanTypeConversion::ConvertPolygonModeToVulkan(rasterizerState._polygonMode);
 	_rasterizerStateInfo.rasterizerDiscardEnable = rasterizerState._rasterizerDiscardEnable;
 }
 

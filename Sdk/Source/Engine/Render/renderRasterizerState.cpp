@@ -11,48 +11,31 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file halRasterizerState.h
-///       Hardware rasterizer state abstraction
+/// @file renderRasterizerState.cpp
+///       Render rasterizer state interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "renderRasterizerState.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halRasterizerState.h"
 
-#include <iostream>		// includes exception handling
-#include <memory>
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include <cassert>
 
 namespace cave
 {
-
-/**
-* @brief Describes setup of the rasterizer state
-*/
-class HalRasterizerState
+RenderRasterizerState::RenderRasterizerState(RenderDevice& renderDevice, HalRasterizerSetup& rasterizerInfo)
+	: _renderDevice(renderDevice)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] rasterizerState	Rasterizer setup struct
-	*/
-	HalRasterizerState(HalRasterizerSetup& rasterizerState);
-
-	/** @brief Destructor */
-	virtual ~HalRasterizerState();
-
-private:
-	HalRasterizerSetup _rasterizerState;	///< Rasterizer state
-};
-
+	// Allocate low level object
+	_halRasterizerState = renderDevice.GetHalRenderDevice()->CreateRasterizerState(rasterizerInfo);
+	assert(_halRasterizerState);
 }
 
-/** @}*/
+RenderRasterizerState::~RenderRasterizerState()
+{
+	if (_halRasterizerState)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halRasterizerState);
+}
 
+}

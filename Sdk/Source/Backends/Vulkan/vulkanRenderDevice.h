@@ -109,6 +109,15 @@ public:
 	*/
 	HalViewportAndScissor* CreateViewportAndScissor(HalViewport& viewport, HalScissor& scissor) override;
 
+	/**
+	* @brief Create a low level rasterizer state
+	*
+	* @param[in] rasterizerStateInfo	Rasterizer setup
+	*
+	* @return  rasterizer abstraction interface
+	*/
+	HalRasterizerState* CreateRasterizerState(HalRasterizerSetup& rasterizerStateInfo) override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

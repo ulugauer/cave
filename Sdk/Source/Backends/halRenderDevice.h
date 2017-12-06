@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halVertexInput.h"
 #include "halInputAssembly.h"
 #include "halViewportAndScissor.h"
+#include "halRasterizerState.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -101,6 +102,15 @@ public:
 	* @return  Viewport, scissor abstraction interface
 	*/
 	virtual HalViewportAndScissor* CreateViewportAndScissor(HalViewport& viewport, HalScissor& scissor) = 0;
+
+	/**
+	* @brief Create a low level rasterizer state
+	*
+	* @param[in] rasterizerStateInfo	Rasterizer setup info
+	*
+	* @return  rasterizer abstraction interface
+	*/
+	virtual HalRasterizerState* CreateRasterizerState(HalRasterizerSetup& rasterizerStateInfo) = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

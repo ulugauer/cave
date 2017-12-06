@@ -65,6 +65,32 @@ public:
 	*/
 	static VkSampleCountFlagBits ConvertSampleCountToVulkan(HalSampleCount sampleCount);
 
+	/**
+	* @brief Convert from generic cull mode to vulkan cull mode
+	*
+	* @param[in] mode	Generic cull mode
+	*
+	* @return Vulkan cull mode
+	*/
+	static VkCullModeFlagBits ConvertCullModeToVulkan(CullMode mode);
+
+	/**
+	* @brief Convert from generic front face to vulkan front face
+	*
+	* @param[in] face	Generic front face value
+	*
+	* @return Vulkan front face
+	*/
+	static VkFrontFace ConvertFrontFaceToVulkan(FrontFace face);
+
+	/**
+	* @brief Convert from generic polygon mode to vulkan polygon mode
+	*
+	* @param[in] mode	Generic polygon mode
+	*
+	* @return Vulkan polygon mode
+	*/
+	static VkPolygonMode ConvertPolygonModeToVulkan(PolygonMode mode);
 };
 
 }

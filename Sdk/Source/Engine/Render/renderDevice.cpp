@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderVertexInput.h"
 #include "renderInputAssembly.h"
 #include "renderLayerSection.h"
+#include "renderRasterizerState.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -148,6 +149,25 @@ void RenderDevice::ReleaseLayerSection(RenderLayerSection* layerSection)
 {
 	if (layerSection)
 		DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *layerSection);
+}
+
+RenderRasterizerState* RenderDevice::CreateRasterizerState(HalRasterizerSetup& rasterizerInfo)
+{
+	RenderRasterizerState* rasterizerState = AllocateObject<RenderRasterizerState>(*_pRenderInstance->GetEngineAllocator(), *this, rasterizerInfo);
+	if (rasterizerState)
+		rasterizerState->IncrementUsageCount();
+
+	return rasterizerState;
+}
+
+void RenderDevice::ReleaseRasterizerState(RenderRasterizerState* rasterizerState)
+{
+	if (rasterizerState)
+	{
+		int32_t refCount = rasterizerState->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *rasterizerState);
+	}
 }
 
 }

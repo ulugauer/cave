@@ -21,7 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 *
 */
 
-#include <string>
+#include "engineDefines.h"
+
+#include <memory>
 
 namespace cave
 {
@@ -158,6 +160,70 @@ enum HalDependencyBits
 	DependencyByRegion = 0x1
 };
 typedef uint32_t HalDependencyFlags;		///< Combined dependency flags
+
+
+/**
+*  @brief A strongly typed enum class representing polygon cull mode
+*/
+enum class CullMode
+{
+	None = 0,
+	Front,
+	Back,
+	FrontAndBack
+};
+
+/**
+*  @brief A strongly typed enum class representing polygons front face
+*/
+enum class FrontFace
+{
+	CounterClockwise = 0,
+	Clockwise,
+};
+
+/**
+*  @brief A strongly typed enum class representing polygon render mode
+*/
+enum class PolygonMode
+{
+	Fill = 0,
+	Line,
+	Point
+};
+
+
+/**
+* @brief Rasterizer state setup
+*/
+struct CAVE_INTERFACE HalRasterizerSetup
+{
+	CullMode _cullMode;				///< Polygon culling mode
+	FrontFace _frontFace;			///< Front face mode
+	bool _depthClampEnable;			///< Clamp depth values to depth range
+	bool _depthBiasEnable;			///< Add constant value to depth
+	float _depthBiasConstantFactor;	///< Constant bias value
+	float _depthBiasClamp;			///< Depth bias clamp value
+	float _depthBiasSlopeFactor;	///< Depth bias slope
+	float _lineWidth;				///< Line thickness
+	PolygonMode _polygonMode;		///< Polygon render mode
+	bool _rasterizerDiscardEnable;	///< Disable rasterizer state
+
+	HalRasterizerSetup()
+	{
+		// defaults
+		_cullMode = CullMode::Back;
+		_frontFace = FrontFace::CounterClockwise;
+		_depthClampEnable = false;
+		_depthBiasEnable = false;
+		_depthBiasConstantFactor = 0;
+		_depthBiasClamp = 0;
+		_depthBiasSlopeFactor = 0;
+		_lineWidth = 1;
+		_polygonMode = PolygonMode::Fill;
+		_rasterizerDiscardEnable = false;
+	}
+};
 
 }
 

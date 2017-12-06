@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderVertexInput.h"
 #include "Render/renderInputAssembly.h"
 #include "Render/renderLayerSection.h"
+#include "Render/renderRasterizerState.h"
 
 #include <iostream>
 #include <sstream>
@@ -149,12 +150,16 @@ int main(int argc, char* argv[])
 	RenderMaterial material = rm.LoadMaterialAsset("ColoredMaterial.asset");
 	RenderVertexInput* vertexInput = renderDevice->CreateVertexInput();
 	RenderInputAssembly* inputAssembly = renderDevice->CreateInputAssembly();
+	// rasterizer state
+	HalRasterizerSetup rasterizerInfo;
+	RenderRasterizerState* rasterizerState = renderDevice->CreateRasterizerState(rasterizerInfo);
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
 
+	renderDevice->ReleaseRasterizerState(rasterizerState);
 	renderDevice->ReleaseInputAssembly(inputAssembly);
 	renderDevice->ReleaseVertexInput(vertexInput);
 	renderDevice->ReleaseLayerSection(layerSection);

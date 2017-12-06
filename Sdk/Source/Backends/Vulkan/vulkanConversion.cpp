@@ -105,4 +105,76 @@ VulkanTypeConversion::ConvertSampleCountToVulkan(HalSampleCount sampleCount)
 	return vkSampleCount;
 }
 
+VkCullModeFlagBits 
+VulkanTypeConversion::ConvertCullModeToVulkan(CullMode mode)
+{
+	VkCullModeFlagBits modeFlag = VK_CULL_MODE_NONE;
+
+	switch (mode)
+	{
+	case CullMode::Front:
+		modeFlag = VK_CULL_MODE_FRONT_BIT;
+		break;
+	case CullMode::Back:
+		modeFlag = VK_CULL_MODE_BACK_BIT;
+		break;
+	case CullMode::FrontAndBack:
+		modeFlag = VK_CULL_MODE_FRONT_AND_BACK;
+		break;
+	case CullMode::None:
+		modeFlag = VK_CULL_MODE_NONE;
+		break;
+	default:
+		modeFlag = VK_CULL_MODE_NONE;
+		break;
+	}
+
+	return modeFlag;
+}
+
+VkFrontFace 
+VulkanTypeConversion::ConvertFrontFaceToVulkan(FrontFace face)
+{
+	VkFrontFace frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+
+	switch (face)
+	{
+	case FrontFace::CounterClockwise:
+		frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+		break;
+	case FrontFace::Clockwise:
+		frontFace = VK_FRONT_FACE_CLOCKWISE;
+		break;
+	default:
+		frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+		break;
+	}
+
+	return frontFace;
+}
+
+VkPolygonMode 
+VulkanTypeConversion::ConvertPolygonModeToVulkan(PolygonMode mode)
+{
+	VkPolygonMode polyMode = VK_POLYGON_MODE_FILL;
+
+	switch (mode)
+	{
+	case PolygonMode::Fill:
+		polyMode = VK_POLYGON_MODE_FILL;
+		break;
+	case PolygonMode::Line:
+		polyMode = VK_POLYGON_MODE_LINE;
+		break;
+	case PolygonMode::Point:
+		polyMode = VK_POLYGON_MODE_POINT;
+		break;
+	default:
+		polyMode = VK_POLYGON_MODE_FILL;
+		break;
+	}
+
+	return polyMode;
+}
+
 }

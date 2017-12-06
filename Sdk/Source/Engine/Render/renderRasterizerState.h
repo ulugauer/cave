@@ -13,46 +13,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halRasterizerState.h
-///       Hardware rasterizer state abstraction
+/// @file renderRasterizerState.h
+///       Render rasterizer state interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "halTypes.h"
-#include "Memory/allocatorBase.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
+/// forward declaration
+class RenderDevice;
+class HalRasterizerState;
+
 /**
-* @brief Describes setup of the rasterizer state
+* @brief Interface for vertex input setup
 */
-class HalRasterizerState
+class CAVE_INTERFACE RenderRasterizerState : public CaveRefCount
 {
 public:
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] rasterizerState	Rasterizer setup struct
+	* @param[in] renderDevice		Pointer to render device
+	* @param[in] rasterizerInfo		Rasterizer info
+	*
 	*/
-	HalRasterizerState(HalRasterizerSetup& rasterizerState);
-
-	/** @brief Destructor */
-	virtual ~HalRasterizerState();
+	RenderRasterizerState(RenderDevice& renderDevice, HalRasterizerSetup& rasterizerInfo);
+	/** @brief destructor */
+	virtual ~RenderRasterizerState();
 
 private:
-	HalRasterizerSetup _rasterizerState;	///< Rasterizer state
+	RenderDevice& _renderDevice;	///< Render device object
+	HalRasterizerState* _halRasterizerState;	///< Pointer to low level rasterizer state object
 };
 
 }
-
 /** @}*/
 

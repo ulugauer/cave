@@ -33,7 +33,8 @@ set(RENDER_SOURCE Render/renderInstance.h Render/renderInstance.cpp
 				  Render/renderVertexInput.h Render/renderVertexInput.cpp 
 				  Render/renderInputAssembly.h Render/renderInputAssembly.cpp 
 				  Render/renderViewportScissor.h Render/renderViewportScissor.cpp
-				  Render/renderLayerSection.h Render/renderLayerSection.cpp )
+				  Render/renderLayerSection.h Render/renderLayerSection.cpp 
+				  Render/renderRasterizerState.h Render/renderRasterizerState.cpp )
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h

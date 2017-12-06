@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanVertexInput.h"
 #include "vulkanInputAssembly.h"
 #include "vulkanViewportAndScissor.h"
+#include "vulkanRasterizerState.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -242,6 +243,16 @@ HalViewportAndScissor* VulkanRenderDevice::CreateViewportAndScissor(HalViewport&
 	VulkanViewportAndScissor* viewportAndScissor = AllocateObject<VulkanViewportAndScissor>(*_pInstance->GetEngineAllocator(), this, viewport, scissor);
 
 	return viewportAndScissor;
+}
+
+HalRasterizerState* VulkanRenderDevice::CreateRasterizerState(HalRasterizerSetup& rasterizerStateInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanRasterizerState* rasterizerState = AllocateObject<VulkanRasterizerState>(*_pInstance->GetEngineAllocator(), this, rasterizerStateInfo);
+
+	return rasterizerState;
 }
 
 }
