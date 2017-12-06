@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanViewportAndScissor.h"
 #include "vulkanRasterizerState.h"
 #include "vulkanMultisample.h"
+#include "vulkanDepthStencil.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -264,6 +265,16 @@ HalMultisample* VulkanRenderDevice::CreateMultisampleState(HalMultisampleState& 
 	VulkanMultisample* multisampleState = AllocateObject<VulkanMultisample>(*_pInstance->GetEngineAllocator(), this, multisampleStateInfo);
 
 	return multisampleState;
+}
+
+HalDepthStencil* VulkanRenderDevice::CreateDepthStencilState(HalDepthStencilSetup& depthStencilInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanDepthStencil* depthStencilState = AllocateObject<VulkanDepthStencil>(*_pInstance->GetEngineAllocator(), this, depthStencilInfo);
+
+	return depthStencilState;
 }
 
 }

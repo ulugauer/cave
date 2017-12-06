@@ -127,6 +127,15 @@ public:
 	*/
 	HalMultisample* CreateMultisampleState(HalMultisampleState& multisampleStateInfo) override;
 
+	/**
+	* @brief Create a low level depth stencil state
+	*
+	* @param[in] depthStencilInfo	Depth Stencil setup info
+	*
+	* @return  DepthStencil abstraction interface
+	*/
+	HalDepthStencil* CreateDepthStencilState(HalDepthStencilSetup& depthStencilInfo) override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

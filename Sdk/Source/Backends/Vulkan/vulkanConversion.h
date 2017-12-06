@@ -91,6 +91,24 @@ public:
 	* @return Vulkan polygon mode
 	*/
 	static VkPolygonMode ConvertPolygonModeToVulkan(HalPolygonMode mode);
+
+	/**
+	* @brief Convert from generic stencil operation to vulkan stencil operation
+	*
+	* @param[in] op	Generic stencil operation
+	*
+	* @return Vulkan stencil operation
+	*/
+	static VkStencilOp ConvertStencilOpToVulkan(HalStencilOp op);
+
+	/**
+	* @brief Convert from generic compare operation to vulkan compare operation
+	*
+	* @param[in] compOp	Generic compare operation
+	*
+	* @return Vulkan compare operation
+	*/
+	static VkCompareOp ConvertDepthCompareOpToVulkan(HalCompareOp compOp);
 };
 
 }

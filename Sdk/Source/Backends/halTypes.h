@@ -192,6 +192,35 @@ enum class HalPolygonMode
 	Point = 2
 };
 
+/**
+*  @brief A strongly typed enum class representing stencil operations
+*/
+enum class HalStencilOp
+{
+	Keep = 0,
+	Zero,
+	Replace,
+	IncrementClamp,
+	DecrementClamp,
+	Invert,
+	IncrementWarp,
+	DecrementWarp,
+};
+
+/**
+*  @brief A strongly typed enum class representing depth compare operations
+*/
+enum class HalCompareOp
+{
+	Never = 0,
+	Less,
+	Equal,
+	LessEqual,
+	Greater,
+	NotEqual,
+	GreaterEqual,
+	Always
+};
 
 /**
 * @brief Rasterizer state setup
@@ -245,6 +274,59 @@ struct CAVE_INTERFACE HalMultisampleState
 		_pSampleMask = nullptr;
 		_rasterizationSamples = HalSampleCount::SampleCount1;
 		_sampleShadingEnable = false;
+	}
+};
+
+/**
+* @brief Stencil operation state setup
+*/
+struct HalStencilOpSetup
+{
+	HalStencilOp _failOp;		///< Operation on failing stencil test samples
+	HalStencilOp _passOp;		///< Operation on passing stencil test samples
+	HalStencilOp _depthFailOp;	///< Operation on failing depth test samples
+	HalStencilOp _depthPassOp;	///< Operation on passing depth test samples
+	HalCompareOp _compareOp;	///< Stencil compare operation
+	uint32_t _compareMask;		///< Bitmaks of tested stencil values
+	uint32_t _writeMask;		///< Bitmask of stencil values written to framebuffer
+	uint32_t _reference;		///< Reference value used for comparisons
+
+	HalStencilOpSetup()
+	{
+		_failOp = HalStencilOp::Keep;
+		_passOp = HalStencilOp::Keep;
+		_depthFailOp = HalStencilOp::Keep;
+		_depthPassOp = HalStencilOp::Keep;
+		_compareMask = 0;
+		_writeMask = 0;
+		_reference = 0;
+	}
+};
+
+/**
+* @brief Depth stencil state setup
+*/
+struct HalDepthStencilSetup
+{
+	bool _depthTestEnable;			///< Enable depth testing
+	bool _depthWriteEnable;			///< Enable depth writes
+	HalCompareOp _depthCompareOp;	///< Depth compare operation
+	bool _depthBoundsTestEnable;	///< Enable depth bounds testing
+	bool _stencilTestEnable;		///< Enable stencil testing
+	HalStencilOpSetup _front;		///< Front face stencil parameter setup
+	HalStencilOpSetup _back;		///< Back face stencil parameter setup
+	float _minDepthBounds;			///< Min depth value used in depth bound test
+	float _maxDepthBounds;			///< Min depth value used in depth bound test
+
+	HalDepthStencilSetup()
+	{
+		_depthTestEnable = false;
+		_depthWriteEnable = false;
+		_depthCompareOp = HalCompareOp::Never;
+		_depthBoundsTestEnable = false;
+		_stencilTestEnable = false;
+		_minDepthBounds = 0;
+		_maxDepthBounds = 1;
 	}
 };
 

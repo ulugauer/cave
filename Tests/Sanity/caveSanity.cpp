@@ -19,6 +19,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderLayerSection.h"
 #include "Render/renderRasterizerState.h"
 #include "Render/renderMultisample.h"
+#include "Render/renderDepthStencil.h"
 
 #include <iostream>
 #include <sstream>
@@ -157,12 +158,16 @@ int main(int argc, char* argv[])
 	// multisample state
 	HalMultisampleState multisampleInfo;
 	RenderMultisample* multisampleState = renderDevice->CreateMultisampleState(multisampleInfo);
+	// depth stencil state
+	HalDepthStencilSetup depthStencilInfo;
+	RenderDepthStencil* depthStencilState = renderDevice->CreateDepthStencilState(depthStencilInfo);
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
 
+	renderDevice->ReleaseDepthStencilState(depthStencilState);
 	renderDevice->ReleaseMultisampleState(multisampleState);
 	renderDevice->ReleaseRasterizerState(rasterizerState);
 	renderDevice->ReleaseInputAssembly(inputAssembly);

@@ -177,4 +177,82 @@ VulkanTypeConversion::ConvertPolygonModeToVulkan(HalPolygonMode mode)
 	return polyMode;
 }
 
+VkStencilOp 
+VulkanTypeConversion::ConvertStencilOpToVulkan(HalStencilOp op)
+{
+	VkStencilOp stencilOp = VK_STENCIL_OP_KEEP;
+
+	switch (op)
+	{
+	case HalStencilOp::Keep:
+		stencilOp = VK_STENCIL_OP_KEEP;
+		break;
+	case HalStencilOp::Zero:
+		stencilOp = VK_STENCIL_OP_ZERO;
+		break;
+	case HalStencilOp::Replace:
+		stencilOp = VK_STENCIL_OP_REPLACE;
+		break;
+	case HalStencilOp::IncrementClamp:
+		stencilOp = VK_STENCIL_OP_INCREMENT_AND_CLAMP;
+		break;
+	case HalStencilOp::DecrementClamp:
+		stencilOp = VK_STENCIL_OP_DECREMENT_AND_CLAMP;
+		break;
+	case HalStencilOp::Invert:
+		stencilOp = VK_STENCIL_OP_INVERT;
+		break;
+	case HalStencilOp::IncrementWarp:
+		stencilOp = VK_STENCIL_OP_INCREMENT_AND_WRAP;
+		break;
+	case HalStencilOp::DecrementWarp:
+		stencilOp = VK_STENCIL_OP_DECREMENT_AND_WRAP;
+		break;
+	default:
+		stencilOp = VK_STENCIL_OP_KEEP;
+		break;
+	}
+
+	return stencilOp;
+}
+
+VkCompareOp 
+VulkanTypeConversion::ConvertDepthCompareOpToVulkan(HalCompareOp compOp)
+{
+	VkCompareOp compareOp = VK_COMPARE_OP_NEVER;
+
+	switch (compOp)
+	{
+	case HalCompareOp::Never:
+		compareOp = VK_COMPARE_OP_NEVER;
+		break;
+	case HalCompareOp::Less:
+		compareOp = VK_COMPARE_OP_LESS;
+		break;
+	case HalCompareOp::Equal:
+		compareOp = VK_COMPARE_OP_EQUAL;
+		break;
+	case HalCompareOp::LessEqual:
+		compareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+		break;
+	case HalCompareOp::Greater:
+		compareOp = VK_COMPARE_OP_GREATER;
+		break;
+	case HalCompareOp::NotEqual:
+		compareOp = VK_COMPARE_OP_NOT_EQUAL;
+		break;
+	case HalCompareOp::GreaterEqual:
+		compareOp = VK_COMPARE_OP_GREATER_OR_EQUAL;
+		break;
+	case HalCompareOp::Always:
+		compareOp = VK_COMPARE_OP_ALWAYS;
+		break;
+	default:
+		compareOp = VK_COMPARE_OP_NEVER;
+		break;
+	}
+
+	return compareOp;
+}
+
 }

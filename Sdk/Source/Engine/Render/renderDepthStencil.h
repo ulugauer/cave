@@ -13,47 +13,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halDepthStencil.h
-///       Hardware depth stencil abstraction
+/// @file renderDepthStencil.h
+///       Render depth stencil state interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "halTypes.h"
-#include "Memory/allocatorBase.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
+/// forward declaration
+class RenderDevice;
+class HalDepthStencil;
 
 /**
-* @brief Describes the depth stencil setup
+* @brief Interface for depth stencil setup
 */
-class HalDepthStencil
+class CAVE_INTERFACE RenderDepthStencil : public CaveRefCount
 {
 public:
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] depthStencilSetup	Depth Stencil setup struct
+	* @param[in] renderDevice		Pointer to render device
+	* @param[in] depthStencilInfo	Depth stencil info
+	*
 	*/
-	HalDepthStencil(HalDepthStencilSetup& depthStencilSetup);
-
-	/** @brief Destructor */
-	virtual ~HalDepthStencil();
+	RenderDepthStencil(RenderDevice& renderDevice, HalDepthStencilSetup& depthStencilInfo);
+	/** @brief destructor */
+	virtual ~RenderDepthStencil();
 
 private:
-	HalDepthStencilSetup _depthStencilState;	///< Depth stencil state info
+	RenderDevice& _renderDevice;	///< Render device object
+	HalDepthStencil* _halDepthStencil;	///< Pointer to low level depth stencil state object
 };
 
 }
-
 /** @}*/
+
 

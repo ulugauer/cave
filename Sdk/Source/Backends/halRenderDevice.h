@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halViewportAndScissor.h"
 #include "halRasterizerState.h"
 #include "halMultisample.h"
+#include "halDepthStencil.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -121,6 +122,15 @@ public:
 	* @return  Multisample abstraction interface
 	*/
 	virtual HalMultisample* CreateMultisampleState(HalMultisampleState& multisampleStateInfo) = 0;
+
+	/**
+	* @brief Create a low level depth stencil state
+	*
+	* @param[in] depthStencilInfo	Depth Stencil setup info
+	*
+	* @return  DepthStencil abstraction interface
+	*/
+	virtual HalDepthStencil* CreateDepthStencilState(HalDepthStencilSetup& depthStencilInfo) = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

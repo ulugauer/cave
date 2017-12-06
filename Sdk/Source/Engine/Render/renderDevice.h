@@ -38,6 +38,7 @@ class RenderInputAssembly;
 struct RenderLayerSectionInfo;
 class RenderLayerSection;
 class RenderRasterizerState;
+class RenderDepthStencil;
 class EngineLog;
 class RenderMultisample;
 
@@ -174,6 +175,22 @@ public:
 	* @param[in] multisampleState	 RenderMultisample object to release
 	*/
 	void ReleaseMultisampleState(RenderMultisample* multisampleState);
+
+	/**
+	* @brief Create a depth stencil state object
+	*
+	* @param[in] depthStencilInfo	 Depth stencil setup info
+
+	* @return RenderDepthStencil object
+	*/
+	RenderDepthStencil* CreateDepthStencilState(HalDepthStencilSetup& depthStencilInfo);
+
+	/**
+	* @brief Release a multisample object
+	*
+	* @param[in] depthStencilState	 RenderDepthStencil object to release
+	*/
+	void ReleaseDepthStencilState(RenderDepthStencil* depthStencilState);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

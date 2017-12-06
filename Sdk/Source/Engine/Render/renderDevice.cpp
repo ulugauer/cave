@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderLayerSection.h"
 #include "renderRasterizerState.h"
 #include "renderMultisample.h"
+#include "renderDepthStencil.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -171,7 +172,6 @@ void RenderDevice::ReleaseRasterizerState(RenderRasterizerState* rasterizerState
 	}
 }
 
-
 RenderMultisample* RenderDevice::CreateMultisampleState(HalMultisampleState& multisampleInfo)
 {
 	RenderMultisample* multisampleState = AllocateObject<RenderMultisample>(*_pRenderInstance->GetEngineAllocator(), *this, multisampleInfo);
@@ -188,6 +188,25 @@ void RenderDevice::ReleaseMultisampleState(RenderMultisample* multisampleState)
 		int32_t refCount = multisampleState->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *multisampleState);
+	}
+}
+
+RenderDepthStencil* RenderDevice::CreateDepthStencilState(HalDepthStencilSetup& depthStencilInfo)
+{
+	RenderDepthStencil* depthStencilState = AllocateObject<RenderDepthStencil>(*_pRenderInstance->GetEngineAllocator(), *this, depthStencilInfo);
+	if (depthStencilState)
+		depthStencilState->IncrementUsageCount();
+
+	return depthStencilState;
+}
+
+void RenderDevice::ReleaseDepthStencilState(RenderDepthStencil* depthStencilState)
+{
+	if (depthStencilState)
+	{
+		int32_t refCount = depthStencilState->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *depthStencilState);
 	}
 }
 

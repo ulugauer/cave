@@ -11,49 +11,31 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file halDepthStencil.h
-///       Hardware depth stencil abstraction
+/// @file renderDepthStencil.cpp
+///       Render depth stencil state interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "renderDepthStencil.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halDepthStencil.h"
 
-#include <iostream>		// includes exception handling
-#include <memory>
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include <cassert>
 
 namespace cave
 {
-
-
-/**
-* @brief Describes the depth stencil setup
-*/
-class HalDepthStencil
+RenderDepthStencil::RenderDepthStencil(RenderDevice& renderDevice, HalDepthStencilSetup& depthStencilInfo)
+	: _renderDevice(renderDevice)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] depthStencilSetup	Depth Stencil setup struct
-	*/
-	HalDepthStencil(HalDepthStencilSetup& depthStencilSetup);
-
-	/** @brief Destructor */
-	virtual ~HalDepthStencil();
-
-private:
-	HalDepthStencilSetup _depthStencilState;	///< Depth stencil state info
-};
-
+	// Allocate low level object
+	_halDepthStencil = renderDevice.GetHalRenderDevice()->CreateDepthStencilState(depthStencilInfo);
+	assert(_halDepthStencil);
 }
 
-/** @}*/
+RenderDepthStencil::~RenderDepthStencil()
+{
+	if (_halDepthStencil)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halDepthStencil);
+}
 
+}
