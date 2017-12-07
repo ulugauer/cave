@@ -13,52 +13,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halRenderPass.h
-///       Hardware render pass abstraction
+/// @file renderRenderPass.h
+///       Render pass interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "halTypes.h"
-#include "Memory/allocatorBase.h"
-#include "Common/caveVector.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-///< forwards
-class HalRenderDevice;
+/// forward declaration
+class RenderDevice;
+class HalRenderPass;
 
 /**
-* @brief Describes a single render pass
+* @brief Interface for render pass setup
 */
-class HalRenderPass
+class CAVE_INTERFACE RenderPass : public CaveRefCount
 {
 public:
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice			Pointer to render device object
-	* @param[in] renderPassInfo	Color	Render pass create info
+	* @param[in] renderDevice		Pointer to render device
+	* @param[in] renderPassInfo	Render pass setup info
+	*
 	*/
-	HalRenderPass(HalRenderDevice* renderDevice, HalRenderPassInfo& renderPassInfo);
-
-	/** @brief Destructor */
-	virtual ~HalRenderPass();
+	RenderPass(RenderDevice& renderDevice, HalRenderPassInfo& renderPassInfo);
+	/** @brief destructor */
+	virtual ~RenderPass();
 
 private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
-	HalRenderPassInfo _renderPassInfo;	///< Hal render pass create info
+	RenderDevice& _renderDevice;	///< Render device object
+	HalRenderPass* _halRenderPass;	///< Pointer to low level render pass object
 };
 
 }
-
 /** @}*/
+
 

@@ -44,6 +44,7 @@ class RenderMultisample;
 class RenderColorBlend;
 class RenderDynamicState;
 class RenderPipelineLayout;
+class RenderPass;
 
 /**
 * Abstraction type of a device instance
@@ -82,6 +83,13 @@ public:
 	*
 	*/
 	void CreateSwapChain();
+
+	/**
+	* @brief Get swap chain image format
+	*
+	* @return Image format
+	*/
+	const HalImageFormat GetSwapChainImageFormat();
 
 	/**
 	* @brief Get Resource manager
@@ -246,6 +254,22 @@ public:
 	* @param[in] pipelineLayout	 RenderColorBlend object to release
 	*/
 	void ReleasePipelineLayout(RenderPipelineLayout* pipelineLayout);
+
+	/**
+	* @brief Create a render pass object
+	*
+	* @param[in] renderPassInfo		Render pass setup info
+	*
+	* @return RenderPass object
+	*/
+	RenderPass* CreateRenderPass(HalRenderPassInfo& renderPassInfo);
+
+	/**
+	* @brief Release a render pass object
+	*
+	* @param[in] renderPass	 RenderPass object to release
+	*/
+	void ReleaseRenderPass(RenderPass* renderPass);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

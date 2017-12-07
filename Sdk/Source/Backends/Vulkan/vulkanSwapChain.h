@@ -69,6 +69,13 @@ public:
 	*/
 	const VkExtent2D GetSwapChainImageExtend() const { return _swapChainExtent; }
 
+	/**
+	* @brief Get swap image format
+	*
+	* @return Image format
+	*/
+	const VkFormat GetSwapChainImageFormat() const { return _swapChainImageFormat; }
+
 private:
 	/**
 	* @brief Create a swap chain for the device

@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanInstance.h"
 #include "vulkanRenderDevice.h"
 #include "vulkanPhysicalDevice.h"
+#include "vulkanConversion.h"
 #include "vulkanSwapChain.h"
 #include "vulkanShader.h"
 #include "vulkanVertexInput.h"
@@ -29,6 +30,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanColorBlend.h"
 #include "vulkanDynamicState.h"
 #include "vulkanPipelineLayout.h"
+#include "vulkanRenderPass.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -210,6 +212,15 @@ void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
 	}
 }
 
+const HalImageFormat VulkanRenderDevice::GetSwapChainImageFormat()
+{
+	HalImageFormat format = HalImageFormat::Undefined;
+	if (_pSwapChain)
+		format = VulkanTypeConversion::ConvertImageFormatFromVulkan(_pSwapChain->GetSwapChainImageFormat());
+
+	return format;
+}
+
 HalShader* VulkanRenderDevice::CreateShader(ShaderType type, ShaderLanguage language)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
@@ -312,4 +323,13 @@ HalPipelineLayout* VulkanRenderDevice::CreatePipelineLayout(caveVector<HalDescri
 	return pipelineLayout;
 }
 
+HalRenderPass* VulkanRenderDevice::CreateRenderPass(HalRenderPassInfo& renderPassInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanRenderPass* renderPass = AllocateObject<VulkanRenderPass>(*_pInstance->GetEngineAllocator(), this, renderPassInfo);
+
+	return renderPass;
+}
 }

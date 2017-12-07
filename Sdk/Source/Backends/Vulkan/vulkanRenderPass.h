@@ -49,9 +49,17 @@ public:
 	/** @brief Destructor */
 	virtual ~VulkanRenderPass();
 
+	/**
+	* @brief Get renderpass object
+	*		 This function creates the object if not yet done
+	*
+	* @return Vulkan VkRenderPass object
+	*/
+	VkRenderPass GetRenderPass();
 
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
+	VkRenderPass _vkRenderPass;	///< Vulkan render pass handle
 	VkRenderPassCreateInfo  _vkRenderPassInfo;	///< Render pass create info
 };
 

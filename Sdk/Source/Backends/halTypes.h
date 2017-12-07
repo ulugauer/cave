@@ -36,6 +36,8 @@ enum class HalImageFormat
 	Undefined = 0,	///< Undefined format
 	R8G8B8A8UNorm = 37,
 	R8G8B8A8SNorm = 38,
+	B8G8R8A8UNorm = 44,
+	B8G8R8A8SNorm = 50,
 };
 
 /**
@@ -56,7 +58,7 @@ typedef uint32_t HalSampleCountFlags;	///< Combined sample count flags
 /**
 *  @brief A strongly typed enum class representing attachment load operations
 */
-enum class HalLoadOperation
+enum class HalAttachmentLoadOperation
 {
 	Load = 0,
 	Clear = 1,
@@ -66,7 +68,7 @@ enum class HalLoadOperation
 /**
 *  @brief A strongly typed enum class representing attachment store operations
 */
-enum class HalStoreOperation
+enum class HalAttachmentStoreOperation
 {
 	Store = 0,
 	DontCare = 1
@@ -85,7 +87,9 @@ enum class HalImageLayout
 	ShaderReadOnly = 5,
 	TransferSrc = 6,
 	TransferDst = 7,
-	Preinitialized = 8
+	Preinitialized = 8,
+	PresentSrcKHR = 9,
+	SharedPresentSrcKHR = 10
 };
 
 /**
@@ -504,6 +508,107 @@ struct CAVE_INTERFACE HalPushConstantRange
 	HalShaderStagesFlags _shaderStagesFlags; ///< Enabled shader stages
 	uint32_t _offset;	///< Range offset in bytes (must be a multiple of 4)
 	uint32_t _size;		///< Range size on bytes (must be a multiple of 4)
+};
+
+/**
+* @brief Renderpass attachment description
+*/
+struct CAVE_INTERFACE HalRenderPassAttachment
+{
+	HalImageFormat _format;		///< Image format
+	HalSampleCount _samples;	///< Sample count
+	HalAttachmentLoadOperation _loadOp;	///< Select load operation for color / depth
+	HalAttachmentStoreOperation _storeOp;	///< Select store operation for color / depth
+	HalAttachmentLoadOperation _loadStencilOp;	///< Select load operation for stencil
+	HalAttachmentStoreOperation _storeStencilOp;	///< Select store operation for stencil
+	HalImageLayout _initialLayout;	///< Layout at render pass start
+	HalImageLayout _finalLayout;	///< Layout at render pass end
+};
+
+/**
+* @brief Renderpass attachment reference
+*/
+struct CAVE_INTERFACE HalAttachmentReference
+{
+	uint32_t _attachment;		///< Reference index into HalRenderPassAttachment array
+	HalImageLayout _layout;		///< Layout at render pass time
+};
+
+/**
+* @brief Render sub-pass description
+*/
+struct CAVE_INTERFACE HalSubpassDescription
+{
+	HalPipelineBindPoints _pipelineBindPoint;				///< Pipeline bind point
+	uint32_t  _inputAttachmentCount;						///< Input attachment count
+	const HalAttachmentReference*    _pInputAttachments;	///< Input attachemnt array
+	uint32_t _colorAttachmentCount;							///< Color attachment count
+	const HalAttachmentReference* _pColorAttachments;		///< Color attachemnt array
+	const HalAttachmentReference* _pResolveAttachments;		///< Resolve attachemnt array same size as _pColorAttachments
+	const HalAttachmentReference* _pDepthStencilAttachment; ///< Depth attachemnt array (only one)
+	uint32_t _preserveAttachmentCount;						///< Preserve attachment count
+	const uint32_t* _pPreserveAttachments;					///< Preserve attachemnt array
+
+	HalSubpassDescription()
+	{
+		_pipelineBindPoint = HalPipelineBindPoints::Graphics;
+		_inputAttachmentCount = 0;
+		_pInputAttachments = nullptr;
+		_colorAttachmentCount = 0;
+		_pColorAttachments = nullptr;
+		_pResolveAttachments = nullptr;
+		_pDepthStencilAttachment = nullptr;
+		_preserveAttachmentCount = 0;
+		_pPreserveAttachments = nullptr;
+	}
+};
+
+/**
+* @brief Render sub-pass dependency description
+*/
+struct CAVE_INTERFACE HalSubpassDependency
+{
+	uint32_t _srcSubpass;					///< Subpass index of first subpass
+	uint32_t _dstSubpass;					///< Subpass index of second subpass
+	HalPipelineStageBits _srcStageMask;		///< Source stage mask
+	HalPipelineStageBits _dstStageMask;		///< Dest stage mask
+	HalAccessFlags _srcAccessMask;			///< Source access mask
+	HalAccessFlags _dstAccessMask;			///< Dest access mask
+	HalDependencyBits  _dependencyFlags;	///< Dependency flags
+
+	HalSubpassDependency()
+	{
+		_srcSubpass = 0;
+		_dstSubpass = 0;
+		_srcStageMask = HalPipelineStageBits::Host;
+		_dstStageMask = HalPipelineStageBits::Host;
+		_srcAccessMask = HalAccessBits::HostRead;
+		_dstAccessMask = HalAccessBits::HostRead;
+		_dependencyFlags = HalDependencyBits::DependencyByRegion;
+	}
+};
+
+/**
+* @brief Render pass create info
+*/
+struct CAVE_INTERFACE HalRenderPassInfo
+{
+	uint32_t _attachmentCount;						///< Render pass attachment count
+	const HalRenderPassAttachment* _pAttachments;	///< Render pass attachments
+	uint32_t _subpassCount;							///< Render sub-pass attachment count
+	const HalSubpassDescription* _pSubpasses;		///< Render sub-pass attachments
+	uint32_t _dependencyCount;						///< Render pass dependency attachment count
+	const HalSubpassDependency*  _pDependencies;	///< Render pass dependencies
+
+	HalRenderPassInfo()
+	{
+		_attachmentCount = 0;
+		_pAttachments = nullptr;
+		_subpassCount = 0;
+		_pSubpasses = nullptr;
+		_dependencyCount = 0;
+		_pDependencies = nullptr;
+	}
 };
 
 }

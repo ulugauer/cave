@@ -28,6 +28,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halColorBlend.h"
 #include "halDynamicState.h"
 #include "halPipelineLayout.h"
+#include "halRenderPass.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -165,6 +166,22 @@ public:
 	*/
 	virtual HalPipelineLayout* CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
 		, caveVector<HalPushConstantRange>& pushConstants) = 0;
+
+	/**
+	* @brief Create a low level render pass object
+	*
+	* @param[in] renderPassInfo		Render pass setup info
+	*
+	* @return  HalRenderPass abstraction interface
+	*/
+	virtual HalRenderPass* CreateRenderPass(HalRenderPassInfo& renderPassInfo) = 0;
+
+	/**
+	* @brief Get swap chain image format
+	*
+	* @return Image format
+	*/
+	virtual const HalImageFormat GetSwapChainImageFormat() = 0;
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object

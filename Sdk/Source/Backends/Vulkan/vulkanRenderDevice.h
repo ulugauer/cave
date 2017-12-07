@@ -167,6 +167,22 @@ public:
 	HalPipelineLayout* CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
 		, caveVector<HalPushConstantRange>& pushConstants) override;
 
+	/**
+	* @brief Create a low level render pass object
+	*
+	* @param[in] renderPassInfo	Render pass setup info
+	*
+	* @return  HalRenderPass abstraction interface
+	*/
+	HalRenderPass* CreateRenderPass(HalRenderPassInfo& renderPassInfo) override;
+
+	/**
+	* @brief Get swap chain image format
+	*
+	* @return Image format
+	*/
+	const HalImageFormat GetSwapChainImageFormat() override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

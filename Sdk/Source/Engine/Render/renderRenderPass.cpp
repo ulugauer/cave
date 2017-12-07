@@ -11,54 +11,31 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file halRenderPass.h
-///       Hardware render pass abstraction
+/// @file renderRenderPass.cpp
+///       Render pass interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
-#include "Common/caveVector.h"
+#include "renderRenderPass.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halRenderPass.h"
 
-#include <iostream>		// includes exception handling
-#include <memory>
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include <cassert>
 
 namespace cave
 {
-
-///< forwards
-class HalRenderDevice;
-
-/**
-* @brief Describes a single render pass
-*/
-class HalRenderPass
+RenderPass::RenderPass(RenderDevice& renderDevice, HalRenderPassInfo& renderPassInfo)
+	: _renderDevice(renderDevice)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice			Pointer to render device object
-	* @param[in] renderPassInfo	Color	Render pass create info
-	*/
-	HalRenderPass(HalRenderDevice* renderDevice, HalRenderPassInfo& renderPassInfo);
-
-	/** @brief Destructor */
-	virtual ~HalRenderPass();
-
-private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
-	HalRenderPassInfo _renderPassInfo;	///< Hal render pass create info
-};
-
+	// Allocate low level object
+	_halRenderPass = renderDevice.GetHalRenderDevice()->CreateRenderPass(renderPassInfo);
+	assert(_halRenderPass);
 }
 
-/** @}*/
+RenderPass::~RenderPass()
+{
+	if (_halRenderPass)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halRenderPass);
+}
 
+}

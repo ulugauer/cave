@@ -57,6 +57,15 @@ public:
 	static VkFormat ConvertImageFormatToVulkan(HalImageFormat imageFormat);
 
 	/**
+	* @brief Convert from vulkan image format to generic image format
+	*
+	* @param[in] imageFormat	Vulkan image format
+	*
+	* @return Generic image format
+	*/
+	static HalImageFormat ConvertImageFormatFromVulkan(VkFormat imageFormat);
+
+	/**
 	* @brief Convert from generic sample count to vulkan sample count
 	*
 	* @param[in] sampleCount	Generic sample count
@@ -163,6 +172,33 @@ public:
 	* @return Vulkan shader stage flags
 	*/
 	static VkShaderStageFlags ConvertBlendOpToVulkan(HalShaderStagesFlags flags);
+
+	/**
+	* @brief Convert from generic attachment load op to vulkan load op
+	*
+	* @param[in] loadOp		Generic attachment load operation
+	*
+	* @return Vulkan attachment load operation
+	*/
+	static VkAttachmentLoadOp ConvertAttachmentLoadOpToVulkan(HalAttachmentLoadOperation loadOp);
+
+	/**
+	* @brief Convert from generic attachment store op to vulkan store op
+	*
+	* @param[in] storeOp	Generic attachment store operation
+	*
+	* @return Vulkan attachment store operation
+	*/
+	static VkAttachmentStoreOp ConvertAttachmentStoreOpToVulkan(HalAttachmentStoreOperation storeOp);
+
+	/**
+	* @brief Convert from generic image layout to vulkan image layouyt
+	*
+	* @param[in] imageLayout	Generic image layout
+	*
+	* @return Vulkan image layout
+	*/
+	static VkImageLayout ConvertImageLayoutToVulkan(HalImageLayout imageLayout);
 };
 
 }

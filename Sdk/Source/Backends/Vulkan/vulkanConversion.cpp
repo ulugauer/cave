@@ -61,14 +61,47 @@ VulkanTypeConversion::ConvertImageFormatToVulkan(HalImageFormat imageFormat)
 	case HalImageFormat::R8G8B8A8SNorm:
 		vkImageFormat = VK_FORMAT_R8G8B8A8_SNORM;
 		break;
+	case HalImageFormat::B8G8R8A8UNorm:
+		vkImageFormat = VK_FORMAT_B8G8R8A8_UNORM;
+		break;
+	case HalImageFormat::B8G8R8A8SNorm:
+		vkImageFormat = VK_FORMAT_B8G8R8A8_SRGB;
+		break;
 	default:
 		vkImageFormat = VK_FORMAT_UNDEFINED;
 		assert(false);
 		break;
 	}
 
-	assert(vkImageFormat != VK_FORMAT_UNDEFINED);
 	return vkImageFormat;
+}
+
+HalImageFormat 
+VulkanTypeConversion::ConvertImageFormatFromVulkan(VkFormat imageFormat)
+{
+	HalImageFormat format = HalImageFormat::Undefined;
+	
+	switch (imageFormat)
+	{
+	case VK_FORMAT_R8G8B8A8_UNORM:
+		format = HalImageFormat::R8G8B8A8UNorm;
+		break;
+	case VK_FORMAT_R8G8B8A8_SNORM:
+		format = HalImageFormat::R8G8B8A8SNorm;
+		break;
+	case VK_FORMAT_B8G8R8A8_UNORM:
+		format = HalImageFormat::B8G8R8A8UNorm;
+		break;
+	case VK_FORMAT_B8G8R8A8_SRGB:
+		format = HalImageFormat::B8G8R8A8SNorm;
+		break;
+	default:
+		format = HalImageFormat::Undefined;
+		assert(false);
+		break;
+	}
+
+	return format;
 }
 
 VkSampleCountFlagBits 
@@ -512,6 +545,102 @@ VulkanTypeConversion::ConvertBlendOpToVulkan(HalShaderStagesFlags flags)
 
 	assert(shaderStageFlags);
 	return shaderStageFlags;
+}
+
+VkAttachmentLoadOp 
+VulkanTypeConversion::ConvertAttachmentLoadOpToVulkan(HalAttachmentLoadOperation loadOp)
+{
+	VkAttachmentLoadOp vkLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+
+	switch (loadOp)
+	{
+	case HalAttachmentLoadOperation::Clear:
+		vkLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		break;
+	case HalAttachmentLoadOperation::DontCare:
+		vkLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		break;
+	case HalAttachmentLoadOperation::Load:
+		vkLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+		break;
+	default:
+		vkLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		assert(false);
+		break;
+	}
+
+	return vkLoadOp;
+}
+
+VkAttachmentStoreOp 
+VulkanTypeConversion::ConvertAttachmentStoreOpToVulkan(HalAttachmentStoreOperation storeOp)
+{
+	VkAttachmentStoreOp vkStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+	switch (storeOp)
+	{
+	case HalAttachmentStoreOperation::DontCare:
+		vkStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		break;
+	case HalAttachmentStoreOperation::Store:
+		vkStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
+		break;
+	default:
+		vkStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		assert(false);
+		break;
+	}
+
+	return vkStoreOp;
+}
+
+VkImageLayout 
+VulkanTypeConversion::ConvertImageLayoutToVulkan(HalImageLayout imageLayout)
+{
+	VkImageLayout vkImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+	switch (imageLayout)
+	{
+	case HalImageLayout::Undefined:
+		vkImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		break;
+	case HalImageLayout::General:
+		vkImageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		break;
+	case HalImageLayout::ColorAttachment:
+		vkImageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		break;
+	case HalImageLayout::DepthStencilAttachment:
+		vkImageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		break;
+	case HalImageLayout::DepthStencilReadOnly:
+		vkImageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+		break;
+	case HalImageLayout::ShaderReadOnly:
+		vkImageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		break;
+	case HalImageLayout::TransferSrc:
+		vkImageLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+		break;
+	case HalImageLayout::TransferDst:
+		vkImageLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		break;
+	case HalImageLayout::Preinitialized:
+		vkImageLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+		break;
+	case HalImageLayout::PresentSrcKHR:
+		vkImageLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		break;
+	case HalImageLayout::SharedPresentSrcKHR:
+		vkImageLayout = VK_IMAGE_LAYOUT_SHARED_PRESENT_KHR;
+		break;
+	default:
+		vkImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		assert(false);
+		break;
+	}
+
+	return vkImageLayout;
 }
 
 }

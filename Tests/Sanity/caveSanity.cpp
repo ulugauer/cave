@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderColorBlend.h"
 #include "Render/renderDynamicState.h"
 #include "Render/renderPipelineLayout.h"
+#include "Render/renderRenderPass.h"
 
 #include <iostream>
 #include <sstream>
@@ -180,6 +181,31 @@ int main(int argc, char* argv[])
 	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(renderDevice->GetEngineAllocator());
 	caveVector<HalPushConstantRange> pushConstants(renderDevice->GetEngineAllocator());
 	RenderPipelineLayout* pipelineLayout = renderDevice->CreatePipelineLayout(descriptorSetLayouts, pushConstants);
+	// render pass
+	HalRenderPassAttachment renderAttachment;
+	renderAttachment._format = renderDevice->GetSwapChainImageFormat();
+	renderAttachment._samples = HalSampleCount::SampleCount1;
+	renderAttachment._loadOp = HalAttachmentLoadOperation::Clear;
+	renderAttachment._storeOp = HalAttachmentStoreOperation::Store;
+	renderAttachment._loadStencilOp = HalAttachmentLoadOperation::DontCare;
+	renderAttachment._storeStencilOp = HalAttachmentStoreOperation::DontCare;
+	renderAttachment._initialLayout = HalImageLayout::Undefined;
+	renderAttachment._finalLayout = HalImageLayout::PresentSrcKHR;
+	HalAttachmentReference attachRef;
+	attachRef._attachment = 0;
+	attachRef._layout = HalImageLayout::ColorAttachment;
+	HalSubpassDescription subpassDesc;
+	subpassDesc._pipelineBindPoint = HalPipelineBindPoints::Graphics;
+	subpassDesc._colorAttachmentCount = 1;
+	subpassDesc._pColorAttachments = &attachRef;
+	HalRenderPassInfo renderPassInfo;
+	renderPassInfo._attachmentCount = 1;
+	renderPassInfo._pAttachments = &renderAttachment;
+	renderPassInfo._subpassCount = 1;
+	renderPassInfo._pSubpasses = &subpassDesc;
+	renderPassInfo._dependencyCount = 0;
+	renderPassInfo._pDependencies = nullptr;
+	RenderPass* renderPass = renderDevice->CreateRenderPass(renderPassInfo);
 
 	do {
 
@@ -187,6 +213,7 @@ int main(int argc, char* argv[])
 	} while (frontend->HandleWindowMessage());
 
 	renderDevice->ReleasePipelineLayout(pipelineLayout);
+	renderDevice->ReleaseRenderPass(renderPass);
 	renderDevice->ReleaseDynamicState(dynamicState);
 	renderDevice->ReleaseColorBlendState(colorBlendState);
 	renderDevice->ReleaseDepthStencilState(depthStencilState);

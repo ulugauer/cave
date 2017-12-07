@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderColorBlend.h"
 #include "renderDynamicState.h"
 #include "renderPipelineLayout.h"
+#include "renderRenderPass.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -103,6 +104,15 @@ void RenderDevice::CreateSwapChain()
 		std::string msg(e.what());
 		throw EngineError(msg);
 	}
+}
+
+const HalImageFormat RenderDevice::GetSwapChainImageFormat()
+{
+	HalImageFormat format = HalImageFormat::Undefined;
+	if (_pHalRenderDevice)
+		format = _pHalRenderDevice->GetSwapChainImageFormat();
+
+	return format;
 }
 
 RenderVertexInput* RenderDevice::CreateVertexInput()
@@ -269,6 +279,25 @@ void RenderDevice::ReleasePipelineLayout(RenderPipelineLayout* pipelineLayout)
 		int32_t refCount = pipelineLayout->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *pipelineLayout);
+	}
+}
+
+RenderPass* RenderDevice::CreateRenderPass(HalRenderPassInfo& renderPassInfo)
+{
+	RenderPass* renderPass = AllocateObject<RenderPass>(*_pRenderInstance->GetEngineAllocator(), *this, renderPassInfo);
+	if (renderPass)
+		renderPass->IncrementUsageCount();
+
+	return renderPass;
+}
+
+void RenderDevice::ReleaseRenderPass(RenderPass* renderPass)
+{
+	if (renderPass)
+	{
+		int32_t refCount = renderPass->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *renderPass);
 	}
 }
 
