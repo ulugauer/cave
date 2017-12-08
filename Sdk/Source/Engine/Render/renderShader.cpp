@@ -102,7 +102,11 @@ bool RenderShader::CompileShader()
 	if (!_halShader || !_source || !_sourceSize)
 		return false;
 
-	return _halShader->CompileShader(_source, _sourceSize);
+	bool success =  _halShader->CompileShader(_source, _sourceSize);
+	if (!success)
+		_renderDevice.GetEngineLog()->Error("Error: Failed to compile shader");
+
+	return success;
 }
 
 }

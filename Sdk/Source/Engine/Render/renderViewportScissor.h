@@ -52,6 +52,13 @@ public:
 	/** @brief copy constructor */
 	virtual ~RenderViewportScissor();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalViewportAndScissor handle
+	*/
+	HalViewportAndScissor* GetHalHandle() { return _halViewportAndScissor; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalViewportAndScissor* _halViewportAndScissor;	///< Pointer to low level viewport and scissor object

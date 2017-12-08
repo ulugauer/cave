@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderDynamicState.h"
 #include "Render/renderPipelineLayout.h"
 #include "Render/renderRenderPass.h"
+#include "Render/renderGraphicsPipeline.h"
 
 #include <iostream>
 #include <sstream>
@@ -206,12 +207,31 @@ int main(int argc, char* argv[])
 	renderPassInfo._dependencyCount = 0;
 	renderPassInfo._pDependencies = nullptr;
 	RenderPass* renderPass = renderDevice->CreateRenderPass(renderPassInfo);
+	// render graphics pipeline
+	RenderGraphicsPipelineInfo grpahicsPipelineInfo;
+	grpahicsPipelineInfo._material = &material;
+	grpahicsPipelineInfo._vertexInput = vertexInput;
+	grpahicsPipelineInfo._inputAssembly = inputAssembly;
+	grpahicsPipelineInfo._viewport = layerSection->GetViewport();
+	grpahicsPipelineInfo._raterizer = rasterizerState;
+	grpahicsPipelineInfo._multisample = multisampleState;
+	grpahicsPipelineInfo._depthStencil = nullptr;
+	grpahicsPipelineInfo._colorBlend = colorBlendState;
+	grpahicsPipelineInfo._dynamicState = nullptr;
+	grpahicsPipelineInfo._layout = pipelineLayout;
+	grpahicsPipelineInfo._renderPass = renderPass;
+	grpahicsPipelineInfo._subpass = 0;
+	grpahicsPipelineInfo._basePipelineIndex = -1;
+	grpahicsPipelineInfo._basePipelineHandle = nullptr;
+	RenderGraphicsPipeline* graphicsPipeline = renderDevice->CreateGraphicsPipeline(grpahicsPipelineInfo);
+	graphicsPipeline->Update();
 
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
 
+	renderDevice->ReleaseGraphicsPipeline(graphicsPipeline);
 	renderDevice->ReleasePipelineLayout(pipelineLayout);
 	renderDevice->ReleaseRenderPass(renderPass);
 	renderDevice->ReleaseDynamicState(dynamicState);

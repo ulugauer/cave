@@ -29,6 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halDynamicState.h"
 #include "halPipelineLayout.h"
 #include "halRenderPass.h"
+#include "halGraphicsPipeline.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -175,6 +176,15 @@ public:
 	* @return  HalRenderPass abstraction interface
 	*/
 	virtual HalRenderPass* CreateRenderPass(HalRenderPassInfo& renderPassInfo) = 0;
+
+	/**
+	* @brief Create a graphics pipeline object
+	*
+	* @param[in] graphicsPipelineInfo	Graphics pipeline setup struct
+	*
+	* @return  HalGraphicsPipeline abstraction interface
+	*/
+	virtual HalGraphicsPipeline* CreateGraphicsPipeline(HalGraphicsPipelineInfo& graphicsPipelineInfo) = 0;
 
 	/**
 	* @brief Get swap chain image format

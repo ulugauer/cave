@@ -52,6 +52,13 @@ public:
 	/** @brief destructor */
 	virtual ~RenderRasterizerState();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalViewportAndScissor handle
+	*/
+	HalRasterizerState* GetHalHandle() { return _halRasterizerState; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalRasterizerState* _halRasterizerState;	///< Pointer to low level rasterizer state object

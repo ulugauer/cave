@@ -92,6 +92,13 @@ public:
 	*/
 	bool CompileShader();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalShader handle
+	*/
+	HalShader* GetHalHandle() { return _halShader; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalShader* _halShader;	///< Pointer to low level shader object

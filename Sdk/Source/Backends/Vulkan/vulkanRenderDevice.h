@@ -177,6 +177,15 @@ public:
 	HalRenderPass* CreateRenderPass(HalRenderPassInfo& renderPassInfo) override;
 
 	/**
+	* @brief Create a low level graphics pipeline object
+	*
+	* @param[in] graphicsPipelineInfo	Graphics pipeline setup struct
+	*
+	* @return  HalGraphicsPipeline abstraction interface
+	*/
+	HalGraphicsPipeline* CreateGraphicsPipeline(HalGraphicsPipelineInfo& graphicsPipelineInfo) override;
+
+	/**
 	* @brief Get swap chain image format
 	*
 	* @return Image format

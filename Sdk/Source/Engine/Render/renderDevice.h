@@ -45,6 +45,8 @@ class RenderColorBlend;
 class RenderDynamicState;
 class RenderPipelineLayout;
 class RenderPass;
+struct RenderGraphicsPipelineInfo;
+class RenderGraphicsPipeline;
 
 /**
 * Abstraction type of a device instance
@@ -270,6 +272,22 @@ public:
 	* @param[in] renderPass	 RenderPass object to release
 	*/
 	void ReleaseRenderPass(RenderPass* renderPass);
+
+	/**
+	* @brief Create a graphics pipeline object
+	*
+	* @param[in] graphicsPipelineInfo	Graphics pipeline setup struct
+	*
+	* @return RenderGraphicsPipeline object
+	*/
+	RenderGraphicsPipeline* CreateGraphicsPipeline(RenderGraphicsPipelineInfo& graphicsPipelineInfo);
+
+	/**
+	* @brief Release a graphics pipeline object
+	*
+	* @param[in] graphicsPipeline	 Graphics pipeline object to release
+	*/
+	void ReleaseGraphicsPipeline(RenderGraphicsPipeline* graphicsPipeline);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

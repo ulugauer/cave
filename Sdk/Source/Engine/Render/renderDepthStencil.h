@@ -52,6 +52,13 @@ public:
 	/** @brief destructor */
 	virtual ~RenderDepthStencil();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalDepthStencil handle
+	*/
+	HalDepthStencil* GetHalHandle() { return _halDepthStencil; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalDepthStencil* _halDepthStencil;	///< Pointer to low level depth stencil state object

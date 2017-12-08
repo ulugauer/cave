@@ -37,6 +37,8 @@ RenderMaterial::~RenderMaterial()
 
 RenderMaterial::RenderMaterial(const RenderMaterial& rhs)
 	: _renderDevice(rhs._renderDevice)
+	, _vertexShader(rhs._vertexShader)
+	, _fragmentShader(rhs._fragmentShader)
 {
 	_materialData = rhs._materialData;
 }
@@ -51,5 +53,12 @@ RenderMaterial& RenderMaterial::operator=(const RenderMaterial& rhs)
 	return *this;
 }
 
+void RenderMaterial::Update()
+{
+	if (_vertexShader)
+		_vertexShader->CompileShader();
+	if (_fragmentShader)
+		_fragmentShader->CompileShader();
+}
 
 }

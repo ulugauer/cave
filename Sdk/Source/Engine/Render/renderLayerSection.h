@@ -63,6 +63,13 @@ public:
 	/** @brief copy constructor */
 	virtual ~RenderLayerSection();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalViewportAndScissor handle
+	*/
+	RenderViewportScissor* GetViewport() { return &_renderViewportAndScissor; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	RenderLayerSectionInfo _renderSection;	///< Render section info

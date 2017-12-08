@@ -57,6 +57,13 @@ public:
 	/** @brief destructor */
 	virtual ~RenderPipelineLayout();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalPipelineLayout handle
+	*/
+	HalPipelineLayout* GetHalHandle() { return _halPipelineLayout; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalPipelineLayout* _halPipelineLayout;	///< Pointer to low level pipeline layout object

@@ -49,11 +49,11 @@ public:
 	virtual ~VulkanDynamicState();
 
 	/**
-	* @brief Get color blend state info
+	* @brief Get dynamic state info
 	*
-	* @return Vulkan VkPipelineColorBlendStateCreateInfo
+	* @return Vulkan VkPipelineDynamicStateCreateInfo
 	*/
-	const VkPipelineDynamicStateCreateInfo& GetColorBlendStateInfo() const
+	const VkPipelineDynamicStateCreateInfo& GetDynamicStateInfo() const
 	{
 		return _dynamicStateInfo;
 	}

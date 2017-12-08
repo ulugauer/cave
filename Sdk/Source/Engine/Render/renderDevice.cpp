@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderDynamicState.h"
 #include "renderPipelineLayout.h"
 #include "renderRenderPass.h"
+#include "renderGraphicsPipeline.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 
@@ -298,6 +299,25 @@ void RenderDevice::ReleaseRenderPass(RenderPass* renderPass)
 		int32_t refCount = renderPass->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *renderPass);
+	}
+}
+
+RenderGraphicsPipeline* RenderDevice::CreateGraphicsPipeline(RenderGraphicsPipelineInfo& graphicsPipelineInfo)
+{
+	RenderGraphicsPipeline* graphicsPipeline = AllocateObject<RenderGraphicsPipeline>(*_pRenderInstance->GetEngineAllocator(), *this, graphicsPipelineInfo);
+	if (graphicsPipeline)
+		graphicsPipeline->IncrementUsageCount();
+
+	return graphicsPipeline;
+}
+
+void RenderDevice::ReleaseGraphicsPipeline(RenderGraphicsPipeline* graphicsPipeline)
+{
+	if (graphicsPipeline)
+	{
+		int32_t refCount = graphicsPipeline->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *graphicsPipeline);
 	}
 }
 

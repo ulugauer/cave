@@ -165,6 +165,9 @@ VulkanRenderPass::~VulkanRenderPass()
 		_pDevice->GetEngineAllocator()->Deallocate((void *)_vkRenderPassInfo.pAttachments);
 	if (_vkRenderPassInfo.pSubpasses != nullptr)
 		_pDevice->GetEngineAllocator()->Deallocate((void *)_vkRenderPassInfo.pSubpasses);
+
+	if (_vkRenderPass != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkDestroyRenderPass(_pDevice->GetDeviceHandle(), _vkRenderPass, nullptr);
 }
 
 VkRenderPass VulkanRenderPass::GetRenderPass()

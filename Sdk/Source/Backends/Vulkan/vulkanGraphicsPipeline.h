@@ -13,58 +13,66 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file renderRenderPass.h
-///       Render pass interface
+/// @file vulkanGraphicsPipeline.h
+///       Vulkan graphics pipeline
 
-#include "Common/caveRefCount.h"
-#include "Memory/allocatorGlobal.h"
-#include "halTypes.h"
+#include "halGraphicsPipeline.h"
 
-#include <memory>
+#include "vulkan.h"
 
-/** \addtogroup engine
+/** \addtogroup backend
 *  @{
-*		This module contains all code related to the engine
+*
 */
 
 namespace cave
 {
 
-/// forward declaration
-class RenderDevice;
-class HalRenderPass;
+///< forwards
+class VulkanRenderDevice;
 
 /**
-* @brief Interface for render pass setup
+* @brief Vulkan layout sets
 */
-class CAVE_INTERFACE RenderPass : public CaveRefCount
+class VulkanGraphicsPipeline : public HalGraphicsPipeline
 {
 public:
-
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device
-	* @param[in] renderPassInfo	Render pass setup info
-	*
+	* @param[in] device					Pointer to device object
+	* @param[in] graphicsPipelineInfo	Graphics pipeline setup struct
 	*/
-	RenderPass(RenderDevice& renderDevice, HalRenderPassInfo& renderPassInfo);
-	/** @brief destructor */
-	virtual ~RenderPass();
+	VulkanGraphicsPipeline(VulkanRenderDevice* device
+		, HalGraphicsPipelineInfo& graphicsPipelineInfo);
+
+	/** @brief Destructor */
+	virtual ~VulkanGraphicsPipeline();
 
 	/**
-	* @brief Get low level HAL handle
+	* @brief Generate low level graphics pipeline object
 	*
-	* @return HalRenderPass handle
+	* @return true if  successful
 	*/
-	HalRenderPass* GetHalHandle() { return _halRenderPass; }
+	bool CompilePipeline() override;
+
+	/**
+	* @brief Get graphics pipeline object
+	*		 This function creates the object if not yet done
+	*
+	* @return Vulkan VkPipeline object
+	*/
+	VkPipeline GetGraphicsPipeline();
 
 private:
-	RenderDevice& _renderDevice;	///< Render device object
-	HalRenderPass* _halRenderPass;	///< Pointer to low level render pass object
+	VulkanRenderDevice* _pDevice;	///< Pointer to device object
+	VkPipeline _vkPipeline;	///< Vulkan pipeline handle
+	VkGraphicsPipelineCreateInfo  _vkGraphicsPipelineInfo;	///< Vulkan graphics pipeline create info
 };
 
 }
+
 /** @}*/
+
 
 

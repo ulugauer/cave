@@ -42,13 +42,13 @@ VulkanViewportAndScissor::VulkanViewportAndScissor(VulkanRenderDevice* device, H
 	_vkScissorRect2D.extent.height = scissor._extend._y;
 
 	// Setup viewport and scissor state
-	_ViewportStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	_ViewportStateInfo.pNext = nullptr;
-	_ViewportStateInfo.flags = 0;
-	_ViewportStateInfo.viewportCount = 1;
-	_ViewportStateInfo.pViewports = &_vkViewport;
-	_ViewportStateInfo.scissorCount = 1;
-	_ViewportStateInfo.pScissors = &_vkScissorRect2D;
+	_vkViewportStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	_vkViewportStateInfo.pNext = nullptr;
+	_vkViewportStateInfo.flags = 0;
+	_vkViewportStateInfo.viewportCount = 1;
+	_vkViewportStateInfo.pViewports = &_vkViewport;
+	_vkViewportStateInfo.scissorCount = 1;
+	_vkViewportStateInfo.pScissors = &_vkScissorRect2D;
 }
 
 VulkanViewportAndScissor::~VulkanViewportAndScissor()

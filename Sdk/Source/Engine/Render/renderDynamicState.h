@@ -54,6 +54,13 @@ public:
 	/** @brief destructor */
 	virtual ~RenderDynamicState();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalColorBlend handle
+	*/
+	HalDynamicState* GetHalHandle() { return _halDynamicState; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalDynamicState* _halDynamicState;	///< Pointer to low level dynamic state object

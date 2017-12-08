@@ -11,60 +11,24 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file renderRenderPass.h
-///       Render pass interface
+/// @file halGraphicsPipeline.cpp
+///       Hardware graphic pipeline abstraction
 
-#include "Common/caveRefCount.h"
-#include "Memory/allocatorGlobal.h"
-#include "halTypes.h"
-
-#include <memory>
-
-/** \addtogroup engine
-*  @{
-*		This module contains all code related to the engine
-*/
+#include "halGraphicsPipeline.h"
+#include "halRenderDevice.h"
 
 namespace cave
 {
 
-/// forward declaration
-class RenderDevice;
-class HalRenderPass;
-
-/**
-* @brief Interface for render pass setup
-*/
-class CAVE_INTERFACE RenderPass : public CaveRefCount
+HalGraphicsPipeline::HalGraphicsPipeline(HalRenderDevice* renderDevice, HalGraphicsPipelineInfo& )
+	: _pDevice(renderDevice)
 {
-public:
+}
 
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice		Pointer to render device
-	* @param[in] renderPassInfo	Render pass setup info
-	*
-	*/
-	RenderPass(RenderDevice& renderDevice, HalRenderPassInfo& renderPassInfo);
-	/** @brief destructor */
-	virtual ~RenderPass();
-
-	/**
-	* @brief Get low level HAL handle
-	*
-	* @return HalRenderPass handle
-	*/
-	HalRenderPass* GetHalHandle() { return _halRenderPass; }
-
-private:
-	RenderDevice& _renderDevice;	///< Render device object
-	HalRenderPass* _halRenderPass;	///< Pointer to low level render pass object
-};
+HalGraphicsPipeline::~HalGraphicsPipeline()
+{
+	
+}
 
 }
-/** @}*/
-
-

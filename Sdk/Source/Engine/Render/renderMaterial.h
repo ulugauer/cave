@@ -100,6 +100,28 @@ public:
 	RenderMaterial& operator=(const RenderMaterial& rhs);
 
 	/**
+	* @brief Return all set stages
+	*
+	* @return stage count
+	*/
+	uint32_t GetStageCount()
+	{
+		uint32_t count = 0;
+		if (_vertexShader) ++count;
+		if (_fragmentShader) ++count;
+
+		return count;
+	}
+
+	/**
+	* @brief Update material
+	*		 If not yet created this creata the program object
+	*
+	* @return none
+	*/
+	void Update();
+
+	/**
 	* @brief Set ambient color
 	*
 	* @param[in] ambient	Ambient color vector

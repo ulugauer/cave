@@ -56,6 +56,13 @@ public:
 	/** @brief destructor */
 	virtual ~RenderColorBlend();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalColorBlend handle
+	*/
+	HalColorBlend* GetHalHandle() { return _halColorBlend; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalColorBlend* _halColorBlend;	///< Pointer to low level color blend state object

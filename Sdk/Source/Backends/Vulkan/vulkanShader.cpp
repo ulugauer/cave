@@ -78,6 +78,10 @@ VulkanShader::~VulkanShader()
 
 bool VulkanShader::CompileShader(const char* code, size_t count)
 {
+	// already compiled
+	if (_vkShader != VK_NULL_HANDLE)
+		return true;
+
 	// code size must be modulo 4
 	if (count % 4)
 		return false;

@@ -31,6 +31,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanDynamicState.h"
 #include "vulkanPipelineLayout.h"
 #include "vulkanRenderPass.h"
+#include "vulkanGraphicsPipeline.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -332,4 +333,15 @@ HalRenderPass* VulkanRenderDevice::CreateRenderPass(HalRenderPassInfo& renderPas
 
 	return renderPass;
 }
+
+HalGraphicsPipeline* VulkanRenderDevice::CreateGraphicsPipeline(HalGraphicsPipelineInfo& graphicsPipelineInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanGraphicsPipeline* graphicsPipeline = AllocateObject<VulkanGraphicsPipeline>(*_pInstance->GetEngineAllocator(), this, graphicsPipelineInfo);
+
+	return graphicsPipeline;
+}
+
 }

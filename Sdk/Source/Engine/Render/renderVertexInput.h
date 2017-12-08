@@ -50,6 +50,13 @@ public:
 	/** @brief copy constructor */
 	virtual ~RenderVertexInput();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalVertexInput handle
+	*/
+	HalVertexInput* GetHalHandle() { return _halVertexInput; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalVertexInput* _halVertexInput;	///< Pointer to low level shader object

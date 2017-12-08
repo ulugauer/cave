@@ -51,11 +51,21 @@ public:
 	/** @brief Destructor */
 	virtual ~VulkanViewportAndScissor();
 
+	/**
+	* @brief Get viewport state info
+	*
+	* @return Vulkan VkPipelineRasterizationStateCreateInfo
+	*/
+	const VkPipelineViewportStateCreateInfo& GetViewportStateInfo() const
+	{
+		return _vkViewportStateInfo;
+	}
+
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
 	VkViewport _vkViewport;			///< Vulkan viewport struct
 	VkRect2D _vkScissorRect2D;		///< Vulkan scissor rect
-	VkPipelineViewportStateCreateInfo _ViewportStateInfo;	///< Viewport and scissor setup state
+	VkPipelineViewportStateCreateInfo _vkViewportStateInfo;	///< Viewport and scissor setup state
 };
 
 }

@@ -52,6 +52,13 @@ public:
 	/** @brief destructor */
 	virtual ~RenderMultisample();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalMultisample handle
+	*/
+	HalMultisample* GetHalHandle() { return _halMultisample; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalMultisample* _halMultisample;	///< Pointer to low level multisample state object
