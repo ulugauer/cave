@@ -186,6 +186,17 @@ void VulkanSwapChain::CreatePresentationSemaphores()
 	}
 }
 
+const VkImageView VulkanSwapChain::GetSwapChainImageView(size_t index) const
+{
+	VkImageView imageView = VK_NULL_HANDLE;
+	if (index < _swapChainImageViewVector.Size())
+	{
+		return _swapChainImageViewVector[index];
+	}
+
+	return imageView;
+}
+
 uint32_t VulkanSwapChain::GetSwapChainNumImages(VkSurfaceCapabilitiesKHR &surfaceCapabilities)
 {
 	// Set of images defined in a swap chain may not always be available for application to render to:

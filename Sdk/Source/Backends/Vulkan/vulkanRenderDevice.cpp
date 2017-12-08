@@ -50,6 +50,7 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	, _pSwapChain(nullptr)
 	, _presentQueueCommandPool(VK_NULL_HANDLE)
 	, _presentCommandBufferArray(nullptr)
+	, _presentationFramebuffers(instance->GetEngineAllocator())
 {
 	std::set<int> uniqueQueueFamilies;
 	// First query the graphics queue index
@@ -149,6 +150,13 @@ VulkanRenderDevice::~VulkanRenderDevice()
 		VulkanApi::GetApi()->vkDeviceWaitIdle(_vkDevice);
 	}
 
+	if (!_presentationFramebuffers.Empty())
+	{
+		for (size_t i = 0; i < _presentationFramebuffers.Size(); i++)
+			VulkanApi::GetApi()->vkDestroyFramebuffer(_vkDevice, _presentationFramebuffers[i], nullptr);
+	}
+	_presentationFramebuffers.Clear();
+
 	if (_presentCommandBufferArray)
 	{
 		const uint32_t imageCount = _pSwapChain->GetSwapChainImageCount();
@@ -210,8 +218,47 @@ void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
 		{
 			throw BackendException("Failed to allocate vulkan presentation command buffers");
 		}
+
+		// If all went well set framebuffer size
+		_presentationFramebuffers.Resize(imageCount);
 	}
 }
+
+void VulkanRenderDevice::CreateSwapChainFramebuffers(HalRenderPass* renderPass)
+{
+	if (_presentationFramebuffers.Size() != _pSwapChain->GetSwapChainImageCount())
+	{
+		throw BackendException("Error: presentation framebuffers not equal swap chain images");
+	}
+
+	VulkanRenderPass* vulkanRenderPass = static_cast<VulkanRenderPass*>(renderPass);
+	VkExtent2D swapChainExtend = _pSwapChain->GetSwapChainImageExtend();
+
+	for (size_t i = 0; i < _presentationFramebuffers.Size(); i++)
+	{
+		VkImageView attachments[] = 
+		{
+			_pSwapChain->GetSwapChainImageView(i)
+		};
+
+		VkFramebufferCreateInfo framebufferInfo;
+		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.pNext = nullptr;
+		framebufferInfo.flags = 0;
+		framebufferInfo.renderPass = vulkanRenderPass->GetRenderPass();
+		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.pAttachments = attachments;
+		framebufferInfo.layers = 1;
+		framebufferInfo.width = swapChainExtend.width;
+		framebufferInfo.height = swapChainExtend.height;
+
+		if (VulkanApi::GetApi()->vkCreateFramebuffer(_vkDevice, &framebufferInfo, nullptr, &_presentationFramebuffers[i]) != VK_SUCCESS)
+		{
+			throw BackendException("Error: Failed to create presentation framebuffer");
+		}
+	}
+}
+
 
 const HalImageFormat VulkanRenderDevice::GetSwapChainImageFormat()
 {

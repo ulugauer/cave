@@ -226,6 +226,9 @@ int main(int argc, char* argv[])
 	RenderGraphicsPipeline* graphicsPipeline = renderDevice->CreateGraphicsPipeline(grpahicsPipelineInfo);
 	graphicsPipeline->Update();
 
+	// with a renderpass object we can create our swap chain framebuffers
+	renderDevice->CreateSwapChainFramebuffers(renderPass);
+
 	do {
 
 

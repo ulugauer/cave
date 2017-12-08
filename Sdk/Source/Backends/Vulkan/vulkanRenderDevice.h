@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "halRenderDevice.h"
 #include "osPlatformLib.h"
+#include "Common/caveVector.h"
 
 #include "vulkan.h"
 
@@ -192,6 +193,16 @@ public:
 	*/
 	const HalImageFormat GetSwapChainImageFormat() override;
 
+	/**
+	* @brief Create presentation framebuffers
+	*		 This functions creates as much framebuffers as swap chain images.
+	*		 This functions throws an exception if soemthing goes wrong
+	*
+	* @param[in] renderPass		RenderPass object which we need to attach to the framebuffers
+	*
+	*/
+	void CreateSwapChainFramebuffers(HalRenderPass* renderPass) override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
@@ -201,6 +212,7 @@ private:
 	VulkanSwapChain* _pSwapChain;	///< Handle to a swap chain
 	VkCommandPool _presentQueueCommandPool;	///< Command pool used for presentations
 	VkCommandBuffer* _presentCommandBufferArray;	///< Presentation command buffer
+	caveVector<VkFramebuffer> _presentationFramebuffers; ///< Array of framebuffers used for presentation
 	uint32_t _presentationQueueFamilyIndex; ///< Index of present queue familiy
 };
 

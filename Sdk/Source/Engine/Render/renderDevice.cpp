@@ -107,6 +107,23 @@ void RenderDevice::CreateSwapChain()
 	}
 }
 
+bool RenderDevice::CreateSwapChainFramebuffers(RenderPass* renderPass)
+{
+	if (renderPass == nullptr)
+		return false;
+
+	try
+	{
+		_pHalRenderDevice->CreateSwapChainFramebuffers(renderPass->GetHalHandle());
+	}
+	catch (std::exception& e)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 const HalImageFormat RenderDevice::GetSwapChainImageFormat()
 {
 	HalImageFormat format = HalImageFormat::Undefined;

@@ -76,6 +76,15 @@ public:
 	*/
 	const VkFormat GetSwapChainImageFormat() const { return _swapChainImageFormat; }
 
+	/**
+	* @brief Get swap image view handle
+	*
+	* @param[in] index	Index into image view array
+	*
+	* @return Image view handle or null handle
+	*/
+	const VkImageView GetSwapChainImageView(size_t index) const;
+
 private:
 	/**
 	* @brief Create a swap chain for the device

@@ -193,6 +193,16 @@ public:
 	*/
 	virtual const HalImageFormat GetSwapChainImageFormat() = 0;
 
+	/**
+	* @brief Create presentation framebuffers
+	*		 This functions creates as much framebuffers as swap chain images.
+	*		 This functions throws an exception if soemthing goes wrong
+	*
+	* @param[in] renderPass		RenderPass object which we need to attach to the framebuffers
+	*
+	*/
+	virtual void CreateSwapChainFramebuffers(HalRenderPass* renderPass) = 0;
+
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object
 };

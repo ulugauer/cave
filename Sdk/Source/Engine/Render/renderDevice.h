@@ -87,6 +87,15 @@ public:
 	void CreateSwapChain();
 
 	/**
+	* @brief Create presentation framebuffers
+	*		 This functions creates as much framebuffers as swap chain images.
+	*
+	* @param[in] renderPass		RenderPass object which we need to attach to the framebuffers
+	*
+	*/
+	bool CreateSwapChainFramebuffers(RenderPass* renderPass);
+
+	/**
 	* @brief Get swap chain image format
 	*
 	* @return Image format
