@@ -77,6 +77,15 @@ public:
 	void CreateSwapChain(SwapChainInfo& swapChainInfo) override;
 
 	/**
+	* @brief Create a low level command pool object
+	*
+	* @param[in] commandPoolInfo	Command pool creation info
+	*
+	* @return HalCommandPool abstraction interface
+	*/
+	HalCommandPool* CreateCommandPool(HalCommandPoolInfo& commandPoolInfo) override;
+
+	/**
 	* @brief Create a low level shader
 	*
 	* @param[in] type		Shader type
@@ -203,17 +212,37 @@ public:
 	*/
 	void CreateSwapChainFramebuffers(HalRenderPass* renderPass) override;
 
+	/**
+	* @brief Get graphics familiy index
+	*
+	* @return graphics familiy index
+	*/
+	const uint32_t GetGraphicsFamilyIndex() const {
+		return _graphicsQueueFamilyIndex;
+	}
+
+	/**
+	* @brief Get presentation familiy index
+	*
+	* @return presentation familiy index
+	*/
+	const uint32_t GetPresentationFamilyIndex() const {
+		return _presentationQueueFamilyIndex;
+	}
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
 	VkSurfaceKHR _presentationSurface; ///< Handle to presentation surface
 	VkDevice _vkDevice;	///< Handle to vulkan device
 	VkQueue _presentQueue;	///< Handle to vulkan queue used for presentations
+	VkQueue _graphicsQueue;	///< Handle to vulkan queue used for graphics
 	VulkanSwapChain* _pSwapChain;	///< Handle to a swap chain
 	VkCommandPool _presentQueueCommandPool;	///< Command pool used for presentations
 	VkCommandBuffer* _presentCommandBufferArray;	///< Presentation command buffer
 	caveVector<VkFramebuffer> _presentationFramebuffers; ///< Array of framebuffers used for presentation
 	uint32_t _presentationQueueFamilyIndex; ///< Index of present queue familiy
+	uint32_t _graphicsQueueFamilyIndex; ///< Index of graphics queue familiy
 };
 
 }

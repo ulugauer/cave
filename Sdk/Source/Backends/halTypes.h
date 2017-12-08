@@ -111,7 +111,7 @@ enum class HalPipelineBindPoints
 /**
 *  @brief A strongly typed enum class representing pipeline staging points
 */
-enum class HalPipelineStageBits 
+enum class HalPipelineStageBits
 {
 	TopOfPipe = 0x1,
 	DrawIndirect = 0x2,
@@ -134,7 +134,7 @@ typedef uint32_t HalPipelineStageFlags;		///< Combined pipeline stage flags
 /**
 *  @brief A strongly typed enum class representing access types
 */
-enum HalAccessBits 
+enum HalAccessBits
 {
 	IndirectCommandRead = 0x1,
 	IndexRead = 0x2,
@@ -159,7 +159,7 @@ typedef uint32_t HalAccessFlags;		///< Combined access flags
 /**
 *  @brief A strongly typed enum class representing subpass dependencies
 */
-enum HalDependencyBits 
+enum HalDependencyBits
 {
 	DependencyByRegion = 0x1
 };
@@ -244,7 +244,7 @@ enum class HalBlendFactor
 	ConstantColor = 10,
 	OneMinusConstantColor = 11,
 	ConstantAlpha = 12,
-	OneMinusConstantAlpha = 13,	
+	OneMinusConstantAlpha = 13,
 	SrcAlphaSaturate = 14,
 	Src1Color = 15,
 	OneMinusSrc1Color = 16,
@@ -334,6 +334,27 @@ typedef uint32_t HalShaderStagesFlags;	///< Shader stages flags
 typedef struct DescriptorSetLayout_T *setLayout;	///< Opqaue handle
 
 /**
+*  @brief A strongly typed enum class representing command pool queue family
+*/
+enum class HalCommandPoolQueueFamily
+{
+	Graphics = 1,
+	Presentation = 2
+};
+
+/**
+*  @brief A strongly typed enum class representing command pool queue family
+*/
+enum class HalCommandPoolUsage
+{
+	CreateTransient = 0x1,
+	ResetCommandBuffer = 0x2
+};
+
+typedef uint32_t HalCommandPoolUsageFlags;	///< Command pool usage flags
+
+
+/**
 * @brief Rasterizer state setup
 */
 struct CAVE_INTERFACE HalRasterizerSetup
@@ -366,7 +387,7 @@ struct CAVE_INTERFACE HalRasterizerSetup
 };
 
 /**
-* @brief Multisample state 
+* @brief Multisample state
 */
 struct CAVE_INTERFACE HalMultisampleState
 {
@@ -465,7 +486,7 @@ struct CAVE_INTERFACE HalColorBlendAttachment
 		_srcAlphaBlendFactor = HalBlendFactor::One;
 		_dstAlphaBlendFactor = HalBlendFactor::Zero;
 		_alphaBlendOp = HalBlendOp::Add;
-		_colorWriteMask = static_cast<uint32_t>(HalColorComponents::Red) 
+		_colorWriteMask = static_cast<uint32_t>(HalColorComponents::Red)
 			| static_cast<uint32_t>(HalColorComponents::Green)
 			| static_cast<uint32_t>(HalColorComponents::Blue)
 			| static_cast<uint32_t>(HalColorComponents::Alpha);
@@ -609,6 +630,15 @@ struct CAVE_INTERFACE HalRenderPassInfo
 		_dependencyCount = 0;
 		_pDependencies = nullptr;
 	}
+};
+
+/**
+* @brief Commnad Pool create info
+*/
+struct CAVE_INTERFACE HalCommandPoolInfo
+{
+	HalCommandPoolQueueFamily _queueFamily;		///< To which queue this commnad pool belongs
+	HalCommandPoolUsageFlags _flags;			///< Usage flags
 };
 
 }

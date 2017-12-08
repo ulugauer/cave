@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineDefines.h"
 #include "halInstance.h"
+#include "halCommandPool.h"
 #include "halShader.h"
 #include "halVertexInput.h"
 #include "halInputAssembly.h"
@@ -85,6 +86,15 @@ public:
 	* @return shader abstraction interface
 	*/
 	virtual HalShader* CreateShader(ShaderType type, ShaderLanguage language) = 0;
+
+	/**
+	* @brief Create a low level command pool object
+	*
+	* @param[in] commandPoolInfo	Command pool creation info
+	*
+	* @return HalCommandPool abstraction interface
+	*/
+	virtual HalCommandPool* CreateCommandPool(HalCommandPoolInfo& commandPoolInfo) = 0;
 
 	/**
 	* @brief Create a low level vertex input state

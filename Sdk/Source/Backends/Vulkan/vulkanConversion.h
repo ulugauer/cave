@@ -199,6 +199,15 @@ public:
 	* @return Vulkan image layout
 	*/
 	static VkImageLayout ConvertImageLayoutToVulkan(HalImageLayout imageLayout);
+
+	/**
+	* @brief Convert from generic command pool usage to vulkan command pool usage
+	*
+	* @param[in] usageFlags	Generic command pool usage flags
+	*
+	* @return Vulkancommand pool create flags
+	*/
+	static VkCommandPoolCreateFlags ConvertCommandPoolUsageFlagsToVulkan(HalCommandPoolUsageFlags usageFlags);
 };
 
 }

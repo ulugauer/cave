@@ -643,4 +643,17 @@ VulkanTypeConversion::ConvertImageLayoutToVulkan(HalImageLayout imageLayout)
 	return vkImageLayout;
 }
 
+VkCommandPoolCreateFlags 
+VulkanTypeConversion::ConvertCommandPoolUsageFlagsToVulkan(HalCommandPoolUsageFlags usageFlags)
+{
+	VkCommandPoolCreateFlags createFlags = 0;
+
+	if (usageFlags & static_cast<uint32_t>(HalCommandPoolUsage::CreateTransient))
+		createFlags |= VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
+	if (usageFlags & static_cast<uint32_t>(HalCommandPoolUsage::ResetCommandBuffer))
+		createFlags |= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+	return createFlags;
+}
+
 }

@@ -22,7 +22,8 @@ set(BACKENDS_SOURCE halTypes.h
 					halDepthStencil.h halDepthStencil.cpp 
 					halPipelineLayout.h halPipelineLayout.cpp 
 					halRenderPass.h halRenderPass.cpp 
-					halGraphicsPipeline.h halGraphicsPipeline.cpp )
+					halGraphicsPipeline.h halGraphicsPipeline.cpp 
+					halCommandPool.h halCommandPool.cpp )
 # vulkan source
 set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h 
 						   Vulkan/vulkanConversion.h Vulkan/vulkanConversion.cpp 
@@ -41,7 +42,8 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 						   Vulkan/vulkanDepthStencil.h Vulkan/vulkanDepthStencil.cpp 
 						   Vulkan/vulkanPipelineLayout.h Vulkan/vulkanPipelineLayout.cpp 
 						   Vulkan/vulkanRenderPass.h Vulkan/vulkanRenderPass.cpp 
-						   Vulkan/vulkanGraphicsPipeline.h Vulkan/vulkanGraphicsPipeline.cpp )
+						   Vulkan/vulkanGraphicsPipeline.h Vulkan/vulkanGraphicsPipeline.cpp 
+						   Vulkan/vulkanCommandPool.h Vulkan/vulkanCommandPool.cpp )
 
 
 # Create named folders for the sources within the .vcproj

@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanPhysicalDevice.h"
 #include "vulkanConversion.h"
 #include "vulkanSwapChain.h"
+#include "vulkanCommandPool.h"
 #include "vulkanShader.h"
 #include "vulkanVertexInput.h"
 #include "vulkanInputAssembly.h"
@@ -47,6 +48,7 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	, _presentationSurface(surface)
 	, _vkDevice(VK_NULL_HANDLE)
 	, _presentQueue(VK_NULL_HANDLE)
+	, _graphicsQueue(VK_NULL_HANDLE)
 	, _pSwapChain(nullptr)
 	, _presentQueueCommandPool(VK_NULL_HANDLE)
 	, _presentCommandBufferArray(nullptr)
@@ -54,20 +56,20 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 {
 	std::set<int> uniqueQueueFamilies;
 	// First query the graphics queue index
-	uint32_t graphicsQueueFamilyIndex = physicalDevice->GetQueueFamilyIndex(VkQueueFlagBits::VK_QUEUE_GRAPHICS_BIT);
-	if (graphicsQueueFamilyIndex == (std::numeric_limits<uint32_t>::max)())
+	_graphicsQueueFamilyIndex = physicalDevice->GetQueueFamilyIndex(VkQueueFlagBits::VK_QUEUE_GRAPHICS_BIT);
+	if (_graphicsQueueFamilyIndex == (std::numeric_limits<uint32_t>::max)())
 		throw BackendException("CreateRenderDevice: no suitable device queues found");
 
-	uniqueQueueFamilies.insert(graphicsQueueFamilyIndex);
+	uniqueQueueFamilies.insert(_graphicsQueueFamilyIndex);
 
 	_presentationQueueFamilyIndex = (std::numeric_limits<uint32_t>::max)();
 	if (surface)
 	{
-		_presentationQueueFamilyIndex = physicalDevice->GetPresentationQueueFamilyIndex(graphicsQueueFamilyIndex, surface);
+		_presentationQueueFamilyIndex = physicalDevice->GetPresentationQueueFamilyIndex(_graphicsQueueFamilyIndex, surface);
 		if (_presentationQueueFamilyIndex == (std::numeric_limits<uint32_t>::max)())
 			throw BackendException("CreateRenderDevice: no suitable device queues found");
 
-		uniqueQueueFamilies.insert(graphicsQueueFamilyIndex);
+		uniqueQueueFamilies.insert(_presentationQueueFamilyIndex);
 	}
 
 
@@ -125,9 +127,12 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 		throw BackendException("Failed to create vulkan device");
 	}
 
-	// allocate presentation queue
+	// get presentation queue
 	if (surface)
 		VulkanApi::GetApi()->vkGetDeviceQueue(_vkDevice, _presentationQueueFamilyIndex, 0, &_presentQueue);
+
+	// get graphics queue
+	VulkanApi::GetApi()->vkGetDeviceQueue(_vkDevice, _graphicsQueueFamilyIndex, 0, &_graphicsQueue);
 
 	// Create presentation command pool
 	VkCommandPoolCreateInfo CreateCommandPoolInfo = {};
@@ -267,6 +272,16 @@ const HalImageFormat VulkanRenderDevice::GetSwapChainImageFormat()
 		format = VulkanTypeConversion::ConvertImageFormatFromVulkan(_pSwapChain->GetSwapChainImageFormat());
 
 	return format;
+}
+
+HalCommandPool* VulkanRenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPoolInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+	
+	VulkanCommandPool* commandPool = AllocateObject<VulkanCommandPool>(*_pInstance->GetEngineAllocator(), this, commandPoolInfo);
+
+	return commandPool;
 }
 
 HalShader* VulkanRenderDevice::CreateShader(ShaderType type, ShaderLanguage language)

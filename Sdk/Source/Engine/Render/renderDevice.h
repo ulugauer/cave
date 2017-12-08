@@ -47,6 +47,7 @@ class RenderPipelineLayout;
 class RenderPass;
 struct RenderGraphicsPipelineInfo;
 class RenderGraphicsPipeline;
+class RenderCommandPool;
 
 /**
 * Abstraction type of a device instance
@@ -121,6 +122,22 @@ public:
 	{
 		return _pHalRenderDevice;
 	}
+
+	/**
+	* @brief Create a command pool object
+	*
+	* @param[in] commandPoolInfo	Command pool creation info
+	*
+	* @return RenderCommandPool object
+	*/
+	RenderCommandPool* CreateCommandPool(HalCommandPoolInfo& commandPoolInfo);
+
+	/**
+	* @brief Release a vertex input object
+	*
+	* @param[in] commandPool	RenderCommandPool object to release
+	*/
+	void ReleaseCommandPool(RenderCommandPool* commandPool);
 
 	/**
 	* @brief Create a vertex input object

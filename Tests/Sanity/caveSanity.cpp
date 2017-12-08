@@ -14,6 +14,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineInstance.h"
 #include "engineError.h"
+#include "Render/renderCommandPool.h"
 #include "Render/renderVertexInput.h"
 #include "Render/renderInputAssembly.h"
 #include "Render/renderLayerSection.h"
@@ -92,6 +93,7 @@ int main(int argc, char* argv[])
 	std::unique_ptr<EngineInstance> engineInstance = nullptr;
 	RenderInstance* renderInstance = nullptr;
 	RenderDevice* renderDevice = nullptr;
+	RenderCommandPool* graphicsCommandPool = nullptr;
 	IFrontend* frontend = nullptr;
 	g_WinWidth = 1280;
 	g_WinHeight = 768;
@@ -131,6 +133,11 @@ int main(int argc, char* argv[])
 		renderDevice = renderInstance->CreateRenderDevice(windowInfo);
 		// Create a swap chain fro this device.
 		renderDevice->CreateSwapChain();
+		// allocate a graphics command pool
+		HalCommandPoolInfo commandPoolInfo;
+		commandPoolInfo._flags = 0;
+		commandPoolInfo._queueFamily = HalCommandPoolQueueFamily::Graphics;
+		graphicsCommandPool = renderDevice->CreateCommandPool(commandPoolInfo);
 	}
 	catch (cave::EngineError err)
 	{
@@ -227,7 +234,10 @@ int main(int argc, char* argv[])
 	graphicsPipeline->Update();
 
 	// with a renderpass object we can create our swap chain framebuffers
-	renderDevice->CreateSwapChainFramebuffers(renderPass);
+	if (!renderDevice->CreateSwapChainFramebuffers(renderPass))
+	{
+		std::cerr << "Failed to create swap chain framebuffers\n";
+	}
 
 	do {
 
@@ -246,6 +256,7 @@ int main(int argc, char* argv[])
 	renderDevice->ReleaseVertexInput(vertexInput);
 	renderDevice->ReleaseLayerSection(layerSection);
 	// release at last
+	renderDevice->ReleaseCommandPool(graphicsCommandPool);
 	renderInstance->ReleaseRenderDevice(renderDevice);
 
 	return 0;

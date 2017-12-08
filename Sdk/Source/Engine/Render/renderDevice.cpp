@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "renderDevice.h"
 #include "renderInstance.h"
+#include "renderCommandPool.h"
 #include "renderVertexInput.h"
 #include "renderInputAssembly.h"
 #include "renderLayerSection.h"
@@ -116,7 +117,7 @@ bool RenderDevice::CreateSwapChainFramebuffers(RenderPass* renderPass)
 	{
 		_pHalRenderDevice->CreateSwapChainFramebuffers(renderPass->GetHalHandle());
 	}
-	catch (std::exception& e)
+	catch (std::exception& )
 	{
 		return false;
 	}
@@ -131,6 +132,25 @@ const HalImageFormat RenderDevice::GetSwapChainImageFormat()
 		format = _pHalRenderDevice->GetSwapChainImageFormat();
 
 	return format;
+}
+
+RenderCommandPool* RenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPoolInfo)
+{
+	RenderCommandPool* commandPool = AllocateObject<RenderCommandPool>(*_pRenderInstance->GetEngineAllocator(), *this, commandPoolInfo);
+	if (commandPool)
+		commandPool->IncrementUsageCount();
+
+	return  commandPool;
+}
+
+void RenderDevice::ReleaseCommandPool(RenderCommandPool* commandPool)
+{
+	if (commandPool)
+	{
+		int32_t refCount = commandPool->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *commandPool);
+	}
 }
 
 RenderVertexInput* RenderDevice::CreateVertexInput()
