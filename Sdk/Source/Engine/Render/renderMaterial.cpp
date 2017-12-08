@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
+
 RenderMaterial::RenderMaterial(RenderDevice& renderDevice)
 	: _vertexShader(nullptr)
 	, _fragmentShader(nullptr)
@@ -36,15 +37,17 @@ RenderMaterial::~RenderMaterial()
 }
 
 RenderMaterial::RenderMaterial(const RenderMaterial& rhs)
-	: _renderDevice(rhs._renderDevice)
-	, _vertexShader(rhs._vertexShader)
+	: _vertexShader(rhs._vertexShader)
 	, _fragmentShader(rhs._fragmentShader)
+	, _renderDevice(rhs._renderDevice)
 {
 	_materialData = rhs._materialData;
 }
 
 RenderMaterial& RenderMaterial::operator=(const RenderMaterial& rhs)
 {
+	_vertexShader = rhs._vertexShader;
+	_fragmentShader = rhs._fragmentShader;
 	_renderDevice = rhs._renderDevice;
 
 	// copy data
