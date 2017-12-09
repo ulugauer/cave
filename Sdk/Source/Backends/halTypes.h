@@ -353,6 +353,14 @@ enum class HalCommandPoolUsage
 
 typedef uint32_t HalCommandPoolUsageFlags;	///< Command pool usage flags
 
+/**
+*  @brief A strongly typed enum class representing command pool queue family
+*/
+enum class HalCommandBufferLevel
+{
+	PrimaryLevel = 0,
+	SecondaryLevel = 1
+};
 
 /**
 * @brief Rasterizer state setup
@@ -639,6 +647,15 @@ struct CAVE_INTERFACE HalCommandPoolInfo
 {
 	HalCommandPoolQueueFamily _queueFamily;		///< To which queue this commnad pool belongs
 	HalCommandPoolUsageFlags _flags;			///< Usage flags
+};
+
+/**
+* @brief Commnad buffer create info
+*/
+struct CAVE_INTERFACE HalCommandBufferInfo
+{
+	HalCommandBufferLevel _level;		///< To which queue this commnad pool belongs
+	uint32_t _bufferCount;				///< Amount of command buffers to create
 };
 
 }

@@ -23,7 +23,8 @@ set(BACKENDS_SOURCE halTypes.h
 					halPipelineLayout.h halPipelineLayout.cpp 
 					halRenderPass.h halRenderPass.cpp 
 					halGraphicsPipeline.h halGraphicsPipeline.cpp 
-					halCommandPool.h halCommandPool.cpp )
+					halCommandPool.h halCommandPool.cpp 
+					halCommandBuffer.h halCommandBuffer.cpp )
 # vulkan source
 set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h 
 						   Vulkan/vulkanConversion.h Vulkan/vulkanConversion.cpp 
