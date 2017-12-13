@@ -21,10 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-HalCommandBuffer::HalCommandBuffer(HalRenderDevice* renderDevice, HalCommandPool* commandPool, HalCommandBufferInfo& commandBufferInfo)
+HalCommandBuffer::HalCommandBuffer(HalRenderDevice* renderDevice)
 	: _pDevice(renderDevice)
-	, _commandPool(commandPool)
-	, _commandBufferInfo(commandBufferInfo)
 {
 
 }

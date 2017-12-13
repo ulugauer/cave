@@ -42,7 +42,8 @@ set(RENDER_SOURCE Render/renderInstance.h Render/renderInstance.cpp
 				  Render/renderPipelineLayout.h Render/renderPipelineLayout.cpp 
 				  Render/renderRenderPass.h Render/renderRenderPass.cpp 
 				  Render/renderGraphicsPipeline.h Render/renderGraphicsPipeline.cpp 
-				  Render/renderCommandPool.h Render/renderCommandPool.cpp )
+				  Render/renderCommandPool.h Render/renderCommandPool.cpp 
+				   Render/renderCommandBuffer.h Render/renderCommandBuffer.cpp )
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h

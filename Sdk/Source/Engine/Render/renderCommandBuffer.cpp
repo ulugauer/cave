@@ -11,53 +11,31 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file halCommandBuffer.h
-///       Hardware command buffer abstraction
+/// @file renderCommandBuffer.cpp
+///       Render command buffer interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "renderCommandBuffer.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halCommandBuffer.h"
 
-#include <memory>
-
-/** \addtogroup backend
-*  @{
-*
-*/
+#include <cassert>
 
 namespace cave
 {
-
-///< forwards
-class HalRenderDevice;
-class HalCommandPool;
-
-/**
-* @brief Represents a command buffer interface
-*/
-class HalCommandBuffer
+RenderCommandBuffer::RenderCommandBuffer(RenderDevice& renderDevice, HalCommandBuffer* commandBuffer)
+	: _renderDevice(renderDevice)
+	, _halCommandBuffer(commandBuffer)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice		Pointer to render device object
-	*/
-	HalCommandBuffer(HalRenderDevice* renderDevice);
+	assert(_halCommandBuffer);
+}
 
-	/** @brief Destructor */
-	virtual ~HalCommandBuffer();
-
-private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
-};
+RenderCommandBuffer::~RenderCommandBuffer()
+{
+	// Even we don't allocated it we free it
+	if (_halCommandBuffer)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halCommandBuffer);
+}
 
 }
- 
-/** @}*/
-
-
-

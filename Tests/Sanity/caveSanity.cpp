@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderPipelineLayout.h"
 #include "Render/renderRenderPass.h"
 #include "Render/renderGraphicsPipeline.h"
+#include "Render/renderCommandBuffer.h"
 
 #include <iostream>
 #include <sstream>
@@ -239,10 +240,25 @@ int main(int argc, char* argv[])
 		std::cerr << "Failed to create swap chain framebuffers\n";
 	}
 
+	// allocate command buffers
+	HalCommandBufferInfo allocInfo;
+	allocInfo._bufferCount = renderDevice->GetSwapChainImageCount();
+	allocInfo._level = HalCommandBufferLevel::PrimaryLevel;
+	caveVector<RenderCommandBuffer*> commandBuffers(renderDevice->GetEngineAllocator());
+	commandBuffers.Resize(allocInfo._bufferCount);
+	if (!renderDevice->AllocateCommandBuffers(graphicsCommandPool, allocInfo, commandBuffers))
+	{
+		std::cerr << "Failed to allocate command buffers\n";
+	}
+
 	do {
 
 
 	} while (frontend->HandleWindowMessage());
+
+	// release render command buffers
+	renderDevice->ReleaseCommandBuffers(commandBuffers);
+	commandBuffers.Clear();
 
 	renderDevice->ReleaseGraphicsPipeline(graphicsPipeline);
 	renderDevice->ReleasePipelineLayout(pipelineLayout);

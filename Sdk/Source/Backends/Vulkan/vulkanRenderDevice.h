@@ -196,11 +196,31 @@ public:
 	HalGraphicsPipeline* CreateGraphicsPipeline(HalGraphicsPipelineInfo& graphicsPipelineInfo) override;
 
 	/**
+	* @brief Allocate command buffers
+	*
+	* @param[in] commandPool		Command pool object
+	* @param[in] commandBufferInfo	Command buffer creation info
+	* @param[out] commandBuffers	Allocated command buffers
+	*
+	* @return  true on succes
+	*/
+	bool AllocateCommandBuffers(HalCommandPool* commandPool
+		, HalCommandBufferInfo& commandBufferInfo
+		, caveVector<HalCommandBuffer*>& commandBuffers) override;
+
+	/**
 	* @brief Get swap chain image format
 	*
 	* @return Image format
 	*/
 	const HalImageFormat GetSwapChainImageFormat() override;
+
+	/**
+	* @brief Get swap chain image count
+	*
+	* @return Image count
+	*/
+	const uint32_t GetSwapChainImageCount() override;
 
 	/**
 	* @brief Create presentation framebuffers

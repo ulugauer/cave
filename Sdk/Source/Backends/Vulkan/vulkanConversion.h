@@ -205,9 +205,18 @@ public:
 	*
 	* @param[in] usageFlags	Generic command pool usage flags
 	*
-	* @return Vulkancommand pool create flags
+	* @return Vulkan command pool create flags
 	*/
 	static VkCommandPoolCreateFlags ConvertCommandPoolUsageFlagsToVulkan(HalCommandPoolUsageFlags usageFlags);
+
+	/**
+	* @brief Convert from generic command buffer level to vulkan command buffer leve
+	*
+	* @param[in] level	Generic command uffer level
+	*
+	* @return Vulkan commnad buffer level
+	*/
+	static VkCommandBufferLevel ConvertCommandBufferLevelToVulkan(HalCommandBufferLevel level);
 };
 
 }

@@ -48,6 +48,7 @@ class RenderPass;
 struct RenderGraphicsPipelineInfo;
 class RenderGraphicsPipeline;
 class RenderCommandPool;
+class RenderCommandBuffer;
 
 /**
 * Abstraction type of a device instance
@@ -102,6 +103,13 @@ public:
 	* @return Image format
 	*/
 	const HalImageFormat GetSwapChainImageFormat();
+
+	/**
+	* @brief Get swap chain image count
+	*
+	* @return Image count
+	*/
+	const uint32_t GetSwapChainImageCount();
 
 	/**
 	* @brief Get Resource manager
@@ -309,11 +317,29 @@ public:
 	RenderGraphicsPipeline* CreateGraphicsPipeline(RenderGraphicsPipelineInfo& graphicsPipelineInfo);
 
 	/**
-	* @brief Release a graphics pipeline object
+	* @brief Allocte command buffers for submits
 	*
-	* @param[in] graphicsPipeline	 Graphics pipeline object to release
+	* @param[in] graphicsPipeline	 RenderGraphicsPipeline to release
 	*/
 	void ReleaseGraphicsPipeline(RenderGraphicsPipeline* graphicsPipeline);
+
+	/**
+	* @brief Allocte command buffers used for recordings
+	*
+	* @param[in] commandPool	 Command pool from where we allocate the buffers
+	* @param[in] commandBufferInfo	Command buffer creation info
+	* @param[out] commandBuffers	Array of RenderCommandBuffers where we store the pointers
+	*/
+	bool AllocateCommandBuffers(RenderCommandPool* commandPool
+								, HalCommandBufferInfo& commandBufferInfo
+								, caveVector<RenderCommandBuffer*>& commandBuffers);
+
+	/**
+	* @brief Relase command buffers 
+	*
+	* @param[in] commandBuffers		Array of RenderCommandBuffers we want to release
+	*/
+	void ReleaseCommandBuffers( caveVector<RenderCommandBuffer*>& commandBuffers);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

@@ -48,6 +48,12 @@ public:
 	/** @brief Destructor */
 	virtual ~VulkanCommandPool();
 
+	/**
+	* @brief Get commnad pool object
+	*
+	* @return Vulkan VkCommandPool object
+	*/
+	VkCommandPool GetCommandPool() { return _vkCommandPool; }
 
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object

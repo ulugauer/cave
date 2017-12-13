@@ -13,51 +13,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halCommandBuffer.h
-///       Hardware command buffer abstraction
+/// @file renderCommandBuffer.h
+///       Render command buffer interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "halTypes.h"
-#include "Memory/allocatorBase.h"
 
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-///< forwards
-class HalRenderDevice;
-class HalCommandPool;
+/// forward declaration
+class RenderDevice;
+class HalCommandBuffer;
 
 /**
 * @brief Represents a command buffer interface
 */
-class HalCommandBuffer
+class CAVE_INTERFACE RenderCommandBuffer : public CaveRefCount
 {
 public:
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device object
+	* @param[in] renderDevice		Pointer to render device
+	* @param[in] commandBuffer		HAL command buffer
+	*
 	*/
-	HalCommandBuffer(HalRenderDevice* renderDevice);
+	RenderCommandBuffer(RenderDevice& renderDevice
+		, HalCommandBuffer* commandBuffer);
+	/** @brief destructor */
+	virtual ~RenderCommandBuffer();
 
-	/** @brief Destructor */
-	virtual ~HalCommandBuffer();
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalCommandBuffer handle
+	*/
+	HalCommandBuffer* GetHalHandle() { return _halCommandBuffer; }
 
 private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
+	RenderDevice& _renderDevice;			///< Render device object
+	HalCommandBuffer* _halCommandBuffer;	///< Pointer to low level command buffer object
 };
 
 }
- 
 /** @}*/
+
 
 
 

@@ -33,6 +33,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanPipelineLayout.h"
 #include "vulkanRenderPass.h"
 #include "vulkanGraphicsPipeline.h"
+#include "vulkanCommandPool.h"
+#include "vulkanCommandBuffer.h"
+#include "vulkanConversion.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -274,6 +277,14 @@ const HalImageFormat VulkanRenderDevice::GetSwapChainImageFormat()
 	return format;
 }
 
+const uint32_t VulkanRenderDevice::GetSwapChainImageCount()
+{
+	if (_pSwapChain)
+		return _pSwapChain->GetSwapChainImageCount();
+
+	return 0;
+}
+
 HalCommandPool* VulkanRenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPoolInfo)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
@@ -404,6 +415,41 @@ HalGraphicsPipeline* VulkanRenderDevice::CreateGraphicsPipeline(HalGraphicsPipel
 	VulkanGraphicsPipeline* graphicsPipeline = AllocateObject<VulkanGraphicsPipeline>(*_pInstance->GetEngineAllocator(), this, graphicsPipelineInfo);
 
 	return graphicsPipeline;
+}
+
+bool VulkanRenderDevice::AllocateCommandBuffers(HalCommandPool* commandPool
+						, HalCommandBufferInfo& commandBufferInfo
+						, caveVector<HalCommandBuffer*>& commandBuffers)
+{
+	if (!_pPhysicalDevice || !_vkDevice || !commandPool)
+		return false;
+
+	assert(commandBufferInfo._bufferCount == static_cast<uint32_t>(commandBuffers.Size()));
+
+	// tmp buffer
+	caveVector<VkCommandBuffer> vkCommandBuffers(_pInstance->GetEngineAllocator());
+	vkCommandBuffers.Resize(commandBufferInfo._bufferCount);
+
+	VulkanCommandPool* vkPool = static_cast<VulkanCommandPool*>(commandPool);
+	VkCommandBufferAllocateInfo allocInfo;
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.pNext = nullptr;
+	allocInfo.commandPool = vkPool->GetCommandPool();
+	allocInfo.commandBufferCount = commandBufferInfo._bufferCount;
+	allocInfo.level = VulkanTypeConversion::ConvertCommandBufferLevelToVulkan(commandBufferInfo._level);
+
+	if (VulkanApi::GetApi()->vkAllocateCommandBuffers(_vkDevice, &allocInfo, vkCommandBuffers.Data()) != VK_SUCCESS)
+	{
+		assert(false);
+		return false;
+	}
+
+	for (size_t i = 0; i < commandBuffers.Size(); ++i)
+	{
+		commandBuffers[i] = AllocateObject<VulkanCommandBuffer>(*_pInstance->GetEngineAllocator(), this, vkCommandBuffers[i]);
+	}
+
+	return true;
 }
 
 }

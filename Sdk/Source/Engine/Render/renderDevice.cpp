@@ -29,8 +29,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderPipelineLayout.h"
 #include "renderRenderPass.h"
 #include "renderGraphicsPipeline.h"
+#include "renderCommandBuffer.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
+#include "engineLog.h"
 
 namespace cave
 {
@@ -132,6 +134,14 @@ const HalImageFormat RenderDevice::GetSwapChainImageFormat()
 		format = _pHalRenderDevice->GetSwapChainImageFormat();
 
 	return format;
+}
+
+const uint32_t RenderDevice::GetSwapChainImageCount()
+{
+	if (_pHalRenderDevice)
+		return _pHalRenderDevice->GetSwapChainImageCount();
+
+	return 0;
 }
 
 RenderCommandPool* RenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPoolInfo)
@@ -355,6 +365,41 @@ void RenderDevice::ReleaseGraphicsPipeline(RenderGraphicsPipeline* graphicsPipel
 		int32_t refCount = graphicsPipeline->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *graphicsPipeline);
+	}
+}
+
+bool RenderDevice::AllocateCommandBuffers(RenderCommandPool* commandPool
+		, HalCommandBufferInfo& commandBufferInfo
+		, caveVector<RenderCommandBuffer*>& commandBuffers)
+{
+	if (!commandPool)
+		return false;
+
+	// tmp buffer
+	caveVector<HalCommandBuffer*> halCommandBuffers(_pRenderInstance->GetEngineAllocator());
+	halCommandBuffers.Resize(commandBufferInfo._bufferCount);
+
+	bool success = _pHalRenderDevice->AllocateCommandBuffers(commandPool->GetHalHandle(), commandBufferInfo, halCommandBuffers);
+	if (!success)
+	{
+		_pRenderInstance->GetEngineLog()->Error("Error: Failed to allocate commnad buffers");
+		return false;
+	}
+
+	for (size_t i = 0; i < commandBuffers.Size(); ++i)
+	{
+		commandBuffers[i] = AllocateObject<RenderCommandBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, halCommandBuffers[i]);
+	}
+
+	return true;
+}
+
+void RenderDevice::ReleaseCommandBuffers(caveVector<RenderCommandBuffer*>& commandBuffers)
+{
+	for (size_t i = 0; i < commandBuffers.Size(); ++i)
+	{
+		if (commandBuffers[i]) 
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *commandBuffers[i]);
 	}
 }
 

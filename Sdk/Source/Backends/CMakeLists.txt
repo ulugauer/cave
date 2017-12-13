@@ -44,7 +44,8 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 						   Vulkan/vulkanPipelineLayout.h Vulkan/vulkanPipelineLayout.cpp 
 						   Vulkan/vulkanRenderPass.h Vulkan/vulkanRenderPass.cpp 
 						   Vulkan/vulkanGraphicsPipeline.h Vulkan/vulkanGraphicsPipeline.cpp 
-						   Vulkan/vulkanCommandPool.h Vulkan/vulkanCommandPool.cpp )
+						   Vulkan/vulkanCommandPool.h Vulkan/vulkanCommandPool.cpp 
+						   Vulkan/vulkanCommandBuffer.h Vulkan/vulkanCommandBuffer.cpp)
 
 
 # Create named folders for the sources within the .vcproj

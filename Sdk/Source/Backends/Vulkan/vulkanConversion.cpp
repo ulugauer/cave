@@ -656,4 +656,26 @@ VulkanTypeConversion::ConvertCommandPoolUsageFlagsToVulkan(HalCommandPoolUsageFl
 	return createFlags;
 }
 
+VkCommandBufferLevel 
+VulkanTypeConversion::ConvertCommandBufferLevelToVulkan(HalCommandBufferLevel level)
+{
+	VkCommandBufferLevel vkLevel = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+	switch (level)
+	{
+	case HalCommandBufferLevel::PrimaryLevel:
+		vkLevel = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		break;
+	case HalCommandBufferLevel::SecondaryLevel:
+		vkLevel = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+		break;
+	default:
+		vkLevel = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		assert(false);
+		break;
+	}
+
+	return vkLevel;
+}
+
 }

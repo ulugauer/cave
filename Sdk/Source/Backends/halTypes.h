@@ -354,7 +354,7 @@ enum class HalCommandPoolUsage
 typedef uint32_t HalCommandPoolUsageFlags;	///< Command pool usage flags
 
 /**
-*  @brief A strongly typed enum class representing command pool queue family
+*  @brief A strongly typed enum class representing command pool level
 */
 enum class HalCommandBufferLevel
 {

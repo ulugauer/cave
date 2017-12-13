@@ -13,15 +13,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halCommandBuffer.h
-///       Hardware command buffer abstraction
+/// @file vulkanCommandBuffer.h
+///       Vulkan command buffer
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "halCommandBuffer.h"
 
-#include <memory>
+#include "vulkan.h"
 
 /** \addtogroup backend
 *  @{
@@ -32,31 +29,39 @@ namespace cave
 {
 
 ///< forwards
-class HalRenderDevice;
-class HalCommandPool;
+class VulkanRenderDevice;
 
 /**
-* @brief Represents a command buffer interface
+* @brief Vulkan command buffer
 */
-class HalCommandBuffer
+class VulkanCommandBuffer : public HalCommandBuffer
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device object
+	* @param[in] device			Pointer to render device object
+	* @param[in] commandBuffer	Vulkan commnad buffer handle
 	*/
-	HalCommandBuffer(HalRenderDevice* renderDevice);
+	VulkanCommandBuffer(VulkanRenderDevice* device, VkCommandBuffer commandBuffer);
 
 	/** @brief Destructor */
-	virtual ~HalCommandBuffer();
+	virtual ~VulkanCommandBuffer();
+
+	/**
+	* @brief Get pipeline layout object
+	*
+	* @return Vulkan VkPipelineLayout object
+	*/
+	VkCommandBuffer GetCommandBuffer() { return _vkCommandBuffer; }
 
 private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
+	VulkanRenderDevice* _pDevice;	///< Pointer to device object
+	VkCommandBuffer _vkCommandBuffer;	///< Low level vulkan handle
 };
 
 }
- 
+
 /** @}*/
 
 

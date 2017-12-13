@@ -11,53 +11,32 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
-#pragma once
 
-/// @file halCommandBuffer.h
-///       Hardware command buffer abstraction
+/// @file vulkanCommandBuffer.cpp
+///       Vulkan command buffer
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "vulkanCommandBuffer.h"
+#include "vulkanRenderDevice.h"
+#include "vulkanConversion.h"
 
-#include <memory>
+#include "vulkanApi.h"
 
-/** \addtogroup backend
-*  @{
-*
-*/
+#include<limits>
 
 namespace cave
 {
 
-///< forwards
-class HalRenderDevice;
-class HalCommandPool;
-
-/**
-* @brief Represents a command buffer interface
-*/
-class HalCommandBuffer
+VulkanCommandBuffer::VulkanCommandBuffer(VulkanRenderDevice* device, VkCommandBuffer commandBuffer)
+	: HalCommandBuffer(device)
+	, _pDevice(device)
+	, _vkCommandBuffer(commandBuffer)
 {
-public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice		Pointer to render device object
-	*/
-	HalCommandBuffer(HalRenderDevice* renderDevice);
+	
+}
 
-	/** @brief Destructor */
-	virtual ~HalCommandBuffer();
-
-private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
-};
+VulkanCommandBuffer::~VulkanCommandBuffer()
+{
+	
+}
 
 }
- 
-/** @}*/
-
-
-

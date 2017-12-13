@@ -31,6 +31,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halPipelineLayout.h"
 #include "halRenderPass.h"
 #include "halGraphicsPipeline.h"
+#include "halCommandBuffer.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -197,11 +198,31 @@ public:
 	virtual HalGraphicsPipeline* CreateGraphicsPipeline(HalGraphicsPipelineInfo& graphicsPipelineInfo) = 0;
 
 	/**
+	* @brief Allocate command buffers
+	*
+	* @param[in] commandPool		Command pool object
+	* @param[in] commandBufferInfo	Command buffer creation info
+	* @param[out] commandBuffers	Allocated command buffers
+	*
+	* @return True on success
+	*/
+	virtual bool AllocateCommandBuffers(HalCommandPool* commandPool
+									 , HalCommandBufferInfo& commandBufferInfo
+									 , caveVector<HalCommandBuffer*>& commandBuffers) = 0;
+
+	/**
 	* @brief Get swap chain image format
 	*
 	* @return Image format
 	*/
 	virtual const HalImageFormat GetSwapChainImageFormat() = 0;
+
+	/**
+	* @brief Get swap chain image count
+	*
+	* @return Image count
+	*/
+	virtual const uint32_t GetSwapChainImageCount() = 0;
 
 	/**
 	* @brief Create presentation framebuffers
