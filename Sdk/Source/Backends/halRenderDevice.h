@@ -211,6 +211,37 @@ public:
 									 , caveVector<HalCommandBuffer*>& commandBuffers) = 0;
 
 	/**
+	* @brief Begin command buffer recording
+	*
+	* @param[in] commandBuffer				Command buffer we use for recording
+	* @param[in] commandBufferBeginInfo		Command buffer begin setup
+	*/
+	virtual void BeginCommandBuffer(HalCommandBuffer* commandBuffer, HalCommandBufferBeginInfo& commandBufferBeginInfo) = 0;
+
+	/**
+	* @brief End command buffer recording
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	*/
+	virtual void EndCommandBuffer(HalCommandBuffer* commandBuffer) = 0;
+
+	/**
+	* @brief Begin render pass command
+	*
+	* @param[in] commandBuffer			Command buffer we use for recording
+	* @param[in] RenderPassBeginInfo	Command info for render pass
+	* @param[in] subpass				Subpass content in primary or secondary command buffers
+	*/
+	virtual void CmdBeginRenderPass(HalCommandBuffer* commandBuffer, HalCmdRenderPassInfo& RenderPassBeginInfo, HalSubpassContents subpass) = 0;
+
+	/**
+	* @brief End command buffer recording
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	*/
+	virtual void CmdEndRenderPass(HalCommandBuffer* commandBuffer) = 0;
+
+	/**
 	* @brief Get swap chain image format
 	*
 	* @return Image format
@@ -223,6 +254,13 @@ public:
 	* @return Image count
 	*/
 	virtual const uint32_t GetSwapChainImageCount() = 0;
+
+	/**
+	* @brief Get swap chain image extend
+	*
+	* @return Image extend
+	*/
+	virtual const HalExtent2D GetSwapChainExtend() = 0;
 
 	/**
 	* @brief Create presentation framebuffers

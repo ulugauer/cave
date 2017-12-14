@@ -34,6 +34,25 @@ namespace cave
 ///< forwards
 class HalRenderDevice;
 class HalCommandPool;
+class HalRenderPass;
+
+/**
+* @brief HAL command render pass info
+*/
+struct CAVE_INTERFACE HalCmdRenderPassInfo
+{
+	HalRenderPass* _renderPass;			///< Pointer to an instance of RenderPass object
+	// HalFramebuffer* _framebuffer;	///< to do
+	int32_t _swapChainIndex;				///< If _framebuffer = nullptr fetch framebuffer from swap chain 
+	HalRect2D _renderRect;				///< Render areaa within the framebuffer
+	uint32_t _clearValueCount;			///< Count of clear value arrau
+	const HalClearValue* _clearValues;	///< Array of clear values
+
+	HalCmdRenderPassInfo()
+		: _renderPass(nullptr)
+		, _swapChainIndex(-1)
+	{}
+};
 
 /**
 * @brief Represents a command buffer interface

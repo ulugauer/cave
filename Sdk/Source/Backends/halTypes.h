@@ -363,6 +363,26 @@ enum class HalCommandBufferLevel
 };
 
 /**
+*  @brief A strongly typed enum class representing command buffer usage
+*/
+enum class HalCommandBufferUsage
+{
+	OneTimeSubmit = 0x1,
+	RenderPassContinue = 0x2,
+	SimultaneousUse = 0x4
+};
+typedef uint32_t HalCommandBufferUsageFlags;	///< Command buffer usage flags
+
+/**
+*  @brief A strongly typed enum class representing subpass drawing commands
+*/
+enum class HalSubpassContents
+{
+	Inline = 0,					// render pass commands are in primary command buffer
+	SecondarCommandBuffer = 1	// render pass command are in secondary command buffer
+};
+
+/**
 * @brief Rasterizer state setup
 */
 struct CAVE_INTERFACE HalRasterizerSetup
@@ -656,6 +676,62 @@ struct CAVE_INTERFACE HalCommandBufferInfo
 {
 	HalCommandBufferLevel _level;		///< To which queue this commnad pool belongs
 	uint32_t _bufferCount;				///< Amount of command buffers to create
+};
+
+/**
+* @brief Command buffer begin info
+*/
+struct CAVE_INTERFACE HalCommandBufferBeginInfo
+{
+	HalCommandBufferUsageFlags _flags;	///< Command buffer usage flags
+};
+
+/**
+* @brief Framebuffer color clear value
+*/
+union CAVE_INTERFACE HalClearColorValue
+{
+	float       float32[4];		///< float clear values
+	int32_t     int32[4];		///< int clear values
+	uint32_t    uint32[4];		///< uint clear values
+};
+
+/**
+* @brief Framebuffer depth stencil clear value
+*/
+struct CAVE_INTERFACE HalClearDepthStencilValue 
+{
+	float       _depth;			///< Depth clear value
+	uint32_t    _stencil;		///< Stencil clear
+};	
+
+/**
+* @brief Union of clear values
+*/
+union CAVE_INTERFACE HalClearValue
+{
+	HalClearColorValue           _color;			///< Color clear
+	HalClearDepthStencilValue    _depthStencil;		///< Depth stencil clear
+};
+
+/**
+* @brief 2D extend
+*/
+struct HalExtent2D 
+{
+	uint32_t    _width;		///< Width
+	uint32_t    _height;	///< Height
+};
+
+/**
+* @brief 2D rect spec
+*/
+struct CAVE_INTERFACE HalRect2D
+{
+	int32_t _x;			///< X offset
+	int32_t _y;			///< Y offset
+	uint32_t _width;	///< Extend in x
+	uint32_t _height;	///< Extend in y
 };
 
 }

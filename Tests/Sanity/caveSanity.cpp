@@ -251,6 +251,30 @@ int main(int argc, char* argv[])
 		std::cerr << "Failed to allocate command buffers\n";
 	}
 
+	// start command buffer recording
+	HalCommandBufferBeginInfo beginInfo; // always the same here
+	beginInfo._flags = static_cast<uint32_t>(HalCommandBufferUsage::SimultaneousUse);
+	HalClearValue clearValues = { 0.0f, 0.0f, 0.0f, 1.0f };
+	HalRect2D renderArea;
+	renderArea._x = 0; renderArea._y = 0;
+	renderArea._height = sectionInfo.height;
+	renderArea._width = sectionInfo.height;
+	for (size_t i = 0; i < commandBuffers.Size(); i++)
+	{
+		renderDevice->BeginCommandBuffer(commandBuffers[i], beginInfo);
+		// render pass begin
+		RenderCmdRenderPassInfo renderPassBeginInfo;
+		renderPassBeginInfo._renderPass = renderPass;
+		renderPassBeginInfo._swapChainIndex = static_cast<int32_t>(i); ///< fetch framebuffer from swap chain
+		renderPassBeginInfo._clearValueCount = 1;
+		renderPassBeginInfo._clearValues = &clearValues;
+		renderPassBeginInfo._renderRect = renderArea;
+		renderDevice->CmdBeginRenderPass(commandBuffers[i], renderPassBeginInfo, HalSubpassContents::Inline);
+
+		renderDevice->CmdEndRenderPass(commandBuffers[i]);
+		renderDevice->EndCommandBuffer(commandBuffers[i]);
+	}
+
 	do {
 
 

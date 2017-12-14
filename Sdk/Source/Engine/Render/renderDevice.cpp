@@ -403,4 +403,35 @@ void RenderDevice::ReleaseCommandBuffers(caveVector<RenderCommandBuffer*>& comma
 	}
 }
 
+void RenderDevice::BeginCommandBuffer(RenderCommandBuffer* commandBuffer, HalCommandBufferBeginInfo& commandBufferBeginInfo)
+{
+	if (commandBuffer)
+		_pHalRenderDevice->BeginCommandBuffer(commandBuffer->GetHalHandle(), commandBufferBeginInfo);
+}
+
+void RenderDevice::EndCommandBuffer(RenderCommandBuffer* commandBuffer)
+{
+	if (commandBuffer)
+		_pHalRenderDevice->EndCommandBuffer(commandBuffer->GetHalHandle());
+}
+
+void RenderDevice::CmdBeginRenderPass(RenderCommandBuffer* commandBuffer, RenderCmdRenderPassInfo& renderPassBeginInfo, HalSubpassContents subpass)
+{
+	HalCmdRenderPassInfo halInfo;
+	halInfo._renderPass = renderPassBeginInfo._renderPass->GetHalHandle();
+	halInfo._swapChainIndex = renderPassBeginInfo._swapChainIndex;
+	halInfo._renderRect = renderPassBeginInfo._renderRect;
+	halInfo._clearValueCount = renderPassBeginInfo._clearValueCount;
+	halInfo._clearValues = renderPassBeginInfo._clearValues;
+
+	if (commandBuffer)
+		_pHalRenderDevice->CmdBeginRenderPass(commandBuffer->GetHalHandle(), halInfo, subpass);
+}
+
+void RenderDevice::CmdEndRenderPass(RenderCommandBuffer* commandBuffer)
+{
+	if (commandBuffer)
+		_pHalRenderDevice->CmdEndRenderPass(commandBuffer->GetHalHandle());
+}
+
 }

@@ -217,6 +217,24 @@ public:
 	* @return Vulkan commnad buffer level
 	*/
 	static VkCommandBufferLevel ConvertCommandBufferLevelToVulkan(HalCommandBufferLevel level);
+
+	/**
+	* @brief Convert from generic command buffer usage to vulkan command buffer usage
+	*
+	* @param[in] usageFlags	Generic command buffer usage flags
+	*
+	* @return Vulkan command buffer usage flags
+	*/
+	static VkCommandBufferUsageFlags ConvertCommandBufferUsageFlagsToVulkan(HalCommandBufferUsageFlags usageFlags);
+
+	/**
+	* @brief Convert from generic subpass command content to vulkan subpass command content
+	*
+	* @param[in] content	Generic subpass command content
+	*
+	* @return Vulkan subpass command content
+	*/
+	static VkSubpassContents ConvertSubpassContentToVulkan(HalSubpassContents content);
 };
 
 }

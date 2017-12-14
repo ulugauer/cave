@@ -678,4 +678,41 @@ VulkanTypeConversion::ConvertCommandBufferLevelToVulkan(HalCommandBufferLevel le
 	return vkLevel;
 }
 
+VkCommandBufferUsageFlags 
+VulkanTypeConversion::ConvertCommandBufferUsageFlagsToVulkan(HalCommandBufferUsageFlags usageFlags)
+{
+	VkCommandBufferUsageFlags vkUsageFlags = 0;
+
+	if (usageFlags & static_cast<uint32_t>(HalCommandBufferUsage::OneTimeSubmit))
+		vkUsageFlags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+	if (usageFlags & static_cast<uint32_t>(HalCommandBufferUsage::RenderPassContinue))
+		vkUsageFlags |= VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+	if (usageFlags & static_cast<uint32_t>(HalCommandBufferUsage::SimultaneousUse))
+		vkUsageFlags |= VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+
+	return vkUsageFlags;
+}
+
+VkSubpassContents 
+VulkanTypeConversion::ConvertSubpassContentToVulkan(HalSubpassContents content)
+{
+	VkSubpassContents vkContent = VK_SUBPASS_CONTENTS_INLINE;
+
+	switch (content)
+	{
+	case HalSubpassContents::Inline:
+		vkContent = VK_SUBPASS_CONTENTS_INLINE;
+		break;
+	case HalSubpassContents::SecondarCommandBuffer:
+		vkContent = VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS;
+		break;
+	default:
+		assert(false);
+		vkContent = VK_SUBPASS_CONTENTS_INLINE;
+		break;
+	}
+
+	return vkContent;
+}
+
 }

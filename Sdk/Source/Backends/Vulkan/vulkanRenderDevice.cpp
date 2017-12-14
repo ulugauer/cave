@@ -285,6 +285,21 @@ const uint32_t VulkanRenderDevice::GetSwapChainImageCount()
 	return 0;
 }
 
+const HalExtent2D VulkanRenderDevice::GetSwapChainExtend()
+{
+	HalExtent2D halExtend;
+	halExtend._height = 0;
+	halExtend._width = 0;
+	if (_pSwapChain)
+	{
+		VkExtent2D extend = _pSwapChain->GetSwapChainImageExtend();
+		halExtend._height = extend.height;
+		halExtend._width = extend.width;
+	}
+
+	return halExtend;
+}
+
 HalCommandPool* VulkanRenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPoolInfo)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
@@ -450,6 +465,67 @@ bool VulkanRenderDevice::AllocateCommandBuffers(HalCommandPool* commandPool
 	}
 
 	return true;
+}
+
+void VulkanRenderDevice::BeginCommandBuffer(HalCommandBuffer* commandBuffer, HalCommandBufferBeginInfo& commandBufferBeginInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	VkCommandBufferBeginInfo beginInfo;
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.pNext = nullptr;
+	beginInfo.flags = VulkanTypeConversion::ConvertCommandBufferUsageFlagsToVulkan(commandBufferBeginInfo._flags);
+	beginInfo.pInheritanceInfo = nullptr;
+
+	VulkanApi::GetApi()->vkBeginCommandBuffer(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer(), &beginInfo);
+}
+
+void VulkanRenderDevice::EndCommandBuffer(HalCommandBuffer* commandBuffer)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	VulkanApi::GetApi()->vkEndCommandBuffer(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer());
+}
+
+void VulkanRenderDevice::CmdBeginRenderPass(HalCommandBuffer* commandBuffer, HalCmdRenderPassInfo& renderPassBeginInfo, HalSubpassContents subpass)
+{
+	VkRenderPassBeginInfo vkRenderPassInfo;
+	vkRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	vkRenderPassInfo.pNext = nullptr;
+	VulkanRenderPass* vulkanRenderPass = static_cast<VulkanRenderPass*>(renderPassBeginInfo._renderPass);
+	vkRenderPassInfo.renderPass = vulkanRenderPass->GetRenderPass();
+	vkRenderPassInfo.framebuffer = _presentationFramebuffers[renderPassBeginInfo._swapChainIndex];
+	vkRenderPassInfo.renderArea.offset.x = renderPassBeginInfo._renderRect._x;
+	vkRenderPassInfo.renderArea.offset.y = renderPassBeginInfo._renderRect._y;
+	vkRenderPassInfo.renderArea.extent.height = renderPassBeginInfo._renderRect._height;
+	vkRenderPassInfo.renderArea.extent.width = renderPassBeginInfo._renderRect._width;
+	vkRenderPassInfo.clearValueCount = renderPassBeginInfo._clearValueCount;
+	// copy clear values
+	caveVector<VkClearValue> vkClearValueArray(_pInstance->GetEngineAllocator());
+	vkClearValueArray.Resize(renderPassBeginInfo._clearValueCount);
+	for (size_t i = 0; i < vkClearValueArray.Size(); ++i)
+	{
+		vkClearValueArray[i].color.float32[0] = renderPassBeginInfo._clearValues->_color.float32[0];
+		vkClearValueArray[i].color.float32[1] = renderPassBeginInfo._clearValues->_color.float32[1];
+		vkClearValueArray[i].color.float32[2] = renderPassBeginInfo._clearValues->_color.float32[2];
+		vkClearValueArray[i].color.float32[3] = renderPassBeginInfo._clearValues->_color.float32[3];
+
+		vkClearValueArray[i].depthStencil.depth = renderPassBeginInfo._clearValues->_depthStencil._depth;
+		vkClearValueArray[i].depthStencil.stencil = renderPassBeginInfo._clearValues->_depthStencil._stencil;
+	}
+	vkRenderPassInfo.pClearValues = vkClearValueArray.Data();
+	VkSubpassContents content = VulkanTypeConversion::ConvertSubpassContentToVulkan(subpass);
+	VulkanApi::GetApi()->vkCmdBeginRenderPass(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer(), &vkRenderPassInfo, content);
+}
+
+void VulkanRenderDevice::CmdEndRenderPass(HalCommandBuffer* commandBuffer)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	VulkanApi::GetApi()->vkCmdEndRenderPass(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer());
 }
 
 }

@@ -49,6 +49,7 @@ struct RenderGraphicsPipelineInfo;
 class RenderGraphicsPipeline;
 class RenderCommandPool;
 class RenderCommandBuffer;
+struct RenderCmdRenderPassInfo;
 
 /**
 * Abstraction type of a device instance
@@ -339,7 +340,44 @@ public:
 	*
 	* @param[in] commandBuffers		Array of RenderCommandBuffers we want to release
 	*/
-	void ReleaseCommandBuffers( caveVector<RenderCommandBuffer*>& commandBuffers);
+	void ReleaseCommandBuffers(caveVector<RenderCommandBuffer*>& commandBuffers);
+
+	/**************************************************************************
+	* 
+	*  Commnand buffer handling
+	*
+	***************************************************************************/
+
+	/**
+	* @brief Begin command buffer recording
+	*
+	* @param[in] commandBuffer				RenderCommandBuffer we use for recording
+	* @param[in] commandBufferBeginInfo		Command buffer begin setup
+	*/
+	void BeginCommandBuffer(RenderCommandBuffer* commandBuffer, HalCommandBufferBeginInfo& commandBufferBeginInfo);
+
+	/**
+	* @brief End command buffer recording
+	*
+	* @param[in] commandBuffer	RenderCommandBuffer we use for recording
+	*/
+	void EndCommandBuffer(RenderCommandBuffer* commandBuffer);
+
+	/**
+	* @brief Begin render pass command
+	*
+	* @param[in] commandBuffer			Command buffer we use for recording
+	* @param[in] renderPassBeginInfo	Command info for render pass
+	* @param[in] subpass				Subpass content in primary or secondary command buffers
+	*/
+	void CmdBeginRenderPass(RenderCommandBuffer* commandBuffer, RenderCmdRenderPassInfo& renderPassBeginInfo, HalSubpassContents subpass);
+
+	/**
+	* @brief End command buffer recording
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	*/
+	void CmdEndRenderPass(RenderCommandBuffer* commandBuffer);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to
