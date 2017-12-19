@@ -12,16 +12,13 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 #pragma once
+/// @file vulkanSemaphore.h
+///       vulkan semaphore abstraction
 
-/// @file halCommandBuffer.h
-///       Hardware command buffer abstraction
+#include "halSemaphore.h"
+#include "osPlatformLib.h"
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
-
-#include <memory>
+#include "vulkan.h"
 
 /** \addtogroup backend
 *  @{
@@ -32,52 +29,42 @@ namespace cave
 {
 
 ///< forwards
-class HalRenderDevice;
-class HalCommandPool;
-class HalRenderPass;
-class HalCommandBuffer;
-
+class VulkanRenderDevice;
 
 /**
-* @brief HAL command render pass info
+* @brief Handles GPU sync on the hardware level
 */
-struct CAVE_INTERFACE HalCmdRenderPassInfo
-{
-	HalRenderPass* _renderPass;			///< Pointer to an instance of RenderPass object
-	// HalFramebuffer* _framebuffer;	///< to do
-	int32_t _swapChainIndex;				///< If _framebuffer = nullptr fetch framebuffer from swap chain 
-	HalRect2D _renderRect;				///< Render areaa within the framebuffer
-	uint32_t _clearValueCount;			///< Count of clear value arrau
-	const HalClearValue* _clearValues;	///< Array of clear values
-
-	HalCmdRenderPassInfo()
-		: _renderPass(nullptr)
-		, _swapChainIndex(-1)
-	{}
-};
-
-/**
-* @brief Represents a command buffer interface
-*/
-class HalCommandBuffer
+class VulkanSemaphore : public HalSemaphore
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device object
+	* @param[in] device	Pointer to device object
+	*
 	*/
-	HalCommandBuffer(HalRenderDevice* renderDevice);
+	VulkanSemaphore(VulkanRenderDevice* device);
 
 	/** @brief Destructor */
-	virtual ~HalCommandBuffer();
+	virtual ~VulkanSemaphore();
+
+	/**
+	* @brief Get semaphore object
+	*
+	* @return Vulkan VkSemaphore object
+	*/
+	const VkSemaphore& GetSemaphore() const
+	{
+		return _vkSemaphore;
+	}
 
 private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
+	VulkanRenderDevice* _pDevice;	///< Pointer to device object
+	VkSemaphore _vkSemaphore;	///< Low level semaphore handle
 };
 
 }
- 
+
 /** @}*/
 
 

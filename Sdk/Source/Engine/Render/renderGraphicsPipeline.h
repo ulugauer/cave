@@ -114,6 +114,13 @@ public:
 	*/
 	void Update();
 
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalGraphicsPipeline handle
+	*/
+	HalGraphicsPipeline* GetHalHandle() { return _halGraphicsPipeline; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalGraphicsPipeline* _halGraphicsPipeline;	///< Pointer to low level graphics pipeline object

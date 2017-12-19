@@ -235,6 +235,33 @@ public:
 	* @return Vulkan subpass command content
 	*/
 	static VkSubpassContents ConvertSubpassContentToVulkan(HalSubpassContents content);
+
+	/**
+	* @brief Convert from generic dependency flags to vulkan dependency flags
+	*
+	* @param[in] dependency		Generic dependency flags
+	*
+	* @return Vulkan VkDependencyFlags
+	*/
+	static VkDependencyFlags ConvertDependencyFlagsToVulkan(HalDependencyFlags dependency);
+
+	/**
+	* @brief Convert from generic pipeline stage flags to vulkan dependency flags
+	*
+	* @param[in] pipelineStage		Generic pipeline stage flags
+	*
+	* @return Vulkan VkPipelineStageFlags
+	*/
+	static VkPipelineStageFlags ConvertPipelineFlagsToVulkan(HalPipelineStageFlags pipelineStage);
+
+	/**
+	* @brief Convert from generic access flags to vulkan access flags
+	*
+	* @param[in] access		Generic access flags
+	*
+	* @return Vulkan VkAccessFlags
+	*/
+	static VkAccessFlags ConvertAccessFlagsToVulkan(HalAccessFlags access);
 };
 
 }

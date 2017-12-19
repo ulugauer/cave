@@ -13,14 +13,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halCommandBuffer.h
-///       Hardware command buffer abstraction
+/// @file halSemaphore.h
+///       Hardware semaphore abstraction
 
 #include "engineDefines.h"
 #include "halInstance.h"
-#include "halTypes.h"
 #include "Memory/allocatorBase.h"
 
+#include <iostream>		// includes exception handling
 #include <memory>
 
 /** \addtogroup backend
@@ -31,54 +31,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-///< forwards
-class HalRenderDevice;
-class HalCommandPool;
-class HalRenderPass;
-class HalCommandBuffer;
-
-
 /**
-* @brief HAL command render pass info
+* @brief Handles GPU sync on the hardware level
 */
-struct CAVE_INTERFACE HalCmdRenderPassInfo
-{
-	HalRenderPass* _renderPass;			///< Pointer to an instance of RenderPass object
-	// HalFramebuffer* _framebuffer;	///< to do
-	int32_t _swapChainIndex;				///< If _framebuffer = nullptr fetch framebuffer from swap chain 
-	HalRect2D _renderRect;				///< Render areaa within the framebuffer
-	uint32_t _clearValueCount;			///< Count of clear value arrau
-	const HalClearValue* _clearValues;	///< Array of clear values
-
-	HalCmdRenderPassInfo()
-		: _renderPass(nullptr)
-		, _swapChainIndex(-1)
-	{}
-};
-
-/**
-* @brief Represents a command buffer interface
-*/
-class HalCommandBuffer
+class HalSemaphore
 {
 public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device object
 	*/
-	HalCommandBuffer(HalRenderDevice* renderDevice);
+	HalSemaphore();
 
 	/** @brief Destructor */
-	virtual ~HalCommandBuffer();
-
-private:
-	HalRenderDevice* _pDevice;	///< Pointer to device object
+	virtual ~HalSemaphore();
 };
 
 }
- 
-/** @}*/
 
+/** @}*/
 
 

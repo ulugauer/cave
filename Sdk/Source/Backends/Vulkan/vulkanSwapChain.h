@@ -85,6 +85,37 @@ public:
 	*/
 	const VkImageView GetSwapChainImageView(size_t index) const;
 
+	/**
+	* @brief Get next available swap chain image
+	*
+	* @param[in] timeout		Timeout in nano seconds
+	*
+	* @return Image index
+	*/
+	const uint32_t AcquireNextSwapChainImage(uint64_t timeout);
+
+	/**
+	* @brief Get semaphore used for image availble signaling
+	*
+	* @return Semaphore object
+	*/
+	const VkSemaphore GetImageAvailableSemaphore() { return _ImageAvailableSemaphore; }
+
+	/**
+	* @brief Get semaphore used for rendering done signaling
+	*
+	* @return Semaphore object
+	*/
+	const VkSemaphore GetRenderingDoneSemaphore() { return _RenderingFinishedSemaphore; }
+
+	/**
+	* @brief Get semaphore used for rendering done signaling
+	*
+	* @return Semaphore object
+	*/
+	const VkSwapchainKHR GetSwapChainHandle() { return _swapChain; }
+
+
 private:
 	/**
 	* @brief Create a swap chain for the device

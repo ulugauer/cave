@@ -28,6 +28,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+#define HAL_SUBPASS_EXTERNAL               (~0U)	///< Special value for subpass before or after present
+
 /**
 *  @brief A strongly typed enum class representing image formts
 */
@@ -136,6 +138,7 @@ typedef uint32_t HalPipelineStageFlags;		///< Combined pipeline stage flags
 */
 enum HalAccessBits
 {
+	AccessNone = 0x0,
 	IndirectCommandRead = 0x1,
 	IndexRead = 0x2,
 	VertexAttributeRead = 0x4,
@@ -161,6 +164,7 @@ typedef uint32_t HalAccessFlags;		///< Combined access flags
 */
 enum HalDependencyBits
 {
+	DependencyNone = 0x0,
 	DependencyByRegion = 0x1
 };
 typedef uint32_t HalDependencyFlags;		///< Combined dependency flags
@@ -619,21 +623,21 @@ struct CAVE_INTERFACE HalSubpassDependency
 {
 	uint32_t _srcSubpass;					///< Subpass index of first subpass
 	uint32_t _dstSubpass;					///< Subpass index of second subpass
-	HalPipelineStageBits _srcStageMask;		///< Source stage mask
-	HalPipelineStageBits _dstStageMask;		///< Dest stage mask
+	HalPipelineStageFlags _srcStageMask;	///< Source stage mask
+	HalPipelineStageFlags _dstStageMask;	///< Dest stage mask
 	HalAccessFlags _srcAccessMask;			///< Source access mask
 	HalAccessFlags _dstAccessMask;			///< Dest access mask
-	HalDependencyBits  _dependencyFlags;	///< Dependency flags
+	HalDependencyFlags  _dependencyFlags;	///< Dependency flags
 
 	HalSubpassDependency()
 	{
 		_srcSubpass = 0;
 		_dstSubpass = 0;
-		_srcStageMask = HalPipelineStageBits::Host;
-		_dstStageMask = HalPipelineStageBits::Host;
+		_srcStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::Host);
+		_dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::Host);
 		_srcAccessMask = HalAccessBits::HostRead;
 		_dstAccessMask = HalAccessBits::HostRead;
-		_dependencyFlags = HalDependencyBits::DependencyByRegion;
+		_dependencyFlags = HalDependencyBits::DependencyNone;
 	}
 };
 
@@ -685,6 +689,7 @@ struct CAVE_INTERFACE HalCommandBufferBeginInfo
 {
 	HalCommandBufferUsageFlags _flags;	///< Command buffer usage flags
 };
+
 
 /**
 * @brief Framebuffer color clear value

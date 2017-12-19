@@ -31,6 +31,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halPipelineLayout.h"
 #include "halRenderPass.h"
 #include "halGraphicsPipeline.h"
+#include "halSemaphore.h"
 #include "halCommandBuffer.h"
 #include "Memory/allocatorBase.h"
 
@@ -198,6 +199,13 @@ public:
 	virtual HalGraphicsPipeline* CreateGraphicsPipeline(HalGraphicsPipelineInfo& graphicsPipelineInfo) = 0;
 
 	/**
+	* @brief Create semaphore object
+	*
+	* @return  HalSemaphore abstraction interface
+	*/
+	virtual HalSemaphore* CreateSemaphore() = 0;
+
+	/**
 	* @brief Allocate command buffers
 	*
 	* @param[in] commandPool		Command pool object
@@ -242,6 +250,44 @@ public:
 	virtual void CmdEndRenderPass(HalCommandBuffer* commandBuffer) = 0;
 
 	/**
+	* @brief Bind graphics pipeline
+	*
+	* @param[in] commandBuffer			Command buffer we use for recording
+	* @param[in] graphicsPipelineInfo	Graphics pipeline object
+	*/
+	virtual void CmdBindGraphicsPipeline(HalCommandBuffer* commandBuffer, HalGraphicsPipeline* graphicsPipelineInfo) = 0;
+
+	/**
+	* @brief Draw command for non indexed drawing
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	* @param[in] vertexCount	Number of vertices to draw
+	* @param[in] instanceCount	Number of instances to draw
+	* @param[in] firstVertex	Index of the first vertex to draw
+	* @param[in] firstInstance	Instance ID of the first instance to draw
+	*/
+	virtual void CmdDraw(HalCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
+		, uint32_t firstVertex, uint32_t firstInstance) = 0;
+
+	/**
+	* @brief A special submit for swap chain image presentation
+	*
+	* @param[in] commandBuffer			Command buffer we use for recording
+	*
+	* @return true if successful
+	*/
+	virtual bool PresentQueueSubmit(HalCommandBuffer* commandBuffer) = 0;
+
+	/**
+	* @brief Present Image on scren
+	*
+	* @param[in] imageIndex		Image to present
+	*
+	* @return true if successful
+	*/
+	virtual bool PresentQueue(uint32_t imageIndex) = 0;
+
+	/**
 	* @brief Get swap chain image format
 	*
 	* @return Image format
@@ -261,6 +307,15 @@ public:
 	* @return Image extend
 	*/
 	virtual const HalExtent2D GetSwapChainExtend() = 0;
+
+	/**
+	* @brief Get next available swap chain image
+	*
+	* @param[in] timeout		Timeout in nano seconds
+	*
+	* @return Image index
+	*/
+	virtual const uint32_t AcquireNextSwapChainImage(uint64_t timeout) = 0;
 
 	/**
 	* @brief Create presentation framebuffers

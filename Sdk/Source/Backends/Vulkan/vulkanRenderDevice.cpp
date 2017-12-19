@@ -33,6 +33,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanPipelineLayout.h"
 #include "vulkanRenderPass.h"
 #include "vulkanGraphicsPipeline.h"
+#include "vulkanSemaphore.h"
 #include "vulkanCommandPool.h"
 #include "vulkanCommandBuffer.h"
 #include "vulkanConversion.h"
@@ -300,6 +301,14 @@ const HalExtent2D VulkanRenderDevice::GetSwapChainExtend()
 	return halExtend;
 }
 
+const uint32_t VulkanRenderDevice::AcquireNextSwapChainImage(uint64_t timeout)
+{
+	if (!_pSwapChain)
+		return (std::numeric_limits<uint32_t>::max)();
+
+	return _pSwapChain->AcquireNextSwapChainImage(timeout);
+}
+
 HalCommandPool* VulkanRenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPoolInfo)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
@@ -432,6 +441,16 @@ HalGraphicsPipeline* VulkanRenderDevice::CreateGraphicsPipeline(HalGraphicsPipel
 	return graphicsPipeline;
 }
 
+HalSemaphore* VulkanRenderDevice::CreateSemaphore()
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanSemaphore* semaphore = AllocateObject<VulkanSemaphore>(*_pInstance->GetEngineAllocator(), this);
+
+	return semaphore;
+}
+
 bool VulkanRenderDevice::AllocateCommandBuffers(HalCommandPool* commandPool
 						, HalCommandBufferInfo& commandBufferInfo
 						, caveVector<HalCommandBuffer*>& commandBuffers)
@@ -526,6 +545,83 @@ void VulkanRenderDevice::CmdEndRenderPass(HalCommandBuffer* commandBuffer)
 		return;
 
 	VulkanApi::GetApi()->vkCmdEndRenderPass(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer());
+}
+
+void VulkanRenderDevice::CmdBindGraphicsPipeline(HalCommandBuffer* commandBuffer, HalGraphicsPipeline* graphicsPipelineInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	VulkanApi::GetApi()->vkCmdBindPipeline(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer()
+		, VK_PIPELINE_BIND_POINT_GRAPHICS
+		, static_cast<VulkanGraphicsPipeline*>(graphicsPipelineInfo)->GetGraphicsPipeline());
+}
+
+void VulkanRenderDevice::CmdDraw(HalCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
+								, uint32_t firstVertex, uint32_t firstInstance)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	VulkanApi::GetApi()->vkCmdDraw(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer()
+		, vertexCount, instanceCount, firstVertex, firstInstance);
+}
+
+bool VulkanRenderDevice::PresentQueueSubmit(HalCommandBuffer* commandBuffer)
+{
+	if (!_pSwapChain)
+		return false;
+
+	VkResult result = VK_INCOMPLETE;
+	if (_graphicsQueue)
+	{
+		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+		const VkSemaphore waitSemaphore = _pSwapChain->GetImageAvailableSemaphore();
+		const VkSemaphore signalSemaphore = _pSwapChain->GetRenderingDoneSemaphore();
+		VkCommandBuffer vkCommandBuffer = static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer();
+
+		VkSubmitInfo submitInfo;
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.pNext = nullptr;
+		submitInfo.waitSemaphoreCount = 1;
+		submitInfo.pWaitSemaphores = &waitSemaphore;
+		submitInfo.pWaitDstStageMask = waitStages;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &vkCommandBuffer;
+		submitInfo.signalSemaphoreCount = 1;
+		submitInfo.pSignalSemaphores = &signalSemaphore;
+
+		result = VulkanApi::GetApi()->vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	}
+
+	return (result == VK_SUCCESS);
+}
+
+bool VulkanRenderDevice::PresentQueue(uint32_t imageIndex)
+{
+	if (!_pSwapChain)
+		return false;
+
+	VkResult result = VK_INCOMPLETE;
+	if (_presentQueue)
+	{
+		const VkSemaphore waitSemaphore = _pSwapChain->GetRenderingDoneSemaphore();
+		const VkSwapchainKHR swapChain = _pSwapChain->GetSwapChainHandle();
+
+		VkPresentInfoKHR presentInfo;
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		presentInfo.pNext = nullptr;
+		presentInfo.waitSemaphoreCount = 1;
+		presentInfo.pWaitSemaphores = &waitSemaphore;
+		presentInfo.swapchainCount = 1;
+		presentInfo.pSwapchains = &swapChain;
+		presentInfo.pImageIndices = &imageIndex;
+		presentInfo.pResults = nullptr;
+
+		result = VulkanApi::GetApi()->vkQueuePresentKHR(_presentQueue, &presentInfo);
+	}
+
+	return (result == VK_SUCCESS);
 }
 
 }

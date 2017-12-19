@@ -113,6 +113,15 @@ public:
 	const uint32_t GetSwapChainImageCount();
 
 	/**
+	* @brief Get next available swap chain image
+	*
+	* @param[in] timeout		Timeout in nano seconds
+	*
+	* @return Image index
+	*/
+	const uint32_t AcquireNextSwapChainImage(uint64_t timeout);
+
+	/**
 	* @brief Get Resource manager
 	*
 	* @return ResourceManager Object
@@ -378,6 +387,42 @@ public:
 	* @param[in] commandBuffer	Command buffer we use for recording
 	*/
 	void CmdEndRenderPass(RenderCommandBuffer* commandBuffer);
+
+	/**
+	* @brief Bind graphics pipeline
+	*
+	* @param[in] commandBuffer			Command buffer we use for recording
+	* @param[in] graphicsPipelineInfo	Graphics pipeline object
+	*/
+	void CmdBindGraphicsPipeline(RenderCommandBuffer* commandBuffer, RenderGraphicsPipeline* graphicsPipelineInfo);
+
+	/**
+	* @brief Draw command for non indexed drawing
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	* @param[in] vertexCount	Number of vertices to draw
+	* @param[in] instanceCount	Number of instances to draw
+	* @param[in] firstVertex	Index of the first vertex to draw
+	* @param[in] firstInstance	Instance ID of the first instance to draw
+	*/
+	void CmdDraw(RenderCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
+		, uint32_t firstVertex, uint32_t firstInstance);
+
+	/**
+	* @brief A special submit for swap chain image presentation
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	*/
+	bool PresentQueueSubmit(RenderCommandBuffer* commandBuffer);
+
+	/**
+	* @brief Present Image on scren
+	*
+	* @param[in] imageIndex		Image to present
+	*
+	* @return true if successful
+	*/
+	bool PresentQueue(uint32_t imageIndex);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to

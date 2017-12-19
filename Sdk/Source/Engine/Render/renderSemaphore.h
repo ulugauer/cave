@@ -13,12 +13,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file renderCommandBuffer.h
-///       Render command buffer interface
+/// @file renderSemaphore.h
+///       Render semaphore interface
 
 #include "Common/caveRefCount.h"
 #include "Memory/allocatorGlobal.h"
-#include "halTypes.h"
 
 #include <memory>
 
@@ -32,63 +31,38 @@ namespace cave
 
 /// forward declaration
 class RenderDevice;
-class RenderPass;
-class HalCommandBuffer;
-class RenderCommandBuffer;
-
+class HalSemaphore;
 
 /**
-* @brief Render command render pass info
+* @brief Interface for semaphores
 */
-struct CAVE_INTERFACE RenderCmdRenderPassInfo
-{
-	RenderPass* _renderPass;			///< Pointer to an instance of RenderPass object
-	// RenderFramebuffer* _framebuffer;	///< to do
-	int32_t _swapChainIndex;				///< If _framebuffer = nullptr fetch framebuffer from swap chain 
-	HalRect2D _renderRect;				///< Render areaa within the framebuffer
-	uint32_t _clearValueCount;			///< Count of clear value arrau
-	const HalClearValue* _clearValues;	///< Array of clear values
-
-	RenderCmdRenderPassInfo()
-		: _renderPass(nullptr)
-		, _swapChainIndex(-1)
-	{}
-};
-
-/**
-* @brief Represents a command buffer interface
-*/
-class CAVE_INTERFACE RenderCommandBuffer : public CaveRefCount
+class CAVE_INTERFACE RenderSemaphore : public CaveRefCount
 {
 public:
 
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device
-	* @param[in] commandBuffer		HAL command buffer
+	* @param[in] renderDevice	Pointer to render device
 	*
 	*/
-	RenderCommandBuffer(RenderDevice& renderDevice
-		, HalCommandBuffer* commandBuffer);
-	/** @brief destructor */
-	virtual ~RenderCommandBuffer();
+	RenderSemaphore(RenderDevice& renderDevice);
+	/** @brief copy constructor */
+	virtual ~RenderSemaphore();
 
 	/**
 	* @brief Get low level HAL handle
 	*
-	* @return HalCommandBuffer handle
+	* @return HalVertexInput handle
 	*/
-	HalCommandBuffer* GetHalHandle() { return _halCommandBuffer; }
+	HalSemaphore* GetHalHandle() { return _halSemaphore; }
 
 private:
-	RenderDevice& _renderDevice;			///< Render device object
-	HalCommandBuffer* _halCommandBuffer;	///< Pointer to low level command buffer object
+	RenderDevice& _renderDevice;	///< Render device object
+	HalSemaphore* _halSemaphore;	///< Pointer to low level semaphore object
 };
 
 }
 /** @}*/
-
-
 
 

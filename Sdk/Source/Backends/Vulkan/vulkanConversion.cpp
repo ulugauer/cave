@@ -715,4 +715,98 @@ VulkanTypeConversion::ConvertSubpassContentToVulkan(HalSubpassContents content)
 	return vkContent;
 }
 
+VkDependencyFlags 
+VulkanTypeConversion::ConvertDependencyFlagsToVulkan(HalDependencyFlags dependency)
+{
+	VkDependencyFlags vkFlags = 0;
+	if (dependency & static_cast<uint32_t>(HalDependencyBits::DependencyByRegion))
+		vkFlags |= VK_DEPENDENCY_BY_REGION_BIT;
+
+	return vkFlags;
+}
+
+VkPipelineStageFlags 
+VulkanTypeConversion::ConvertPipelineFlagsToVulkan(HalPipelineStageFlags pipelineStage)
+{
+	VkPipelineStageFlags vkFlags = 0;
+
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::TopOfPipe))
+		vkFlags |= VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::DrawIndirect))
+		vkFlags |= VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::VertexInput))
+		vkFlags |= VK_PIPELINE_STAGE_VERTEX_INPUT_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::DrawIndirect))
+		vkFlags |= VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::VertexShader))
+		vkFlags |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::TessellationControlShader))
+		vkFlags |= VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::TessellationEvaluationShader))
+		vkFlags |= VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::GeometryShader))
+		vkFlags |= VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::FragmentShader))
+		vkFlags |= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::EarlyFragmentTests))
+		vkFlags |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::LateFragmentTests))
+		vkFlags |= VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::ColorAttachmentOutput))
+		vkFlags |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::ComputeShader))
+		vkFlags |= VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::Transfer))
+		vkFlags |= VK_PIPELINE_STAGE_TRANSFER_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::BottomOfPipe))
+		vkFlags |= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+	if (pipelineStage & static_cast<uint32_t>(HalPipelineStageBits::Host))
+		vkFlags |= VK_PIPELINE_STAGE_HOST_BIT;
+
+	return vkFlags;
+}
+
+VkAccessFlags 
+VulkanTypeConversion::ConvertAccessFlagsToVulkan(HalAccessFlags access)
+{
+	VkAccessFlags vkFlags = 0;
+
+	if (access & static_cast<uint32_t>(HalAccessBits::IndirectCommandRead))
+		vkFlags |= VK_ACCESS_INDIRECT_COMMAND_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::IndexRead))
+		vkFlags |= VK_ACCESS_INDEX_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::VertexAttributeRead))
+		vkFlags |= VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::UniformRead))
+		vkFlags |= VK_ACCESS_UNIFORM_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::InputAttachmentRead))
+		vkFlags |= VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::ShaderRead))
+		vkFlags |= VK_ACCESS_SHADER_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::ShaderWrite))
+		vkFlags |= VK_ACCESS_SHADER_WRITE_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::ColorAttachmentRead))
+		vkFlags |= VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::ColorAttachmentWrite))
+		vkFlags |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::DepthStencilAttachmentRead))
+		vkFlags |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::DepthStencilAttachmentWrite))
+		vkFlags |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::TransferRead))
+		vkFlags |= VK_ACCESS_TRANSFER_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::TransferWrite))
+		vkFlags |= VK_ACCESS_TRANSFER_WRITE_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::HostRead))
+		vkFlags |= VK_ACCESS_HOST_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::HostWrite))
+		vkFlags |= VK_ACCESS_HOST_WRITE_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::MemoryRead))
+		vkFlags |= VK_ACCESS_MEMORY_READ_BIT;
+	if (access & static_cast<uint32_t>(HalAccessBits::MemoryWrite))
+		vkFlags |= VK_ACCESS_MEMORY_WRITE_BIT;
+
+	return vkFlags;
+}
+
 }

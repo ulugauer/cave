@@ -138,11 +138,29 @@ VulkanRenderPass::VulkanRenderPass(VulkanRenderDevice* device, HalRenderPassInfo
 		}
 	}
 
-	// convert dependencies not handled yet
-	assert(renderPassInfo._dependencyCount == 0);
-	_vkRenderPassInfo.dependencyCount = 0;
-	_vkRenderPassInfo.pDependencies = nullptr;
+	// convert dependencies
+	_vkRenderPassInfo.dependencyCount = renderPassInfo._dependencyCount;
+	if (renderPassInfo._dependencyCount > 0)
+	{
+		// allocte memory
+		size_t dependencyArraySize = renderPassInfo._dependencyCount * sizeof(VkAttachmentDescription);
+		VkSubpassDependency *dependencies = static_cast<VkSubpassDependency*>(device->GetEngineAllocator()->Allocate(dependencyArraySize, 4));
+		if (dependencies)
+		{
+			for (size_t i = 0; i < renderPassInfo._dependencyCount; ++i)
+			{
+				dependencies[i].dependencyFlags = VulkanTypeConversion::ConvertDependencyFlagsToVulkan(renderPassInfo._pDependencies[i]._dependencyFlags);
+				dependencies[i].srcSubpass = renderPassInfo._pDependencies[i]._srcSubpass;
+				dependencies[i].dstSubpass = renderPassInfo._pDependencies[i]._dstSubpass;
+				dependencies[i].srcStageMask = VulkanTypeConversion::ConvertPipelineFlagsToVulkan(renderPassInfo._pDependencies[i]._srcStageMask);
+				dependencies[i].srcAccessMask = VulkanTypeConversion::ConvertAccessFlagsToVulkan(renderPassInfo._pDependencies[i]._srcAccessMask);
+				dependencies[i].dstStageMask = VulkanTypeConversion::ConvertPipelineFlagsToVulkan(renderPassInfo._pDependencies[i]._dstStageMask);
+				dependencies[i].dstAccessMask = VulkanTypeConversion::ConvertAccessFlagsToVulkan(renderPassInfo._pDependencies[i]._dstAccessMask);
+			}
+		}
 
+		_vkRenderPassInfo.pDependencies = dependencies;
+	}
 }
 
 VulkanRenderPass::~VulkanRenderPass()
@@ -165,6 +183,8 @@ VulkanRenderPass::~VulkanRenderPass()
 		_pDevice->GetEngineAllocator()->Deallocate((void *)_vkRenderPassInfo.pAttachments);
 	if (_vkRenderPassInfo.pSubpasses != nullptr)
 		_pDevice->GetEngineAllocator()->Deallocate((void *)_vkRenderPassInfo.pSubpasses);
+	if (_vkRenderPassInfo.pDependencies != nullptr)
+		_pDevice->GetEngineAllocator()->Deallocate((void *)_vkRenderPassInfo.pDependencies);
 
 	if (_vkRenderPass != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkDestroyRenderPass(_pDevice->GetDeviceHandle(), _vkRenderPass, nullptr);

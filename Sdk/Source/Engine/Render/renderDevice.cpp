@@ -144,6 +144,15 @@ const uint32_t RenderDevice::GetSwapChainImageCount()
 	return 0;
 }
 
+const uint32_t RenderDevice::AcquireNextSwapChainImage(uint64_t timeout)
+{
+	uint32_t imageIndex = (std::numeric_limits<uint32_t>::max)();
+	if (_pHalRenderDevice)
+		imageIndex = _pHalRenderDevice->AcquireNextSwapChainImage(timeout);
+
+	return imageIndex;
+}
+
 RenderCommandPool* RenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPoolInfo)
 {
 	RenderCommandPool* commandPool = AllocateObject<RenderCommandPool>(*_pRenderInstance->GetEngineAllocator(), *this, commandPoolInfo);
@@ -432,6 +441,32 @@ void RenderDevice::CmdEndRenderPass(RenderCommandBuffer* commandBuffer)
 {
 	if (commandBuffer)
 		_pHalRenderDevice->CmdEndRenderPass(commandBuffer->GetHalHandle());
+}
+
+void RenderDevice::CmdBindGraphicsPipeline(RenderCommandBuffer* commandBuffer, RenderGraphicsPipeline* graphicsPipelineInfo)
+{
+	if (commandBuffer && graphicsPipelineInfo)
+		_pHalRenderDevice->CmdBindGraphicsPipeline(commandBuffer->GetHalHandle(), graphicsPipelineInfo->GetHalHandle());
+}
+
+void RenderDevice::CmdDraw(RenderCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
+	, uint32_t firstVertex, uint32_t firstInstance)
+{
+	if (commandBuffer)
+		_pHalRenderDevice->CmdDraw(commandBuffer->GetHalHandle(), vertexCount, instanceCount, firstVertex, firstInstance);
+}
+
+bool RenderDevice::PresentQueueSubmit(RenderCommandBuffer* commandBuffer)
+{
+	if (commandBuffer)
+		return _pHalRenderDevice->PresentQueueSubmit(commandBuffer->GetHalHandle());
+
+	return false;
+}
+
+bool RenderDevice::PresentQueue(uint32_t imageIndex)
+{
+	return _pHalRenderDevice->PresentQueue(imageIndex);
 }
 
 }

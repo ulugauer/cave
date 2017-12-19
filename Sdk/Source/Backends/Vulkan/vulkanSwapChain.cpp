@@ -175,7 +175,7 @@ void VulkanSwapChain::CreatePresentationSemaphores()
 {
 	VkSemaphoreCreateInfo semaphoreCreateInfo = {};
 	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	semaphoreCreateInfo.flags = 0;;
+	semaphoreCreateInfo.flags = 0;
 	
 
 	VulkanApi::GetApi()->vkCreateSemaphore(_pRenderDevice->GetDeviceHandle(), &semaphoreCreateInfo, nullptr, &_ImageAvailableSemaphore);
@@ -269,6 +269,18 @@ VkExtent2D VulkanSwapChain::GetSwapChainExtent(VkSurfaceCapabilitiesKHR &surface
 	// Most of the cases we define size of the swap_chain images equal to current window's size
 	return surfaceCapabilities.currentExtent;
 }
+
+const uint32_t VulkanSwapChain::AcquireNextSwapChainImage(uint64_t timeout)
+{
+	if (!_swapChain)
+		return (std::numeric_limits<uint32_t>::max)();
+
+	uint32_t imageIndex;
+	VulkanApi::GetApi()->vkAcquireNextImageKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, timeout, _ImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+
+	return imageIndex;
+}
+
 
 VkImageUsageFlags VulkanSwapChain::GetSwapChainUsageFlags(VkSurfaceCapabilitiesKHR &surfaceCapabilities)
 {

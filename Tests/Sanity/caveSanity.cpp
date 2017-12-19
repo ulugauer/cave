@@ -167,6 +167,7 @@ int main(int argc, char* argv[])
 	RenderInputAssembly* inputAssembly = renderDevice->CreateInputAssembly();
 	// rasterizer state
 	HalRasterizerSetup rasterizerInfo;
+	rasterizerInfo._frontFace = HalFrontFace::Clockwise;
 	RenderRasterizerState* rasterizerState = renderDevice->CreateRasterizerState(rasterizerInfo);
 	// multisample state
 	HalMultisampleState multisampleInfo;
@@ -207,13 +208,21 @@ int main(int argc, char* argv[])
 	subpassDesc._pipelineBindPoint = HalPipelineBindPoints::Graphics;
 	subpassDesc._colorAttachmentCount = 1;
 	subpassDesc._pColorAttachments = &attachRef;
+	HalSubpassDependency dependency;
+	dependency._srcSubpass = HAL_SUBPASS_EXTERNAL;	// special subpass
+	dependency._dstSubpass = 0;	// our subpass
+	dependency._srcStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
+	dependency._srcAccessMask = HalAccessBits::AccessNone;
+	dependency._dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
+	dependency._dstAccessMask = HalAccessBits::ColorAttachmentRead | HalAccessBits::ColorAttachmentWrite;
+	dependency._dependencyFlags = HalDependencyBits::DependencyNone;
 	HalRenderPassInfo renderPassInfo;
 	renderPassInfo._attachmentCount = 1;
 	renderPassInfo._pAttachments = &renderAttachment;
 	renderPassInfo._subpassCount = 1;
 	renderPassInfo._pSubpasses = &subpassDesc;
-	renderPassInfo._dependencyCount = 0;
-	renderPassInfo._pDependencies = nullptr;
+	renderPassInfo._dependencyCount = 1;
+	renderPassInfo._pDependencies = &dependency;
 	RenderPass* renderPass = renderDevice->CreateRenderPass(renderPassInfo);
 	// render graphics pipeline
 	RenderGraphicsPipelineInfo grpahicsPipelineInfo;
@@ -258,7 +267,7 @@ int main(int argc, char* argv[])
 	HalRect2D renderArea;
 	renderArea._x = 0; renderArea._y = 0;
 	renderArea._height = sectionInfo.height;
-	renderArea._width = sectionInfo.height;
+	renderArea._width = sectionInfo.width;
 	for (size_t i = 0; i < commandBuffers.Size(); i++)
 	{
 		renderDevice->BeginCommandBuffer(commandBuffers[i], beginInfo);
@@ -270,14 +279,21 @@ int main(int argc, char* argv[])
 		renderPassBeginInfo._clearValues = &clearValues;
 		renderPassBeginInfo._renderRect = renderArea;
 		renderDevice->CmdBeginRenderPass(commandBuffers[i], renderPassBeginInfo, HalSubpassContents::Inline);
+		renderDevice->CmdBindGraphicsPipeline(commandBuffers[i], graphicsPipeline);
+
+		renderDevice->CmdDraw(commandBuffers[i], 3, 1, 0, 0);
 
 		renderDevice->CmdEndRenderPass(commandBuffers[i]);
 		renderDevice->EndCommandBuffer(commandBuffers[i]);
 	}
 
+	uint32_t nextImage;
+
 	do {
+		nextImage = renderDevice->AcquireNextSwapChainImage((std::numeric_limits<uint64_t>::max)());
+		renderDevice->PresentQueueSubmit(commandBuffers[nextImage]);
 
-
+		renderDevice->PresentQueue(nextImage);
 	} while (frontend->HandleWindowMessage());
 
 	// release render command buffers
