@@ -153,6 +153,11 @@ bool WindowFrontend::CreateOsWindow(RenderWindowInfo& windowInfo)
 	return true;
 }
 
+void WindowFrontend::RegisterInputEngine(InputEngine* input)
+{
+	_inputEngine = input;
+}
+
 void WindowFrontend::DisplayWindow()
 {
 	if (_hWnd)

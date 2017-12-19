@@ -47,6 +47,14 @@ public:
 	virtual bool CreateOsWindow(RenderWindowInfo& windowInfo) override;
 
 	/**
+	* @brief Set Input engine
+	*
+	* @param[in] InputEngine 	Pointer to input engine object
+	*
+	*/
+	virtual void RegisterInputEngine(InputEngine* input) override;
+
+	/**
 	* @brief Display the window
 	*
 	*/

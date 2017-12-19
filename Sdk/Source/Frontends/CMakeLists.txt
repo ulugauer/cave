@@ -27,6 +27,7 @@ add_library(frontends OBJECT ${FRONTEND_SOURCE})
 # additional include directories
 target_include_directories(frontends PRIVATE .)
 target_include_directories(frontends PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Engine)
+target_include_directories(frontends PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Input)
 
 # Creates folder "os" and adds target project (os.vcproj)
 set_property(TARGET frontends PROPERTY FOLDER "sdk")

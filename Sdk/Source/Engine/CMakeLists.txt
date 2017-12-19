@@ -77,7 +77,8 @@ add_library(cave SHARED ${ENGINE_SOURCE} ${RENDER_SOURCE} ${RESOURCE_SOURCE}
 						${MEMORY_SOURCE} ${MATH_SOURCE} 
 			$<TARGET_OBJECTS:os> 
 			$<TARGET_OBJECTS:backends> 
-			$<TARGET_OBJECTS:frontends> )
+			$<TARGET_OBJECTS:frontends> 
+			$<TARGET_OBJECTS:input> )
 
 # additional include directories
 target_include_directories(cave PRIVATE .)
@@ -86,6 +87,7 @@ target_include_directories(cave PRIVATE Math)
 target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Os)
 target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Backends)
 target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Frontends)
+target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Input)
 # 3rd party libs
 target_include_directories(cave PRIVATE ${PROJECT_3RDPARTY_JSON_DIR})
 

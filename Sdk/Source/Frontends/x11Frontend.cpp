@@ -90,6 +90,11 @@ bool X11Frontend::CreateOsWindow(RenderWindowInfo& windowInfo)
 	return true;
 }
 
+void X11Frontend::RegisterInputEngine(InputEngine* input)
+{
+	_inputEngine = input;
+}
+
 void X11Frontend::DisplayWindow()
 {
 	if (_connection)

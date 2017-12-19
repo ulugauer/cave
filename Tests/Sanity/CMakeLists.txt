@@ -41,6 +41,7 @@ target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/E
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Os)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Backends)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Frontends)
+target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Input)
 
 # Set OS related libs
 IF(UNIX)

@@ -101,7 +101,13 @@ int main(int argc, char* argv[])
 
 	// get commaqnd line arguments
 	if (!getComdLineArguments(argc, argv))
-		return 1;
+		return -1;
+
+	if (g_ProjectPath.empty())
+	{
+		std::cerr << "No valid resource path specified\n";
+		return -1;
+	}
 
 	// window cration info
 	FrontendWindowInfo windowInfo = {};
@@ -291,6 +297,9 @@ int main(int argc, char* argv[])
 
 	do {
 		nextImage = renderDevice->AcquireNextSwapChainImage((std::numeric_limits<uint64_t>::max)());
+		if (nextImage < 0 || nextImage > renderDevice->GetSwapChainImageCount())
+			continue;
+
 		renderDevice->PresentQueueSubmit(commandBuffers[nextImage]);
 
 		renderDevice->PresentQueue(nextImage);

@@ -60,6 +60,9 @@ RenderGraphicsPipeline::RenderGraphicsPipeline(RenderDevice& renderDevice
 	graphicsPipeline._stageCount = static_cast<uint32_t>(stages.Size());
 	graphicsPipeline._pStages = stages.Data();
 
+	// we need at least a vertex program
+	assert(graphicsPipeline._stageCount);
+
 	if (graphicsPipelineInfo._vertexInput)
 		graphicsPipeline._vertexInput = graphicsPipelineInfo._vertexInput->GetHalHandle();
 	if (graphicsPipelineInfo._inputAssembly)

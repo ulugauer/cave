@@ -39,6 +39,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #endif
 
+#include "inputEngine.h"
+
 #include <memory>
 
 namespace cave
@@ -75,7 +77,7 @@ typedef struct FrontendWindowInfo
 class CAVE_INTERFACE IFrontend
 {
 public:
-	IFrontend() {}
+	IFrontend() : _inputEngine(nullptr) {}
 	virtual ~IFrontend() { } 
 
 	 /**
@@ -86,6 +88,14 @@ public:
 	 * @return  true if successfull
 	 */
 	virtual bool CreateOsWindow(RenderWindowInfo& windowInfo) = 0; 
+
+	/**
+	* @brief Set Input engine
+	*
+	* @param[in] InputEngine 	Pointer to input engine object
+	*
+	*/
+	virtual void RegisterInputEngine(InputEngine* input) = 0;
 
 	/**
 	* @brief Display the window
@@ -108,6 +118,9 @@ public:
 	* @return  true if successfull
 	*/
 	static IFrontend* CreateFrontend(std::shared_ptr<AllocatorBase> allocator);
+
+public:
+	InputEngine* _inputEngine;
 }; 
 
 }
