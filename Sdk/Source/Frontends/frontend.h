@@ -92,7 +92,7 @@ public:
 	/**
 	* @brief Set Input engine
 	*
-	* @param[in] InputEngine 	Pointer to input engine object
+	* @param[in] input 	Pointer to input engine object
 	*
 	*/
 	virtual void RegisterInputEngine(InputEngine* input) = 0;
@@ -120,7 +120,7 @@ public:
 	static IFrontend* CreateFrontend(std::shared_ptr<AllocatorBase> allocator);
 
 public:
-	InputEngine* _inputEngine;
+	InputEngine* _inputEngine;	///< Pointer to the input handling
 }; 
 
 }

@@ -14,19 +14,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineInstance.h"
 #include "engineError.h"
-#include "Render/renderCommandPool.h"
-#include "Render/renderVertexInput.h"
-#include "Render/renderInputAssembly.h"
-#include "Render/renderLayerSection.h"
-#include "Render/renderRasterizerState.h"
-#include "Render/renderMultisample.h"
-#include "Render/renderDepthStencil.h"
-#include "Render/renderColorBlend.h"
-#include "Render/renderDynamicState.h"
-#include "Render/renderPipelineLayout.h"
 #include "Render/renderRenderPass.h"
-#include "Render/renderGraphicsPipeline.h"
-#include "Render/renderCommandBuffer.h"
+
+#include "Base/caveSanityTestDevice.h"
 
 #include <iostream>
 #include <sstream>
@@ -39,6 +29,65 @@ typedef std::basic_string<char> string_type;
 string_type			g_ProjectPath;  ///< path to project content
 int32_t				g_WinWidth;		/// window width
 int32_t				g_WinHeight;	/// window height
+
+
+/// holds a test name and a pointer to the test class
+typedef struct
+{
+	char				*m_name;	///< the name of the test
+	CaveSanityTestBase	*m_test;    ///< pointer to the test class
+} testElement;
+
+#undef CAVE_SANITY_TEST_ITERATE
+#define CAVE_SANITY_TEST_ITERATE(_testName) \
+    { #_testName, NULL },
+
+static testElement
+testList[] =
+{
+#include "caveSanityTestList.h"
+};
+
+static void
+initTestList()
+{
+	uint32_t curTest = 0;
+
+#undef CAVE_SANITY_TEST_ITERATE
+#define CAVE_SANITY_TEST_ITERATE(_testName) \
+    testList[curTest++].m_test = new _testName;
+
+#include "caveSanityTestList.h"
+}
+
+static void
+destroyTestList()
+{
+	uint32_t curTest = 0;
+
+#undef CAVE_SANITY_TEST_ITERATE
+#define CAVE_SANITY_TEST_ITERATE(_testName) \
+   delete testList[curTest++].m_test;
+
+#include "caveSanityTestList.h"
+}
+
+static bool
+executeTest(RenderDevice *device, RenderCommandPool* commandPool, RenderPass* renderPass, CaveSanityTestBase *curTest, char *testName, userContextData* pUserData)
+{
+	bool success = true;
+
+	std::cerr << testName << "\n";
+
+	if (curTest->IsSupported(device))
+	{
+		success = curTest->Run(device, commandPool, renderPass, pUserData);
+		curTest->Cleanup(device, pUserData);
+	}
+
+	return success;
+}
+
 
 static void
 printHelpMessage()
@@ -96,8 +145,11 @@ int main(int argc, char* argv[])
 	RenderDevice* renderDevice = nullptr;
 	RenderCommandPool* graphicsCommandPool = nullptr;
 	IFrontend* frontend = nullptr;
-	g_WinWidth = 1280;
-	g_WinHeight = 768;
+	g_WinWidth = 640;
+	g_WinHeight = 480;
+	int32_t testPassed = 0;
+	int32_t testFailed = 0;
+
 
 	// get commaqnd line arguments
 	if (!getComdLineArguments(argc, argv))
@@ -108,6 +160,9 @@ int main(int argc, char* argv[])
 		std::cerr << "No valid resource path specified\n";
 		return -1;
 	}
+
+	// user data
+	userContextData userData = { (uint32_t)g_WinWidth, (uint32_t)g_WinHeight };
 
 	// window cration info
 	FrontendWindowInfo windowInfo = {};
@@ -160,44 +215,9 @@ int main(int argc, char* argv[])
 	// Initialization went successful dispaly window
 	frontend->DisplayWindow();
 
-	// Render section
-	RenderLayerSectionInfo sectionInfo;
-	sectionInfo.x = sectionInfo.y = 0;
-	sectionInfo.width = windowInfo.windowWidth;
-	sectionInfo.height = windowInfo.windowHeight;
-	RenderLayerSection* layerSection = renderDevice->CreateLayerSection(sectionInfo);
-	// load resources
-	ResourceManager& rm = renderDevice->GetResourceManager();
-	RenderMaterial material = rm.LoadMaterialAsset("ColoredMaterial.asset");
-	RenderVertexInput* vertexInput = renderDevice->CreateVertexInput();
-	RenderInputAssembly* inputAssembly = renderDevice->CreateInputAssembly();
-	// rasterizer state
-	HalRasterizerSetup rasterizerInfo;
-	rasterizerInfo._frontFace = HalFrontFace::Clockwise;
-	RenderRasterizerState* rasterizerState = renderDevice->CreateRasterizerState(rasterizerInfo);
-	// multisample state
-	HalMultisampleState multisampleInfo;
-	RenderMultisample* multisampleState = renderDevice->CreateMultisampleState(multisampleInfo);
-	// depth stencil state
-	HalDepthStencilSetup depthStencilInfo;
-	RenderDepthStencil* depthStencilState = renderDevice->CreateDepthStencilState(depthStencilInfo);
-	HalColorBlendState colorBlendInfo;
-	HalColorBlendAttachment blendAttachment;
-	caveVector<HalColorBlendAttachment> blendAttachmentArray(renderDevice->GetEngineAllocator());
-	blendAttachmentArray.Push(blendAttachment);
-	RenderColorBlend* colorBlendState = renderDevice->CreateColorBlendState(colorBlendInfo, blendAttachmentArray);
-	blendAttachmentArray.Clear();
-	// dynamic state
-	caveVector<HalDynamicStates> dynamicStates(renderDevice->GetEngineAllocator());
-	dynamicStates.Push(HalDynamicStates::Viewport);
-	dynamicStates.Push(HalDynamicStates::Scissor);
-	RenderDynamicState* dynamicState = renderDevice->CreateDynamicState(dynamicStates);
-	dynamicStates.Clear();
-	// pipeline layout
-	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(renderDevice->GetEngineAllocator());
-	caveVector<HalPushConstantRange> pushConstants(renderDevice->GetEngineAllocator());
-	RenderPipelineLayout* pipelineLayout = renderDevice->CreatePipelineLayout(descriptorSetLayouts, pushConstants);
-	// render pass
+
+	// Right now we need a common render pass for all tests.
+	// This will change one we can do offscreen rendering.
 	HalRenderPassAttachment renderAttachment;
 	renderAttachment._format = renderDevice->GetSwapChainImageFormat();
 	renderAttachment._samples = HalSampleCount::SampleCount1;
@@ -230,96 +250,39 @@ int main(int argc, char* argv[])
 	renderPassInfo._dependencyCount = 1;
 	renderPassInfo._pDependencies = &dependency;
 	RenderPass* renderPass = renderDevice->CreateRenderPass(renderPassInfo);
-	// render graphics pipeline
-	RenderGraphicsPipelineInfo grpahicsPipelineInfo;
-	grpahicsPipelineInfo._material = &material;
-	grpahicsPipelineInfo._vertexInput = vertexInput;
-	grpahicsPipelineInfo._inputAssembly = inputAssembly;
-	grpahicsPipelineInfo._viewport = layerSection->GetViewport();
-	grpahicsPipelineInfo._raterizer = rasterizerState;
-	grpahicsPipelineInfo._multisample = multisampleState;
-	grpahicsPipelineInfo._depthStencil = nullptr;
-	grpahicsPipelineInfo._colorBlend = colorBlendState;
-	grpahicsPipelineInfo._dynamicState = nullptr;
-	grpahicsPipelineInfo._layout = pipelineLayout;
-	grpahicsPipelineInfo._renderPass = renderPass;
-	grpahicsPipelineInfo._subpass = 0;
-	grpahicsPipelineInfo._basePipelineIndex = -1;
-	grpahicsPipelineInfo._basePipelineHandle = nullptr;
-	RenderGraphicsPipeline* graphicsPipeline = renderDevice->CreateGraphicsPipeline(grpahicsPipelineInfo);
-	graphicsPipeline->Update();
-
+	
 	// with a renderpass object we can create our swap chain framebuffers
 	if (!renderDevice->CreateSwapChainFramebuffers(renderPass))
 	{
 		std::cerr << "Failed to create swap chain framebuffers\n";
 	}
 
-	// allocate command buffers
-	HalCommandBufferInfo allocInfo;
-	allocInfo._bufferCount = renderDevice->GetSwapChainImageCount();
-	allocInfo._level = HalCommandBufferLevel::PrimaryLevel;
-	caveVector<RenderCommandBuffer*> commandBuffers(renderDevice->GetEngineAllocator());
-	commandBuffers.Resize(allocInfo._bufferCount);
-	if (!renderDevice->AllocateCommandBuffers(graphicsCommandPool, allocInfo, commandBuffers))
+	// init test list
+	initTestList();
+
+	// run tests
+	for (uint32_t i = 0; i < sizeof(testList) / sizeof(testList[0]); i++)
 	{
-		std::cerr << "Failed to allocate command buffers\n";
+		bool passed = executeTest(renderDevice, graphicsCommandPool, renderPass, testList[i].m_test, testList[i].m_name, &userData);
+
+		if (passed)
+			testPassed++;
+		else
+			testFailed++;
 	}
 
-	// start command buffer recording
-	HalCommandBufferBeginInfo beginInfo; // always the same here
-	beginInfo._flags = static_cast<uint32_t>(HalCommandBufferUsage::SimultaneousUse);
-	HalClearValue clearValues = { 0.0f, 0.0f, 0.0f, 1.0f };
-	HalRect2D renderArea;
-	renderArea._x = 0; renderArea._y = 0;
-	renderArea._height = sectionInfo.height;
-	renderArea._width = sectionInfo.width;
-	for (size_t i = 0; i < commandBuffers.Size(); i++)
-	{
-		renderDevice->BeginCommandBuffer(commandBuffers[i], beginInfo);
-		// render pass begin
-		RenderCmdRenderPassInfo renderPassBeginInfo;
-		renderPassBeginInfo._renderPass = renderPass;
-		renderPassBeginInfo._swapChainIndex = static_cast<int32_t>(i); ///< fetch framebuffer from swap chain
-		renderPassBeginInfo._clearValueCount = 1;
-		renderPassBeginInfo._clearValues = &clearValues;
-		renderPassBeginInfo._renderRect = renderArea;
-		renderDevice->CmdBeginRenderPass(commandBuffers[i], renderPassBeginInfo, HalSubpassContents::Inline);
-		renderDevice->CmdBindGraphicsPipeline(commandBuffers[i], graphicsPipeline);
-
-		renderDevice->CmdDraw(commandBuffers[i], 3, 1, 0, 0);
-
-		renderDevice->CmdEndRenderPass(commandBuffers[i]);
-		renderDevice->EndCommandBuffer(commandBuffers[i]);
-	}
-
-	uint32_t nextImage;
+	std::cerr << "Tests passed: " << testPassed << "\n";
+	std::cerr << "Tests failed: " << testFailed << "\n";
 
 	do {
-		nextImage = renderDevice->AcquireNextSwapChainImage((std::numeric_limits<uint64_t>::max)());
-		if (nextImage < 0 || nextImage > renderDevice->GetSwapChainImageCount())
-			continue;
-
-		renderDevice->PresentQueueSubmit(commandBuffers[nextImage]);
-
-		renderDevice->PresentQueue(nextImage);
+		
 	} while (frontend->HandleWindowMessage());
 
-	// release render command buffers
-	renderDevice->ReleaseCommandBuffers(commandBuffers);
-	commandBuffers.Clear();
+	// destroy test list
+	destroyTestList();
 
-	renderDevice->ReleaseGraphicsPipeline(graphicsPipeline);
-	renderDevice->ReleasePipelineLayout(pipelineLayout);
+	// release resources
 	renderDevice->ReleaseRenderPass(renderPass);
-	renderDevice->ReleaseDynamicState(dynamicState);
-	renderDevice->ReleaseColorBlendState(colorBlendState);
-	renderDevice->ReleaseDepthStencilState(depthStencilState);
-	renderDevice->ReleaseMultisampleState(multisampleState);
-	renderDevice->ReleaseRasterizerState(rasterizerState);
-	renderDevice->ReleaseInputAssembly(inputAssembly);
-	renderDevice->ReleaseVertexInput(vertexInput);
-	renderDevice->ReleaseLayerSection(layerSection);
 	// release at last
 	renderDevice->ReleaseCommandPool(graphicsCommandPool);
 	renderInstance->ReleaseRenderDevice(renderDevice);

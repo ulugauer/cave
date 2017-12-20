@@ -26,14 +26,18 @@ link_directories(${CAVE_RUNTIME_BIN_DIR})
 ENDIF()
 
 # Add sources
-list(APPEND CAVE_SANITY_SOURCE caveSanity.cpp) 
+set(CAVE_SANITY_SOURCE  caveSanity.cpp
+						caveSanityTestBase.h) 
+
+set(CAVE_SANITY_BASE_SOURCE  Base/caveSanityTestDevice.h Base/caveSanityTestDevice.cpp ) 
 
 # Create named folders for the sources within the .vcproj
 # Empty name lists them directly under the .vcproj
-source_group("sanity\\Source" FILES ${CAVE_SANITY_SOURCE})
+source_group("sanity" FILES ${CAVE_SANITY_SOURCE})
+source_group("sanity\\base" FILES ${CAVE_SANITY_BASE_SOURCE})
 
 #Generate the executable from the sources
-add_executable(CaveSanity ${CAVE_SANITY_SOURCE})
+add_executable(CaveSanity ${CAVE_SANITY_SOURCE} ${CAVE_SANITY_BASE_SOURCE})
 
 # additional include directories
 target_include_directories(CaveSanity PRIVATE .)

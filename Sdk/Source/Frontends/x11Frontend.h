@@ -49,7 +49,7 @@ public:
 	/**
 	* @brief Set Input engine
 	*
-	* @param[in] InputEngine 	Pointer to input engine object
+	* @param[in] input 	Pointer to input engine object
 	*
 	*/
 	virtual void RegisterInputEngine(InputEngine* input) override;

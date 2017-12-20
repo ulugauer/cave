@@ -230,6 +230,11 @@ void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
 
 		// If all went well set framebuffer size
 		_presentationFramebuffers.Resize(imageCount);
+		// init with null
+		for (uint32_t i = 0; i < imageCount; i++)
+		{
+			_presentationFramebuffers[i] = VK_NULL_HANDLE;
+		}
 	}
 }
 
@@ -245,6 +250,10 @@ void VulkanRenderDevice::CreateSwapChainFramebuffers(HalRenderPass* renderPass)
 
 	for (size_t i = 0; i < _presentationFramebuffers.Size(); i++)
 	{
+		// do not create twice
+		if (_presentationFramebuffers[i] != VK_NULL_HANDLE)
+			continue;
+
 		VkImageView attachments[] = 
 		{
 			_pSwapChain->GetSwapChainImageView(i)
