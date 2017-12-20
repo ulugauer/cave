@@ -34,7 +34,7 @@ int32_t				g_WinHeight;	/// window height
 /// holds a test name and a pointer to the test class
 typedef struct
 {
-	char				*m_name;	///< the name of the test
+	const char			*m_name;	///< the name of the test
 	CaveSanityTestBase	*m_test;    ///< pointer to the test class
 } testElement;
 
@@ -73,7 +73,7 @@ destroyTestList()
 }
 
 static bool
-executeTest(RenderDevice *device, RenderCommandPool* commandPool, RenderPass* renderPass, CaveSanityTestBase *curTest, char *testName, userContextData* pUserData)
+executeTest(RenderDevice *device, RenderCommandPool* commandPool, RenderPass* renderPass, CaveSanityTestBase *curTest, const char *testName, userContextData* pUserData)
 {
 	bool success = true;
 
