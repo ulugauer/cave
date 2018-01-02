@@ -809,4 +809,58 @@ VulkanTypeConversion::ConvertAccessFlagsToVulkan(HalAccessFlags access)
 	return vkFlags;
 }
 
+VkBufferCreateFlags 
+VulkanTypeConversion::ConvertBufferCreateFlagsToVulkan(HalBufferCreateFlags create)
+{
+	VkBufferCreateFlags vkFlags = 0;
+
+	if (create & static_cast<uint32_t>(HalBufferCreate::SparseBinding))
+		vkFlags |= VK_BUFFER_CREATE_SPARSE_BINDING_BIT;
+	if (create & static_cast<uint32_t>(HalBufferCreate::SparseResidency))
+		vkFlags |= VK_BUFFER_CREATE_SPARSE_RESIDENCY_BIT;
+	if (create & static_cast<uint32_t>(HalBufferCreate::SparseAliased))
+		vkFlags |= VK_BUFFER_CREATE_SPARSE_ALIASED_BIT;
+
+	return vkFlags;
+}
+
+VkBufferUsageFlags 
+VulkanTypeConversion::ConvertBufferUsageFlagsToVulkan(HalBufferUsageFlags usage)
+{
+	VkBufferUsageFlags vkFlags = 0;
+
+	if (usage & static_cast<uint32_t>(HalBufferUsage::TransferSource))
+		vkFlags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	if (usage & static_cast<uint32_t>(HalBufferUsage::TransferDest))
+		vkFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+	if (usage & static_cast<uint32_t>(HalBufferUsage::UniformTexelBuffer))
+		vkFlags |= VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
+	if (usage & static_cast<uint32_t>(HalBufferUsage::StorageTexelBuffer))
+		vkFlags |= VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT;
+	if (usage & static_cast<uint32_t>(HalBufferUsage::UniformBuffer))
+		vkFlags |= VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+	if (usage & static_cast<uint32_t>(HalBufferUsage::StorageBuffer))
+		vkFlags |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+	if (usage & static_cast<uint32_t>(HalBufferUsage::IndexBuffer))
+		vkFlags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+	if (usage & static_cast<uint32_t>(HalBufferUsage::VertexBuffer))
+		vkFlags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	if (usage & static_cast<uint32_t>(HalBufferUsage::IndirectBuffer))
+		vkFlags |= VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
+
+	assert(vkFlags);	// assert if zero
+	return vkFlags;
+}
+
+VkSharingMode  
+VulkanTypeConversion::ConvertSharedModeFlagsToVulkan(HalBufferShareMode mode)
+{
+	VkSharingMode vkMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (mode == HalBufferShareMode::Comcurrent)
+		vkMode = VK_SHARING_MODE_CONCURRENT;
+
+	return vkMode;
+}
+
 }

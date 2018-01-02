@@ -7,7 +7,7 @@ ENDIF()
 
 add_definitions(-DCAVE_EXPORTS) 
 
-# Add sources
+# HAL sources
 set(BACKENDS_SOURCE halTypes.h 
 					halInstance.h halInstance.cpp 
 					halRenderDevice.h halRenderDevice.cpp 
@@ -25,7 +25,9 @@ set(BACKENDS_SOURCE halTypes.h
 					halGraphicsPipeline.h halGraphicsPipeline.cpp 
 					halCommandPool.h halCommandPool.cpp 
 					halCommandBuffer.h halCommandBuffer.cpp 
-					halSemaphore.h halSemaphore.cpp )
+					halSemaphore.h halSemaphore.cpp 
+					halBuffer.h halBuffer.cpp )
+
 # vulkan source
 set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h 
 						   Vulkan/vulkanConversion.h Vulkan/vulkanConversion.cpp 
@@ -47,7 +49,8 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 						   Vulkan/vulkanGraphicsPipeline.h Vulkan/vulkanGraphicsPipeline.cpp 
 						   Vulkan/vulkanCommandPool.h Vulkan/vulkanCommandPool.cpp 
 						   Vulkan/vulkanCommandBuffer.h Vulkan/vulkanCommandBuffer.cpp 
-						   Vulkan/vulkanSemaphore.h Vulkan/vulkanSemaphore.cpp )
+						   Vulkan/vulkanSemaphore.h Vulkan/vulkanSemaphore.cpp 
+						   Vulkan/vulkanBuffer.h Vulkan/vulkanBuffer.cpp )
 
 
 # Create named folders for the sources within the .vcproj

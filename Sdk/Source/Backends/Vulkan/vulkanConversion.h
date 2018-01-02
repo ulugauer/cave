@@ -262,6 +262,33 @@ public:
 	* @return Vulkan VkAccessFlags
 	*/
 	static VkAccessFlags ConvertAccessFlagsToVulkan(HalAccessFlags access);
+
+	/**
+	* @brief Convert from generic create flags to vulkan crweate flags
+	*
+	* @param[in] create		Generic create flags
+	*
+	* @return Vulkan VkBufferCreateFlags
+	*/
+	static VkBufferCreateFlags ConvertBufferCreateFlagsToVulkan(HalBufferCreateFlags create);
+
+	/**
+	* @brief Convert from generic usage flags to vulkan usage flags
+	*
+	* @param[in] usage		Generic usage flags
+	*
+	* @return Vulkan VkBufferUsageFlags
+	*/
+	static VkBufferUsageFlags ConvertBufferUsageFlagsToVulkan(HalBufferUsageFlags usage);
+
+	/**
+	* @brief Convert from generic shared mode to vulkan shared mode
+	*
+	* @param[in] mode		Generic shared mode
+	*
+	* @return Vulkan VkSharingMode 
+	*/
+	static VkSharingMode  ConvertSharedModeFlagsToVulkan(HalBufferShareMode mode);
 };
 
 }

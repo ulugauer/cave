@@ -36,6 +36,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanSemaphore.h"
 #include "vulkanCommandPool.h"
 #include "vulkanCommandBuffer.h"
+#include "vulkanBuffer.h"
 #include "vulkanConversion.h"
 #include "vulkanApi.h"
 
@@ -458,6 +459,16 @@ HalSemaphore* VulkanRenderDevice::CreateSemaphore()
 	VulkanSemaphore* semaphore = AllocateObject<VulkanSemaphore>(*_pInstance->GetEngineAllocator(), this);
 
 	return semaphore;
+}
+
+HalBuffer* VulkanRenderDevice::CreateBuffer(HalBufferInfo& bufferInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanBuffer *buffer = AllocateObject<VulkanBuffer>(*_pInstance->GetEngineAllocator(), this, bufferInfo);
+
+	return buffer;
 }
 
 bool VulkanRenderDevice::AllocateCommandBuffers(HalCommandPool* commandPool

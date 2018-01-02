@@ -29,6 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderPipelineLayout.h"
 #include "renderRenderPass.h"
 #include "renderGraphicsPipeline.h"
+#include "renderVertexBuffer.h"
 #include "renderCommandBuffer.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
@@ -374,6 +375,33 @@ void RenderDevice::ReleaseGraphicsPipeline(RenderGraphicsPipeline* graphicsPipel
 		int32_t refCount = graphicsPipeline->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *graphicsPipeline);
+	}
+}
+
+RenderVertexBuffer* RenderDevice::CreateVertexBuffer(HalBufferInfo& bufferInfo)
+{
+	RenderVertexBuffer* vertexBuffer = nullptr;
+	try
+	{
+		vertexBuffer = AllocateObject<RenderVertexBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo);
+		if (vertexBuffer)
+			vertexBuffer->IncrementUsageCount();
+
+		return vertexBuffer;
+	}
+	catch (std::exception& )
+	{
+		return vertexBuffer;
+	}
+}
+
+void RenderDevice::ReleaseVertexBuffer(RenderVertexBuffer* vertexBuffer)
+{
+	if (vertexBuffer)
+	{
+		int32_t refCount = vertexBuffer->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *vertexBuffer);
 	}
 }
 

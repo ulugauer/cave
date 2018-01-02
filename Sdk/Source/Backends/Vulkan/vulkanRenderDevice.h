@@ -203,6 +203,15 @@ public:
 	HalSemaphore* CreateSemaphore() override;
 
 	/**
+	* @brief Create a low level buffer object
+	*
+	* @param[in] bufferInfo		Buffer create info
+	*
+	* @return  HalBuffer abstraction interface
+	*/
+	HalBuffer* CreateBuffer(HalBufferInfo& bufferInfo) override;
+
+	/**
 	* @brief Allocate command buffers
 	*
 	* @param[in] commandPool		Command pool object

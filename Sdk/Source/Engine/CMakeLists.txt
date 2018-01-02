@@ -44,7 +44,9 @@ set(RENDER_SOURCE Render/renderInstance.h Render/renderInstance.cpp
 				  Render/renderGraphicsPipeline.h Render/renderGraphicsPipeline.cpp 
 				  Render/renderCommandPool.h Render/renderCommandPool.cpp 
 				  Render/renderCommandBuffer.h Render/renderCommandBuffer.cpp 
-				  Render/renderSemaphore.h Render/renderSemaphore.cpp )
+				  Render/renderSemaphore.h Render/renderSemaphore.cpp 
+				  Render/renderBuffer.h Render/renderBuffer.cpp 
+				  Render/RenderVertexBuffer.h Render/RenderVertexBuffer.cpp)
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h

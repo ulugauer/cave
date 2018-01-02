@@ -377,6 +377,44 @@ enum class HalCommandBufferUsage
 };
 typedef uint32_t HalCommandBufferUsageFlags;	///< Command buffer usage flags
 
+
+/**
+*  @brief A strongly typed enum class representing buffer creation
+*/
+enum class HalBufferCreate
+{
+	SparseBinding = 0x0001,
+	SparseResidency = 0x0002,
+	SparseAliased = 0x0004,
+};
+typedef uint32_t HalBufferCreateFlags;	///< Buffer create flags
+
+/**
+*  @brief A strongly typed enum class representing buffer usage
+*/
+enum class HalBufferUsage
+{
+	TransferSource = 0x0001,
+	TransferDest = 0x0002,
+	UniformTexelBuffer = 0x0004,
+	StorageTexelBuffer = 0x0008,
+	UniformBuffer = 0x0010,
+	StorageBuffer = 0x0020,
+	IndexBuffer = 0x0040,
+	VertexBuffer = 0x0080,
+	IndirectBuffer = 0x0100,
+};
+typedef uint32_t HalBufferUsageFlags;	///< Buffer usage flags
+
+/**
+*  @brief A strongly typed enum class representing buffer sharing mode
+*/
+enum class HalBufferShareMode
+{
+	Exclusive = 1,
+	Comcurrent = 2,
+};
+
 /**
 *  @brief A strongly typed enum class representing subpass drawing commands
 */
@@ -690,6 +728,28 @@ struct CAVE_INTERFACE HalCommandBufferBeginInfo
 	HalCommandBufferUsageFlags _flags;	///< Command buffer usage flags
 };
 
+/**
+* @brief Device buffer create info
+*/
+struct CAVE_INTERFACE HalBufferInfo
+{
+	uint64_t _size;							///< Buffer size in bytes
+	HalBufferCreateFlags _create;			///< Buffer create flags
+	HalBufferUsageFlags _usage;				///< Usage flags
+	HalBufferShareMode _shareMode;			///< Buffer share mode
+	uint32_t _queueFamilyIndexCount;		///< Index count
+	const uint32_t* _queueFamilyIndices;	///< Queue family indices array
+		
+	HalBufferInfo()
+	{
+		_size = 0;
+		_create = 0;
+		_usage = static_cast<HalBufferUsageFlags>(HalBufferUsage::UniformBuffer);
+		_shareMode = HalBufferShareMode::Exclusive;
+		_queueFamilyIndexCount = 0;
+		_queueFamilyIndices = nullptr;
+	}
+};
 
 /**
 * @brief Framebuffer color clear value

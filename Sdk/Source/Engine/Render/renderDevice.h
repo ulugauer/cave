@@ -50,6 +50,7 @@ class RenderGraphicsPipeline;
 class RenderCommandPool;
 class RenderCommandBuffer;
 struct RenderCmdRenderPassInfo;
+class RenderVertexBuffer;
 
 /**
 * Abstraction type of a device instance
@@ -300,6 +301,22 @@ public:
 	* @param[in] pipelineLayout	 RenderColorBlend object to release
 	*/
 	void ReleasePipelineLayout(RenderPipelineLayout* pipelineLayout);
+
+	/**
+	* @brief Create a vertex buffer object
+	*
+	* @param[in] bufferInfo		Buffer create info
+	*
+	* @return RenderVertexBuffer object
+	*/
+	RenderVertexBuffer* CreateVertexBuffer(HalBufferInfo& bufferInfo);
+
+	/**
+	* @brief Release a pipeline layout object
+	*
+	* @param[in] vertexBuffer	 RenderVertexBuffer object to release
+	*/
+	void ReleaseVertexBuffer(RenderVertexBuffer* vertexBuffer);
 
 	/**
 	* @brief Create a render pass object

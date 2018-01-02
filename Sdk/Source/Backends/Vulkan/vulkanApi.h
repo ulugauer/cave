@@ -70,6 +70,8 @@ typedef VkResult	(VKAPI_PTR* vkAcquireNextImageKHRPtr)(VkDevice device, VkSwapch
 typedef VkResult	(VKAPI_PTR* vkQueuePresentKHRPtr) (VkQueue queue, const VkPresentInfoKHR* pPresentInfo);
 typedef VkResult	(VKAPI_PTR* vkCreateSemaphorePtr) (VkDevice device, const VkSemaphoreCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSemaphore* pSemaphore);
 typedef void		(VKAPI_PTR* vkDestroySemaphorePtr) (VkDevice device, VkSemaphore semaphore, const VkAllocationCallbacks* pAllocator);
+typedef VkResult	(VKAPI_PTR* vkCreateBufferPtr)(VkDevice device, const VkBufferCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkBuffer* pBuffer);
+typedef void		(VKAPI_PTR* vkDestroyBufferPtr)(VkDevice device, VkBuffer buffer, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkQueueSubmitPtr) (VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence);
 typedef VkResult	(VKAPI_PTR* vkCreateCommandPoolPtr) (VkDevice device, const VkCommandPoolCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkCommandPool* pCommandPool);
 typedef VkResult	(VKAPI_PTR* vkAllocateCommandBuffersPtr) (VkDevice device, const VkCommandBufferAllocateInfo* pAllocateInfo, VkCommandBuffer* pCommandBuffers);
@@ -302,6 +304,8 @@ public:
 			retValue = true;
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateSemaphore", vkCreateSemaphore);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroySemaphore", vkDestroySemaphore);
+			retValue &= LoadDeviceFunction(pDevice, "vkCreateBuffer", vkCreateBuffer);
+			retValue &= LoadDeviceFunction(pDevice, "vkDestroyBuffer", vkDestroyBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkQueueSubmit", vkQueueSubmit);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateCommandPool", vkCreateCommandPool);
 			retValue &= LoadDeviceFunction(pDevice, "vkAllocateCommandBuffers", vkAllocateCommandBuffers);
@@ -409,6 +413,8 @@ public:
 	// ************************************************************ // 
 	vkCreateSemaphorePtr						vkCreateSemaphore;
 	vkDestroySemaphorePtr						vkDestroySemaphore;
+	vkCreateBufferPtr							vkCreateBuffer;
+	vkDestroyBufferPtr							vkDestroyBuffer;
 	vkQueueSubmitPtr							vkQueueSubmit;
 	vkCreateCommandPoolPtr						vkCreateCommandPool;
 	vkAllocateCommandBuffersPtr					vkAllocateCommandBuffers;

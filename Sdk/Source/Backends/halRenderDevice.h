@@ -33,6 +33,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halGraphicsPipeline.h"
 #include "halSemaphore.h"
 #include "halCommandBuffer.h"
+#include "halBuffer.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -204,6 +205,15 @@ public:
 	* @return  HalSemaphore abstraction interface
 	*/
 	virtual HalSemaphore* CreateSemaphore() = 0;
+
+	/**
+	* @brief Create a buffer object
+	*
+	* @param[in] bufferInfo		Buffer create info
+	*
+	* @return  HalBuffer abstraction interface
+	*/
+	virtual HalBuffer* CreateBuffer(HalBufferInfo& bufferInfo) = 0;
 
 	/**
 	* @brief Allocate command buffers
