@@ -161,9 +161,11 @@ public:
 	/**
 	* @brief Create a vertex input object
 	*
+	* @param[in] vertexInputState	Vertex input setup struct
+	*
 	* @return Vertex input object
 	*/
-	RenderVertexInput* CreateVertexInput();
+	RenderVertexInput* CreateVertexInput(HalVertexInputStateInfo& vertexInputState);
 
 	/**
 	* @brief Release a vertex input object

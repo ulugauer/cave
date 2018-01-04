@@ -173,9 +173,9 @@ void RenderDevice::ReleaseCommandPool(RenderCommandPool* commandPool)
 	}
 }
 
-RenderVertexInput* RenderDevice::CreateVertexInput()
+RenderVertexInput* RenderDevice::CreateVertexInput(HalVertexInputStateInfo& vertexInputState)
 {
-	RenderVertexInput* vertexInput = AllocateObject<RenderVertexInput>(*_pRenderInstance->GetEngineAllocator(), *this);
+	RenderVertexInput* vertexInput = AllocateObject<RenderVertexInput>(*_pRenderInstance->GetEngineAllocator(), *this, vertexInputState);
 	if (vertexInput)
 		vertexInput->IncrementUsageCount();
 

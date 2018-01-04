@@ -339,12 +339,12 @@ HalShader* VulkanRenderDevice::CreateShader(ShaderType type, ShaderLanguage lang
 	return shader;
 }
 
-HalVertexInput* VulkanRenderDevice::CreateVertexInput()
+HalVertexInput* VulkanRenderDevice::CreateVertexInput(HalVertexInputStateInfo& vertexInputState)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
 		return nullptr;
 
-	VulkanVertexInput* vertexInput = AllocateObject<VulkanVertexInput>(*_pInstance->GetEngineAllocator(), this);
+	VulkanVertexInput* vertexInput = AllocateObject<VulkanVertexInput>(*_pInstance->GetEngineAllocator(), this, vertexInputState);
 
 	return vertexInput;
 }

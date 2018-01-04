@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
-RenderVertexInput::RenderVertexInput(RenderDevice& renderDevice)
+RenderVertexInput::RenderVertexInput(RenderDevice& renderDevice, HalVertexInputStateInfo& vertexInputState)
 	: _renderDevice(renderDevice)
 {
 	// Allocate low level object
-	_halVertexInput = renderDevice.GetHalRenderDevice()->CreateVertexInput();
+	_halVertexInput = renderDevice.GetHalRenderDevice()->CreateVertexInput(vertexInputState);
 	assert(_halVertexInput);
 }
 

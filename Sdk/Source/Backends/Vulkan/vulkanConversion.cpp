@@ -67,6 +67,12 @@ VulkanTypeConversion::ConvertImageFormatToVulkan(HalImageFormat imageFormat)
 	case HalImageFormat::B8G8R8A8SNorm:
 		vkImageFormat = VK_FORMAT_B8G8R8A8_SRGB;
 		break;
+	case HalImageFormat::R32G32SFloat:
+		vkImageFormat = VK_FORMAT_R32G32_SFLOAT;
+		break;
+	case HalImageFormat::R32G32B32SFloat:
+		vkImageFormat = VK_FORMAT_R32G32B32_SFLOAT;
+		break;
 	default:
 		vkImageFormat = VK_FORMAT_UNDEFINED;
 		assert(false);
@@ -94,6 +100,12 @@ VulkanTypeConversion::ConvertImageFormatFromVulkan(VkFormat imageFormat)
 		break;
 	case VK_FORMAT_B8G8R8A8_SRGB:
 		format = HalImageFormat::B8G8R8A8SNorm;
+		break;
+	case VK_FORMAT_R32G32_SFLOAT:
+		format = HalImageFormat::R32G32SFloat;
+		break;
+	case VK_FORMAT_R32G32B32_SFLOAT:
+		format = HalImageFormat::R32G32B32SFloat;
 		break;
 	default:
 		format = HalImageFormat::Undefined;
@@ -861,6 +873,17 @@ VulkanTypeConversion::ConvertSharedModeFlagsToVulkan(HalBufferShareMode mode)
 		vkMode = VK_SHARING_MODE_CONCURRENT;
 
 	return vkMode;
+}
+
+VkVertexInputRate 
+VulkanTypeConversion::ConvertVertexInputRateToVulkan(HalVertexInputRate rate)
+{
+	VkVertexInputRate vkRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	if (rate == HalVertexInputRate::Instance)
+		vkRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+
+	return vkRate;
 }
 
 }

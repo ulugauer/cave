@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "Common/caveRefCount.h"
 #include "Memory/allocatorGlobal.h"
+#include "halTypes.h"
 
 #include <memory>
 
@@ -44,9 +45,10 @@ public:
 	* @brief Constructor
 	*
 	* @param[in] renderDevice	Pointer to render device
+	* @param[in] vertexInputState	Vertex input setup struct
 	*
 	*/
-	RenderVertexInput(RenderDevice& renderDevice);
+	RenderVertexInput(RenderDevice& renderDevice, HalVertexInputStateInfo& vertexInputState);
 	/** @brief copy constructor */
 	virtual ~RenderVertexInput();
 

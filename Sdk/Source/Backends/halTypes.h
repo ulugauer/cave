@@ -40,6 +40,8 @@ enum class HalImageFormat
 	R8G8B8A8SNorm = 38,
 	B8G8R8A8UNorm = 44,
 	B8G8R8A8SNorm = 50,
+	R32G32SFloat = 103,
+	R32G32B32SFloat = 106
 };
 
 /**
@@ -332,10 +334,18 @@ enum class HalShaderStages
 	Fragment = 0x10,
 	Compute = 0x20
 };
-
 typedef uint32_t HalShaderStagesFlags;	///< Shader stages flags
 
 typedef struct DescriptorSetLayout_T *setLayout;	///< Opqaue handle
+
+/**
+*  @brief A strongly typed enum class representing input rate
+*/
+enum class HalVertexInputRate 
+{
+	Vertex = 0,
+	Instance = 1,
+} ;
 
 /**
 *  @brief A strongly typed enum class representing command pool queue family
@@ -700,6 +710,38 @@ struct CAVE_INTERFACE HalRenderPassInfo
 		_dependencyCount = 0;
 		_pDependencies = nullptr;
 	}
+};
+
+/**
+* @brief Vertex binding description
+*/
+struct CAVE_INTERFACE HalVertexInputBindingDescription
+{
+	uint32_t _binding;					///< Binding point
+	uint32_t _stride;					///< Vertex stride
+	HalVertexInputRate	_inputRate;		///< Attribute per vertex or instance
+};
+
+/**
+* @brief Vertex attribute description
+*/
+struct CAVE_INTERFACE HalVertexInputAttributeDescription
+{
+	uint32_t _location;			///< Shader binding location
+	uint32_t _binding;			///< From which location to take the data (HalVertexInputBindingDescription)
+	HalImageFormat _format;		///< Size and type of data
+	uint32_t _offset;			///< Attribute offset relative from start in bytes
+};
+
+/**
+* @brief Vertex binding description
+*/
+struct CAVE_INTERFACE HalVertexInputStateInfo 
+{
+	uint32_t _vertexBindingDescriptionCount;									///< Number of vertex bindings descriptions
+	const HalVertexInputBindingDescription* _pVertexBindingDescriptions;		///< Pointer to HalVertexInputBindingDescription array
+	uint32_t _vertexAttributeDescriptionCount;									///< Number of of vertex attribute descriptions
+	const HalVertexInputAttributeDescription* _pVertexAttributeDescriptions;	///< Pointer to HalVertexInputAttributeDescription array
 };
 
 /**

@@ -98,9 +98,11 @@ public:
 	/**
 	* @brief Create a low level vertex input state
 	*
+	* @param[in] vertexInputState	Vertex input setup struct
+	*
 	* @return Vertex input interface
 	*/
-	HalVertexInput* CreateVertexInput() override;
+	HalVertexInput* CreateVertexInput(HalVertexInputStateInfo& vertexInputState) override;
 
 	/**
 	* @brief Create a low level input assembly state

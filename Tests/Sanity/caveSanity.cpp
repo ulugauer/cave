@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderRenderPass.h"
 
 #include "Base/caveSanityTestDevice.h"
+#include "Base/caveSanityTestMappedVbo.h"
 
 #include <iostream>
 #include <sstream>

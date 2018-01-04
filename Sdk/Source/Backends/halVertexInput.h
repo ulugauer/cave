@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineDefines.h"
 #include "halInstance.h"
+#include "halTypes.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -40,8 +41,9 @@ public:
 	/**
 	* @brief Constructor
 	*
+	* @param[in] vertexInputState	Vertex input setup struct
 	*/
-	HalVertexInput();
+	HalVertexInput(HalVertexInputStateInfo& vertexInputState);
 
 	/** @brief Destructor */
 	virtual ~HalVertexInput();

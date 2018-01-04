@@ -12,10 +12,10 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file caveSanityTestDevice.cpp
-///       Base class for all low level sanity tests
+/// @file caveSanityTestMappedVbo.cpp
+///       Draw simple triangle with a mapped vbo
 
-#include "caveSanityTestDevice.h"
+#include "caveSanityTestMappedVbo.h"
 
 #include "engineInstance.h"
 #include "engineError.h"
@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 using namespace cave;
 
-CaveSanityTestDevice::CaveSanityTestDevice()
+CaveSanityTestMappedVbo::CaveSanityTestMappedVbo()
 	: _material(nullptr)
 	, _layerSection(nullptr)
 	, _inputAssembly(nullptr)
@@ -41,17 +41,17 @@ CaveSanityTestDevice::CaveSanityTestDevice()
 
 }
 
-CaveSanityTestDevice::~CaveSanityTestDevice()
+CaveSanityTestMappedVbo::~CaveSanityTestMappedVbo()
 {
 
 }
 
-bool CaveSanityTestDevice::IsSupported(RenderDevice* )
+bool CaveSanityTestMappedVbo::IsSupported(RenderDevice*)
 {
 	return true;
 }
 
-bool CaveSanityTestDevice::Run(RenderDevice *device, RenderCommandPool* commandPool, cave::RenderPass* renderPass, userContextData* pUserData)
+bool CaveSanityTestMappedVbo::Run(RenderDevice *device, RenderCommandPool* commandPool, cave::RenderPass* renderPass, userContextData* pUserData)
 {
 	try
 	{
@@ -111,7 +111,7 @@ bool CaveSanityTestDevice::Run(RenderDevice *device, RenderCommandPool* commandP
 	return true;
 }
 
-void CaveSanityTestDevice::Cleanup(RenderDevice *device, userContextData* )
+void CaveSanityTestMappedVbo::Cleanup(RenderDevice *device, userContextData*)
 {
 	if (_commandBuffers)
 	{
@@ -123,7 +123,7 @@ void CaveSanityTestDevice::Cleanup(RenderDevice *device, userContextData* )
 				_commandBuffers[i] = nullptr;
 			}
 		}
-		
+
 		DeallocateArray<RenderCommandBuffer*>(*device->GetEngineAllocator(), _commandBuffers);
 	}
 	if (_graphicsPipeline)
@@ -152,7 +152,7 @@ void CaveSanityTestDevice::Cleanup(RenderDevice *device, userContextData* )
 		DeallocateDelete(*device->GetEngineAllocator(), *_material);
 }
 
-bool CaveSanityTestDevice::RunPerformance(RenderDevice*, userContextData* )
+bool CaveSanityTestMappedVbo::RunPerformance(RenderDevice*, userContextData*)
 {
 	return true;
 }
@@ -161,17 +161,17 @@ bool CaveSanityTestDevice::RunPerformance(RenderDevice*, userContextData* )
 // Setup functions
 //-----------------------------------------------------------------------------
 
-void CaveSanityTestDevice::LoadResource(cave::RenderDevice *device)
+void CaveSanityTestMappedVbo::LoadResource(cave::RenderDevice *device)
 {
 	_material = AllocateObject<RenderMaterial>(*device->GetEngineAllocator(), *device);
 	ResourceManager& rm = device->GetResourceManager();
-	*_material = rm.LoadMaterialAsset("CaveSanityTestDevice.asset");
+	*_material = rm.LoadMaterialAsset("CaveSanityTestMappedVbo.asset");
 
 	if (!_material || _material->GetStageCount() == 0)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to load material");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to load material");
 }
 
-void CaveSanityTestDevice::CreateRenderSection(RenderDevice *device, userContextData* pUserData)
+void CaveSanityTestMappedVbo::CreateRenderSection(RenderDevice *device, userContextData* pUserData)
 {
 	// Render section
 	RenderLayerSectionInfo sectionInfo;
@@ -181,10 +181,10 @@ void CaveSanityTestDevice::CreateRenderSection(RenderDevice *device, userContext
 	_layerSection = device->CreateLayerSection(sectionInfo);
 
 	if (!_layerSection)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to create layer section");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create layer section");
 }
 
-void CaveSanityTestDevice::CreateVertexSetup(cave::RenderDevice *device)
+void CaveSanityTestMappedVbo::CreateVertexSetup(cave::RenderDevice *device)
 {
 	// Vertex setup
 	HalVertexInputStateInfo vertexInputInfo;
@@ -197,10 +197,10 @@ void CaveSanityTestDevice::CreateVertexSetup(cave::RenderDevice *device)
 	_inputAssembly = device->CreateInputAssembly();
 
 	if (!_vertexInput || !_inputAssembly)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to create vertex setup");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create vertex setup");
 }
 
-void CaveSanityTestDevice::CreateRasterizerState(cave::RenderDevice *device)
+void CaveSanityTestMappedVbo::CreateRasterizerState(cave::RenderDevice *device)
 {
 	// rasterizer state
 	HalRasterizerSetup rasterizerInfo;
@@ -208,30 +208,30 @@ void CaveSanityTestDevice::CreateRasterizerState(cave::RenderDevice *device)
 	_rasterizerState = device->CreateRasterizerState(rasterizerInfo);
 
 	if (!_rasterizerState)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to create rasterizer state");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create rasterizer state");
 }
 
-void CaveSanityTestDevice::CreateMultisampleState(cave::RenderDevice *device)
+void CaveSanityTestMappedVbo::CreateMultisampleState(cave::RenderDevice *device)
 {
 	// multisample state
 	HalMultisampleState multisampleInfo;
 	_multisampleState = device->CreateMultisampleState(multisampleInfo);
 
 	if (!_multisampleState)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to create multisample state");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create multisample state");
 }
 
-void CaveSanityTestDevice::CreateDepthStencilState(cave::RenderDevice *device)
+void CaveSanityTestMappedVbo::CreateDepthStencilState(cave::RenderDevice *device)
 {
 	// depth stencil state
 	HalDepthStencilSetup depthStencilInfo;
 	_depthStencilState = device->CreateDepthStencilState(depthStencilInfo);
 
 	if (!_depthStencilState)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to create depth stencil state");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create depth stencil state");
 }
 
-void CaveSanityTestDevice::CreateColorBlendState(cave::RenderDevice *device)
+void CaveSanityTestMappedVbo::CreateColorBlendState(cave::RenderDevice *device)
 {
 	HalColorBlendState colorBlendInfo;
 	HalColorBlendAttachment blendAttachment;
@@ -240,10 +240,10 @@ void CaveSanityTestDevice::CreateColorBlendState(cave::RenderDevice *device)
 	_colorBlendState = device->CreateColorBlendState(colorBlendInfo, blendAttachmentArray);
 
 	if (!_colorBlendState)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to create color blend state");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create color blend state");
 }
 
-void CaveSanityTestDevice::CreateDynamicState(cave::RenderDevice *device)
+void CaveSanityTestMappedVbo::CreateDynamicState(cave::RenderDevice *device)
 {
 	caveVector<HalDynamicStates> dynamicStates(device->GetEngineAllocator());
 	dynamicStates.Push(HalDynamicStates::Viewport);
@@ -251,20 +251,20 @@ void CaveSanityTestDevice::CreateDynamicState(cave::RenderDevice *device)
 	_dynamicState = device->CreateDynamicState(dynamicStates);
 
 	if (!_dynamicState)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to create dynamic state");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create dynamic state");
 }
 
-void CaveSanityTestDevice::CreatePipelineLayout(cave::RenderDevice *device)
+void CaveSanityTestMappedVbo::CreatePipelineLayout(cave::RenderDevice *device)
 {
 	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(device->GetEngineAllocator());
 	caveVector<HalPushConstantRange> pushConstants(device->GetEngineAllocator());
 	_pipelineLayout = device->CreatePipelineLayout(descriptorSetLayouts, pushConstants);
 
 	if (!_pipelineLayout)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to create pipeline layout");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create pipeline layout");
 }
 
-void CaveSanityTestDevice::CreateRenderPass(cave::RenderDevice *device)
+void CaveSanityTestMappedVbo::CreateRenderPass(cave::RenderDevice *device)
 {
 	HalRenderPassAttachment renderAttachment;
 	renderAttachment._format = device->GetSwapChainImageFormat();
@@ -300,10 +300,10 @@ void CaveSanityTestDevice::CreateRenderPass(cave::RenderDevice *device)
 	_renderPass = device->CreateRenderPass(renderPassInfo);
 
 	if (!_renderPass)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to create render pass");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create render pass");
 }
 
-void CaveSanityTestDevice::CreateGraphicsPipeline(cave::RenderDevice *device, cave::RenderPass* renderPass)
+void CaveSanityTestMappedVbo::CreateGraphicsPipeline(cave::RenderDevice *device, cave::RenderPass* renderPass)
 {
 	RenderGraphicsPipelineInfo grpahicsPipelineInfo;
 	grpahicsPipelineInfo._material = _material;
@@ -328,7 +328,7 @@ void CaveSanityTestDevice::CreateGraphicsPipeline(cave::RenderDevice *device, ca
 	_graphicsPipeline->Update();
 }
 
-void CaveSanityTestDevice::AllocateCommandBuffers(cave::RenderDevice *device, cave::RenderCommandPool* commandPool)
+void CaveSanityTestMappedVbo::AllocateCommandBuffers(cave::RenderDevice *device, cave::RenderCommandPool* commandPool)
 {
 	// allocate command buffers
 	HalCommandBufferInfo allocInfo;
@@ -337,12 +337,12 @@ void CaveSanityTestDevice::AllocateCommandBuffers(cave::RenderDevice *device, ca
 	caveVector<RenderCommandBuffer*> commandBuffers(device->GetEngineAllocator());
 	commandBuffers.Resize(allocInfo._bufferCount);
 	if (!device->AllocateCommandBuffers(commandPool, allocInfo, commandBuffers))
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to allocate command buffers");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to allocate command buffers");
 
 	// copy buffer pointer
 	_commandBuffers = AllocateArray<RenderCommandBuffer*>(*device->GetEngineAllocator(), allocInfo._bufferCount);
 	if (!_commandBuffers)
-		throw CaveSanityTestException("CaveSanityTestDevice: Failed to allocate command buffers");
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to allocate command buffers");
 
 	for (uint32_t i = 0; i < allocInfo._bufferCount; ++i)
 	{

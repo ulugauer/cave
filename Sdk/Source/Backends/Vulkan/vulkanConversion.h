@@ -288,7 +288,16 @@ public:
 	*
 	* @return Vulkan VkSharingMode 
 	*/
-	static VkSharingMode  ConvertSharedModeFlagsToVulkan(HalBufferShareMode mode);
+	static VkSharingMode ConvertSharedModeFlagsToVulkan(HalBufferShareMode mode);
+
+	/**
+	* @brief Convert from generic vertex input rate to vulkan vertex input rate
+	*
+	* @param[in] rate		Generic vertex input rate
+	*
+	* @return Vulkan VkVertexInputRate
+	*/
+	static VkVertexInputRate ConvertVertexInputRateToVulkan(HalVertexInputRate rate);
 };
 
 }
