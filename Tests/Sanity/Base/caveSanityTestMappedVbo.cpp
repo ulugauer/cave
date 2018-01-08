@@ -21,6 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineError.h"
 #include "Render/renderCommandPool.h"
 
+#include <cstring>
+
 using namespace cave;
 
 CaveSanityTestMappedVbo::CaveSanityTestMappedVbo()
