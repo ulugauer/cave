@@ -100,6 +100,11 @@ bool CaveSanityTestMappedVbo::Run(RenderDevice *device, RenderCommandPool* comma
 		device->CmdBeginRenderPass(_commandBuffers[i], renderPassBeginInfo, HalSubpassContents::Inline);
 		device->CmdBindGraphicsPipeline(_commandBuffers[i], _graphicsPipeline);
 
+		// bind vertex buffer
+		RenderVertexBuffer* vertexBuffers[] = { _vertexBuffer };
+		uint64_t offsets[] = { 0 };
+		device->CmdBindVertexBuffers(_commandBuffers[i], 0, 1, vertexBuffers, offsets);
+
 		device->CmdDraw(_commandBuffers[i], 3, 1, 0, 0);
 
 		device->CmdEndRenderPass(_commandBuffers[i]);
@@ -193,11 +198,29 @@ void CaveSanityTestMappedVbo::CreateRenderSection(RenderDevice *device, userCont
 void CaveSanityTestMappedVbo::CreateVertexSetup(cave::RenderDevice *device)
 {
 	// Vertex setup
+	HalVertexInputBindingDescription bindingDesc;
+	bindingDesc._binding = 0;
+	bindingDesc._stride = sizeof(float) * (2 + 3); // 2 vertex pos, three colors
+	bindingDesc._inputRate = HalVertexInputRate::Vertex;
+
+	caveVector<HalVertexInputAttributeDescription> attribDescArray(device->GetEngineAllocator());
+	attribDescArray.Resize(2);
+	// position
+	attribDescArray[0]._binding = 0;
+	attribDescArray[0]._location = 0;
+	attribDescArray[0]._offset = 0;
+	attribDescArray[0]._format = HalImageFormat::R32G32SFloat;
+	// color
+	attribDescArray[1]._binding = 0;
+	attribDescArray[1]._location = 1;
+	attribDescArray[1]._offset = sizeof(float) * 2;
+	attribDescArray[1]._format = HalImageFormat::R32G32B32SFloat;
+
 	HalVertexInputStateInfo vertexInputInfo;
-	vertexInputInfo._vertexBindingDescriptionCount = 0;
-	vertexInputInfo._pVertexBindingDescriptions = nullptr;
-	vertexInputInfo._vertexAttributeDescriptionCount = 0;
-	vertexInputInfo._pVertexAttributeDescriptions = nullptr;
+	vertexInputInfo._vertexBindingDescriptionCount = 1;
+	vertexInputInfo._pVertexBindingDescriptions = &bindingDesc;
+	vertexInputInfo._vertexAttributeDescriptionCount = static_cast<uint32_t>(attribDescArray.Size());
+	vertexInputInfo._pVertexAttributeDescriptions = attribDescArray.Data();
 
 	_vertexInput = device->CreateVertexInput(vertexInputInfo);
 	_inputAssembly = device->CreateInputAssembly();
@@ -314,7 +337,7 @@ void CaveSanityTestMappedVbo::CreateVertexBuffer(cave::RenderDevice *device)
 	// Vertex Data
 	const std::vector<float> vertices = 
 	{
-		0.0f, -0.5f, 1.0f, 1.0f, 0.0f,	// pos, color
+		0.0f, -0.5f, 1.0f, 1.0f, 1.0f,	// pos, color
 		0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f
 	};

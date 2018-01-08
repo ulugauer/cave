@@ -270,6 +270,18 @@ public:
 	virtual void CmdBindGraphicsPipeline(HalCommandBuffer* commandBuffer, HalGraphicsPipeline* graphicsPipelineInfo) = 0;
 
 	/**
+	* @brief Bind vertex buffers to the pipeline
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	* @param[in] firstBinding	First binding point
+	* @param[in] bindingCount	Numbers of vertex buffers
+	* @param[in] vertexBuffers	Array of HalBuffer pointer
+	* @param[in] offsetArray	Array of buffer offsets
+	*/
+	virtual void CmdBindVertexBuffers(HalCommandBuffer* commandBuffer, uint32_t firstBinding, uint32_t bindingCount
+			, HalBuffer** vertexBuffers, const uint64_t* offsetArray) = 0;
+
+	/**
 	* @brief Draw command for non indexed drawing
 	*
 	* @param[in] commandBuffer	Command buffer we use for recording

@@ -62,6 +62,8 @@ public:
 	
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
+	VkVertexInputBindingDescription* _bindingsDescArray;	///< Bindings description array
+	VkVertexInputAttributeDescription* _attributesDescArray;	///< Attribute description array
 	VkPipelineVertexInputStateCreateInfo _vkVertexInputStateInfo;		///< Vertex setup state info
 };
 

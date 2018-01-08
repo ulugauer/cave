@@ -106,6 +106,7 @@ typedef VkResult	(VKAPI_PTR* vkCreateGraphicsPipelinesPtr) (VkDevice device, VkP
 typedef VkResult	(VKAPI_PTR* vkCreateComputePipelinesPtr) (VkDevice device, VkPipelineCache pipelineCache, uint32_t createInfoCount, const VkComputePipelineCreateInfo* pCreateInfos, const VkAllocationCallbacks* pAllocator, VkPipeline* pPipelines);
 typedef void		(VKAPI_PTR* vkDestroyPipelinePtr) (VkDevice device, VkPipeline pipeline, const VkAllocationCallbacks* pAllocator);
 typedef void		(VKAPI_PTR* vkCmdBindPipelinePtr) (VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint, VkPipeline pipeline);
+typedef void		(VKAPI_PTR* vkCmdBindVertexBuffersPtr)(VkCommandBuffer commandBuffer, uint32_t firstBinding, uint32_t bindingCount, const VkBuffer* pBuffers, const VkDeviceSize* pOffsets);
 typedef void		(VKAPI_PTR* vkCmdBeginRenderPassPtr) (VkCommandBuffer commandBuffer, const VkRenderPassBeginInfo* pRenderPassBegin, VkSubpassContents contents);
 typedef void		(VKAPI_PTR* vkCmdNextSubpassPtr) (VkCommandBuffer commandBuffer, VkSubpassContents contents);
 typedef void		(VKAPI_PTR* vkCmdEndRenderPassPtr) (VkCommandBuffer commandBuffer);
@@ -342,6 +343,7 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateComputePipelines", vkCreateComputePipelines);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyPipeline", vkDestroyPipeline);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdBindPipeline", vkCmdBindPipeline);
+			retValue &= LoadDeviceFunction(pDevice, "vkCmdBindVertexBuffers", vkCmdBindVertexBuffers);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdBeginRenderPass", vkCmdBeginRenderPass);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdNextSubpass", vkCmdNextSubpass);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdEndRenderPass", vkCmdEndRenderPass);
@@ -457,6 +459,7 @@ public:
 	vkCreateComputePipelinesPtr					vkCreateComputePipelines;
 	vkDestroyPipelinePtr						vkDestroyPipeline;
 	vkCmdBindPipelinePtr						vkCmdBindPipeline;
+	vkCmdBindVertexBuffersPtr					vkCmdBindVertexBuffers;
 	vkCmdBeginRenderPassPtr						vkCmdBeginRenderPass;
 	vkCmdNextSubpassPtr							vkCmdNextSubpass;
 	vkCmdEndRenderPassPtr						vkCmdEndRenderPass;

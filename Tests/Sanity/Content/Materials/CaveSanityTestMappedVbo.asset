@@ -15,11 +15,11 @@
     "name": "SimpleColor",
     "language": "spirv",
     "vertex": {
-      "source": "Shader/triangle_vert.spv",
+      "source": "Shader/CaveSanityTestMappedVbo_vert.spv",
       "entry": "main"
     },
     "fragment": {
-      "source": "Shader/triangle_frag.spv",
+      "source": "Shader/CaveSanityTestMappedVbo_frag.spv",
       "entry": "main"
     }
   }

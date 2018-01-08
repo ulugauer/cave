@@ -599,6 +599,25 @@ void VulkanRenderDevice::CmdBindGraphicsPipeline(HalCommandBuffer* commandBuffer
 		, static_cast<VulkanGraphicsPipeline*>(graphicsPipelineInfo)->GetGraphicsPipeline());
 }
 
+void VulkanRenderDevice::CmdBindVertexBuffers(HalCommandBuffer* commandBuffer, uint32_t firstBinding, uint32_t bindingCount
+	, HalBuffer** vertexBuffers, const uint64_t* offsetArray)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	// tmp buffer
+	caveVector<VkBuffer> vkBuffers(_pInstance->GetEngineAllocator());
+	vkBuffers.Resize(bindingCount);
+	for (uint32_t i = 0; i < bindingCount; i++)
+	{
+		VulkanBuffer* buffer = static_cast<VulkanBuffer*>(vertexBuffers[i]);
+		vkBuffers[i] = buffer->GetBuffer();
+	}
+
+	VulkanApi::GetApi()->vkCmdBindVertexBuffers(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer()
+		, firstBinding, bindingCount, vkBuffers.Data(), offsetArray);
+}
+
 void VulkanRenderDevice::CmdDraw(HalCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
 								, uint32_t firstVertex, uint32_t firstInstance)
 {

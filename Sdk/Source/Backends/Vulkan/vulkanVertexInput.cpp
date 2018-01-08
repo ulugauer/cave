@@ -29,6 +29,8 @@ namespace cave
 VulkanVertexInput::VulkanVertexInput(VulkanRenderDevice* device, HalVertexInputStateInfo& vertexInputState)
 	: HalVertexInput(vertexInputState)
 	, _pDevice(device)
+	, _bindingsDescArray(nullptr)
+	, _attributesDescArray(nullptr)
 {
 	// Setup a default state
 	_vkVertexInputStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -38,47 +40,46 @@ VulkanVertexInput::VulkanVertexInput(VulkanRenderDevice* device, HalVertexInputS
 	_vkVertexInputStateInfo.vertexAttributeDescriptionCount = vertexInputState._vertexAttributeDescriptionCount;
 	_vkVertexInputStateInfo.pVertexAttributeDescriptions = nullptr;
 
-	VkVertexInputBindingDescription* bindingsArray = nullptr;
 	if (vertexInputState._vertexBindingDescriptionCount)
 	{
-		bindingsArray = AllocateArray<VkVertexInputBindingDescription>(*device->GetEngineAllocator(), vertexInputState._vertexBindingDescriptionCount);
-		if (bindingsArray)
+		_bindingsDescArray = AllocateArray<VkVertexInputBindingDescription>(*device->GetEngineAllocator(), vertexInputState._vertexBindingDescriptionCount);
+		if (_bindingsDescArray)
 		{
 			for (uint32_t i = 0; i < vertexInputState._vertexBindingDescriptionCount; i++)
 			{
-				bindingsArray[i].binding = vertexInputState._pVertexBindingDescriptions[i]._binding;
-				bindingsArray[i].stride = vertexInputState._pVertexBindingDescriptions[i]._stride;
-				bindingsArray[i].inputRate = VulkanTypeConversion::ConvertVertexInputRateToVulkan(vertexInputState._pVertexBindingDescriptions[i]._inputRate);
+				_bindingsDescArray[i].binding = vertexInputState._pVertexBindingDescriptions[i]._binding;
+				_bindingsDescArray[i].stride = vertexInputState._pVertexBindingDescriptions[i]._stride;
+				_bindingsDescArray[i].inputRate = VulkanTypeConversion::ConvertVertexInputRateToVulkan(vertexInputState._pVertexBindingDescriptions[i]._inputRate);
 			}
 		}
 	}
 
-	VkVertexInputAttributeDescription* attributesArray = nullptr;
+	_attributesDescArray = nullptr;
 	if (vertexInputState._vertexAttributeDescriptionCount)
 	{
-		attributesArray = AllocateArray<VkVertexInputAttributeDescription>(*device->GetEngineAllocator(), vertexInputState._vertexAttributeDescriptionCount);
-		if (attributesArray)
+		_attributesDescArray = AllocateArray<VkVertexInputAttributeDescription>(*device->GetEngineAllocator(), vertexInputState._vertexAttributeDescriptionCount);
+		if (_attributesDescArray)
 		{
-			for (uint32_t i = 0; i < vertexInputState._vertexBindingDescriptionCount; i++)
+			for (uint32_t i = 0; i < vertexInputState._vertexAttributeDescriptionCount; i++)
 			{
-				attributesArray[i].location = vertexInputState._pVertexAttributeDescriptions[i]._location;
-				attributesArray[i].binding = vertexInputState._pVertexAttributeDescriptions[i]._binding;
-				attributesArray[i].format = VulkanTypeConversion::ConvertImageFormatToVulkan(vertexInputState._pVertexAttributeDescriptions[i]._format);
-				attributesArray[i].offset = vertexInputState._pVertexAttributeDescriptions[i]._offset;
+				_attributesDescArray[i].location = vertexInputState._pVertexAttributeDescriptions[i]._location;
+				_attributesDescArray[i].binding = vertexInputState._pVertexAttributeDescriptions[i]._binding;
+				_attributesDescArray[i].format = VulkanTypeConversion::ConvertImageFormatToVulkan(vertexInputState._pVertexAttributeDescriptions[i]._format);
+				_attributesDescArray[i].offset = vertexInputState._pVertexAttributeDescriptions[i]._offset;
 			}
 		}
 	}
 
-	_vkVertexInputStateInfo.pVertexBindingDescriptions = bindingsArray;
-	_vkVertexInputStateInfo.pVertexAttributeDescriptions = attributesArray;
+	_vkVertexInputStateInfo.pVertexBindingDescriptions = _bindingsDescArray;
+	_vkVertexInputStateInfo.pVertexAttributeDescriptions = _attributesDescArray;
 }
 
 VulkanVertexInput::~VulkanVertexInput()
 {
-	if (_vkVertexInputStateInfo.pVertexBindingDescriptions)
-		DeallocateDelete(*_pDevice->GetEngineAllocator(), _vkVertexInputStateInfo.pVertexBindingDescriptions);
-	if (_vkVertexInputStateInfo.pVertexAttributeDescriptions)
-		DeallocateDelete(*_pDevice->GetEngineAllocator(), _vkVertexInputStateInfo.pVertexAttributeDescriptions);
+	if (_bindingsDescArray)
+		DeallocateArray<VkVertexInputBindingDescription>(*_pDevice->GetEngineAllocator(), _bindingsDescArray);
+	if (_attributesDescArray)
+		DeallocateArray<VkVertexInputAttributeDescription>(*_pDevice->GetEngineAllocator(), _attributesDescArray);
 }
 
 }

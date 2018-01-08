@@ -477,6 +477,21 @@ void RenderDevice::CmdBindGraphicsPipeline(RenderCommandBuffer* commandBuffer, R
 		_pHalRenderDevice->CmdBindGraphicsPipeline(commandBuffer->GetHalHandle(), graphicsPipelineInfo->GetHalHandle());
 }
 
+void RenderDevice::CmdBindVertexBuffers(RenderCommandBuffer* commandBuffer, uint32_t firstBinding, uint32_t bindingCount
+	, RenderVertexBuffer** vertexBuffers, const uint64_t* offsetArray)
+{
+	if (commandBuffer)
+	{
+		// tmp buffer
+		caveVector<HalBuffer*> halVertexBuffers(_pRenderInstance->GetEngineAllocator());
+		halVertexBuffers.Resize(bindingCount);
+		for (uint32_t i = 0; i < bindingCount; i++)
+			halVertexBuffers[i] = vertexBuffers[i]->GetHalHandle();
+
+		_pHalRenderDevice->CmdBindVertexBuffers(commandBuffer->GetHalHandle(), firstBinding, bindingCount, halVertexBuffers.Data(), offsetArray);
+	}
+}
+
 void RenderDevice::CmdDraw(RenderCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
 	, uint32_t firstVertex, uint32_t firstInstance)
 {

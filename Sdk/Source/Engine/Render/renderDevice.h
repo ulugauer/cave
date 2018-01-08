@@ -416,6 +416,18 @@ public:
 	void CmdBindGraphicsPipeline(RenderCommandBuffer* commandBuffer, RenderGraphicsPipeline* graphicsPipelineInfo);
 
 	/**
+	* @brief Bind vertex buffers to the pipeline
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	* @param[in] firstBinding	First binding point
+	* @param[in] bindingCount	Numbers of vertex buffers
+	* @param[in] vertexBuffers	Array of RenderVertexBuffer
+	* @param[in] offsetArray	Array of buffer offsets
+	*/
+	void CmdBindVertexBuffers(RenderCommandBuffer* commandBuffer, uint32_t firstBinding, uint32_t bindingCount
+		, RenderVertexBuffer** vertexBuffers, const uint64_t* offsetArray);
+
+	/**
 	* @brief Draw command for non indexed drawing
 	*
 	* @param[in] commandBuffer	Command buffer we use for recording
