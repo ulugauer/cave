@@ -886,4 +886,23 @@ VulkanTypeConversion::ConvertVertexInputRateToVulkan(HalVertexInputRate rate)
 	return vkRate;
 }
 
+VkMemoryPropertyFlags
+VulkanTypeConversion::ConvertMemoryPropertiesToVulkan(HalMemoryPropertyFlags properties)
+{
+	VkMemoryPropertyFlags vkFlags = 0;
+
+	if (properties & static_cast<uint32_t>(HalMemoryPropertyBits::DeviceLocal))
+		vkFlags |= VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	if (properties & static_cast<uint32_t>(HalMemoryPropertyBits::HostVisible))
+		vkFlags |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+	if (properties & static_cast<uint32_t>(HalMemoryPropertyBits::HostCoherent))
+		vkFlags |= VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	if (properties & static_cast<uint32_t>(HalMemoryPropertyBits::HostCached))
+		vkFlags |= VK_MEMORY_PROPERTY_HOST_CACHED_BIT;
+	if (properties & static_cast<uint32_t>(HalMemoryPropertyBits::LazilyAllocated))
+		vkFlags |= VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT;
+	
+	return vkFlags;
+}
+
 }

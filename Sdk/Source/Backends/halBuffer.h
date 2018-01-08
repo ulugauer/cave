@@ -51,6 +51,28 @@ public:
 	/** @brief Destructor */
 	virtual ~HalBuffer();
 
+	/**
+	* @brief Bind Binds a buffer and allocates memory
+	*
+	*/
+	virtual void Bind() = 0;
+
+	/**
+	* @brief Map buffer to virtual memory address
+	*
+	* @param[in] offset		Start offset from memory start
+	* @param[in] size		The size of the memory range to map from offset
+	* @param[out] ppData	Points to a pointer in which is returned a host-accessible pointer to the beginning of the mapped range
+	*
+	*/
+	virtual void Map(uint64_t offset, uint64_t size, void** ppData) = 0;
+
+	/**
+	* @brief Unmap buffer
+	*
+	*/
+	virtual void Unmap() = 0;
+
 private:
 	HalRenderDevice* _pDevice;	///< Pointer to device object
 	HalBufferInfo _bufferInfo;	///< Buffer create info

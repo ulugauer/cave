@@ -35,6 +35,7 @@ CaveSanityTestMappedVbo::CaveSanityTestMappedVbo()
 	, _dynamicState(nullptr)
 	, _pipelineLayout(nullptr)
 	, _renderPass(nullptr)
+	, _vertexBuffer(nullptr)
 	, _graphicsPipeline(nullptr)
 	, _commandBuffers(nullptr)
 {
@@ -66,6 +67,7 @@ bool CaveSanityTestMappedVbo::Run(RenderDevice *device, RenderCommandPool* comma
 		CreateDynamicState(device);
 		CreatePipelineLayout(device);
 		//CreateRenderPass(device);
+		CreateVertexBuffer(device);
 		CreateGraphicsPipeline(device, renderPass);
 		AllocateCommandBuffers(device, commandPool);
 	}
@@ -130,6 +132,8 @@ void CaveSanityTestMappedVbo::Cleanup(RenderDevice *device, userContextData*)
 		device->ReleaseGraphicsPipeline(_graphicsPipeline);
 	if (_renderPass)
 		device->ReleaseRenderPass(_renderPass);
+	if (_vertexBuffer)
+		device->ReleaseVertexBuffer(_vertexBuffer);
 	if (_pipelineLayout)
 		device->ReleasePipelineLayout(_pipelineLayout);
 	if (_dynamicState)
@@ -301,6 +305,44 @@ void CaveSanityTestMappedVbo::CreateRenderPass(cave::RenderDevice *device)
 
 	if (!_renderPass)
 		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create render pass");
+}
+
+void CaveSanityTestMappedVbo::CreateVertexBuffer(cave::RenderDevice *device)
+{
+	// Vertex Data
+	const std::vector<float> vertices = 
+	{
+		0.0f, -0.5f, 1.0f, 1.0f, 0.0f,	// pos, color
+		0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f
+	};
+
+	HalBufferInfo bufferInfo;
+	bufferInfo._size = sizeof(float) * vertices.size();
+	bufferInfo._usage = static_cast<HalBufferUsageFlags>(HalBufferUsage::VertexBuffer);
+	bufferInfo._shareMode = HalBufferShareMode::Exclusive;
+	bufferInfo._properties = static_cast<HalMemoryPropertyFlags>(HalMemoryPropertyBits::HostVisible | HalMemoryPropertyBits::HostCoherent);
+	_vertexBuffer = device->CreateVertexBuffer(bufferInfo);
+	if (!_vertexBuffer)
+		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create vertex buffer");
+
+	// fill with data
+	void* data = nullptr;
+	try
+	{
+		// back it with memory
+		_vertexBuffer->Bind();
+		// map memory
+		_vertexBuffer->Map(0, bufferInfo._size, &data);
+	}
+	catch (cave::EngineError err)
+	{
+		throw CaveSanityTestException(err.what());
+		return;
+	}
+
+	std::memcpy(data, vertices.data(), (size_t)bufferInfo._size);
+	_vertexBuffer->Unmap();
 }
 
 void CaveSanityTestMappedVbo::CreateGraphicsPipeline(cave::RenderDevice *device, cave::RenderPass* renderPass)

@@ -298,6 +298,15 @@ public:
 	* @return Vulkan VkVertexInputRate
 	*/
 	static VkVertexInputRate ConvertVertexInputRateToVulkan(HalVertexInputRate rate);
+
+	/**
+	* @brief Convert from generic memory properties to vulkan memory properties
+	*
+	* @param[in] properties		Generic memory properties
+	*
+	* @return Vulkan VkMemoryPropertyFlags
+	*/
+	static VkMemoryPropertyFlags ConvertMemoryPropertiesToVulkan(HalMemoryPropertyFlags properties);
 };
 
 }

@@ -34,6 +34,7 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 					 	   Vulkan/vulkanInstance.h Vulkan/vulkanInstance.cpp 
 					 	   Vulkan/vulkanPhysicalDevice.h Vulkan/vulkanPhysicalDevice.cpp
 					 	   Vulkan/vulkanRenderDevice.h Vulkan/vulkanRenderDevice.cpp 
+						   Vulkan/vulkanMemoryManager.h Vulkan/vulkanMemoryManager.cpp
 					 	   Vulkan/vulkanSwapChain.h Vulkan/vulkanSwapChain.cpp 
 						   Vulkan/vulkanShader.h Vulkan/vulkanShader.cpp 
 						   Vulkan/vulkanVertexInput.h Vulkan/vulkanVertexInput.cpp 

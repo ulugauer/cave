@@ -68,11 +68,18 @@ typedef void		(VKAPI_PTR* vkDestroySwapchainKHRPtr) (VkDevice device, VkSwapchai
 typedef VkResult	(VKAPI_PTR* vkGetSwapchainImagesKHRPtr) (VkDevice device, VkSwapchainKHR swapchain, uint32_t* pSwapchainImageCount, VkImage* pSwapchainImages);
 typedef VkResult	(VKAPI_PTR* vkAcquireNextImageKHRPtr)(VkDevice device, VkSwapchainKHR swapchain, uint64_t timeout, VkSemaphore semaphore, VkFence fence, uint32_t* pImageIndex);
 typedef VkResult	(VKAPI_PTR* vkQueuePresentKHRPtr) (VkQueue queue, const VkPresentInfoKHR* pPresentInfo);
+
+typedef VkResult	(VKAPI_PTR* vkAllocateMemoryPtr)(VkDevice device, const VkMemoryAllocateInfo* pAllocateInfo, const VkAllocationCallbacks*  pAllocator, VkDeviceMemory* pMemory);
+typedef void		(VKAPI_PTR* vkFreeMemoryPtr)(VkDevice device, VkDeviceMemory memory, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkCreateSemaphorePtr) (VkDevice device, const VkSemaphoreCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSemaphore* pSemaphore);
 typedef void		(VKAPI_PTR* vkDestroySemaphorePtr) (VkDevice device, VkSemaphore semaphore, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkCreateBufferPtr)(VkDevice device, const VkBufferCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkBuffer* pBuffer);
 typedef void		(VKAPI_PTR* vkDestroyBufferPtr)(VkDevice device, VkBuffer buffer, const VkAllocationCallbacks* pAllocator);
+typedef VkResult	(VKAPI_PTR* vkBindBufferMemoryPtr)(VkDevice device, VkBuffer buffer, VkDeviceMemory memory, VkDeviceSize memoryOffset);
+typedef VkResult	(VKAPI_PTR* vkMapMemoryPtr)(VkDevice device, VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData);
+typedef void		(VKAPI_PTR* vkUnmapMemoryPtr)(VkDevice device, VkDeviceMemory memory);
 typedef VkResult	(VKAPI_PTR* vkQueueSubmitPtr) (VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence);
+typedef void		(VKAPI_PTR* vkGetBufferMemoryRequirementsPtr)(VkDevice device, VkBuffer buffer, VkMemoryRequirements* pMemoryRequirements);
 typedef VkResult	(VKAPI_PTR* vkCreateCommandPoolPtr) (VkDevice device, const VkCommandPoolCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkCommandPool* pCommandPool);
 typedef VkResult	(VKAPI_PTR* vkAllocateCommandBuffersPtr) (VkDevice device, const VkCommandBufferAllocateInfo* pAllocateInfo, VkCommandBuffer* pCommandBuffers);
 typedef void		(VKAPI_PTR* vkDestroyCommandPoolPtr) (VkDevice device, VkCommandPool commandPool, const VkAllocationCallbacks* pAllocator);
@@ -302,11 +309,17 @@ public:
 		if (_hVulkan && pDevice)
 		{
 			retValue = true;
+			retValue &= LoadDeviceFunction(pDevice, "vkAllocateMemory", vkAllocateMemory);
+			retValue &= LoadDeviceFunction(pDevice, "vkFreeMemory", vkFreeMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateSemaphore", vkCreateSemaphore);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroySemaphore", vkDestroySemaphore);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateBuffer", vkCreateBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyBuffer", vkDestroyBuffer);
+			retValue &= LoadDeviceFunction(pDevice, "vkBindBufferMemory", vkBindBufferMemory);
+			retValue &= LoadDeviceFunction(pDevice, "vkMapMemory", vkMapMemory);
+			retValue &= LoadDeviceFunction(pDevice, "vkUnmapMemory", vkUnmapMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkQueueSubmit", vkQueueSubmit);
+			retValue &= LoadDeviceFunction(pDevice, "vkGetBufferMemoryRequirements", vkGetBufferMemoryRequirements);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateCommandPool", vkCreateCommandPool);
 			retValue &= LoadDeviceFunction(pDevice, "vkAllocateCommandBuffers", vkAllocateCommandBuffers);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyCommandPool", vkDestroyCommandPool);
@@ -411,11 +424,17 @@ public:
 	//                                                              //
 	// These functions are used mainly for drawing                  //
 	// ************************************************************ // 
+	vkAllocateMemoryPtr							vkAllocateMemory;
+	vkFreeMemoryPtr								vkFreeMemory;
 	vkCreateSemaphorePtr						vkCreateSemaphore;
 	vkDestroySemaphorePtr						vkDestroySemaphore;
 	vkCreateBufferPtr							vkCreateBuffer;
 	vkDestroyBufferPtr							vkDestroyBuffer;
+	vkBindBufferMemoryPtr						vkBindBufferMemory;
+	vkMapMemoryPtr								vkMapMemory;
+	vkUnmapMemoryPtr							vkUnmapMemory;
 	vkQueueSubmitPtr							vkQueueSubmit;
+	vkGetBufferMemoryRequirementsPtr			vkGetBufferMemoryRequirements;
 	vkCreateCommandPoolPtr						vkCreateCommandPool;
 	vkAllocateCommandBuffersPtr					vkAllocateCommandBuffers;
 	vkDestroyCommandPoolPtr						vkDestroyCommandPool;

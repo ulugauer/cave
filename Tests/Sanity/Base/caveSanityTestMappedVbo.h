@@ -46,6 +46,7 @@ private:
 	void CreateDynamicState(cave::RenderDevice *device);
 	void CreatePipelineLayout(cave::RenderDevice *device);
 	void CreateRenderPass(cave::RenderDevice *device);
+	void CreateVertexBuffer(cave::RenderDevice *device);
 	void CreateGraphicsPipeline(cave::RenderDevice *device, cave::RenderPass* renderPass);
 	void AllocateCommandBuffers(cave::RenderDevice *device, cave::RenderCommandPool* commandPool);
 
@@ -61,6 +62,7 @@ private:
 	cave::RenderDynamicState* _dynamicState;
 	cave::RenderPipelineLayout* _pipelineLayout;
 	cave::RenderPass* _renderPass;
+	cave::RenderVertexBuffer* _vertexBuffer;
 	cave::RenderGraphicsPipeline* _graphicsPipeline;
 	cave::RenderCommandBuffer** _commandBuffers;
 };

@@ -28,7 +28,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-#define HAL_SUBPASS_EXTERNAL               (~0U)	///< Special value for subpass before or after present
+#define HAL_SUBPASS_EXTERNAL            (~0U)	///< Special value for subpass before or after present
+#define HAL_WHOLE_SIZE					(~0ULL)	///< Special value for memory size
 
 /**
 *  @brief A strongly typed enum class representing image formts
@@ -160,6 +161,20 @@ enum HalAccessBits
 	MemoryWrite = 0x10000,
 };
 typedef uint32_t HalAccessFlags;		///< Combined access flags
+
+/**
+*  @brief A strongly typed enum class representing memory properties
+*/
+enum HalMemoryPropertyBits
+{
+	DeviceLocal = 0x01,
+	HostVisible = 0x02,
+	HostCoherent = 0x04,
+	HostCached = 0x08,
+	LazilyAllocated = 0x10,
+};
+typedef uint32_t HalMemoryPropertyFlags;		///< Combined memory property flags
+
 
 /**
 *  @brief A strongly typed enum class representing subpass dependencies
@@ -779,6 +794,7 @@ struct CAVE_INTERFACE HalBufferInfo
 	HalBufferCreateFlags _create;			///< Buffer create flags
 	HalBufferUsageFlags _usage;				///< Usage flags
 	HalBufferShareMode _shareMode;			///< Buffer share mode
+	HalMemoryPropertyFlags _properties;		///< Memory properties
 	uint32_t _queueFamilyIndexCount;		///< Index count
 	const uint32_t* _queueFamilyIndices;	///< Queue family indices array
 		
@@ -788,6 +804,7 @@ struct CAVE_INTERFACE HalBufferInfo
 		_create = 0;
 		_usage = static_cast<HalBufferUsageFlags>(HalBufferUsage::UniformBuffer);
 		_shareMode = HalBufferShareMode::Exclusive;
+		_properties = 0;
 		_queueFamilyIndexCount = 0;
 		_queueFamilyIndices = nullptr;
 	}

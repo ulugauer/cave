@@ -27,6 +27,8 @@ namespace cave
 RenderBuffer::RenderBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo)
 	: _renderDevice(renderDevice)
 	, _halBuffer(nullptr)
+	, _size(0)
+	, _mapped(false)
 {
 	if (bufferInfo._size == 0)
 		throw EngineError("Invalid buffer size");
@@ -41,6 +43,8 @@ RenderBuffer::RenderBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo
 		std::string msg(e.what());
 		throw EngineError(msg);
 	}
+
+	_size = bufferInfo._size;
 }
 
 RenderBuffer::~RenderBuffer()
@@ -48,6 +52,53 @@ RenderBuffer::~RenderBuffer()
 	// Free handle
 	if (_halBuffer)
 		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halBuffer);
+}
+
+void RenderBuffer::Bind()
+{
+	if (!_halBuffer)
+		throw EngineError("Invalid buffer");
+
+	// Allocate low level object
+	try
+	{
+		_halBuffer->Bind();
+	}
+	catch (std::exception& e)
+	{
+		std::string msg(e.what());
+		throw EngineError(msg);
+	}
+}
+
+void RenderBuffer::Map(uint64_t offset, uint64_t size, void** ppData)
+{
+	if (_mapped)
+		throw EngineError("Error RenderBuffer::Map: Already mapped");
+
+	if ((size == 0) || (size > _size) || (offset + size > _size))
+		throw EngineError("Error RenderBuffer::Map: Size missmatch");
+
+	try
+	{
+		_halBuffer->Map(offset, size, ppData);
+	}
+	catch (std::exception& e)
+	{
+		std::string msg(e.what());
+		throw EngineError(msg);
+	}
+
+	_mapped = true;
+}
+
+void RenderBuffer:: Unmap()
+{
+	if (_mapped)
+	{
+		_halBuffer->Unmap();
+		_mapped = false;
+	}
 }
 
 }

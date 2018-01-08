@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Base class for all low level sanity tests
 
 #include "Render/renderDevice.h"
+#include "Render/renderVertexBuffer.h"
 #include "Render/renderCommandPool.h"
 #include "Render/renderLayerSection.h"
 #include "Render/renderGraphicsPipeline.h"

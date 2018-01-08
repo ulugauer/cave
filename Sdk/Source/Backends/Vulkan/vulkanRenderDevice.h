@@ -34,6 +34,7 @@ namespace cave
 class VulkanInstance;
 class VulkanPhysicalDevice;
 class VulkanSwapChain;
+class VulkanMemoryManager;
 
 /**
 * Vulkan render device
@@ -60,6 +61,20 @@ public:
 	* @return Lowlevel vulkan handle
 	*/
 	VkDevice GetDeviceHandle() { return _vkDevice; }
+
+	/**
+	* @brief Get vulkan memory manager
+	*
+	* @return Device memory manager object
+	*/
+	VulkanMemoryManager* GetMemoryManager() { return _pMemoryManager; }
+
+	/**
+	* @brief Query physical device memory proeprties
+	*
+	* @param[in,out] deviceMemProperties	Pointer to VkPhysicalDeviceMemoryProperties
+	*/
+	void GetPhysicalDeviceMemoryProperties(VkPhysicalDeviceMemoryProperties& deviceMemProperties);
 
 	/**
 	* @brief Get vulkan surface handle
@@ -354,6 +369,7 @@ public:
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
+	VulkanMemoryManager* _pMemoryManager;	///< Pointer to internal memory manager
 	VkSurfaceKHR _presentationSurface; ///< Handle to presentation surface
 	VkDevice _vkDevice;	///< Handle to vulkan device
 	VkQueue _presentQueue;	///< Handle to vulkan queue used for presentations

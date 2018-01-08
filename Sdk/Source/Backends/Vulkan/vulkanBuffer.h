@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Vulkan device buffer
 
 #include "halBuffer.h"
+#include "vulkanMemoryManager.h"
 
 #include "vulkan.h"
 
@@ -49,6 +50,28 @@ public:
 	virtual ~VulkanBuffer();
 
 	/**
+	* @brief Bind Binds a buffer and allocates memory
+	*
+	*/
+	void Bind() override;
+
+	/**
+	* @brief Map buffer to virtual memory address
+	*
+	* @param[in] offset		Start offset from memory start
+	* @param[in] size		The size of the memory range to map from offset
+	* @param[out] ppData	Points to a pointer in which is returned a host-accessible pointer to the beginning of the mapped range
+	*
+	*/
+	void Map(uint64_t offset, uint64_t size, void** ppData) override;
+
+	/**
+	* @brief Unmap previously mapped buffer
+	*
+	*/
+	void Unmap() override;
+
+	/**
 	* @brief Get pipeline layout object
 	*
 	* @return Vulkan buffer object
@@ -59,7 +82,9 @@ private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
 	VkBuffer _vkBuffer;	///< Low level vulkan handle
 	uint32_t* _familyIndicesArray;		///< Familiy indices array. Only required for buffers in non-exclusive mode
+	VkMemoryPropertyFlags _vkMemProperties;	///< Vulkan memory properties
 	VkBufferCreateInfo _vkCreateInfo;	///< Vulkan buffer creation info
+	VulkanDeviceMemory _deviceMemory;	///< Allocate device memory info
 };
 
 }

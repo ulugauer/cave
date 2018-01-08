@@ -19,6 +19,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanRenderDevice.h"
 #include "vulkanPhysicalDevice.h"
 #include "vulkanConversion.h"
+#include "vulkanMemoryManager.h"
 #include "vulkanSwapChain.h"
 #include "vulkanCommandPool.h"
 #include "vulkanShader.h"
@@ -50,6 +51,7 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	: HalRenderDevice(instance)
 	, _pInstance(instance)
 	, _pPhysicalDevice(physicalDevice)
+	, _pMemoryManager(nullptr)
 	, _presentationSurface(surface)
 	, _vkDevice(VK_NULL_HANDLE)
 	, _presentQueue(VK_NULL_HANDLE)
@@ -132,6 +134,13 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 		throw BackendException("Failed to create vulkan device");
 	}
 
+	// create device memory manager
+	_pMemoryManager = AllocateObject<VulkanMemoryManager>(*_pInstance->GetEngineAllocator(), instance, physicalDevice, this);
+	if (!_pMemoryManager)
+	{
+		throw BackendException("Failed to create vulkan device");
+	}
+
 	// get presentation queue
 	if (surface)
 		VulkanApi::GetApi()->vkGetDeviceQueue(_vkDevice, _presentationQueueFamilyIndex, 0, &_presentQueue);
@@ -187,11 +196,24 @@ VulkanRenderDevice::~VulkanRenderDevice()
 		DeallocateDelete(*_pInstance->GetEngineAllocator(), *_pSwapChain);
 	}
 
+	if (_pMemoryManager)
+	{
+		DeallocateDelete(*_pInstance->GetEngineAllocator(), *_pMemoryManager);
+	}
+
 	if (_vkDevice)
 	{
 		VulkanApi::GetApi()->vkDestroyDevice(_vkDevice, nullptr);
 		_vkDevice = nullptr;
 	}
+}
+
+void VulkanRenderDevice::GetPhysicalDeviceMemoryProperties(VkPhysicalDeviceMemoryProperties& deviceMemProperties)
+{
+	if (!_pPhysicalDevice)
+		throw BackendException("Vulkan physical device not properly setup");
+
+	VulkanApi::GetApi()->vkGetPhysicalDeviceMemoryProperties(_pPhysicalDevice->GetPhysicalDeviceHandle(), &deviceMemProperties);
 }
 
 void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )

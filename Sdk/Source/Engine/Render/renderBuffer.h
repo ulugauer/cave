@@ -54,6 +54,29 @@ public:
 	virtual ~RenderBuffer();
 
 	/**
+	* @brief Backs the buffer with memory
+	*
+	*/
+	virtual void Bind();
+
+	/**
+	* @brief Map buffer to virtual memory address
+	*		 Throws an exception at failure
+	*
+	* @param[in] offset		Start offset from memory start
+	* @param[in] size		The size of the memory range to map from offset
+	* @param[out] ppData	Points to a pointer in which is returned a host-accessible pointer to the beginning of the mapped range
+	*
+	*/
+	virtual void Map(uint64_t offset, uint64_t size, void** ppData);
+
+	/**
+	* @brief Unmap buffer
+	*
+	*/
+	virtual void Unmap();
+
+	/**
 	* @brief Get low level HAL handle
 	*
 	* @return HalBuffer handle
@@ -63,6 +86,8 @@ public:
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalBuffer* _halBuffer;			///< Pointer to low level data buffer object
+	uint64_t _size;					///< Buffer size
+	bool _mapped;					///< Buffer is currently mapped
 };
 
 }
