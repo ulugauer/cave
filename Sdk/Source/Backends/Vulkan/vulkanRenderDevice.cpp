@@ -216,6 +216,30 @@ void VulkanRenderDevice::GetPhysicalDeviceMemoryProperties(VkPhysicalDeviceMemor
 	VulkanApi::GetApi()->vkGetPhysicalDeviceMemoryProperties(_pPhysicalDevice->GetPhysicalDeviceHandle(), &deviceMemProperties);
 }
 
+void VulkanRenderDevice::GetApiVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
+{
+	if (!_pPhysicalDevice)
+		throw BackendException("Vulkan physical device not properly setup");
+
+	_pPhysicalDevice->GetApiVersion(major, minor, patch);
+}
+
+void VulkanRenderDevice::GetDriverVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
+{
+	if (!_pPhysicalDevice)
+		throw BackendException("Vulkan physical device not properly setup");
+
+	_pPhysicalDevice->GetDriverVersion(major, minor, patch);
+}
+
+const char* VulkanRenderDevice::GetDeviceName()
+{
+	if (!_pPhysicalDevice)
+		throw BackendException("Vulkan physical device not properly setup");
+
+	return _pPhysicalDevice->GetDeviceName();
+}
+
 void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
 {
 	if (!_pPhysicalDevice || !_vkDevice)

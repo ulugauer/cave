@@ -95,6 +95,30 @@ EngineLog* RenderDevice::GetEngineLog() const
 	return _pRenderInstance->GetEngineLog();
 }
 
+void RenderDevice::GetApiVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
+{
+	if (!_pHalRenderDevice)
+		throw EngineError("Render device not properly setup");
+
+	_pHalRenderDevice->GetApiVersion(major, minor, patch);
+}
+
+void RenderDevice::GetDriverVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
+{
+	if (!_pHalRenderDevice)
+		throw EngineError("Render device not properly setup");
+
+	_pHalRenderDevice->GetDriverVersion(major, minor, patch);
+}
+
+const char* RenderDevice::GetDeviceName()
+{
+	if (!_pHalRenderDevice)
+		throw EngineError("Render device not properly setup");
+
+	return _pHalRenderDevice->GetDeviceName();
+}
+
 void RenderDevice::CreateSwapChain()
 {
 	if (!_pHalRenderDevice || !_pRenderInstance || !_pHalInstance)

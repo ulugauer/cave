@@ -201,6 +201,14 @@ int main(int argc, char* argv[])
 		commandPoolInfo._flags = 0;
 		commandPoolInfo._queueFamily = HalCommandPoolQueueFamily::Graphics;
 		graphicsCommandPool = renderDevice->CreateCommandPool(commandPoolInfo);
+
+		// print some device info
+		uint32_t major, minor, patch;
+		renderDevice->GetApiVersion(major, minor, patch);
+		std::cerr << "API Vesrion: " << major << "." << minor << "." << patch << std::endl;
+		renderDevice->GetDriverVersion(major, minor, patch);
+		std::cerr << "Driver Vesrion: " << major << "." << minor << "." << patch << std::endl;
+		std::cerr << "Device Name: " << renderDevice->GetDeviceName() << "\n\n";
 	}
 	catch (cave::EngineError err)
 	{

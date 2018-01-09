@@ -73,8 +73,7 @@ void VulkanMemoryManager::ReleaseBufferMemory(VulkanDeviceMemory& deviceMemory)
 
 uint32_t VulkanMemoryManager::ChooseMemoryHeap(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties)
 {
-	VkPhysicalDeviceMemoryProperties deviceMemProperties;
-	_pRenderDevice->GetPhysicalDeviceMemoryProperties(deviceMemProperties);
+	const VkPhysicalDeviceMemoryProperties& deviceMemProperties = _pPhysicalDevice->GetPhysicalDeviceMemoryProperties();
 
 	uint32_t selectedHeapIndex = ~0u;
 	for (uint32_t i = 0; i < deviceMemProperties.memoryTypeCount; i++)

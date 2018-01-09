@@ -70,7 +70,7 @@ void RenderShader::SetShaderSource(const std::vector<char>& code)
 	if (_sourceSize > 0 || _source)
 	{
 		// we already have the source
-		_renderDevice.GetEngineLog()->Error("Warning: Source code alread set");
+		_renderDevice.GetEngineLog()->Error("Warning: Source code already set");
 		return;
 	}
 

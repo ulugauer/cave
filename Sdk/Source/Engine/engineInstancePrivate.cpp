@@ -85,7 +85,7 @@ EngineInstancePrivate::EngineInstancePrivate(EngineCreateStruct& engineCreate)
 		// get runtime binary path
 		_ApplicationPath = GetAppPath();
 		// Create our logger. By default no logging
-		_pEngineLog = AllocateObject<EngineLog>(*_pAllocator, EngineLog::WARNING_LEVEL_NOENE, EngineLog::MESSAGE_LEVEL_NOENE, true);
+		_pEngineLog = AllocateObject<EngineLog>(*_pAllocator, EngineLog::WARNING_LEVEL_NONE, EngineLog::MESSAGE_LEVEL_NONE, true);
 	}
 }
 

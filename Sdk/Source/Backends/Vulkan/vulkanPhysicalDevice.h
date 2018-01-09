@@ -126,6 +126,42 @@ public:
 	*/
 	bool PresentationQueueSupported(SwapChainInfo& swapChainInfo, uint32_t &familyQueueIndex);
 
+	/**
+	* @brief Query physical device memory proeprties
+	*
+	* return Pointer to VkPhysicalDeviceMemoryProperties
+	*/
+	const VkPhysicalDeviceMemoryProperties& GetPhysicalDeviceMemoryProperties() {
+		return _physicalDeviceMemoryProperties;
+	}
+
+	/**
+	* @brief Query API version number
+	*
+	* @param[out] major		Major API version number
+	* @param[out] minor		Minor API version number
+	* @param[out] patch		Patch API version number
+	*
+	*/
+	void GetApiVersion(uint32_t& major, uint32_t& minor, uint32_t& patch);
+
+	/**
+	* @brief Query Driver version number
+	*
+	* @param[out] major		Major driver version number
+	* @param[out] minor		Minor driver version number
+	* @param[out] patch		Patch driver version number
+	*
+	*/
+	void GetDriverVersion(uint32_t& major, uint32_t& minor, uint32_t& patch);
+
+	/**
+	* @brief Query device name
+	*
+	* return Pointer string
+	*/
+	const char* GetDeviceName();
+
 private:
 	VkPhysicalDevice _vkPhysicalDevice;	///< Handle to vulkan device
 	VkPhysicalDeviceProperties _physicalDeviceProperties;	///< Properties of the device

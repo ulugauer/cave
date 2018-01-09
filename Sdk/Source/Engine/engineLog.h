@@ -35,14 +35,14 @@ public:
 	/// The warning levels
     typedef enum
     {
-		WARNING_LEVEL_NOENE = 0,	///< Level None - no warnings
+		WARNING_LEVEL_NONE = 0,		///< Level None - no warnings
         WARNING_LEVEL0 = 1,			///< Level 0 - informational warnings
         WARNING_LEVEL1,				///< Level 1 - severe warnings
     } logWarningLevel;
     /// The message levels
     typedef enum
     {
-		MESSAGE_LEVEL_NOENE = 0,	///< Level None - no messages
+		MESSAGE_LEVEL_NONE = 0,		///< Level None - no messages
         MESSAGE_LEVEL0 = 1,			///< Level 0 - informational message
         MESSAGE_LEVEL1,				///< Level 1 - important messages
     } logMessageLevel;

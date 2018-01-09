@@ -79,6 +79,25 @@ void VulkanPhysicalDevice::SetPhysicalDeviceHandle(std::shared_ptr<AllocatorBase
 	}
 }
 
+void VulkanPhysicalDevice::GetApiVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
+{
+	major = VK_VERSION_MAJOR(_physicalDeviceProperties.apiVersion);
+	minor = VK_VERSION_MINOR(_physicalDeviceProperties.apiVersion);
+	patch = VK_VERSION_PATCH(_physicalDeviceProperties.apiVersion);
+}
+
+void VulkanPhysicalDevice::GetDriverVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
+{
+	major = VK_VERSION_MAJOR(_physicalDeviceProperties.driverVersion);
+	minor = VK_VERSION_MINOR(_physicalDeviceProperties.driverVersion);
+	patch = VK_VERSION_PATCH(_physicalDeviceProperties.driverVersion);
+}
+
+const char* VulkanPhysicalDevice::GetDeviceName()
+{
+	return _physicalDeviceProperties.deviceName;
+}
+
 bool VulkanPhysicalDevice::HasQueueCapabilites(VkQueueFlags flags, VkSurfaceKHR presentationSurface)
 {
 	for (uint32_t i = 0; i < _physicalDeviceQueueFamilyCount; ++ i)

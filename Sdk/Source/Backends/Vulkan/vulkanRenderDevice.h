@@ -77,6 +77,33 @@ public:
 	void GetPhysicalDeviceMemoryProperties(VkPhysicalDeviceMemoryProperties& deviceMemProperties);
 
 	/**
+	* @brief Query API version number
+	*
+	* @param[out] major		Major API version number
+	* @param[out] minor		Minor API version number
+	* @param[out] patch		Patch API version number
+	*
+	*/
+	void GetApiVersion(uint32_t& major, uint32_t& minor, uint32_t& patch);
+
+	/**
+	* @brief Query Driver version number
+	*
+	* @param[out] major		Major driver version number
+	* @param[out] minor		Minor driver version number
+	* @param[out] patch		Patch driver version number
+	*
+	*/
+	void GetDriverVersion(uint32_t& major, uint32_t& minor, uint32_t& patch);
+
+	/**
+	* @brief Query device name
+	*
+	* return Pointer string
+	*/
+	const char* GetDeviceName();
+
+	/**
 	* @brief Get vulkan surface handle
 	*
 	* @return Lowlevel vulkan handle
