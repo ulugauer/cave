@@ -79,6 +79,7 @@ typedef VkResult	(VKAPI_PTR* vkBindBufferMemoryPtr)(VkDevice device, VkBuffer bu
 typedef VkResult	(VKAPI_PTR* vkMapMemoryPtr)(VkDevice device, VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData);
 typedef void		(VKAPI_PTR* vkUnmapMemoryPtr)(VkDevice device, VkDeviceMemory memory);
 typedef VkResult	(VKAPI_PTR* vkQueueSubmitPtr) (VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence);
+typedef VkResult	(VKAPI_PTR* vkQueueWaitIdlePtr)(VkQueue queue);
 typedef void		(VKAPI_PTR* vkGetBufferMemoryRequirementsPtr)(VkDevice device, VkBuffer buffer, VkMemoryRequirements* pMemoryRequirements);
 typedef VkResult	(VKAPI_PTR* vkCreateCommandPoolPtr) (VkDevice device, const VkCommandPoolCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkCommandPool* pCommandPool);
 typedef VkResult	(VKAPI_PTR* vkAllocateCommandBuffersPtr) (VkDevice device, const VkCommandBufferAllocateInfo* pAllocateInfo, VkCommandBuffer* pCommandBuffers);
@@ -111,6 +112,7 @@ typedef void		(VKAPI_PTR* vkCmdBeginRenderPassPtr) (VkCommandBuffer commandBuffe
 typedef void		(VKAPI_PTR* vkCmdNextSubpassPtr) (VkCommandBuffer commandBuffer, VkSubpassContents contents);
 typedef void		(VKAPI_PTR* vkCmdEndRenderPassPtr) (VkCommandBuffer commandBuffer);
 typedef void		(VKAPI_PTR* vkCmdDrawPtr) (VkCommandBuffer commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
+typedef void		(VKAPI_PTR* vkCmdCopyBufferPtr) (VkCommandBuffer commandBuffer, VkBuffer srcBuffer, VkBuffer dstBuffer, uint32_t regionCount, const VkBufferCopy* pRegions);
 
 
 /** @}*/
@@ -320,6 +322,7 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkMapMemory", vkMapMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkUnmapMemory", vkUnmapMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkQueueSubmit", vkQueueSubmit);
+			retValue &= LoadDeviceFunction(pDevice, "vkQueueWaitIdle", vkQueueWaitIdle);
 			retValue &= LoadDeviceFunction(pDevice, "vkGetBufferMemoryRequirements", vkGetBufferMemoryRequirements);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateCommandPool", vkCreateCommandPool);
 			retValue &= LoadDeviceFunction(pDevice, "vkAllocateCommandBuffers", vkAllocateCommandBuffers);
@@ -348,6 +351,7 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdNextSubpass", vkCmdNextSubpass);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdEndRenderPass", vkCmdEndRenderPass);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdDraw", vkCmdDraw);
+			retValue &= LoadDeviceFunction(pDevice, "vkCmdCopyBuffer", vkCmdCopyBuffer);
 
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateSwapchainKHR", vkCreateSwapchainKHR);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroySwapchainKHR", vkDestroySwapchainKHR);
@@ -436,6 +440,7 @@ public:
 	vkMapMemoryPtr								vkMapMemory;
 	vkUnmapMemoryPtr							vkUnmapMemory;
 	vkQueueSubmitPtr							vkQueueSubmit;
+	vkQueueWaitIdlePtr							vkQueueWaitIdle;
 	vkGetBufferMemoryRequirementsPtr			vkGetBufferMemoryRequirements;
 	vkCreateCommandPoolPtr						vkCreateCommandPool;
 	vkAllocateCommandBuffersPtr					vkAllocateCommandBuffers;
@@ -464,6 +469,7 @@ public:
 	vkCmdNextSubpassPtr							vkCmdNextSubpass;
 	vkCmdEndRenderPassPtr						vkCmdEndRenderPass;
 	vkCmdDrawPtr								vkCmdDraw;
+	vkCmdCopyBufferPtr							vkCmdCopyBuffer;
 
 	// ************************************************************ //
 	// Device level functions                                       //

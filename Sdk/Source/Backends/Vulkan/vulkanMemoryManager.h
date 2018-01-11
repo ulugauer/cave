@@ -43,11 +43,13 @@ struct VulkanDeviceMemory
 	{
 		_offset = _size = 0;
 		_vkDeviceMemory = VK_NULL_HANDLE;
+		_mappedAddress = nullptr;
 	}
 
 	uint64_t _offset;	///< Memory offset
 	uint64_t _size;		///< Actual allocated size
 	VkDeviceMemory _vkDeviceMemory;		///< Vulkan device memory handle
+	void* _mappedAddress;	///< Pointer to virtual memory if mapped
 };
 
 /**
@@ -86,13 +88,51 @@ public:
 	*/
 	void ReleaseBufferMemory(VulkanDeviceMemory& deviceMemory);
 
+	/**
+	* @brief Allocate host visible memory for memory copy
+	*
+	* @param[in] memRequirements	VkMemoryRequirements struct
+	* @param[out] deviceMemory		Filled in VulkanDeviceMemory struct on success
+	*
+	*/
+	void AllocateStagingMemory(VkMemoryRequirements& memRequirements, VulkanDeviceMemory& deviceMemory);
+
+	/**
+	* @brief Release staging memory back to system
+	*
+	* @param[in] deviceMemory		VulkanDeviceMemory struct returned on AllocateStagingMemory call
+	*
+	*/
+	void ReleaseStagingMemory(VulkanDeviceMemory& deviceMemory);
+
+	/**
+	* @brief Allocate host visible memory for memory copy
+	*
+	* @param[in] srcBuffer	VkBuffer handle
+	* @param[in] dstBuffer	VkBuffer handle
+	* @param[in] srcOffset	Source offset in bytes
+	* @param[in] dstOffset	Dest offset in bytes
+	* @param[in] size		Copy size in bytes
+	*
+	*/
+	void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64_t srcOffset, uint64_t dstOffset, uint64_t size);
+
 private:
-	uint32_t ChooseMemoryHeap(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties);
+	/**
+	* @brief Select memory type from property flags
+	*
+	* @param[in] memRequirements	VkBuffer memory requilrements
+	* @param[in] properties			Memory property requirement
+	*
+	* return index into memory type array
+	*/
+	uint32_t ChooseMemoryType(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties);
 
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
 	VulkanRenderDevice* _pRenderDevice;	///< Pointer to logical device
+	VkCommandPool _vkCommandPool;	///< Vulkan command pool handle
 };
 
 }

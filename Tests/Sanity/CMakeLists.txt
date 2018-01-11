@@ -30,7 +30,8 @@ set(CAVE_SANITY_SOURCE  caveSanity.cpp
 						caveSanityTestBase.h) 
 
 set(CAVE_SANITY_BASE_SOURCE  Base/caveSanityTestDevice.h Base/caveSanityTestDevice.cpp 
-							 Base/caveSanityTestMappedVbo.h Base/caveSanityTestMappedVbo.cpp ) 
+							 Base/caveSanityTestMappedVbo.h Base/caveSanityTestMappedVbo.cpp 
+							 Base/caveSanityTestDeviceVbo.h Base/caveSanityTestDeviceVbo.cpp ) 
 
 # Create named folders for the sources within the .vcproj
 # Empty name lists them directly under the .vcproj

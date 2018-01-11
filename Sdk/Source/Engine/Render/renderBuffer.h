@@ -60,6 +60,17 @@ public:
 	virtual void Bind();
 
 	/**
+	* @brief Copy data to buffer
+	*		 Throws an exception at failure
+	*
+	* @param[in] offset		Start offset from where to copy data
+	* @param[in] size		The size of the memory range to copy
+	* @param[in] pData		Pointer to data
+	*
+	*/
+	virtual void Update(uint64_t offset, uint64_t size, const void* pData);
+
+	/**
 	* @brief Map buffer to virtual memory address
 	*		 Throws an exception at failure
 	*

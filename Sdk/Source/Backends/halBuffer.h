@@ -58,9 +58,19 @@ public:
 	virtual void Bind() = 0;
 
 	/**
+	* @brief Copy data to buffer
+	*
+	* @param[in] offset		Start offset from where to copy data
+	* @param[in] size		The size of the memory range to copy
+	* @param[in] pData		Pointer to data
+	*
+	*/
+	virtual void Update(uint64_t offset, uint64_t size, const void* pData) = 0;
+
+	/**
 	* @brief Map buffer to virtual memory address
 	*
-	* @param[in] offset		Start offset from memory start
+	* @param[in] offset		Start offset from memory start in bytes
 	* @param[in] size		The size of the memory range to map from offset
 	* @param[out] ppData	Points to a pointer in which is returned a host-accessible pointer to the beginning of the mapped range
 	*

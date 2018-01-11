@@ -71,6 +71,14 @@ void RenderBuffer::Bind()
 	}
 }
 
+void RenderBuffer::Update(uint64_t offset, uint64_t size, const void* pData)
+{
+	if ((size == 0) || (size > _size) || (offset + size > _size))
+		throw EngineError("Error RenderBuffer::Map: Size missmatch");
+
+	_halBuffer->Update(offset, size, pData);
+}
+
 void RenderBuffer::Map(uint64_t offset, uint64_t size, void** ppData)
 {
 	if (_mapped)

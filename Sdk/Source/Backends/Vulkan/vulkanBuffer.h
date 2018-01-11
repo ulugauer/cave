@@ -56,6 +56,16 @@ public:
 	void Bind() override;
 
 	/**
+	* @brief Copy data to buffer
+	*
+	* @param[in] offset		Start offset from where to copy data
+	* @param[in] size		The size of the memory range to copy
+	* @param[in] pData		Pointer to data
+	*
+	*/
+	virtual void Update(uint64_t offset, uint64_t size, const void* pData) override;
+
+	/**
 	* @brief Map buffer to virtual memory address
 	*
 	* @param[in] offset		Start offset from memory start

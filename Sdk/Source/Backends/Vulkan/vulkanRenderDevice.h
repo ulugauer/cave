@@ -405,6 +405,15 @@ public:
 		return _presentationQueueFamilyIndex;
 	}
 
+	/**
+	* @brief Get graphicsQueue familiy index
+	*
+	* @return VkQueue handle
+	*/
+	const VkQueue GetGraphicsQueue() const {
+		return _graphicsQueue;
+	}
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

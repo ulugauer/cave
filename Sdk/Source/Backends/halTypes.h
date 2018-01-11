@@ -165,7 +165,7 @@ typedef uint32_t HalAccessFlags;		///< Combined access flags
 /**
 *  @brief A strongly typed enum class representing memory properties
 */
-enum HalMemoryPropertyBits
+enum class HalMemoryPropertyBits
 {
 	DeviceLocal = 0x01,
 	HostVisible = 0x02,
@@ -179,7 +179,7 @@ typedef uint32_t HalMemoryPropertyFlags;		///< Combined memory property flags
 /**
 *  @brief A strongly typed enum class representing subpass dependencies
 */
-enum HalDependencyBits
+enum class HalDependencyBits
 {
 	DependencyNone = 0x0,
 	DependencyByRegion = 0x1
@@ -700,7 +700,7 @@ struct CAVE_INTERFACE HalSubpassDependency
 		_dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::Host);
 		_srcAccessMask = HalAccessBits::HostRead;
 		_dstAccessMask = HalAccessBits::HostRead;
-		_dependencyFlags = HalDependencyBits::DependencyNone;
+		_dependencyFlags = static_cast<HalDependencyFlags>(HalDependencyBits::DependencyNone);
 	}
 };
 

@@ -96,6 +96,50 @@ void VulkanBuffer::Bind()
 		throw BackendException("Error failed to bind device memory");
 }
 
+void VulkanBuffer::Update(uint64_t offset, uint64_t size, const void* pData)
+{
+	if (_deviceMemory._vkDeviceMemory == VK_NULL_HANDLE)
+		return;
+
+	VulkanMemoryManager* memManager = _pDevice->GetMemoryManager();
+
+	// create temporay staging buffer
+	VkBufferCreateInfo stagingCreateInfo = {};
+	stagingCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingCreateInfo.size = size;
+	stagingCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	stagingCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	VkBuffer stagingBuffer;
+	if (VulkanApi::GetApi()->vkCreateBuffer(_pDevice->GetDeviceHandle(), &stagingCreateInfo, NULL, &stagingBuffer) != VK_SUCCESS)
+		return;
+
+	VkMemoryRequirements memRequirements;
+	VulkanApi::GetApi()->vkGetBufferMemoryRequirements(_pDevice->GetDeviceHandle(), stagingBuffer, &memRequirements);
+	// allocate staging memory
+	VulkanDeviceMemory stagingMemory;
+	memManager->AllocateStagingMemory(memRequirements, stagingMemory);
+	if (stagingMemory._mappedAddress == nullptr)
+	{
+		VulkanApi::GetApi()->vkDestroyBuffer(_pDevice->GetDeviceHandle(), stagingBuffer, nullptr);
+		return;
+	}
+
+	// bind memory
+	if (VulkanApi::GetApi()->vkBindBufferMemory(_pDevice->GetDeviceHandle(), stagingBuffer, stagingMemory._vkDeviceMemory, 0) != VK_SUCCESS)
+		return;
+
+	// copy data to staging buffer
+	std::memcpy(stagingMemory._mappedAddress, pData, (size_t)size);
+
+	// copy buffer
+	memManager->CopyBuffer(stagingBuffer, _vkBuffer, stagingMemory._offset, offset, size);
+
+	// clean up
+	memManager->ReleaseStagingMemory(stagingMemory);
+	VulkanApi::GetApi()->vkDestroyBuffer(_pDevice->GetDeviceHandle(), stagingBuffer, nullptr);
+}
+
 void VulkanBuffer::Map(uint64_t offset, uint64_t size, void** ppData)
 {
 	*ppData = nullptr;
@@ -106,10 +150,7 @@ void VulkanBuffer::Map(uint64_t offset, uint64_t size, void** ppData)
 	if ((size > _vkCreateInfo.size) || (offset + size > _vkCreateInfo.size))
 		return;
 
-	if (VulkanApi::GetApi()->vkMapMemory(_pDevice->GetDeviceHandle(), _deviceMemory._vkDeviceMemory, offset, size, 0, ppData) != VK_SUCCESS)
-	{
-		throw BackendException("Error failed to map device memory");
-	}
+	VulkanApi::GetApi()->vkMapMemory(_pDevice->GetDeviceHandle(), _deviceMemory._vkDeviceMemory, offset, size, 0, ppData);
 }
 
 void VulkanBuffer::Unmap()

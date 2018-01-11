@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "Base/caveSanityTestDevice.h"
 #include "Base/caveSanityTestMappedVbo.h"
+#include "Base/caveSanityTestDeviceVbo.h"
 
 #include <iostream>
 #include <sstream>
@@ -250,7 +251,7 @@ int main(int argc, char* argv[])
 	dependency._srcAccessMask = HalAccessBits::AccessNone;
 	dependency._dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
 	dependency._dstAccessMask = HalAccessBits::ColorAttachmentRead | HalAccessBits::ColorAttachmentWrite;
-	dependency._dependencyFlags = HalDependencyBits::DependencyNone;
+	dependency._dependencyFlags = static_cast<HalDependencyFlags>(HalDependencyBits::DependencyNone);
 	HalRenderPassInfo renderPassInfo;
 	renderPassInfo._attachmentCount = 1;
 	renderPassInfo._pAttachments = &renderAttachment;

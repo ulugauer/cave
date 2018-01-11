@@ -318,7 +318,7 @@ void CaveSanityTestMappedVbo::CreateRenderPass(cave::RenderDevice *device)
 	dependency._srcAccessMask = HalAccessBits::AccessNone;
 	dependency._dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
 	dependency._dstAccessMask = HalAccessBits::ColorAttachmentRead | HalAccessBits::ColorAttachmentWrite;
-	dependency._dependencyFlags = HalDependencyBits::DependencyNone;
+	dependency._dependencyFlags = static_cast<HalDependencyFlags>(HalDependencyBits::DependencyNone);
 	HalRenderPassInfo renderPassInfo;
 	renderPassInfo._attachmentCount = 1;
 	renderPassInfo._pAttachments = &renderAttachment;
@@ -346,7 +346,8 @@ void CaveSanityTestMappedVbo::CreateVertexBuffer(cave::RenderDevice *device)
 	bufferInfo._size = sizeof(float) * vertices.size();
 	bufferInfo._usage = static_cast<HalBufferUsageFlags>(HalBufferUsage::VertexBuffer);
 	bufferInfo._shareMode = HalBufferShareMode::Exclusive;
-	bufferInfo._properties = static_cast<HalMemoryPropertyFlags>(HalMemoryPropertyBits::HostVisible | HalMemoryPropertyBits::HostCoherent);
+	bufferInfo._properties = static_cast<HalMemoryPropertyFlags>(HalMemoryPropertyBits::HostVisible) 
+				| static_cast<HalMemoryPropertyFlags>(HalMemoryPropertyBits::HostCoherent);
 	_vertexBuffer = device->CreateVertexBuffer(bufferInfo);
 	if (!_vertexBuffer)
 		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create vertex buffer");
