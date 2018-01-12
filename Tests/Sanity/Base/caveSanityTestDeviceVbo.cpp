@@ -122,6 +122,9 @@ bool CaveSanityTestDeviceVbo::Run(RenderDevice *device, RenderCommandPool* comma
 
 void CaveSanityTestDeviceVbo::Cleanup(RenderDevice *device, userContextData*)
 {
+	// before we cleanup make sure everything is processed
+	device->WaitIdle();
+
 	if (_commandBuffers)
 	{
 		for (size_t i = 0; i < device->GetSwapChainImageCount(); ++i)

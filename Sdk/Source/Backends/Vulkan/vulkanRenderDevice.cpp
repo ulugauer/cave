@@ -185,9 +185,6 @@ VulkanRenderDevice::~VulkanRenderDevice()
 		DeallocateArray<VkCommandBuffer>(*_pInstance->GetEngineAllocator(), _presentCommandBufferArray);
 	}
 
-	if (_presentationSurface)
-		VulkanApi::GetApi()->vkDestroySurfaceKHR(_pInstance->GetInstanceHandle(), _presentationSurface, nullptr);
-
 	if (_presentQueueCommandPool)
 		VulkanApi::GetApi()->vkDestroyCommandPool(_vkDevice, _presentQueueCommandPool, nullptr);
 
@@ -195,6 +192,9 @@ VulkanRenderDevice::~VulkanRenderDevice()
 	{
 		DeallocateDelete(*_pInstance->GetEngineAllocator(), *_pSwapChain);
 	}
+
+	if (_presentationSurface)
+		VulkanApi::GetApi()->vkDestroySurfaceKHR(_pInstance->GetInstanceHandle(), _presentationSurface, nullptr);
 
 	if (_pMemoryManager)
 	{
@@ -238,6 +238,12 @@ const char* VulkanRenderDevice::GetDeviceName()
 		throw BackendException("Vulkan physical device not properly setup");
 
 	return _pPhysicalDevice->GetDeviceName();
+}
+
+void VulkanRenderDevice::WaitIdle()
+{
+	if (_vkDevice)
+		VulkanApi::GetApi()->vkDeviceWaitIdle(_vkDevice);
 }
 
 void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )

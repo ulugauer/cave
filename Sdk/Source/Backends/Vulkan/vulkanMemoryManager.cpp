@@ -181,6 +181,8 @@ void VulkanMemoryManager::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uin
 	submitInfo.pCommandBuffers = &commandBuffer;
 
 	VulkanApi::GetApi()->vkQueueSubmit(_pRenderDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+	//XXX wait with fences before freeing command bufferse?
+	VulkanApi::GetApi()->vkQueueWaitIdle(_pRenderDevice->GetGraphicsQueue());
 
 	VulkanApi::GetApi()->vkFreeCommandBuffers(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, 1, &commandBuffer);
 }

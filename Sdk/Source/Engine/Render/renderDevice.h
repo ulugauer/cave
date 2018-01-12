@@ -112,6 +112,13 @@ public:
 	const char* GetDeviceName();
 
 	/**
+	* @brief Hardcore function for everything has processed
+	*	Use with caution
+	*
+	*/
+	void WaitIdle();
+
+	/**
 	* @brief Create a swap chain
 	*
 	*/

@@ -27,6 +27,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+// Luna debug callback function
+static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+	VkDebugReportFlagsEXT ,
+	VkDebugReportObjectTypeEXT ,
+	uint64_t ,
+	size_t ,
+	int32_t ,
+	const char* ,
+	const char* msg,
+	void* ) {
+
+	std::cerr << "validation layer: " << msg << std::endl;
+
+	return VK_FALSE;
+}
+
 /**
 * @brief Helper class to find extension names
 *
@@ -47,11 +63,32 @@ static bool CheckExtensionAvailability(const char *extension_name, const std::ve
 	return false;
 }
 
+/**
+* @brief Helper class to find layer names
+*
+* @pram[in] layer_name			Layer name to search for
+* @pram[in] available_layers	Arrary of available layes
+*
+* @return true if found
+*/
+static bool CheckLayerAvailability(const char *layer_name, const std::vector<VkLayerProperties> &available_layers)
+{
+	for (size_t i = 0; i < available_layers.size(); ++i)
+	{
+		if (strcmp(available_layers[i].layerName, layer_name) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 
 VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName)
 	: HalInstance(allocator, type)
 	, _physicalDeviceCount(0)
 	, _physicalDeviceArray(nullptr)
+	, _callback(VK_NULL_HANDLE)
 {
 	// this loads the library 
 	VulkanApi* pApi = VulkanApi::GetApi();
@@ -65,6 +102,30 @@ VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, Backend
 	{
 		throw BackendException("Failed to load vulkan global functions");
 	}
+
+	bool enableValidationLayers = false;
+	std::vector<const char*> layers;
+	// only on windows we setup validation layers if available
+#if defined(_WIN32) || defined(_DEBUG)
+	// enumerate validation layers optional
+	uint32_t layerCount;
+	pApi->vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+	std::vector<VkLayerProperties> availableLayers(layerCount);
+	if (layerCount)
+		pApi->vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+	size_t layersFound = 0;
+	layers.push_back("VK_LAYER_LUNARG_standard_validation");
+	for (size_t i = 0; i < layers.size(); ++i)
+	{
+		if (CheckLayerAvailability(layers[i], availableLayers))
+		{
+			layersFound++;
+		}
+	}
+
+	enableValidationLayers = (layersFound == layers.size());
+#endif
 
 	// We need to setup all possible used extension before we can create an instance
 	uint32_t extensions_count = 0;
@@ -88,6 +149,11 @@ VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, Backend
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
 	extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
 #endif
+
+	if (enableValidationLayers) 
+	{
+		extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+	}
 
 	for (size_t i = 0; i < extensions.size(); ++i)
 	{
@@ -118,6 +184,14 @@ VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, Backend
 	instanceCreateInfo.pApplicationInfo = &appInfo;
 	instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 	instanceCreateInfo.ppEnabledExtensionNames = &extensions[0];
+	if (enableValidationLayers)
+	{
+		instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
+		instanceCreateInfo.ppEnabledLayerNames = &layers[0];
+	}
+	else
+		instanceCreateInfo.enabledLayerCount = 0;
+
 
 	result = pApi->vkCreateInstance(&instanceCreateInfo, nullptr, &_vkInstance);
 
@@ -131,6 +205,10 @@ VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, Backend
 	{
 		throw BackendException("Failed to load vulkan instance functions");
 	}
+
+	// setup debug callback if enabled
+	if (enableValidationLayers)
+		CreateDebugCallback();
 }
 
 VulkanInstance::~VulkanInstance()
@@ -143,10 +221,24 @@ VulkanInstance::~VulkanInstance()
 		}
 		DeallocateArray<VulkanPhysicalDevice>(*_allocator, _physicalDeviceArray);
 	}
+
+	if (_callback)
+		VulkanApi::GetApi()->vkDestroyDebugReportCallbackEXT(_vkInstance, _callback, nullptr);
+
 	if (_vkInstance)
 	{
 		VulkanApi::GetApi()->vkDestroyInstance(_vkInstance, nullptr);
 	}
+}
+
+void VulkanInstance::CreateDebugCallback()
+{
+	VkDebugReportCallbackCreateInfoEXT createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+	createInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
+	createInfo.pfnCallback = debugCallback;
+
+	VulkanApi::GetApi()->vkCreateDebugReportCallbackEXT(_vkInstance, &createInfo, nullptr, &_callback);
 }
 
 

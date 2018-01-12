@@ -125,6 +125,8 @@ VulkanRenderPass::VulkanRenderPass(VulkanRenderDevice* device, HalRenderPassInfo
 					}
 				}
 
+				subpass[i].flags = 0;
+
 				// the below is not handled yet
 				assert(renderPassInfo._pSubpasses[i]._inputAttachmentCount == 0);
 				subpass[i].inputAttachmentCount = 0;

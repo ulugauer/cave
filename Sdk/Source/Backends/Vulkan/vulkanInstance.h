@@ -84,10 +84,17 @@ private:
 	*/
 	VkSurfaceKHR CreatePresentaionSurface(SwapChainInfo& swapChainInfo);
 
+	/**
+	* @brief Create a debug callback handle
+	*
+	*/
+	void CreateDebugCallback();
+
 private:
 	VkInstance _vkInstance;	///< Handle to vulkan instance
 	uint32_t _physicalDeviceCount;	///< Physical devices accessible by this instance
 	VulkanPhysicalDevice* _physicalDeviceArray;	///< Pointer to array of physical devices
+	VkDebugReportCallbackEXT _callback;	///< Debug callback
 };
 
 }

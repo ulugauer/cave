@@ -100,6 +100,13 @@ public:
 	virtual const char* GetDeviceName() = 0;
 
 	/**
+	* @brief Hardcore function for everything has processed
+	*	Use with caution
+	*
+	*/
+	virtual void WaitIdle() = 0;
+
+	/**
 	* @brief Create a swap chain
 	*
 	* @param[in] swapChainInfo	Swap chain creation info

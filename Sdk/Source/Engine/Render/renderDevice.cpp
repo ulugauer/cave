@@ -119,6 +119,12 @@ const char* RenderDevice::GetDeviceName()
 	return _pHalRenderDevice->GetDeviceName();
 }
 
+void RenderDevice::WaitIdle()
+{
+	if (_pHalRenderDevice)
+		_pHalRenderDevice->WaitIdle();
+}
+
 void RenderDevice::CreateSwapChain()
 {
 	if (!_pHalRenderDevice || !_pRenderInstance || !_pHalInstance)

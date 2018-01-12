@@ -36,9 +36,12 @@ typedef PFN_vkVoidFunction	(VKAPI_PTR* vkGetInstanceProcAddrPtr) (VkInstance ins
 typedef VkResult	(VKAPI_PTR* vkEnumerateInstanceExtensionPropertiesPtr) (const char* pLayerName, uint32_t* pPropertyCount, VkExtensionProperties* pProperties);
 typedef VkResult	(VKAPI_PTR* vkEnumerateInstanceLayerPropertiesPtr)(uint32_t* pPropertyCount, VkLayerProperties* pProperties);
 typedef VkResult	(VKAPI_PTR* vkCreateInstancePtr) (const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance);
-
 typedef void		(VKAPI_PTR* vkDestroyInstancePtr) (VkInstance instance, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkEnumeratePhysicalDevicesPtr) (VkInstance instance, uint32_t* pPhysicalDeviceCount, VkPhysicalDevice* pPhysicalDevices);
+typedef VkResult	(VKAPI_PTR* vkCreateDebugReportCallbackEXTPtr)(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
+typedef void		(VKAPI_PTR* vkDestroyDebugReportCallbackEXTPtr)(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator);
+typedef void		(VKAPI_PTR* vkDebugReportMessageEXTPtr)(VkInstance instance, VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage);
+
 typedef void		(VKAPI_PTR* vkGetPhysicalDevicePropertiesPtr) (VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties* pProperties);
 typedef void		(VKAPI_PTR* vkGetPhysicalDeviceFeaturesPtr) (VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures* pFeatures);
 typedef void		(VKAPI_PTR* vkGetPhysicalDeviceQueueFamilyPropertiesPtr) (VkPhysicalDevice physicalDevice, uint32_t* pQueueFamilyPropertyCount, VkQueueFamilyProperties* pQueueFamilyProperties);
@@ -73,6 +76,11 @@ typedef VkResult	(VKAPI_PTR* vkAllocateMemoryPtr)(VkDevice device, const VkMemor
 typedef void		(VKAPI_PTR* vkFreeMemoryPtr)(VkDevice device, VkDeviceMemory memory, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkCreateSemaphorePtr) (VkDevice device, const VkSemaphoreCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSemaphore* pSemaphore);
 typedef void		(VKAPI_PTR* vkDestroySemaphorePtr) (VkDevice device, VkSemaphore semaphore, const VkAllocationCallbacks* pAllocator);
+typedef VkResult	(VKAPI_PTR* vkCreateFencePtr)(VkDevice device, const VkFenceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkFence* pFence);
+typedef void		(VKAPI_PTR* vkDestroyFencePtr)(VkDevice device, VkFence fence, const VkAllocationCallbacks* pAllocator);
+typedef VkResult	(VKAPI_PTR* vkResetFencesPtr)(VkDevice device, uint32_t fenceCount, const VkFence* pFences);
+typedef VkResult	(VKAPI_PTR* vkGetFenceStatusPtr)(VkDevice device, VkFence fence);
+typedef VkResult	(VKAPI_PTR* vkWaitForFencesPtr)(VkDevice device, uint32_t fenceCount, const VkFence* pFences, VkBool32 waitAll, uint64_t timeout);
 typedef VkResult	(VKAPI_PTR* vkCreateBufferPtr)(VkDevice device, const VkBufferCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkBuffer* pBuffer);
 typedef void		(VKAPI_PTR* vkDestroyBufferPtr)(VkDevice device, VkBuffer buffer, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkBindBufferMemoryPtr)(VkDevice device, VkBuffer buffer, VkDeviceMemory memory, VkDeviceSize memoryOffset);
@@ -281,6 +289,9 @@ public:
 			retValue &= LoadInstanceFunction(pInstance, "vkGetDeviceQueue", vkGetDeviceQueue);
 			retValue &= LoadInstanceFunction(pInstance, "vkDestroyDevice", vkDestroyDevice);
 			retValue &= LoadInstanceFunction(pInstance, "vkDeviceWaitIdle", vkDeviceWaitIdle);
+			retValue &= LoadInstanceFunction(pInstance, "vkCreateDebugReportCallbackEXT", vkCreateDebugReportCallbackEXT);
+			retValue &= LoadInstanceFunction(pInstance, "vkDestroyDebugReportCallbackEXT", vkDestroyDebugReportCallbackEXT);
+			retValue &= LoadInstanceFunction(pInstance, "vkDebugReportMessageEXT", vkDebugReportMessageEXT);
 
 			retValue &= LoadInstanceFunction(pInstance, "vkDestroySurfaceKHR", vkDestroySurfaceKHR);
 			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceSurfaceSupportKHR", vkGetPhysicalDeviceSurfaceSupportKHR);
@@ -316,6 +327,11 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkFreeMemory", vkFreeMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateSemaphore", vkCreateSemaphore);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroySemaphore", vkDestroySemaphore);
+			retValue &= LoadDeviceFunction(pDevice, "vkCreateFence", vkCreateFence);
+			retValue &= LoadDeviceFunction(pDevice, "vkDestroyFence", vkDestroyFence);
+			retValue &= LoadDeviceFunction(pDevice, "vkResetFences", vkResetFences);
+			retValue &= LoadDeviceFunction(pDevice, "vkGetFenceStatus", vkGetFenceStatus);
+			retValue &= LoadDeviceFunction(pDevice, "vkWaitForFences", vkWaitForFences);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateBuffer", vkCreateBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyBuffer", vkDestroyBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkBindBufferMemory", vkBindBufferMemory);
@@ -406,6 +422,9 @@ public:
 	vkGetDeviceQueuePtr							vkGetDeviceQueue;
 	vkDestroyDevicePtr							vkDestroyDevice;
 	vkDeviceWaitIdlePtr							vkDeviceWaitIdle;
+	vkCreateDebugReportCallbackEXTPtr			vkCreateDebugReportCallbackEXT;
+	vkDestroyDebugReportCallbackEXTPtr			vkDestroyDebugReportCallbackEXT;
+	vkDebugReportMessageEXTPtr					vkDebugReportMessageEXT;
 
 	// ************************************************************ //
 	// Instance level functions                                     //
@@ -434,6 +453,11 @@ public:
 	vkFreeMemoryPtr								vkFreeMemory;
 	vkCreateSemaphorePtr						vkCreateSemaphore;
 	vkDestroySemaphorePtr						vkDestroySemaphore;
+	vkCreateFencePtr							vkCreateFence;
+	vkDestroyFencePtr							vkDestroyFence;
+	vkResetFencesPtr							vkResetFences;
+	vkGetFenceStatusPtr							vkGetFenceStatus;
+	vkWaitForFencesPtr							vkWaitForFences;
 	vkCreateBufferPtr							vkCreateBuffer;
 	vkDestroyBufferPtr							vkDestroyBuffer;
 	vkBindBufferMemoryPtr						vkBindBufferMemory;

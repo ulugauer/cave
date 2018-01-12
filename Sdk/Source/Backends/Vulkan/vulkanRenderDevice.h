@@ -104,6 +104,13 @@ public:
 	const char* GetDeviceName();
 
 	/**
+	* @brief Hardcore function for everything has processed
+	*	Use with caution
+	*
+	*/
+	void WaitIdle() override;
+
+	/**
 	* @brief Get vulkan surface handle
 	*
 	* @return Lowlevel vulkan handle
