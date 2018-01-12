@@ -289,9 +289,6 @@ public:
 			retValue &= LoadInstanceFunction(pInstance, "vkGetDeviceQueue", vkGetDeviceQueue);
 			retValue &= LoadInstanceFunction(pInstance, "vkDestroyDevice", vkDestroyDevice);
 			retValue &= LoadInstanceFunction(pInstance, "vkDeviceWaitIdle", vkDeviceWaitIdle);
-			retValue &= LoadInstanceFunction(pInstance, "vkCreateDebugReportCallbackEXT", vkCreateDebugReportCallbackEXT);
-			retValue &= LoadInstanceFunction(pInstance, "vkDestroyDebugReportCallbackEXT", vkDestroyDebugReportCallbackEXT);
-			retValue &= LoadInstanceFunction(pInstance, "vkDebugReportMessageEXT", vkDebugReportMessageEXT);
 
 			retValue &= LoadInstanceFunction(pInstance, "vkDestroySurfaceKHR", vkDestroySurfaceKHR);
 			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceSurfaceSupportKHR", vkGetPhysicalDeviceSurfaceSupportKHR);
@@ -305,6 +302,27 @@ public:
 			retValue &= LoadInstanceFunction(pInstance, "vkCreateXcbSurfaceKHR", vkCreateXcbSurfaceKHR);
 			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceXcbPresentationSupportKHR", vkGetPhysicalDeviceXcbPresentationSupportKHR);
 #endif
+		}
+
+		return retValue;
+	}
+
+	/**
+	* @brief Load instance level accessible debug EXT functions from vulkan lib
+	*
+	* param[in] pInstance	Pointer to vulkan instance
+	*
+	* @return true if loading succeded
+	*/
+	bool LoadInstanceDebugEXTFunctions(VkInstance* pInstance)
+	{
+		bool retValue = false;
+		if (_hVulkan && pInstance)
+		{
+			retValue = true;
+			retValue &= LoadInstanceFunction(pInstance, "vkCreateDebugReportCallbackEXT", vkCreateDebugReportCallbackEXT);
+			retValue &= LoadInstanceFunction(pInstance, "vkDestroyDebugReportCallbackEXT", vkDestroyDebugReportCallbackEXT);
+			retValue &= LoadInstanceFunction(pInstance, "vkDebugReportMessageEXT", vkDebugReportMessageEXT);
 		}
 
 		return retValue;

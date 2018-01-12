@@ -63,6 +63,7 @@ static bool CheckExtensionAvailability(const char *extension_name, const std::ve
 	return false;
 }
 
+#if defined(_WIN32) || defined(_DEBUG)
 /**
 * @brief Helper class to find layer names
 *
@@ -82,7 +83,7 @@ static bool CheckLayerAvailability(const char *layer_name, const std::vector<VkL
 	}
 	return false;
 }
-
+#endif 
 
 VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName)
 	: HalInstance(allocator, type)
@@ -204,6 +205,12 @@ VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, Backend
 	if (!pApi->LoadInstanceFunctions(&_vkInstance))
 	{
 		throw BackendException("Failed to load vulkan instance functions");
+	}
+
+	// load instance debug ext functions
+	if (enableValidationLayers && !pApi->LoadInstanceDebugEXTFunctions(&_vkInstance))
+	{
+		throw BackendException("Failed to load vulkan debug EXT instance functions");
 	}
 
 	// setup debug callback if enabled
