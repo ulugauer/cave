@@ -666,6 +666,9 @@ bool VulkanRenderDevice::PresentQueueSubmit(HalCommandBuffer* commandBuffer)
 	VkResult result = VK_INCOMPLETE;
 	if (_graphicsQueue)
 	{
+		// wait for possible copies
+		_pMemoryManager->WaitForCopies();
+
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		const VkSemaphore waitSemaphore = _pSwapChain->GetImageAvailableSemaphore();
 		const VkSemaphore signalSemaphore = _pSwapChain->GetRenderingDoneSemaphore();

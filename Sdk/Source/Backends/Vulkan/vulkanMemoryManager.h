@@ -53,6 +53,20 @@ struct VulkanDeviceMemory
 };
 
 /**
+* Vulkan device memory allocation
+*/
+struct VulkanStagingBufferInfo
+{
+	VulkanStagingBufferInfo()
+	{
+		_stagingBuffer = VK_NULL_HANDLE;
+	}
+
+	VkBuffer _stagingBuffer;	///< Handled to staging buffer
+	VulkanDeviceMemory _statgingMemory; ///< Memory  associated with the buffer
+};
+
+/**
 * Vulkan device memory manager
 */
 class VulkanMemoryManager
@@ -69,6 +83,8 @@ public:
 	VulkanMemoryManager(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice, VulkanRenderDevice* renderDevice);
 	/** @brief Destructor */
 	virtual ~VulkanMemoryManager();
+
+	static constexpr uint64_t StagingBufferSize = 8388608;	///< 8 MB
 
 	/**
 	* @brief Allocate device memory for any buffer usage
@@ -89,6 +105,53 @@ public:
 	void ReleaseBufferMemory(VulkanDeviceMemory& deviceMemory);
 
 	/**
+	* @brief Allocate host visible staging buffer
+	*
+	* @param[in] size				Required Size
+	* @param[out] stagingBufferInfo	Filled in VulkanStagingBuffer struct on success
+	*
+	*/
+	void GetStagingBuffer(uint64_t size, VulkanStagingBufferInfo& stagingBufferInfo);
+
+	/**
+	* @brief Allocate host visible memory for memory copy
+	*
+	* @param[in] stagingBufferInfo	Returned from a call to GetStagingBuffer
+	*
+	*/
+	void ReleaseStagingBuffer(VulkanStagingBufferInfo& stagingBufferInfo);
+
+	/**
+	* @brief Allocate host visible memory for memory copy
+	*
+	* @param[in] srcBuffer	VkBuffer source handle
+	* @param[in] dstBuffer	VkBuffer dest handle
+	* @param[in] srcOffset	Source offset in bytes
+	* @param[in] dstOffset	Dest offset in bytes
+	* @param[in] size		Copy size in bytes
+	*
+	*/
+	void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64_t srcOffset, uint64_t dstOffset, uint64_t size);
+
+	/**
+	* @brief Wai for possibly scheduled copies
+	*
+	*
+	*/
+	void WaitForCopies();
+
+private:
+	/**
+	* @brief Select memory type from property flags
+	*
+	* @param[in] memRequirements	VkBuffer memory requilrements
+	* @param[in] properties			Memory property requirement
+	*
+	* return index into memory type array
+	*/
+	uint32_t ChooseMemoryType(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties);
+
+	/**
 	* @brief Allocate host visible memory for memory copy
 	*
 	* @param[in] memRequirements	VkMemoryRequirements struct
@@ -106,33 +169,24 @@ public:
 	void ReleaseStagingMemory(VulkanDeviceMemory& deviceMemory);
 
 	/**
-	* @brief Allocate host visible memory for memory copy
+	* @brief Find a suitable and available staging buffer
 	*
-	* @param[in] srcBuffer	VkBuffer handle
-	* @param[in] dstBuffer	VkBuffer handle
-	* @param[in] srcOffset	Source offset in bytes
-	* @param[in] dstOffset	Dest offset in bytes
-	* @param[in] size		Copy size in bytes
+	* @param[in] size			Required buffer size
+	* @param[out] memoryInfo	Returned memory info required
 	*
+	* return Vulkan buffer handle
 	*/
-	void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64_t srcOffset, uint64_t dstOffset, uint64_t size);
-
-private:
-	/**
-	* @brief Select memory type from property flags
-	*
-	* @param[in] memRequirements	VkBuffer memory requilrements
-	* @param[in] properties			Memory property requirement
-	*
-	* return index into memory type array
-	*/
-	uint32_t ChooseMemoryType(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties);
+	VkBuffer FindStagingBuffer(uint64_t size, VulkanDeviceMemory& memoryInfo);
 
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
 	VulkanRenderDevice* _pRenderDevice;	///< Pointer to logical device
 	VkCommandPool _vkCommandPool;	///< Vulkan command pool handle
+	VkCommandBuffer _vkTransferCommandBuffer;	///< Vulkan command buffer for data transfers
+	VkFence _vkBufferCopyFence;	///< Fence used to wait submited buffer copies
+	VkBuffer _vkStagingBuffer;	///< Our big staging buffe we use for copies
+	VulkanDeviceMemory _stagingBufferDeviceMemeory; ///< Memory bound to _vkStagingBuffer;
 };
 
 }

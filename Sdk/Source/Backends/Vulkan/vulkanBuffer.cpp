@@ -104,41 +104,20 @@ void VulkanBuffer::Update(uint64_t offset, uint64_t size, const void* pData)
 
 	VulkanMemoryManager* memManager = _pDevice->GetMemoryManager();
 
-	// create temporay staging buffer
-	VkBufferCreateInfo stagingCreateInfo = {};
-	stagingCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	stagingCreateInfo.size = size;
-	stagingCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	stagingCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	VulkanStagingBufferInfo stagingBufferInfo;
+	memManager->GetStagingBuffer(size, stagingBufferInfo);
 
-	VkBuffer stagingBuffer;
-	if (VulkanApi::GetApi()->vkCreateBuffer(_pDevice->GetDeviceHandle(), &stagingCreateInfo, NULL, &stagingBuffer) != VK_SUCCESS)
-		return;
-
-	VkMemoryRequirements memRequirements;
-	VulkanApi::GetApi()->vkGetBufferMemoryRequirements(_pDevice->GetDeviceHandle(), stagingBuffer, &memRequirements);
-	// allocate staging memory
-	VulkanDeviceMemory stagingMemory;
-	memManager->AllocateStagingMemory(memRequirements, stagingMemory);
-	if (stagingMemory._mappedAddress == nullptr)
-	{
-		VulkanApi::GetApi()->vkDestroyBuffer(_pDevice->GetDeviceHandle(), stagingBuffer, nullptr);
-		return;
-	}
-
-	// bind memory
-	if (VulkanApi::GetApi()->vkBindBufferMemory(_pDevice->GetDeviceHandle(), stagingBuffer, stagingMemory._vkDeviceMemory, 0) != VK_SUCCESS)
+	if (stagingBufferInfo._statgingMemory._mappedAddress == nullptr)
 		return;
 
 	// copy data to staging buffer
-	std::memcpy(stagingMemory._mappedAddress, pData, (size_t)size);
+	std::memcpy(stagingBufferInfo._statgingMemory._mappedAddress, pData, (size_t)size);
 
 	// copy buffer
-	memManager->CopyBuffer(stagingBuffer, _vkBuffer, stagingMemory._offset, offset, size);
+	memManager->CopyBuffer(stagingBufferInfo._stagingBuffer, _vkBuffer, stagingBufferInfo._statgingMemory._offset, offset, size);
 
 	// clean up
-	memManager->ReleaseStagingMemory(stagingMemory);
-	VulkanApi::GetApi()->vkDestroyBuffer(_pDevice->GetDeviceHandle(), stagingBuffer, nullptr);
+	memManager->ReleaseStagingBuffer(stagingBufferInfo);
 }
 
 void VulkanBuffer::Map(uint64_t offset, uint64_t size, void** ppData)
