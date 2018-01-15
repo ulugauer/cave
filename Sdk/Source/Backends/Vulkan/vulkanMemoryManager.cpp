@@ -40,7 +40,7 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 	VkCommandPoolCreateInfo vkPoolCreateInfo;
 	vkPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	vkPoolCreateInfo.pNext = nullptr;
-	vkPoolCreateInfo.flags = 0;
+	vkPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	vkPoolCreateInfo.queueFamilyIndex = _pRenderDevice->GetGraphicsFamilyIndex();
 
 	if (VulkanApi::GetApi()->vkCreateCommandPool(_pRenderDevice->GetDeviceHandle(), &vkPoolCreateInfo, nullptr, &_vkCommandPool) != VK_SUCCESS)
@@ -250,14 +250,14 @@ void VulkanMemoryManager::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uin
 	if (VulkanApi::GetApi()->vkWaitForFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkBufferCopyFence, VK_TRUE, (std::numeric_limits<uint64_t>::max)()) != VK_SUCCESS)
 		return;
 
+	// we re-use the command buffer which is safe after we waited for the fence
+	VulkanApi::GetApi()->vkResetCommandBuffer(_vkTransferCommandBuffer, 0);
+
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-	if (VulkanApi::GetApi()->vkBeginCommandBuffer(_vkTransferCommandBuffer, &beginInfo) != VK_SUCCESS)
-	{
-		return;
-	}
+	VulkanApi::GetApi()->vkBeginCommandBuffer(_vkTransferCommandBuffer, &beginInfo);
 
 	VkBufferCopy copyRegion = {};
 	copyRegion.srcOffset = srcOffset;

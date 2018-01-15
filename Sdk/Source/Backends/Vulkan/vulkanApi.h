@@ -94,6 +94,7 @@ typedef VkResult	(VKAPI_PTR* vkAllocateCommandBuffersPtr) (VkDevice device, cons
 typedef void		(VKAPI_PTR* vkDestroyCommandPoolPtr) (VkDevice device, VkCommandPool commandPool, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkBeginCommandBufferPtr) (VkCommandBuffer commandBuffer, const VkCommandBufferBeginInfo* pBeginInfo);
 typedef VkResult	(VKAPI_PTR* vkEndCommandBufferPtr) (VkCommandBuffer commandBuffer);
+typedef VkResult	(VKAPI_PTR* vkResetCommandBufferPtr)(VkCommandBuffer commandBuffer, VkCommandBufferResetFlags flags);
 typedef void		(VKAPI_PTR* vkFreeCommandBuffersPtr) (VkDevice device, VkCommandPool commandPool, uint32_t commandBufferCount, const VkCommandBuffer* pCommandBuffers);
 typedef void		(VKAPI_PTR* vkCmdPipelineBarrierPtr) (VkCommandBuffer commandBuffer, VkPipelineStageFlags srcStageMask, VkPipelineStageFlags dstStageMask
 						, VkDependencyFlags dependencyFlags, uint32_t memoryBarrierCount, const VkMemoryBarrier* pMemoryBarriers
@@ -363,6 +364,7 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyCommandPool", vkDestroyCommandPool);
 			retValue &= LoadDeviceFunction(pDevice, "vkBeginCommandBuffer", vkBeginCommandBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkEndCommandBuffer", vkEndCommandBuffer);
+			retValue &= LoadDeviceFunction(pDevice, "vkResetCommandBuffer", vkResetCommandBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkFreeCommandBuffers", vkFreeCommandBuffers);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdPipelineBarrier", vkCmdPipelineBarrier);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdClearColorImage", vkCmdClearColorImage);
@@ -489,6 +491,7 @@ public:
 	vkDestroyCommandPoolPtr						vkDestroyCommandPool;
 	vkBeginCommandBufferPtr						vkBeginCommandBuffer;
 	vkEndCommandBufferPtr						vkEndCommandBuffer;
+	vkResetCommandBufferPtr						vkResetCommandBuffer;
 	vkFreeCommandBuffersPtr						vkFreeCommandBuffers;
 	vkCmdPipelineBarrierPtr						vkCmdPipelineBarrier;
 	vkCmdClearColorImagePtr						vkCmdClearColorImage;
