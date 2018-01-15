@@ -43,12 +43,14 @@ struct VulkanDeviceMemory
 	{
 		_offset = _size = 0;
 		_vkDeviceMemory = VK_NULL_HANDLE;
+		_needsFlush = false;
 		_mappedAddress = nullptr;
 	}
 
 	uint64_t _offset;	///< Memory offset
 	uint64_t _size;		///< Actual allocated size
 	VkDeviceMemory _vkDeviceMemory;		///< Vulkan device memory handle
+	bool _needsFlush;		///< does this memory need a flush before usage
 	void* _mappedAddress;	///< Pointer to virtual memory if mapped
 };
 
@@ -57,10 +59,46 @@ struct VulkanDeviceMemory
 */
 struct VulkanStagingBufferInfo
 {
+	/** @brief constructor */
 	VulkanStagingBufferInfo()
 	{
 		_stagingBuffer = VK_NULL_HANDLE;
 	}
+
+	/**
+	* @brief Query memory offset 
+	*
+	* @return memory offset
+	*/
+	uint64_t GetOffset() const { return _statgingMemory._offset; }
+
+	/**
+	* @brief Query memory size
+	*
+	* @return memory size
+	*/
+	uint64_t GetSize() const { return _statgingMemory._size; }
+
+	/**
+	* @brief Get device handle
+	*
+	* @return vulkan device handle
+	*/
+	VkDeviceMemory GetDeviceHandle() const { return _statgingMemory._vkDeviceMemory; }
+
+	/**
+	* @brief Get mapped device memory address
+	*
+	* @return mapped address
+	*/
+	void* GetMappedAddress() const { return _statgingMemory._mappedAddress; }
+
+	/**
+	* @brief Query if the memory requires a memory flush sync
+	*
+	* @return true if flush is required
+	*/
+	bool NeedsFlush() const { return _statgingMemory._needsFlush; }
 
 	VkBuffer _stagingBuffer;	///< Handled to staging buffer
 	VulkanDeviceMemory _statgingMemory; ///< Memory  associated with the buffer
@@ -120,6 +158,14 @@ public:
 	*
 	*/
 	void ReleaseStagingBuffer(VulkanStagingBufferInfo& stagingBufferInfo);
+
+	/**
+	* @brief Flush host visible memory
+	*
+	* @param[in] deviceMemory	VulkanDeviceMemory struct returned on AllocateBufferMemory call
+	*
+	*/
+	void FlushStagingMemory(VulkanDeviceMemory& deviceMemory);
 
 	/**
 	* @brief Allocate host visible memory for memory copy
@@ -182,6 +228,7 @@ private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device
 	VulkanRenderDevice* _pRenderDevice;	///< Pointer to logical device
+	uint64_t _nonCoherentAlignment;	///< Minimum alignment for non-coherent memory
 	VkCommandPool _vkCommandPool;	///< Vulkan command pool handle
 	VkCommandBuffer _vkTransferCommandBuffer;	///< Vulkan command buffer for data transfers
 	VkFence _vkBufferCopyFence;	///< Fence used to wait submited buffer copies

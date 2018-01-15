@@ -110,6 +110,13 @@ public:
 	uint32_t GetPresentationQueueFamilyIndex(uint32_t graphicsIndex, VkSurfaceKHR presentationSurface);
 
 	/**
+	* @brief Query device properties
+	*
+	* @return Struct of device proeprties
+	*/
+	const VkPhysicalDeviceProperties& GetPhysicalDeviceProperties() const { return _physicalDeviceProperties; }
+
+	/**
 	* @brief Query supported device features
 	*
 	* @return Struct of supported device features

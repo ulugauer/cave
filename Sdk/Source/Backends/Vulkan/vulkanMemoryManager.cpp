@@ -31,11 +31,16 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 	: _pInstance(instance)
 	, _pPhysicalDevice(physicalDevice)
 	, _pRenderDevice(renderDevice)
+	, _nonCoherentAlignment(0)
 	, _vkCommandPool(VK_NULL_HANDLE)
 	, _vkTransferCommandBuffer(VK_NULL_HANDLE)
 	, _vkBufferCopyFence(VK_NULL_HANDLE)
 	, _vkStagingBuffer(VK_NULL_HANDLE)
 {
+	// store some physical device properties
+	VkPhysicalDeviceProperties deviceProperties = physicalDevice->GetPhysicalDeviceProperties();
+	_nonCoherentAlignment = deviceProperties.limits.nonCoherentAtomSize;
+
 	// for some operations we need a command pool
 	VkCommandPoolCreateInfo vkPoolCreateInfo;
 	vkPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -143,6 +148,14 @@ void VulkanMemoryManager::AllocateStagingMemory(VkMemoryRequirements& memRequire
 {
 	VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 	uint32_t memoryTypeIndex = ChooseMemoryType(memRequirements, properties);
+	if (memoryTypeIndex == ~0u)
+	{
+		// if we failed try again without coherent bit
+		properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+		memoryTypeIndex = ChooseMemoryType(memRequirements, properties);
+		deviceMemory._needsFlush = true; // data needs to be flushed before used
+	}
+
 	if (memoryTypeIndex != ~0u)
 	{
 		// Allocate memory
@@ -190,6 +203,20 @@ void VulkanMemoryManager::ReleaseStagingMemory(VulkanDeviceMemory& deviceMemory)
 		deviceMemory._size = 0;
 		deviceMemory._vkDeviceMemory = nullptr;
 	}
+}
+
+void VulkanMemoryManager::FlushStagingMemory(VulkanDeviceMemory& deviceMemory)
+{
+	VkMappedMemoryRange stagingRange;
+	stagingRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+	stagingRange.pNext = nullptr;
+	stagingRange.memory = deviceMemory._vkDeviceMemory;
+	stagingRange.offset = deviceMemory._offset;
+
+	// We must align size
+	uint64_t alignedSize = (deviceMemory._size - 1) - ((deviceMemory._size - 1) % _nonCoherentAlignment) + _nonCoherentAlignment;
+	stagingRange.size = alignedSize;
+	VulkanApi::GetApi()->vkFlushMappedMemoryRanges(_pRenderDevice->GetDeviceHandle(), 1, &stagingRange);
 }
 
 uint32_t VulkanMemoryManager::ChooseMemoryType(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties)

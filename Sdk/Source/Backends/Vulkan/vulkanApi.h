@@ -86,6 +86,7 @@ typedef void		(VKAPI_PTR* vkDestroyBufferPtr)(VkDevice device, VkBuffer buffer, 
 typedef VkResult	(VKAPI_PTR* vkBindBufferMemoryPtr)(VkDevice device, VkBuffer buffer, VkDeviceMemory memory, VkDeviceSize memoryOffset);
 typedef VkResult	(VKAPI_PTR* vkMapMemoryPtr)(VkDevice device, VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData);
 typedef void		(VKAPI_PTR* vkUnmapMemoryPtr)(VkDevice device, VkDeviceMemory memory);
+typedef VkResult	(VKAPI_PTR* vkFlushMappedMemoryRangesPtr)(VkDevice device, uint32_t memoryRangeCount, const VkMappedMemoryRange* pMemoryRanges);
 typedef VkResult	(VKAPI_PTR* vkQueueSubmitPtr) (VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence);
 typedef VkResult	(VKAPI_PTR* vkQueueWaitIdlePtr)(VkQueue queue);
 typedef void		(VKAPI_PTR* vkGetBufferMemoryRequirementsPtr)(VkDevice device, VkBuffer buffer, VkMemoryRequirements* pMemoryRequirements);
@@ -356,6 +357,7 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkBindBufferMemory", vkBindBufferMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkMapMemory", vkMapMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkUnmapMemory", vkUnmapMemory);
+			retValue &= LoadDeviceFunction(pDevice, "vkFlushMappedMemoryRanges", vkFlushMappedMemoryRanges);
 			retValue &= LoadDeviceFunction(pDevice, "vkQueueSubmit", vkQueueSubmit);
 			retValue &= LoadDeviceFunction(pDevice, "vkQueueWaitIdle", vkQueueWaitIdle);
 			retValue &= LoadDeviceFunction(pDevice, "vkGetBufferMemoryRequirements", vkGetBufferMemoryRequirements);
@@ -483,6 +485,7 @@ public:
 	vkBindBufferMemoryPtr						vkBindBufferMemory;
 	vkMapMemoryPtr								vkMapMemory;
 	vkUnmapMemoryPtr							vkUnmapMemory;
+	vkFlushMappedMemoryRangesPtr				vkFlushMappedMemoryRanges;
 	vkQueueSubmitPtr							vkQueueSubmit;
 	vkQueueWaitIdlePtr							vkQueueWaitIdle;
 	vkGetBufferMemoryRequirementsPtr			vkGetBufferMemoryRequirements;

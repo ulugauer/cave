@@ -107,14 +107,18 @@ void VulkanBuffer::Update(uint64_t offset, uint64_t size, const void* pData)
 	VulkanStagingBufferInfo stagingBufferInfo;
 	memManager->GetStagingBuffer(size, stagingBufferInfo);
 
-	if (stagingBufferInfo._statgingMemory._mappedAddress == nullptr)
+	if (stagingBufferInfo.GetMappedAddress() == nullptr)
 		return;
 
 	// copy data to staging buffer
-	std::memcpy(stagingBufferInfo._statgingMemory._mappedAddress, pData, (size_t)size);
+	std::memcpy(stagingBufferInfo.GetMappedAddress(), pData, (size_t)size);
+
+	// Flush memory if needed
+	if (stagingBufferInfo.NeedsFlush())
+		memManager->FlushStagingMemory(stagingBufferInfo._statgingMemory);
 
 	// copy buffer
-	memManager->CopyBuffer(stagingBufferInfo._stagingBuffer, _vkBuffer, stagingBufferInfo._statgingMemory._offset, offset, size);
+	memManager->CopyBuffer(stagingBufferInfo._stagingBuffer, _vkBuffer, stagingBufferInfo.GetOffset(), offset, size);
 
 	// clean up
 	memManager->ReleaseStagingBuffer(stagingBufferInfo);
