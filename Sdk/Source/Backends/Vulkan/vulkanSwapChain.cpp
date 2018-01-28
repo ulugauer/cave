@@ -116,6 +116,14 @@ void VulkanSwapChain::CreateSwapChain()
 	swapChainCreateInfo.clipped = VK_TRUE;
 	swapChainCreateInfo.oldSwapchain = _swapChain;
 
+	// additional flags for access to swap chain images if requested
+	VkFormatProperties formatProps;
+	VulkanApi::GetApi()->vkGetPhysicalDeviceFormatProperties(_pPhysicalDevice->GetPhysicalDeviceHandle(), surfaceFormat.format, &formatProps);
+	if ((formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_SRC_BIT_KHR) || (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)) 
+	{
+		swapChainCreateInfo.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	}
+
 	VkResult result = VulkanApi::GetApi()->vkCreateSwapchainKHR(_pRenderDevice->GetDeviceHandle(), &swapChainCreateInfo, nullptr, &_swapChain);
 	if (result != VK_SUCCESS)
 		throw BackendException("Failed to create swap chain");

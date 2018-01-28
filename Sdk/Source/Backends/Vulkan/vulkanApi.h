@@ -44,6 +44,7 @@ typedef void		(VKAPI_PTR* vkDebugReportMessageEXTPtr)(VkInstance instance, VkDeb
 
 typedef void		(VKAPI_PTR* vkGetPhysicalDevicePropertiesPtr) (VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties* pProperties);
 typedef void		(VKAPI_PTR* vkGetPhysicalDeviceFeaturesPtr) (VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures* pFeatures);
+typedef void		(VKAPI_PTR* vkGetPhysicalDeviceFormatPropertiesPtr)(VkPhysicalDevice physicalDevice, VkFormat format, VkFormatProperties* pFormatProperties);
 typedef void		(VKAPI_PTR* vkGetPhysicalDeviceQueueFamilyPropertiesPtr) (VkPhysicalDevice physicalDevice, uint32_t* pQueueFamilyPropertyCount, VkQueueFamilyProperties* pQueueFamilyProperties);
 typedef VkResult	(VKAPI_PTR* vkCreateDevicePtr) (VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDevice* pDevice);
 typedef PFN_vkVoidFunction	(VKAPI_PTR* vkGetDeviceProcAddrPtr) (VkDevice device, const char* pName);
@@ -283,6 +284,7 @@ public:
 			retValue &= LoadInstanceFunction(pInstance, "vkEnumeratePhysicalDevices", vkEnumeratePhysicalDevices);
 			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceProperties", vkGetPhysicalDeviceProperties);
 			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceFeatures", vkGetPhysicalDeviceFeatures);
+			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceFormatProperties", vkGetPhysicalDeviceFormatProperties);
 			retValue &= LoadInstanceFunction(pInstance, "vkGetPhysicalDeviceQueueFamilyProperties", vkGetPhysicalDeviceQueueFamilyProperties);
 			retValue &= LoadInstanceFunction(pInstance, "vkCreateDevice", vkCreateDevice);
 			retValue &= LoadInstanceFunction(pInstance, "vkGetDeviceProcAddr", vkGetDeviceProcAddr);
@@ -436,6 +438,7 @@ public:
 	vkEnumeratePhysicalDevicesPtr				vkEnumeratePhysicalDevices;
 	vkGetPhysicalDevicePropertiesPtr			vkGetPhysicalDeviceProperties;
 	vkGetPhysicalDeviceFeaturesPtr				vkGetPhysicalDeviceFeatures;
+	vkGetPhysicalDeviceFormatPropertiesPtr		vkGetPhysicalDeviceFormatProperties;
 	vkGetPhysicalDeviceQueueFamilyPropertiesPtr	vkGetPhysicalDeviceQueueFamilyProperties;
 	vkCreateDevicePtr							vkCreateDevice;
 	vkGetDeviceProcAddrPtr						vkGetDeviceProcAddr;

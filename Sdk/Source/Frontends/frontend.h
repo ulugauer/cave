@@ -53,22 +53,24 @@ typedef struct FrontendWindowInfo
 {
 	uint32_t xOffset;			///< Window x position
 	uint32_t yOffset;			///< Window y position
-	uint32_t windowWidth;	///< Window width
-	uint32_t windowHeight;	///< Window height
-	uint32_t colorBits;		///< Amount of total colorbits (24, 32)
-	uint32_t depthBits;		///< Amount of total depthbits (24, 32)
-	bool borderLess;	///< No window border
-	bool fullscreen;	///< Create fullscreen window
-	bool offscreen;		///< We do not render to a window surface
+	uint32_t windowWidth;		///< Window width
+	uint32_t windowHeight;		///< Window height
+	uint32_t colorBits;			///< Amount of total color bits (24, 32)
+	uint32_t depthBits;			///< Amount of total depth bits (24, 32)
+	uint32_t stencilBits;		///< Amount of total stencil bits (8)
+	bool borderLess;			///< No window border
+	bool fullscreen;			///< Create fullscreen window
+	bool offscreen;				///< We do not render to a window surface
+	bool enableSrcTransfer;		///< Enable support to access final render target
 #ifdef _WIN32
-	HINSTANCE hInstance;	///< Filled in at CreateOsWindow call
-	HWND hWindow;	///< Filled in at CreateOsWindow call
+	HINSTANCE hInstance;		///< Filled in at CreateOsWindow call
+	HWND hWindow;				///< Filled in at CreateOsWindow call
 #else
 	xcb_connection_t* connection;		///< xcb connection. Filled in at CreateOsWindow call
-	xcb_visualid_t visualId;		///< xcb visual id. Filled in at CreateOsWindow call
-	xcb_window_t window;		///< Window id. Filled in at CreateOsWindow call
+	xcb_visualid_t visualId;			///< xcb visual id. Filled in at CreateOsWindow call
+	xcb_window_t window;				///< Window id. Filled in at CreateOsWindow call
 #endif
-	const char* windowTitle;		///< Window Title
+	const char* windowTitle;			///< Window Title
 }RenderWindowInfo;
 
 /**

@@ -174,6 +174,7 @@ int main(int argc, char* argv[])
 	windowInfo.fullscreen = false;
 	windowInfo.borderLess = false;
 	windowInfo.offscreen = false;
+	windowInfo.enableSrcTransfer = true;
 	windowInfo.colorBits = 32;
 	windowInfo.depthBits = 24;
 	windowInfo.windowTitle = "caveSanity";
