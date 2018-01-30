@@ -61,7 +61,6 @@ typedef struct FrontendWindowInfo
 	bool borderLess;			///< No window border
 	bool fullscreen;			///< Create fullscreen window
 	bool offscreen;				///< We do not render to a window surface
-	bool enableSrcTransfer;		///< Enable support to access final render target
 #ifdef _WIN32
 	HINSTANCE hInstance;		///< Filled in at CreateOsWindow call
 	HWND hWindow;				///< Filled in at CreateOsWindow call

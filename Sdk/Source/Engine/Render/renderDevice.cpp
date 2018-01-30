@@ -51,7 +51,6 @@ RenderDevice::RenderDevice(RenderInstance* renderInstance, HalInstance* halInsta
 	_swapChainInfo.offscreen = windowInfo.offscreen;
 	_swapChainInfo.surfaceHeight = windowInfo.windowHeight;
 	_swapChainInfo.surfaceWidth = windowInfo.windowWidth;
-	_swapChainInfo.enableSrcTransfer = windowInfo.enableSrcTransfer;
 #ifdef _WIN32
 	_swapChainInfo.hInstance = windowInfo.hInstance;
 	_swapChainInfo.hWindow = windowInfo.hWindow;

@@ -87,7 +87,6 @@ typedef struct SwapChainInfo
 	uint32_t depthBits;		///< Amount of total depthbits (24, 32)
 	bool fullscreen;	///< Create fullscreen window
 	bool offscreen;	///< We do not render to a window
-	bool enableSrcTransfer;		///< Enable support to access final render target
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 	HINSTANCE hInstance;	///< Filled in at CreateOsWindow call
 	HWND hWindow;	///< Filled in at CreateOsWindow call
