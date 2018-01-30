@@ -542,4 +542,10 @@ bool RenderDevice::PresentQueue(uint32_t imageIndex)
 	return _pHalRenderDevice->PresentQueue(imageIndex);
 }
 
+void RenderDevice::ReadPixels(void* data)
+{
+	if (data)
+		_pHalRenderDevice->ReadPixels(data);
+}
+
 }

@@ -718,4 +718,10 @@ bool VulkanRenderDevice::PresentQueue(uint32_t imageIndex)
 	return (result == VK_SUCCESS);
 }
 
+void VulkanRenderDevice::ReadPixels(void* data)
+{
+	if (_pSwapChain)
+		_pSwapChain->ReadPixels(data);
+}
+
 }

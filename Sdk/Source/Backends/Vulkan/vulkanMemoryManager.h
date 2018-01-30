@@ -232,7 +232,9 @@ private:
 	uint64_t _nonCoherentAlignment;	///< Minimum alignment for non-coherent memory
 	VkCommandPool _vkCommandPool;	///< Vulkan command pool handle
 	VkCommandBuffer _vkTransferCommandBuffer;	///< Vulkan command buffer for data transfers
+	VkCommandBuffer _vkImageTransferCommandBuffer;	///< Vulkan command buffer for image transfers
 	VkFence _vkBufferCopyFence;	///< Fence used to wait submited buffer copies
+	VkFence _vkImageCopyFence;	///< Fence used to wait submited image copies
 	VkBuffer _vkStagingBuffer;	///< Our big staging buffe we use for copies
 	VulkanDeviceMemory _stagingBufferDeviceMemeory; ///< Memory bound to _vkStagingBuffer;
 };

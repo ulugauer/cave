@@ -34,12 +34,17 @@ VulkanSwapChain::VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice*
 	, _swapChain(nullptr)
 	, _swapChainImageVector(instance->GetEngineAllocator())
 	, _swapChainImageViewVector(instance->GetEngineAllocator())
+	, _imageIndex(0)
 	, _ImageAvailableSemaphore(VK_NULL_HANDLE)
 	, _RenderingFinishedSemaphore(VK_NULL_HANDLE)
+	, _vkCommandPool(VK_NULL_HANDLE)
+	, _vkImageReadCommandBuffer(VK_NULL_HANDLE)
+	, _vkReadImage(VK_NULL_HANDLE)
 {
 	CreateSwapChain();
 	CreateImageViews();
 	CreatePresentationSemaphores();
+	CreateReadBackCommandPool();
 }
 
 VulkanSwapChain::~VulkanSwapChain()
@@ -54,6 +59,21 @@ VulkanSwapChain::~VulkanSwapChain()
 
 	_swapChainImageViewVector.Clear();
 	_swapChainImageVector.Clear();
+
+	if (_vkReadImage != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkDestroyImage(_pRenderDevice->GetDeviceHandle(), _vkReadImage, nullptr);
+
+	if (_readBackDeviceMemory._vkDeviceMemory != VK_NULL_HANDLE)
+	{
+		VulkanMemoryManager* memManager = _pRenderDevice->GetMemoryManager();
+		memManager->ReleaseBufferMemory(_readBackDeviceMemory);
+	}
+
+	if (_vkImageReadCommandBuffer != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkFreeCommandBuffers(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, 1, &_vkImageReadCommandBuffer);
+
+	if (_vkCommandPool != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkDestroyCommandPool(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, nullptr);
 
 	if (_ImageAvailableSemaphore)
 		VulkanApi::GetApi()->vkDestroySemaphore(_pRenderDevice->GetDeviceHandle(), _ImageAvailableSemaphore, nullptr);
@@ -186,6 +206,27 @@ void VulkanSwapChain::CreatePresentationSemaphores()
 	}
 }
 
+void VulkanSwapChain::CreateReadBackCommandPool()
+{
+	// for some operations we need a command pool
+	VkCommandPoolCreateInfo vkPoolCreateInfo;
+	vkPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	vkPoolCreateInfo.pNext = nullptr;
+	vkPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	vkPoolCreateInfo.queueFamilyIndex = _pRenderDevice->GetGraphicsFamilyIndex();
+
+	VulkanApi::GetApi()->vkCreateCommandPool(_pRenderDevice->GetDeviceHandle(), &vkPoolCreateInfo, nullptr, &_vkCommandPool);
+
+	// allocate command buffer used for buffer transfers
+	VkCommandBufferAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = _vkCommandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VulkanApi::GetApi()->vkAllocateCommandBuffers(_pRenderDevice->GetDeviceHandle(), &allocInfo, &_vkImageReadCommandBuffer);
+}
+
 const VkImageView VulkanSwapChain::GetSwapChainImageView(size_t index) const
 {
 	VkImageView imageView = VK_NULL_HANDLE;
@@ -275,10 +316,9 @@ const uint32_t VulkanSwapChain::AcquireNextSwapChainImage(uint64_t timeout)
 	if (!_swapChain)
 		return (std::numeric_limits<uint32_t>::max)();
 
-	uint32_t imageIndex;
-	VulkanApi::GetApi()->vkAcquireNextImageKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, timeout, _ImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+	VulkanApi::GetApi()->vkAcquireNextImageKHR(_pRenderDevice->GetDeviceHandle(), _swapChain, timeout, _ImageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
 
-	return imageIndex;
+	return _imageIndex;
 }
 
 
@@ -341,6 +381,250 @@ VkPresentModeKHR VulkanSwapChain::GetSwapChainPresentMode(std::vector<VkPresentM
 	// return the first one
 	return presentModes[0];
 
+}
+
+void VulkanSwapChain::ReadPixels(void* data)
+{
+	if (!_vkCommandPool || !_vkImageReadCommandBuffer)
+		return;
+
+	bool supportsBlit = true;
+	VkFormatProperties formatProperties;
+	VulkanMemoryManager* memManager = _pRenderDevice->GetMemoryManager();
+
+	// Check if we can blit from optimal tiled source
+	VulkanApi::GetApi()->vkGetPhysicalDeviceFormatProperties(_pPhysicalDevice->GetPhysicalDeviceHandle(), _swapChainImageFormat, &formatProperties);
+	if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT))
+	{
+		supportsBlit = false;
+	}
+	// Check if we can blit linear to destination
+	VulkanApi::GetApi()->vkGetPhysicalDeviceFormatProperties(_pPhysicalDevice->GetPhysicalDeviceHandle(), VK_FORMAT_R8G8B8A8_UNORM, &formatProperties);
+	if (!(formatProperties.linearTilingFeatures  & VK_FORMAT_FEATURE_BLIT_DST_BIT))
+	{
+		supportsBlit = false;
+	}
+
+	// Get source image
+	VkImage srcImage = _swapChainImageVector[_imageIndex];
+
+	// Create the linear tiled destination image to copy to and finally map and read from
+	if (_vkReadImage == VK_NULL_HANDLE)
+	{
+		VkImageCreateInfo imageCreateInfo;
+		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageCreateInfo.pNext = nullptr;
+		imageCreateInfo.flags = 0;
+		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+		imageCreateInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+		imageCreateInfo.extent.width = _swapChainExtent.width;
+		imageCreateInfo.extent.height = _swapChainExtent.height;
+		imageCreateInfo.extent.depth = 1;
+		imageCreateInfo.arrayLayers = 1;
+		imageCreateInfo.mipLevels = 1;
+		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
+		imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		imageCreateInfo.queueFamilyIndexCount = 0;
+		imageCreateInfo.pQueueFamilyIndices = nullptr;
+		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+		if (VulkanApi::GetApi()->vkCreateImage(_pRenderDevice->GetDeviceHandle(), &imageCreateInfo, nullptr, &_vkReadImage) != VK_SUCCESS)
+			return;
+	}
+
+	// lazy allocation
+	if (_readBackDeviceMemory._vkDeviceMemory == VK_NULL_HANDLE)
+	{
+		// query memory requirements for this image
+		VkMemoryRequirements memRequirements;
+		VulkanApi::GetApi()->vkGetImageMemoryRequirements(_pRenderDevice->GetDeviceHandle(), _vkReadImage, &memRequirements);
+		VkMemoryPropertyFlags memProperties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+		// allcoate memory
+		memManager->AllocateBufferMemory(memRequirements, memProperties, _readBackDeviceMemory);
+		if (_readBackDeviceMemory._vkDeviceMemory == VK_NULL_HANDLE)
+			return;
+
+		if (VulkanApi::GetApi()->vkBindImageMemory(_pRenderDevice->GetDeviceHandle(), _vkReadImage, _readBackDeviceMemory._vkDeviceMemory, 0) != VK_SUCCESS)
+			return;
+	}
+
+	// we re-use the command buffer which is safe after we waited for the fence
+	VulkanApi::GetApi()->vkResetCommandBuffer(_vkImageReadCommandBuffer, 0);
+
+	VkCommandBufferBeginInfo beginInfo = {};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	VulkanApi::GetApi()->vkBeginCommandBuffer(_vkImageReadCommandBuffer, &beginInfo);
+
+	// Setup transition barriers
+	// Transition dest image to transfer dest layout
+	VkImageMemoryBarrier destImageStartBarrier;
+	destImageStartBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	destImageStartBarrier.pNext = nullptr;
+	destImageStartBarrier.srcAccessMask = 0;
+	destImageStartBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	destImageStartBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	destImageStartBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+	destImageStartBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	destImageStartBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	destImageStartBarrier.image = _vkReadImage;
+	destImageStartBarrier.subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+	VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageReadCommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
+		, 0, nullptr
+		, 0, nullptr
+		, 1, &destImageStartBarrier);
+
+	// Transition source image from present to transfer layout
+	VkImageMemoryBarrier srcImageStartBarrier;
+	srcImageStartBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	srcImageStartBarrier.pNext = nullptr;
+	srcImageStartBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+	srcImageStartBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+	srcImageStartBarrier.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	srcImageStartBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+	srcImageStartBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	srcImageStartBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	srcImageStartBarrier.image = srcImage;
+	srcImageStartBarrier.subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+	VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageReadCommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
+		, 0, nullptr
+		, 0, nullptr
+		, 1, &srcImageStartBarrier);
+
+	// copy command
+	if (supportsBlit)
+	{
+		VkOffset3D blitSize;
+		blitSize.x = _swapChainExtent.width;
+		blitSize.y = _swapChainExtent.height;
+		blitSize.z = 1;
+		VkImageBlit imageBlitRegion{};
+		imageBlitRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageBlitRegion.srcSubresource.layerCount = 1;
+		imageBlitRegion.srcOffsets[1] = blitSize;
+		imageBlitRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageBlitRegion.dstSubresource.layerCount = 1;
+		imageBlitRegion.dstOffsets[1] = blitSize;
+
+		VulkanApi::GetApi()->vkCmdBlitImage(
+			_vkImageReadCommandBuffer,
+			srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+			_vkReadImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			1,
+			&imageBlitRegion,
+			VK_FILTER_NEAREST);
+	}
+	else
+	{
+		VkImageCopy imageCopyRegion{};
+		imageCopyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageCopyRegion.srcSubresource.layerCount = 1;
+		imageCopyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageCopyRegion.dstSubresource.layerCount = 1;
+		imageCopyRegion.extent.width = _swapChainExtent.width;
+		imageCopyRegion.extent.height = _swapChainExtent.height;
+		imageCopyRegion.extent.depth = 1;
+
+		VulkanApi::GetApi()->vkCmdCopyImage(
+			_vkImageReadCommandBuffer,
+			srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+			_vkReadImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			1,
+			&imageCopyRegion);
+	}
+
+	// Transition dest image to gneral layout for memory mapping
+	VkImageMemoryBarrier destImageEndBarrier;
+	destImageEndBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	destImageEndBarrier.pNext = nullptr;
+	destImageEndBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	destImageEndBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+	destImageEndBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+	destImageEndBarrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+	destImageEndBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	destImageEndBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	destImageEndBarrier.image = _vkReadImage;
+	destImageEndBarrier.subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+	VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageReadCommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
+		, 0, nullptr
+		, 0, nullptr
+		, 1, &destImageEndBarrier);
+
+	// Transition source image back to present layout after blit
+	VkImageMemoryBarrier srcImageEndBarrier;
+	srcImageEndBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	srcImageEndBarrier.pNext = nullptr;
+	srcImageEndBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+	srcImageEndBarrier.dstAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+	srcImageEndBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+	srcImageEndBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	srcImageEndBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	srcImageEndBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	srcImageEndBarrier.image = srcImage;
+	srcImageEndBarrier.subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+	VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageReadCommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
+		, 0, nullptr
+		, 0, nullptr
+		, 1, &srcImageEndBarrier);
+
+	VulkanApi::GetApi()->vkEndCommandBuffer(_vkImageReadCommandBuffer);
+
+	// submit job
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &_vkImageReadCommandBuffer;
+
+	VulkanApi::GetApi()->vkQueueSubmit(_pRenderDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+	_pRenderDevice->WaitIdle();
+
+	// Get layout of the image
+	VkImageSubresource subResource{};
+	subResource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	VkSubresourceLayout subResourceLayout;
+	VulkanApi::GetApi()->vkGetImageSubresourceLayout(_pRenderDevice->GetDeviceHandle(), _vkReadImage, &subResource, &subResourceLayout);
+
+	// check for swizzle
+	bool needSwizzle = false;
+	if (!supportsBlit && (_swapChainImageFormat == VK_FORMAT_B8G8R8A8_UNORM))
+		needSwizzle = true;
+
+	// Map image memory for read back
+	const uint8_t* pixels;
+	VulkanApi::GetApi()->vkMapMemory(_pRenderDevice->GetDeviceHandle(), _readBackDeviceMemory._vkDeviceMemory, 0, VK_WHOLE_SIZE, 0, (void**)&pixels);
+	pixels += subResourceLayout.offset;
+
+	uint8_t* dataPtr = static_cast<uint8_t*>(data);
+
+	// copy data
+	for (uint32_t h = 0; h < _swapChainExtent.height; h++)
+	{
+		uint32_t *row = (uint32_t*)pixels;
+		for (uint32_t w = 0; w < _swapChainExtent.width; w++)
+		{
+			if (needSwizzle)
+			{
+				*dataPtr++ = *(pixels + 2);
+				*dataPtr++ = *(pixels + 1);
+				*dataPtr++ = *(pixels + 0);
+				*dataPtr++ = *(pixels + 3);
+			}
+			else
+			{
+				*dataPtr++ = *(pixels + 0);
+				*dataPtr++ = *(pixels + 1);
+				*dataPtr++ = *(pixels + 2);
+				*dataPtr++ = *(pixels + 3);
+			}
+			row++;
+		}
+		pixels += subResourceLayout.rowPitch;
+	}
+
+	VulkanApi::GetApi()->vkUnmapMemory(_pRenderDevice->GetDeviceHandle(), _readBackDeviceMemory._vkDeviceMemory);
 }
 
 }

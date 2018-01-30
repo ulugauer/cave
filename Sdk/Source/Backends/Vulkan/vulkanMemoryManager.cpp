@@ -34,7 +34,9 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 	, _nonCoherentAlignment(0)
 	, _vkCommandPool(VK_NULL_HANDLE)
 	, _vkTransferCommandBuffer(VK_NULL_HANDLE)
+	, _vkImageTransferCommandBuffer(VK_NULL_HANDLE)
 	, _vkBufferCopyFence(VK_NULL_HANDLE)
+	, _vkImageCopyFence(VK_NULL_HANDLE)
 	, _vkStagingBuffer(VK_NULL_HANDLE)
 {
 	// store some physical device properties
@@ -49,9 +51,9 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 	vkPoolCreateInfo.queueFamilyIndex = _pRenderDevice->GetGraphicsFamilyIndex();
 
 	if (VulkanApi::GetApi()->vkCreateCommandPool(_pRenderDevice->GetDeviceHandle(), &vkPoolCreateInfo, nullptr, &_vkCommandPool) != VK_SUCCESS)
-		throw BackendException("Error failed to GPU device memory manager");
+		throw BackendException("Error failed to create GPU device memory manager");
 
-	// allocate command buffer used for transfers
+	// allocate command buffer used for buffer transfers
 	VkCommandBufferAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -61,13 +63,21 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 	if (VulkanApi::GetApi()->vkAllocateCommandBuffers(_pRenderDevice->GetDeviceHandle(), &allocInfo, &_vkTransferCommandBuffer) != VK_SUCCESS)
 		throw BackendException("Error failed to GPU device memory manager");
 
-	// create sync fence
+	// same for image transfer
+	if (VulkanApi::GetApi()->vkAllocateCommandBuffers(_pRenderDevice->GetDeviceHandle(), &allocInfo, &_vkImageTransferCommandBuffer) != VK_SUCCESS)
+		throw BackendException("Error failed to create GPU device memory manager");
+
+	// create buffer transfer sync fence
 	VkFenceCreateInfo fenceInfo;
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceInfo.pNext = nullptr;
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 	if (VulkanApi::GetApi()->vkCreateFence(_pRenderDevice->GetDeviceHandle(), &fenceInfo, nullptr, &_vkBufferCopyFence) != VK_SUCCESS)
-		throw BackendException("Error failed to GPU device memory manager");
+		throw BackendException("Error failed to create GPU device memory manager");
+
+	// create image transfer sync fence
+	if (VulkanApi::GetApi()->vkCreateFence(_pRenderDevice->GetDeviceHandle(), &fenceInfo, nullptr, &_vkImageCopyFence) != VK_SUCCESS)
+		throw BackendException("Error failed to create GPU device memory manager");
 
 	// create staging buffer
 	// create temporay staging buffer
@@ -94,11 +104,17 @@ VulkanMemoryManager::~VulkanMemoryManager()
 	if (_vkTransferCommandBuffer != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkFreeCommandBuffers(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, 1, &_vkTransferCommandBuffer);
 
+	if (_vkImageTransferCommandBuffer != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkFreeCommandBuffers(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, 1, &_vkImageTransferCommandBuffer);
+
 	if (_vkCommandPool != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkDestroyCommandPool(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, nullptr);
 
 	if (_vkBufferCopyFence != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkBufferCopyFence, nullptr);
+
+	if (_vkImageCopyFence != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkImageCopyFence, nullptr);
 }
 
 void VulkanMemoryManager::AllocateBufferMemory(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VulkanDeviceMemory& deviceMemory)

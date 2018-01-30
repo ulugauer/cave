@@ -421,6 +421,17 @@ public:
 		return _graphicsQueue;
 	}
 
+	/**
+	* @brief Read pixels from the last used swap chain image
+	*		 The returned pixels are always in RGBA format.
+	*		 data must point to a memory which has sufficient space.
+	*		 WIDTH * HEIGHT * 4 bytes
+	*
+	* @param[out] data	Pixel values are returned here
+	*
+	*/
+	void ReadPixels(void* data) override;
+
 private:
 	VulkanInstance* _pInstance;	///< Pointer to instance object
 	VulkanPhysicalDevice* _pPhysicalDevice;	///< Pointer to physical device

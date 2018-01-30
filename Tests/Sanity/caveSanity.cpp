@@ -267,6 +267,10 @@ int main(int argc, char* argv[])
 		std::cerr << "Failed to create swap chain framebuffers\n";
 	}
 
+	// allocate buffer for readback
+	uint32_t readSize = userData.winWidth * userData.winHeight * 4;
+	void* pixelBuffer = renderDevice->GetEngineAllocator()->Allocate(readSize, 4);
+
 	// init test list
 	initTestList();
 
@@ -274,6 +278,9 @@ int main(int argc, char* argv[])
 	for (uint32_t i = 0; i < sizeof(testList) / sizeof(testList[0]); i++)
 	{
 		bool passed = executeTest(renderDevice, graphicsCommandPool, renderPass, testList[i].m_test, testList[i].m_name, &userData);
+
+		if (pixelBuffer)
+			renderDevice->ReadPixels(pixelBuffer);
 
 		if (passed)
 			testPassed++;
@@ -293,6 +300,8 @@ int main(int argc, char* argv[])
 
 	// release resources
 	renderDevice->ReleaseRenderPass(renderPass);
+	if (pixelBuffer)
+		renderDevice->GetEngineAllocator()->Deallocate(pixelBuffer);
 	// release at last
 	renderDevice->ReleaseCommandPool(graphicsCommandPool);
 	renderInstance->ReleaseRenderDevice(renderDevice);

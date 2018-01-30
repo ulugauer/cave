@@ -85,12 +85,14 @@ typedef VkResult	(VKAPI_PTR* vkWaitForFencesPtr)(VkDevice device, uint32_t fence
 typedef VkResult	(VKAPI_PTR* vkCreateBufferPtr)(VkDevice device, const VkBufferCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkBuffer* pBuffer);
 typedef void		(VKAPI_PTR* vkDestroyBufferPtr)(VkDevice device, VkBuffer buffer, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkBindBufferMemoryPtr)(VkDevice device, VkBuffer buffer, VkDeviceMemory memory, VkDeviceSize memoryOffset);
+typedef VkResult	(VKAPI_PTR* vkBindImageMemoryPtr)(VkDevice device, VkImage image, VkDeviceMemory memory, VkDeviceSize memoryOffset);
 typedef VkResult	(VKAPI_PTR* vkMapMemoryPtr)(VkDevice device, VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData);
 typedef void		(VKAPI_PTR* vkUnmapMemoryPtr)(VkDevice device, VkDeviceMemory memory);
 typedef VkResult	(VKAPI_PTR* vkFlushMappedMemoryRangesPtr)(VkDevice device, uint32_t memoryRangeCount, const VkMappedMemoryRange* pMemoryRanges);
 typedef VkResult	(VKAPI_PTR* vkQueueSubmitPtr) (VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence);
 typedef VkResult	(VKAPI_PTR* vkQueueWaitIdlePtr)(VkQueue queue);
 typedef void		(VKAPI_PTR* vkGetBufferMemoryRequirementsPtr)(VkDevice device, VkBuffer buffer, VkMemoryRequirements* pMemoryRequirements);
+typedef void		(VKAPI_PTR* vkGetImageMemoryRequirementsPtr)(VkDevice device, VkImage image, VkMemoryRequirements* pMemoryRequirements);
 typedef VkResult	(VKAPI_PTR* vkCreateCommandPoolPtr) (VkDevice device, const VkCommandPoolCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkCommandPool* pCommandPool);
 typedef VkResult	(VKAPI_PTR* vkAllocateCommandBuffersPtr) (VkDevice device, const VkCommandBufferAllocateInfo* pAllocateInfo, VkCommandBuffer* pCommandBuffers);
 typedef void		(VKAPI_PTR* vkDestroyCommandPoolPtr) (VkDevice device, VkCommandPool commandPool, const VkAllocationCallbacks* pAllocator);
@@ -108,6 +110,9 @@ typedef VkResult	(VKAPI_PTR* vkCreateRenderPassPtr) (VkDevice device, const VkRe
 typedef void		(VKAPI_PTR* vkDestroyRenderPassPtr) (VkDevice device, VkRenderPass renderPass, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkCreateFramebufferPtr) (VkDevice device, const VkFramebufferCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkFramebuffer* pFramebuffer);
 typedef void		(VKAPI_PTR* vkDestroyFramebufferPtr) (VkDevice device, VkFramebuffer framebuffer, const VkAllocationCallbacks* pAllocator);
+typedef VkResult	(VKAPI_PTR* vkCreateImagePtr)(VkDevice device, const VkImageCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkImage* pImage);
+typedef void		(VKAPI_PTR* vkDestroyImagePtr)(VkDevice device, VkImage image, const VkAllocationCallbacks* pAllocator);
+typedef void		(VKAPI_PTR* vkGetImageSubresourceLayoutPtr)(VkDevice device, VkImage image, const VkImageSubresource* pSubresource, VkSubresourceLayout* pLayout);
 typedef VkResult	(VKAPI_PTR* vkCreateImageViewPtr) (VkDevice device, const VkImageViewCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkImageView* pView);
 typedef void		(VKAPI_PTR* vkDestroyImageViewPtr) (VkDevice device, VkImageView imageView, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkCreateShaderModulePtr) (VkDevice device, const VkShaderModuleCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkShaderModule* pShaderModule);
@@ -124,6 +129,8 @@ typedef void		(VKAPI_PTR* vkCmdNextSubpassPtr) (VkCommandBuffer commandBuffer, V
 typedef void		(VKAPI_PTR* vkCmdEndRenderPassPtr) (VkCommandBuffer commandBuffer);
 typedef void		(VKAPI_PTR* vkCmdDrawPtr) (VkCommandBuffer commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
 typedef void		(VKAPI_PTR* vkCmdCopyBufferPtr) (VkCommandBuffer commandBuffer, VkBuffer srcBuffer, VkBuffer dstBuffer, uint32_t regionCount, const VkBufferCopy* pRegions);
+typedef void		(VKAPI_PTR* vkCmdCopyImagePtr)(VkCommandBuffer commandBuffer, VkImage srcImage, VkImageLayout srcImageLayout, VkImage dstImage, VkImageLayout dstImageLayout, uint32_t regionCount, const VkImageCopy* pRegions);
+typedef void		(VKAPI_PTR* vkCmdBlitImagePtr)(VkCommandBuffer commandBuffer, VkImage srcImage, VkImageLayout srcImageLayout, VkImage dstImage, VkImageLayout dstImageLayout, uint32_t regionCount, const VkImageBlit* pRegions, VkFilter filter);
 
 
 /** @}*/
@@ -357,12 +364,14 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateBuffer", vkCreateBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyBuffer", vkDestroyBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkBindBufferMemory", vkBindBufferMemory);
+			retValue &= LoadDeviceFunction(pDevice, "vkBindImageMemory", vkBindImageMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkMapMemory", vkMapMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkUnmapMemory", vkUnmapMemory);
 			retValue &= LoadDeviceFunction(pDevice, "vkFlushMappedMemoryRanges", vkFlushMappedMemoryRanges);
 			retValue &= LoadDeviceFunction(pDevice, "vkQueueSubmit", vkQueueSubmit);
 			retValue &= LoadDeviceFunction(pDevice, "vkQueueWaitIdle", vkQueueWaitIdle);
 			retValue &= LoadDeviceFunction(pDevice, "vkGetBufferMemoryRequirements", vkGetBufferMemoryRequirements);
+			retValue &= LoadDeviceFunction(pDevice, "vkGetImageMemoryRequirements", vkGetImageMemoryRequirements);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateCommandPool", vkCreateCommandPool);
 			retValue &= LoadDeviceFunction(pDevice, "vkAllocateCommandBuffers", vkAllocateCommandBuffers);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyCommandPool", vkDestroyCommandPool);
@@ -376,6 +385,9 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyRenderPass", vkDestroyRenderPass);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateFramebuffer", vkCreateFramebuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyFramebuffer", vkDestroyFramebuffer);
+			retValue &= LoadDeviceFunction(pDevice, "vkCreateImage", vkCreateImage);
+			retValue &= LoadDeviceFunction(pDevice, "vkDestroyImage", vkDestroyImage);
+			retValue &= LoadDeviceFunction(pDevice, "vkGetImageSubresourceLayout", vkGetImageSubresourceLayout);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateImageView", vkCreateImageView);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyImageView", vkDestroyImageView);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateShaderModule", vkCreateShaderModule);
@@ -392,6 +404,8 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdEndRenderPass", vkCmdEndRenderPass);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdDraw", vkCmdDraw);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdCopyBuffer", vkCmdCopyBuffer);
+			retValue &= LoadDeviceFunction(pDevice, "vkCmdCopyImage", vkCmdCopyImage);
+			retValue &= LoadDeviceFunction(pDevice, "vkCmdBlitImage", vkCmdBlitImage);
 
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateSwapchainKHR", vkCreateSwapchainKHR);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroySwapchainKHR", vkDestroySwapchainKHR);
@@ -486,12 +500,14 @@ public:
 	vkCreateBufferPtr							vkCreateBuffer;
 	vkDestroyBufferPtr							vkDestroyBuffer;
 	vkBindBufferMemoryPtr						vkBindBufferMemory;
+	vkBindImageMemoryPtr						vkBindImageMemory;
 	vkMapMemoryPtr								vkMapMemory;
 	vkUnmapMemoryPtr							vkUnmapMemory;
 	vkFlushMappedMemoryRangesPtr				vkFlushMappedMemoryRanges;
 	vkQueueSubmitPtr							vkQueueSubmit;
 	vkQueueWaitIdlePtr							vkQueueWaitIdle;
 	vkGetBufferMemoryRequirementsPtr			vkGetBufferMemoryRequirements;
+	vkGetImageMemoryRequirementsPtr				vkGetImageMemoryRequirements;
 	vkCreateCommandPoolPtr						vkCreateCommandPool;
 	vkAllocateCommandBuffersPtr					vkAllocateCommandBuffers;
 	vkDestroyCommandPoolPtr						vkDestroyCommandPool;
@@ -505,6 +521,9 @@ public:
 	vkDestroyRenderPassPtr						vkDestroyRenderPass;
 	vkCreateFramebufferPtr						vkCreateFramebuffer;
 	vkDestroyFramebufferPtr						vkDestroyFramebuffer;
+	vkCreateImagePtr							vkCreateImage;
+	vkDestroyImagePtr							vkDestroyImage;
+	vkGetImageSubresourceLayoutPtr				vkGetImageSubresourceLayout;
 	vkCreateImageViewPtr						vkCreateImageView;
 	vkDestroyImageViewPtr						vkDestroyImageView;
 	vkCreateShaderModulePtr						vkCreateShaderModule;
@@ -521,6 +540,8 @@ public:
 	vkCmdEndRenderPassPtr						vkCmdEndRenderPass;
 	vkCmdDrawPtr								vkCmdDraw;
 	vkCmdCopyBufferPtr							vkCmdCopyBuffer;
+	vkCmdCopyImagePtr							vkCmdCopyImage;
+	vkCmdBlitImagePtr							vkCmdBlitImage;
 
 	// ************************************************************ //
 	// Device level functions                                       //

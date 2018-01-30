@@ -18,7 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "halRenderDevice.h"
 #include "Common/caveVector.h"
-#include "vulkan.h"
+#include "vulkanMemoryManager.h"
 
 #include <vector>
 
@@ -115,6 +115,16 @@ public:
 	*/
 	const VkSwapchainKHR GetSwapChainHandle() { return _swapChain; }
 
+	/**
+	* @brief Read pixels from the last used swap chain image
+	*		 The returned pixels are always in RGBA format.
+	*		 data must point to a memory which has sufficient space.
+	*		 WIDTH * HEIGHT * 4 bytes
+	*
+	* @param[out] data	Pixel values are returned here
+	*
+	*/
+	void ReadPixels(void* data);
 
 private:
 	/**
@@ -134,6 +144,12 @@ private:
 	*
 	*/
 	void CreatePresentationSemaphores();
+
+	/**
+	* @brief Create command pool and command buffer for read backs
+	*
+	*/
+	void CreateReadBackCommandPool();
 
 	/**
 	* @brief Get swap image count supported by the device
@@ -198,10 +214,15 @@ private:
 	VkSwapchainKHR _swapChain;	///< Handle to a vulkan swap chain
 	caveVector<VkImage> _swapChainImageVector; ///< Vector of swap chain images
 	caveVector<VkImageView> _swapChainImageViewVector; ///< Array of generated swap images views
+	uint32_t _imageIndex;	///< Current used image index
 	VkFormat _swapChainImageFormat;	///< The chosen image format
 	VkExtent2D _swapChainExtent;	///< The current extend
 	VkSemaphore _ImageAvailableSemaphore; ///< Next image available semaphore
 	VkSemaphore _RenderingFinishedSemaphore; ///< Rendering done semaphore
+	VkCommandPool _vkCommandPool;	///< Vulkan command pool handle
+	VkCommandBuffer _vkImageReadCommandBuffer;	///< Vulkan command buffer for image read
+	VkImage _vkReadImage;	///< Image used for reading back rendered content
+	VulkanDeviceMemory _readBackDeviceMemory;	///< Allocate device memory for read back
 	
 };
 

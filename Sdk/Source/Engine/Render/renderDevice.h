@@ -386,6 +386,12 @@ public:
 	*/
 	void ReleaseGraphicsPipeline(RenderGraphicsPipeline* graphicsPipeline);
 
+	/**************************************************************************
+	*
+	*  Command buffer handling
+	*
+	***************************************************************************/
+
 	/**
 	* @brief Allocte command buffers used for recordings
 	*
@@ -403,12 +409,6 @@ public:
 	* @param[in] commandBuffers		Array of RenderCommandBuffers we want to release
 	*/
 	void ReleaseCommandBuffers(caveVector<RenderCommandBuffer*>& commandBuffers);
-
-	/**************************************************************************
-	* 
-	*  Commnand buffer handling
-	*
-	***************************************************************************/
 
 	/**
 	* @brief Begin command buffer recording
@@ -481,13 +481,30 @@ public:
 	bool PresentQueueSubmit(RenderCommandBuffer* commandBuffer);
 
 	/**
-	* @brief Present Image on scren
+	* @brief Present Image on screen
 	*
 	* @param[in] imageIndex		Image to present
 	*
 	* @return true if successful
 	*/
 	bool PresentQueue(uint32_t imageIndex);
+
+	/**************************************************************************
+	*
+	*  Misc tools functions
+	*
+	***************************************************************************/
+	
+	/**
+	* @brief Read pixels from the last used swap chain image
+	*		 The returned pixels are always in RGBA format.
+	*		 data must point to a memory which has sufficient space.
+	*		 WIDTH * HEIGHT * 4 bytes
+	*
+	* @param[out] data	Pixel values are returned here
+	*
+	*/
+	void ReadPixels(void* data);
 
 private:
 	RenderInstance* _pRenderInstance;	///< Pointer to the render instance we belong to
