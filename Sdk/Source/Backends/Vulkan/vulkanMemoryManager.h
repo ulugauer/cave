@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "halTypes.h"
 #include "osPlatformLib.h"
+#include "Common/caveList.h"
 
 #include "vulkan.h"
 
