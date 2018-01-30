@@ -79,7 +79,10 @@ public:
 	/** default constructor */
 	CaveList(std::shared_ptr<AllocatorBase> allocator)
 		: _allocator(allocator)
-		, _head(nullptr), _tail(nullptr),  {}
+		, _head(nullptr), _tail(nullptr) 
+	{
+		
+	}
 
 	/** @brief Destructor */
 	~CaveList()
