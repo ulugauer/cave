@@ -58,6 +58,7 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	, _graphicsQueue(VK_NULL_HANDLE)
 	, _pSwapChain(nullptr)
 	, _presentQueueCommandPool(VK_NULL_HANDLE)
+	, _graphicsQueueCommandPool(VK_NULL_HANDLE)
 	, _presentCommandBufferArray(nullptr)
 	, _presentationFramebuffers(instance->GetEngineAllocator())
 {
@@ -159,6 +160,15 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	{
 		throw BackendException("Failed to create vulkan present command queue");
 	}
+
+	// Create graphics command pool
+	VkCommandPoolCreateInfo vkPoolCreateInfo = {};
+	vkPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	vkPoolCreateInfo.pNext = nullptr;
+	vkPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	vkPoolCreateInfo.queueFamilyIndex = _graphicsQueueFamilyIndex;
+
+	VulkanApi::GetApi()->vkCreateCommandPool(_vkDevice, &vkPoolCreateInfo, nullptr, &_graphicsQueueCommandPool);
 }
 
 VulkanRenderDevice::~VulkanRenderDevice()
@@ -187,6 +197,9 @@ VulkanRenderDevice::~VulkanRenderDevice()
 
 	if (_presentQueueCommandPool)
 		VulkanApi::GetApi()->vkDestroyCommandPool(_vkDevice, _presentQueueCommandPool, nullptr);
+
+	if (_graphicsQueueCommandPool)
+		VulkanApi::GetApi()->vkDestroyCommandPool(_vkDevice, _graphicsQueueCommandPool, nullptr);
 
 	if (_pSwapChain)
 	{
@@ -721,7 +734,7 @@ bool VulkanRenderDevice::PresentQueue(uint32_t imageIndex)
 void VulkanRenderDevice::ReadPixels(void* data)
 {
 	if (_pSwapChain)
-		_pSwapChain->ReadPixels(data);
+		_pSwapChain->ReadPixels(_graphicsQueueCommandPool, data);
 }
 
 }

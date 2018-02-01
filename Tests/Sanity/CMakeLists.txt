@@ -19,6 +19,8 @@ ENDIF()
 
 # librarie search path
 link_directories(${CAVE_RUNTIME_LIB_DIR}) 
+link_directories(${PROJECT_3RDPARTY_PNG_LIB_DIR})
+link_directories(${PROJECT_3RDPARTY_ZLIB_LIB_DIR})
 
 # shared libs
 IF(UNIX)
@@ -26,8 +28,11 @@ link_directories(${CAVE_RUNTIME_BIN_DIR})
 ENDIF()
 
 # Add sources
+set(CAVE_SANITY_COMMON_SOURCE	../Common/caveImageUtil.h
+								../Common/caveImagePng.cpp ) 
+
 set(CAVE_SANITY_SOURCE  caveSanity.cpp
-						caveSanityTestBase.h) 
+						caveSanityTestBase.h ) 
 
 set(CAVE_SANITY_BASE_SOURCE  Base/caveSanityTestDevice.h Base/caveSanityTestDevice.cpp 
 							 Base/caveSanityTestMappedVbo.h Base/caveSanityTestMappedVbo.cpp 
@@ -37,9 +42,11 @@ set(CAVE_SANITY_BASE_SOURCE  Base/caveSanityTestDevice.h Base/caveSanityTestDevi
 # Empty name lists them directly under the .vcproj
 source_group("sanity" FILES ${CAVE_SANITY_SOURCE})
 source_group("sanity\\base" FILES ${CAVE_SANITY_BASE_SOURCE})
+source_group("sanity\\common" FILES ${CAVE_SANITY_COMMON_SOURCE})
 
 #Generate the executable from the sources
-add_executable(CaveSanity ${CAVE_SANITY_SOURCE} ${CAVE_SANITY_BASE_SOURCE})
+add_executable(CaveSanity ${CAVE_SANITY_SOURCE} ${CAVE_SANITY_COMMON_SOURCE} 
+				${CAVE_SANITY_BASE_SOURCE})
 
 # additional include directories
 target_include_directories(CaveSanity PRIVATE .)
@@ -48,6 +55,9 @@ target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/O
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Backends)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Frontends)
 target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Input)
+
+# 3rd party includes
+target_include_directories(CaveSanity PRIVATE ${PROJECT_3RDPARTY_PNG_HEADER_DIR})
 
 # Set OS related libs
 IF(UNIX)
@@ -60,7 +70,10 @@ ENDIF()
 
 # Properties->Linker->Input->Additional Dependencies
 # For the GNU compiler link order matters
-SET(LINK_LIBRARY optimized cave debug caved)
+SET(LINK_LIBRARY optimized cave debug caved
+				 optimized png debug pngd 
+				 optimized zlib debug zlibd )
+
 target_link_libraries (CaveSanity ${LINK_LIBRARY} 
 								  ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} 
 								  ${OS_LIBRARIES} )

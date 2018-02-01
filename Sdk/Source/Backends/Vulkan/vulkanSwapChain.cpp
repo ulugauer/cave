@@ -37,14 +37,10 @@ VulkanSwapChain::VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice*
 	, _imageIndex(0)
 	, _ImageAvailableSemaphore(VK_NULL_HANDLE)
 	, _RenderingFinishedSemaphore(VK_NULL_HANDLE)
-	, _vkCommandPool(VK_NULL_HANDLE)
-	, _vkImageReadCommandBuffer(VK_NULL_HANDLE)
-	, _vkReadImage(VK_NULL_HANDLE)
 {
 	CreateSwapChain();
 	CreateImageViews();
 	CreatePresentationSemaphores();
-	CreateReadBackCommandPool();
 }
 
 VulkanSwapChain::~VulkanSwapChain()
@@ -59,21 +55,6 @@ VulkanSwapChain::~VulkanSwapChain()
 
 	_swapChainImageViewVector.Clear();
 	_swapChainImageVector.Clear();
-
-	if (_vkReadImage != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroyImage(_pRenderDevice->GetDeviceHandle(), _vkReadImage, nullptr);
-
-	if (_readBackDeviceMemory._vkDeviceMemory != VK_NULL_HANDLE)
-	{
-		VulkanMemoryManager* memManager = _pRenderDevice->GetMemoryManager();
-		memManager->ReleaseBufferMemory(_readBackDeviceMemory);
-	}
-
-	if (_vkImageReadCommandBuffer != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkFreeCommandBuffers(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, 1, &_vkImageReadCommandBuffer);
-
-	if (_vkCommandPool != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroyCommandPool(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, nullptr);
 
 	if (_ImageAvailableSemaphore)
 		VulkanApi::GetApi()->vkDestroySemaphore(_pRenderDevice->GetDeviceHandle(), _ImageAvailableSemaphore, nullptr);
@@ -204,27 +185,6 @@ void VulkanSwapChain::CreatePresentationSemaphores()
 	{
 		throw BackendException("Failed to create presentation semaphores!");
 	}
-}
-
-void VulkanSwapChain::CreateReadBackCommandPool()
-{
-	// for some operations we need a command pool
-	VkCommandPoolCreateInfo vkPoolCreateInfo;
-	vkPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	vkPoolCreateInfo.pNext = nullptr;
-	vkPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	vkPoolCreateInfo.queueFamilyIndex = _pRenderDevice->GetGraphicsFamilyIndex();
-
-	VulkanApi::GetApi()->vkCreateCommandPool(_pRenderDevice->GetDeviceHandle(), &vkPoolCreateInfo, nullptr, &_vkCommandPool);
-
-	// allocate command buffer used for buffer transfers
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = _vkCommandPool;
-	allocInfo.commandBufferCount = 1;
-
-	VulkanApi::GetApi()->vkAllocateCommandBuffers(_pRenderDevice->GetDeviceHandle(), &allocInfo, &_vkImageReadCommandBuffer);
 }
 
 const VkImageView VulkanSwapChain::GetSwapChainImageView(size_t index) const
@@ -383,105 +343,54 @@ VkPresentModeKHR VulkanSwapChain::GetSwapChainPresentMode(std::vector<VkPresentM
 
 }
 
-void VulkanSwapChain::ReadPixels(void* data)
+void VulkanSwapChain::ReadPixels(VkCommandPool commandPool, void* data)
 {
-	if (!_vkCommandPool || !_vkImageReadCommandBuffer)
-		return;
-
-	bool supportsBlit = true;
-	VkFormatProperties formatProperties;
 	VulkanMemoryManager* memManager = _pRenderDevice->GetMemoryManager();
-
-	// Check if we can blit from optimal tiled source
-	VulkanApi::GetApi()->vkGetPhysicalDeviceFormatProperties(_pPhysicalDevice->GetPhysicalDeviceHandle(), _swapChainImageFormat, &formatProperties);
-	if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT))
-	{
-		supportsBlit = false;
-	}
-	// Check if we can blit linear to destination
-	VulkanApi::GetApi()->vkGetPhysicalDeviceFormatProperties(_pPhysicalDevice->GetPhysicalDeviceHandle(), VK_FORMAT_R8G8B8A8_UNORM, &formatProperties);
-	if (!(formatProperties.linearTilingFeatures  & VK_FORMAT_FEATURE_BLIT_DST_BIT))
-	{
-		supportsBlit = false;
-	}
+	// wait until all rendering is done
+	_pRenderDevice->WaitIdle();
 
 	// Get source image
 	VkImage srcImage = _swapChainImageVector[_imageIndex];
 
-	// Create the linear tiled destination image to copy to and finally map and read from
-	if (_vkReadImage == VK_NULL_HANDLE)
-	{
-		VkImageCreateInfo imageCreateInfo;
-		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.pNext = nullptr;
-		imageCreateInfo.flags = 0;
-		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageCreateInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-		imageCreateInfo.extent.width = _swapChainExtent.width;
-		imageCreateInfo.extent.height = _swapChainExtent.height;
-		imageCreateInfo.extent.depth = 1;
-		imageCreateInfo.arrayLayers = 1;
-		imageCreateInfo.mipLevels = 1;
-		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-		imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
-		imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		imageCreateInfo.queueFamilyIndexCount = 0;
-		imageCreateInfo.pQueueFamilyIndices = nullptr;
-		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	// allocate buffer
+	VkBufferCreateInfo bufferCreateInfo = {};
+	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferCreateInfo.pNext = nullptr;
+	bufferCreateInfo.size = _swapChainExtent.height * _swapChainExtent.width * 4 * sizeof(int8_t);
+	bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	VkBuffer destBuffer;
+	VulkanApi::GetApi()->vkCreateBuffer(_pRenderDevice->GetDeviceHandle(), &bufferCreateInfo, nullptr, &destBuffer);
 
-		if (VulkanApi::GetApi()->vkCreateImage(_pRenderDevice->GetDeviceHandle(), &imageCreateInfo, nullptr, &_vkReadImage) != VK_SUCCESS)
-			return;
-	}
+	// query memory requirements for this buffer
+	VkMemoryRequirements memRequirements;
+	VulkanApi::GetApi()->vkGetBufferMemoryRequirements(_pRenderDevice->GetDeviceHandle(), destBuffer, &memRequirements);
+	VkMemoryPropertyFlags memProperties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	// allcoate memory
+	VulkanDeviceMemory destMemory;
+	memManager->AllocateBufferMemory(memRequirements, memProperties, destMemory);
+	VulkanApi::GetApi()->vkBindBufferMemory(_pRenderDevice->GetDeviceHandle(), destBuffer, destMemory._vkDeviceMemory, 0);
 
-	// lazy allocation
-	if (_readBackDeviceMemory._vkDeviceMemory == VK_NULL_HANDLE)
-	{
-		// query memory requirements for this image
-		VkMemoryRequirements memRequirements;
-		VulkanApi::GetApi()->vkGetImageMemoryRequirements(_pRenderDevice->GetDeviceHandle(), _vkReadImage, &memRequirements);
-		VkMemoryPropertyFlags memProperties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-		// allcoate memory
-		memManager->AllocateBufferMemory(memRequirements, memProperties, _readBackDeviceMemory);
-		if (_readBackDeviceMemory._vkDeviceMemory == VK_NULL_HANDLE)
-			return;
+	// allocate command buffer used for read backs
+	VkCommandBufferAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = commandPool;
+	allocInfo.commandBufferCount = 1;
 
-		if (VulkanApi::GetApi()->vkBindImageMemory(_pRenderDevice->GetDeviceHandle(), _vkReadImage, _readBackDeviceMemory._vkDeviceMemory, 0) != VK_SUCCESS)
-			return;
-	}
-
-	// we re-use the command buffer which is safe after we waited for the fence
-	VulkanApi::GetApi()->vkResetCommandBuffer(_vkImageReadCommandBuffer, 0);
+	VkCommandBuffer copyCmdBuffer;
+	VulkanApi::GetApi()->vkAllocateCommandBuffers(_pRenderDevice->GetDeviceHandle(), &allocInfo, &copyCmdBuffer);
 
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-	VulkanApi::GetApi()->vkBeginCommandBuffer(_vkImageReadCommandBuffer, &beginInfo);
-
-	// Setup transition barriers
-	// Transition dest image to transfer dest layout
-	VkImageMemoryBarrier destImageStartBarrier;
-	destImageStartBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-	destImageStartBarrier.pNext = nullptr;
-	destImageStartBarrier.srcAccessMask = 0;
-	destImageStartBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-	destImageStartBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	destImageStartBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-	destImageStartBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	destImageStartBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	destImageStartBarrier.image = _vkReadImage;
-	destImageStartBarrier.subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-	VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageReadCommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
-		, 0, nullptr
-		, 0, nullptr
-		, 1, &destImageStartBarrier);
+	VulkanApi::GetApi()->vkBeginCommandBuffer(copyCmdBuffer, &beginInfo);
 
 	// Transition source image from present to transfer layout
 	VkImageMemoryBarrier srcImageStartBarrier;
 	srcImageStartBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 	srcImageStartBarrier.pNext = nullptr;
-	srcImageStartBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+	srcImageStartBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 	srcImageStartBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 	srcImageStartBarrier.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 	srcImageStartBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
@@ -489,120 +398,77 @@ void VulkanSwapChain::ReadPixels(void* data)
 	srcImageStartBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	srcImageStartBarrier.image = srcImage;
 	srcImageStartBarrier.subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-	VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageReadCommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
+	VulkanApi::GetApi()->vkCmdPipelineBarrier(copyCmdBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
 		, 0, nullptr
 		, 0, nullptr
 		, 1, &srcImageStartBarrier);
 
-	// copy command
-	if (supportsBlit)
-	{
-		VkOffset3D blitSize;
-		blitSize.x = _swapChainExtent.width;
-		blitSize.y = _swapChainExtent.height;
-		blitSize.z = 1;
-		VkImageBlit imageBlitRegion{};
-		imageBlitRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		imageBlitRegion.srcSubresource.layerCount = 1;
-		imageBlitRegion.srcOffsets[1] = blitSize;
-		imageBlitRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		imageBlitRegion.dstSubresource.layerCount = 1;
-		imageBlitRegion.dstOffsets[1] = blitSize;
+	// copy image to buffer
+	VkBufferImageCopy bufferImageCopy = {};
+	bufferImageCopy.bufferOffset = destMemory._offset;
+	bufferImageCopy.bufferRowLength = 0;		// tightly packed
+	bufferImageCopy.bufferImageHeight = 0;		// tightly packed
+	bufferImageCopy.imageExtent.width = _swapChainExtent.width;
+	bufferImageCopy.imageExtent.height = _swapChainExtent.height;
+	bufferImageCopy.imageExtent.depth = 1;
+	bufferImageCopy.imageSubresource = VkImageSubresourceLayers{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1};
+	VulkanApi::GetApi()->vkCmdCopyImageToBuffer(copyCmdBuffer, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, destBuffer, 1, &bufferImageCopy);
 
-		VulkanApi::GetApi()->vkCmdBlitImage(
-			_vkImageReadCommandBuffer,
-			srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-			_vkReadImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			1,
-			&imageBlitRegion,
-			VK_FILTER_NEAREST);
-	}
-	else
-	{
-		VkImageCopy imageCopyRegion{};
-		imageCopyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		imageCopyRegion.srcSubresource.layerCount = 1;
-		imageCopyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		imageCopyRegion.dstSubresource.layerCount = 1;
-		imageCopyRegion.extent.width = _swapChainExtent.width;
-		imageCopyRegion.extent.height = _swapChainExtent.height;
-		imageCopyRegion.extent.depth = 1;
-
-		VulkanApi::GetApi()->vkCmdCopyImage(
-			_vkImageReadCommandBuffer,
-			srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-			_vkReadImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			1,
-			&imageCopyRegion);
-	}
-
-	// Transition dest image to gneral layout for memory mapping
-	VkImageMemoryBarrier destImageEndBarrier;
-	destImageEndBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-	destImageEndBarrier.pNext = nullptr;
-	destImageEndBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-	destImageEndBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-	destImageEndBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-	destImageEndBarrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-	destImageEndBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	destImageEndBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	destImageEndBarrier.image = _vkReadImage;
-	destImageEndBarrier.subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-	VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageReadCommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
-		, 0, nullptr
-		, 0, nullptr
-		, 1, &destImageEndBarrier);
-
-	// Transition source image back to present layout after blit
+	// Transition source image back to present layout
 	VkImageMemoryBarrier srcImageEndBarrier;
 	srcImageEndBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 	srcImageEndBarrier.pNext = nullptr;
 	srcImageEndBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-	srcImageEndBarrier.dstAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+	srcImageEndBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 	srcImageEndBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 	srcImageEndBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 	srcImageEndBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	srcImageEndBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	srcImageEndBarrier.image = srcImage;
 	srcImageEndBarrier.subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-	VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageReadCommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
+	VulkanApi::GetApi()->vkCmdPipelineBarrier(copyCmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0
 		, 0, nullptr
 		, 0, nullptr
 		, 1, &srcImageEndBarrier);
 
-	VulkanApi::GetApi()->vkEndCommandBuffer(_vkImageReadCommandBuffer);
+	VulkanApi::GetApi()->vkEndCommandBuffer(copyCmdBuffer);
 
 	// submit job
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &_vkImageReadCommandBuffer;
+	submitInfo.pCommandBuffers = &copyCmdBuffer;
 
-	VulkanApi::GetApi()->vkQueueSubmit(_pRenderDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-	_pRenderDevice->WaitIdle();
+	// Create fence to ensure that the command buffer has finished executing
+	VkFenceCreateInfo fenceInfo = {};
+	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.pNext = nullptr;
+	fenceInfo.flags = 0;
+	VkFence fence;
+	VulkanApi::GetApi()->vkCreateFence(_pRenderDevice->GetDeviceHandle(), &fenceInfo, nullptr, &fence);
 
-	// Get layout of the image
-	VkImageSubresource subResource{};
-	subResource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	VkSubresourceLayout subResourceLayout;
-	VulkanApi::GetApi()->vkGetImageSubresourceLayout(_pRenderDevice->GetDeviceHandle(), _vkReadImage, &subResource, &subResourceLayout);
+	if ( VulkanApi::GetApi()->vkQueueSubmit(_pRenderDevice->GetGraphicsQueue(), 1, &submitInfo, fence) == VK_SUCCESS)
+		VulkanApi::GetApi()->vkWaitForFences(_pRenderDevice->GetDeviceHandle(), 1, &fence, VK_TRUE, (std::numeric_limits<uint64_t>::max)());
+
+	VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), fence, nullptr);
+
+	VulkanApi::GetApi()->vkFreeCommandBuffers(_pRenderDevice->GetDeviceHandle(), commandPool, 1, &copyCmdBuffer);
+
+	// map buffer
+	const uint8_t* pixels;
+	VulkanApi::GetApi()->vkMapMemory(_pRenderDevice->GetDeviceHandle(), destMemory._vkDeviceMemory, 0, VK_WHOLE_SIZE, 0, (void**)&pixels);
+	pixels += memRequirements.size - 4; // we start from the end
 
 	// check for swizzle
 	bool needSwizzle = false;
-	if (!supportsBlit && (_swapChainImageFormat == VK_FORMAT_B8G8R8A8_UNORM))
+	if ((_swapChainImageFormat == VK_FORMAT_B8G8R8A8_UNORM))
 		needSwizzle = true;
-
-	// Map image memory for read back
-	const uint8_t* pixels;
-	VulkanApi::GetApi()->vkMapMemory(_pRenderDevice->GetDeviceHandle(), _readBackDeviceMemory._vkDeviceMemory, 0, VK_WHOLE_SIZE, 0, (void**)&pixels);
-	pixels += subResourceLayout.offset;
 
 	uint8_t* dataPtr = static_cast<uint8_t*>(data);
 
 	// copy data
 	for (uint32_t h = 0; h < _swapChainExtent.height; h++)
 	{
-		uint32_t *row = (uint32_t*)pixels;
 		for (uint32_t w = 0; w < _swapChainExtent.width; w++)
 		{
 			if (needSwizzle)
@@ -619,12 +485,13 @@ void VulkanSwapChain::ReadPixels(void* data)
 				*dataPtr++ = *(pixels + 2);
 				*dataPtr++ = *(pixels + 3);
 			}
-			row++;
+			pixels -= 4;
 		}
-		pixels += subResourceLayout.rowPitch;
 	}
 
-	VulkanApi::GetApi()->vkUnmapMemory(_pRenderDevice->GetDeviceHandle(), _readBackDeviceMemory._vkDeviceMemory);
+	VulkanApi::GetApi()->vkUnmapMemory(_pRenderDevice->GetDeviceHandle(), destMemory._vkDeviceMemory);
+	VulkanApi::GetApi()->vkDestroyBuffer(_pRenderDevice->GetDeviceHandle(), destBuffer, nullptr);
+	memManager->ReleaseBufferMemory(destMemory);
 }
 
 }

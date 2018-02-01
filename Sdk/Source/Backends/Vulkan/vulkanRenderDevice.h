@@ -413,12 +413,21 @@ public:
 	}
 
 	/**
-	* @brief Get graphicsQueue familiy index
+	* @brief Get graphics queue 
 	*
 	* @return VkQueue handle
 	*/
 	const VkQueue GetGraphicsQueue() const {
 		return _graphicsQueue;
+	}
+
+	/**
+	* @brief Get presentation queue
+	*
+	* @return VkQueue handle
+	*/
+	const VkQueue GetPresentationQueue() const {
+		return _presentQueue;
 	}
 
 	/**
@@ -442,6 +451,7 @@ private:
 	VkQueue _graphicsQueue;	///< Handle to vulkan queue used for graphics
 	VulkanSwapChain* _pSwapChain;	///< Handle to a swap chain
 	VkCommandPool _presentQueueCommandPool;	///< Command pool used for presentations
+	VkCommandPool _graphicsQueueCommandPool;	///< Command pool used for rendering
 	VkCommandBuffer* _presentCommandBufferArray;	///< Presentation command buffer
 	caveVector<VkFramebuffer> _presentationFramebuffers; ///< Array of framebuffers used for presentation
 	uint32_t _presentationQueueFamilyIndex; ///< Index of present queue familiy

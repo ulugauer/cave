@@ -44,8 +44,13 @@ ENDIF()
 #-------------------------------------------------------------------------------
 # 3rdparty Dependencies
 #-------------------------------------------------------------------------------
+set(PROJECT_3RDPARTY_DIR ${PROJECT_SOURCE_DIR}/3rdparty)
 set(PROJECT_3RDPARTY_SHARED_DIR ${PROJECT_SOURCE_DIR}/3rdparty/Shared)
 set(PROJECT_3RDPARTY_JSON_DIR ${PROJECT_3RDPARTY_SHARED_DIR}/Json)
+set(PROJECT_3RDPARTY_PNG_HEADER_DIR ${PROJECT_3RDPARTY_DIR}/Png-1.6.21)
+set(PROJECT_3RDPARTY_PNG_LIB_DIR ${PROJECT_3RDPARTY_DIR}/Png-1.6.21/${ARCH_DIR})
+set(PROJECT_3RDPARTY_ZLIB_HEADER_DIR ${PROJECT_3RDPARTY_DIR}/Zlib-1.2.8)
+set(PROJECT_3RDPARTY_ZLIB_LIB_DIR ${PROJECT_3RDPARTY_DIR}/Zlib-1.2.8/${ARCH_DIR})
 
 #-------------------------------------------------------------------------------
 # Platform defines

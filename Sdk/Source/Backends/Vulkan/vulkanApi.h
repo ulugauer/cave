@@ -131,6 +131,7 @@ typedef void		(VKAPI_PTR* vkCmdDrawPtr) (VkCommandBuffer commandBuffer, uint32_t
 typedef void		(VKAPI_PTR* vkCmdCopyBufferPtr) (VkCommandBuffer commandBuffer, VkBuffer srcBuffer, VkBuffer dstBuffer, uint32_t regionCount, const VkBufferCopy* pRegions);
 typedef void		(VKAPI_PTR* vkCmdCopyImagePtr)(VkCommandBuffer commandBuffer, VkImage srcImage, VkImageLayout srcImageLayout, VkImage dstImage, VkImageLayout dstImageLayout, uint32_t regionCount, const VkImageCopy* pRegions);
 typedef void		(VKAPI_PTR* vkCmdBlitImagePtr)(VkCommandBuffer commandBuffer, VkImage srcImage, VkImageLayout srcImageLayout, VkImage dstImage, VkImageLayout dstImageLayout, uint32_t regionCount, const VkImageBlit* pRegions, VkFilter filter);
+typedef void		(VKAPI_PTR* vkCmdCopyImageToBufferPtr)(VkCommandBuffer commandBuffer, VkImage srcImage, VkImageLayout srcImageLayout, VkBuffer dstBuffer, uint32_t regionCount, const VkBufferImageCopy* pRegions);
 
 
 /** @}*/
@@ -406,6 +407,7 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdCopyBuffer", vkCmdCopyBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdCopyImage", vkCmdCopyImage);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdBlitImage", vkCmdBlitImage);
+			retValue &= LoadDeviceFunction(pDevice, "vkCmdCopyImageToBuffer", vkCmdCopyImageToBuffer);
 
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateSwapchainKHR", vkCreateSwapchainKHR);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroySwapchainKHR", vkDestroySwapchainKHR);
@@ -542,6 +544,7 @@ public:
 	vkCmdCopyBufferPtr							vkCmdCopyBuffer;
 	vkCmdCopyImagePtr							vkCmdCopyImage;
 	vkCmdBlitImagePtr							vkCmdBlitImage;
+	vkCmdCopyImageToBufferPtr					vkCmdCopyImageToBuffer;
 
 	// ************************************************************ //
 	// Device level functions                                       //

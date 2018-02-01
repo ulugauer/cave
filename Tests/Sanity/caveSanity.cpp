@@ -16,6 +16,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineError.h"
 #include "Render/renderRenderPass.h"
 
+#include "../Common/caveImageUtil.h"
+
 #include "Base/caveSanityTestDevice.h"
 #include "Base/caveSanityTestMappedVbo.h"
 #include "Base/caveSanityTestDeviceVbo.h"
@@ -28,9 +30,13 @@ using namespace cave;
 
 typedef std::basic_string<char> string_type;
 
-string_type			g_ProjectPath;  ///< path to project content
-int32_t				g_WinWidth;		/// window width
-int32_t				g_WinHeight;	/// window height
+// command line arguments
+string_type			g_ProjectPath;			///< path to project content
+int32_t				g_WinWidth;				///< window width
+int32_t				g_WinHeight;			///< window height
+bool				g_WriteImage = false;	///< write output images
+string_type			g_OutDirName;			///< path to write output images
+
 
 
 /// holds a test name and a pointer to the test class
@@ -97,6 +103,7 @@ printHelpMessage()
 	string_type MsgStr = "NDDPathFinder display point clouds.\n\n";
 	MsgStr += " -h			 - prints this help message\n";
 	MsgStr += " -r			 - path to resource files\n";
+	MsgStr += " -o			 - path to image output (directory must exist)\n";
 	MsgStr += " -winSize x y - Set window size\n";
 
 	std::cerr << MsgStr.c_str();
@@ -123,6 +130,15 @@ bool getComdLineArguments(int argc, char** argv)
 		{
 			pArgStr = argv[theIndex + 1];
 			g_ProjectPath = pArgStr;
+		}
+
+		// check if we should write images
+		index = pArgStr.find("-o");
+		if (index != string_type::npos && argv[theIndex + 1] != NULL)
+		{
+			pArgStr = argv[theIndex + 1];
+			g_OutDirName = pArgStr;
+			g_WriteImage = true;
 		}
 
 		// get window size
@@ -279,8 +295,21 @@ int main(int argc, char* argv[])
 	{
 		bool passed = executeTest(renderDevice, graphicsCommandPool, renderPass, testList[i].m_test, testList[i].m_name, &userData);
 
-		if (pixelBuffer)
-			renderDevice->ReadPixels(pixelBuffer);
+		// write image 
+		if (g_WriteImage)
+		{
+			string_type file = g_OutDirName;
+			file += testList[i].m_name;
+			file += ".png";
+
+			if (pixelBuffer)
+			{
+				renderDevice->ReadPixels(pixelBuffer);
+				image_t image = { (unsigned char *)pixelBuffer, userData.winWidth, userData.winHeight, userData.winWidth * 4, 4, true };
+
+				WritePng(file.c_str(), &image);
+			}
+		}
 
 		if (passed)
 			testPassed++;

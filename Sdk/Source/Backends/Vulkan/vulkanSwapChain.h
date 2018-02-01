@@ -121,10 +121,11 @@ public:
 	*		 data must point to a memory which has sufficient space.
 	*		 WIDTH * HEIGHT * 4 bytes
 	*
-	* @param[out] data	Pixel values are returned here
+	* @param[in] commandPool	Command pool used to allocate command buffer
+	* @param[out] data			Pixel values are returned here
 	*
 	*/
-	void ReadPixels(void* data);
+	void ReadPixels(VkCommandPool commandPool, void* data);
 
 private:
 	/**
@@ -144,12 +145,6 @@ private:
 	*
 	*/
 	void CreatePresentationSemaphores();
-
-	/**
-	* @brief Create command pool and command buffer for read backs
-	*
-	*/
-	void CreateReadBackCommandPool();
 
 	/**
 	* @brief Get swap image count supported by the device
@@ -219,10 +214,6 @@ private:
 	VkExtent2D _swapChainExtent;	///< The current extend
 	VkSemaphore _ImageAvailableSemaphore; ///< Next image available semaphore
 	VkSemaphore _RenderingFinishedSemaphore; ///< Rendering done semaphore
-	VkCommandPool _vkCommandPool;	///< Vulkan command pool handle
-	VkCommandBuffer _vkImageReadCommandBuffer;	///< Vulkan command buffer for image read
-	VkImage _vkReadImage;	///< Image used for reading back rendered content
-	VulkanDeviceMemory _readBackDeviceMemory;	///< Allocate device memory for read back
 	
 };
 
