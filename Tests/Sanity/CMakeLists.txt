@@ -29,7 +29,9 @@ ENDIF()
 
 # Add sources
 set(CAVE_SANITY_COMMON_SOURCE	../Common/caveImageUtil.h
-								../Common/caveImagePng.cpp ) 
+								../Common/caveImagePng.cpp 
+								../Common/caveHtmlLog.h
+								../Common/caveHtmlLog.cpp ) 
 
 set(CAVE_SANITY_SOURCE  caveSanity.cpp
 						caveSanityTestBase.h ) 
