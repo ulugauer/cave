@@ -456,8 +456,9 @@ void VulkanSwapChain::ReadPixels(VkCommandPool commandPool, void* data)
 
 	// map buffer
 	const uint8_t* pixels;
+	uint32_t rowPitch = _swapChainExtent.width * 4;
 	VulkanApi::GetApi()->vkMapMemory(_pRenderDevice->GetDeviceHandle(), destMemory._vkDeviceMemory, 0, VK_WHOLE_SIZE, 0, (void**)&pixels);
-	pixels += memRequirements.size - 4; // we start from the end
+	pixels += memRequirements.size - rowPitch; // we start at last row
 
 	// check for swizzle
 	bool needSwizzle = false;
@@ -469,24 +470,26 @@ void VulkanSwapChain::ReadPixels(VkCommandPool commandPool, void* data)
 	// copy data
 	for (uint32_t h = 0; h < _swapChainExtent.height; h++)
 	{
+		uint8_t *row = (uint8_t*)pixels;
 		for (uint32_t w = 0; w < _swapChainExtent.width; w++)
 		{
 			if (needSwizzle)
 			{
-				*dataPtr++ = *(pixels + 2);
-				*dataPtr++ = *(pixels + 1);
-				*dataPtr++ = *(pixels + 0);
-				*dataPtr++ = *(pixels + 3);
+				*dataPtr++ = *(row + 2);
+				*dataPtr++ = *(row + 1);
+				*dataPtr++ = *(row + 0);
+				*dataPtr++ = *(row + 3);
 			}
 			else
 			{
-				*dataPtr++ = *(pixels + 0);
-				*dataPtr++ = *(pixels + 1);
-				*dataPtr++ = *(pixels + 2);
-				*dataPtr++ = *(pixels + 3);
+				*dataPtr++ = *(row + 0);
+				*dataPtr++ = *(row + 1);
+				*dataPtr++ = *(row + 2);
+				*dataPtr++ = *(row + 3);
 			}
-			pixels -= 4;
+			row += 4;
 		}
+		pixels -= rowPitch; // from bottom to top
 	}
 
 	VulkanApi::GetApi()->vkUnmapMemory(_pRenderDevice->GetDeviceHandle(), destMemory._vkDeviceMemory);

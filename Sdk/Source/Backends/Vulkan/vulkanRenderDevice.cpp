@@ -661,6 +661,17 @@ void VulkanRenderDevice::CmdBindVertexBuffers(HalCommandBuffer* commandBuffer, u
 		, firstBinding, bindingCount, vkBuffers.Data(), offsetArray);
 }
 
+void VulkanRenderDevice::CmdBindIndexBuffer(HalCommandBuffer* commandBuffer
+	, HalBuffer* indexBuffer, const uint64_t offset, HalIndexType indexType)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	VulkanBuffer* buffer = static_cast<VulkanBuffer*>(indexBuffer);
+	VulkanApi::GetApi()->vkCmdBindIndexBuffer(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer()
+	 , buffer->GetBuffer(), offset, VulkanTypeConversion::ConvertIndexTypeToVulkan(indexType));
+}
+
 void VulkanRenderDevice::CmdDraw(HalCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
 								, uint32_t firstVertex, uint32_t firstInstance)
 {
@@ -669,6 +680,16 @@ void VulkanRenderDevice::CmdDraw(HalCommandBuffer* commandBuffer, uint32_t verte
 
 	VulkanApi::GetApi()->vkCmdDraw(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer()
 		, vertexCount, instanceCount, firstVertex, firstInstance);
+}
+
+void VulkanRenderDevice::CmdDrawIndexed(HalCommandBuffer* commandBuffer, uint32_t indexCount, uint32_t instanceCount
+	, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	VulkanApi::GetApi()->vkCmdDrawIndexed(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer()
+		, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 bool VulkanRenderDevice::PresentQueueSubmit(HalCommandBuffer* commandBuffer)

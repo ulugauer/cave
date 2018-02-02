@@ -12,17 +12,27 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file caveSanityTestList.h
-///       This file has a list of all available tests. The macro CAVE_SANITY_DO_SOMETHING can be defined to execute tasks on each test.
+/// @file renderIndexBuffer.cpp
+///       Vertex data buffer interface
 
-#ifndef CAVE_SANITY_TEST_ITERATE
-#error CAVE_SANITY_TEST_ITERATE
-#endif
+#include "renderIndexBuffer.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halBuffer.h"
 
-// base functionality
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestDevice)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestMappedVbo)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestDeviceVbo)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestIndexBuffer)
+#include <cassert>
 
+namespace cave
+{
+RenderIndexBuffer::RenderIndexBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo)
+	: RenderBuffer(renderDevice, bufferInfo)
+{
 
+}
+
+RenderIndexBuffer::~RenderIndexBuffer()
+{
+
+}
+
+}

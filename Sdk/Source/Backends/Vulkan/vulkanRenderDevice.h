@@ -327,6 +327,17 @@ public:
 		, HalBuffer** vertexBuffers, const uint64_t* offsetArray) override;
 
 	/**
+	* @brief Bind index buffer to the pipeline
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	* @param[in] indexBuffer	HalBuffer pointer
+	* @param[in] offset			Offset into the buffer
+	* @param[in] indexType		Index tpye like uint16
+	*/
+	void CmdBindIndexBuffer(HalCommandBuffer* commandBuffer
+		, HalBuffer* indexBuffer, const uint64_t offset, HalIndexType indexType) override;
+
+	/**
 	* @brief Draw command for non indexed drawing
 	*
 	* @param[in] commandBuffer	Command buffer we use for recording
@@ -337,6 +348,19 @@ public:
 	*/
 	void CmdDraw(HalCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
 		, uint32_t firstVertex, uint32_t firstInstance) override;
+
+	/**
+	* @brief Draw command for indexed drawing
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	* @param[in] indexCount		Number of indices to draw
+	* @param[in] instanceCount	Number of instances to draw
+	* @param[in] firstIndex		Index of the first index to draw
+	* @param[in] vertexOffset	Value added to the vertex index before indexing into the vertex buffer.
+	* @param[in] firstInstance	Instance ID of the first instance to draw
+	*/
+	void CmdDrawIndexed(HalCommandBuffer* commandBuffer, uint32_t indexCount, uint32_t instanceCount
+		, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) override;
 
 	/**
 	* @brief A special submit for swap chain image presentation

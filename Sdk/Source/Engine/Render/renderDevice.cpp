@@ -30,6 +30,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderRenderPass.h"
 #include "renderGraphicsPipeline.h"
 #include "renderVertexBuffer.h"
+#include "renderIndexBuffer.h"
 #include "renderCommandBuffer.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
@@ -435,6 +436,33 @@ void RenderDevice::ReleaseVertexBuffer(RenderVertexBuffer* vertexBuffer)
 	}
 }
 
+RenderIndexBuffer* RenderDevice::CreateIndexBuffer(HalBufferInfo& bufferInfo)
+{
+	RenderIndexBuffer* indexBuffer = nullptr;
+	try
+	{
+		indexBuffer = AllocateObject<RenderIndexBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo);
+		if (indexBuffer)
+			indexBuffer->IncrementUsageCount();
+
+		return indexBuffer;
+	}
+	catch (std::exception&)
+	{
+		return indexBuffer;
+	}
+}
+
+void RenderDevice::ReleaseIndexBuffer(RenderIndexBuffer* indexBuffer)
+{
+	if (indexBuffer)
+	{
+		int32_t refCount = indexBuffer->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *indexBuffer);
+	}
+}
+
 bool RenderDevice::AllocateCommandBuffers(RenderCommandPool* commandPool
 		, HalCommandBufferInfo& commandBufferInfo
 		, caveVector<RenderCommandBuffer*>& commandBuffers)
@@ -522,11 +550,25 @@ void RenderDevice::CmdBindVertexBuffers(RenderCommandBuffer* commandBuffer, uint
 	}
 }
 
+void RenderDevice::CmdBindIndexBuffer(RenderCommandBuffer* commandBuffer
+	, RenderIndexBuffer* indexBuffer, const uint64_t offset, HalIndexType indexType)
+{
+	if (commandBuffer)
+		_pHalRenderDevice->CmdBindIndexBuffer(commandBuffer->GetHalHandle(), indexBuffer->GetHalHandle(), offset, indexType);
+}
+
 void RenderDevice::CmdDraw(RenderCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
 	, uint32_t firstVertex, uint32_t firstInstance)
 {
 	if (commandBuffer)
 		_pHalRenderDevice->CmdDraw(commandBuffer->GetHalHandle(), vertexCount, instanceCount, firstVertex, firstInstance);
+}
+
+void RenderDevice::CmdDrawIndexed(RenderCommandBuffer* commandBuffer, uint32_t indexCount, uint32_t instanceCount
+	, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance)
+{
+	if (commandBuffer)
+		_pHalRenderDevice->CmdDrawIndexed(commandBuffer->GetHalHandle(), indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 bool RenderDevice::PresentQueueSubmit(RenderCommandBuffer* commandBuffer)

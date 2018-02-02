@@ -392,6 +392,15 @@ enum class HalCommandBufferLevel
 };
 
 /**
+*  @brief A strongly typed enum class representing index types
+*/
+enum class HalIndexType
+{
+	UInt16 = 0,
+	UInt32 = 1
+};
+
+/**
 *  @brief A strongly typed enum class representing command buffer usage
 */
 enum class HalCommandBufferUsage

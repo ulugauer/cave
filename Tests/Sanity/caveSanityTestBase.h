@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "Render/renderDevice.h"
 #include "Render/renderVertexBuffer.h"
+#include "Render/renderIndexBuffer.h"
 #include "Render/renderCommandPool.h"
 #include "Render/renderLayerSection.h"
 #include "Render/renderGraphicsPipeline.h"

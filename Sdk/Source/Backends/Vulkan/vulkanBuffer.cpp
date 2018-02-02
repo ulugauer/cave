@@ -103,6 +103,7 @@ void VulkanBuffer::Update(uint64_t offset, uint64_t size, const void* pData)
 		return;
 
 	VulkanMemoryManager* memManager = _pDevice->GetMemoryManager();
+	memManager->WaitForCopies();
 
 	VulkanStagingBufferInfo stagingBufferInfo;
 	memManager->GetStagingBuffer(size, stagingBufferInfo);

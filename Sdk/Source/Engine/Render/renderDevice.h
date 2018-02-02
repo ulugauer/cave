@@ -51,6 +51,7 @@ class RenderCommandPool;
 class RenderCommandBuffer;
 struct RenderCmdRenderPassInfo;
 class RenderVertexBuffer;
+class RenderIndexBuffer;
 
 /**
 * Abstraction type of a device instance
@@ -348,11 +349,27 @@ public:
 	RenderVertexBuffer* CreateVertexBuffer(HalBufferInfo& bufferInfo);
 
 	/**
-	* @brief Release a pipeline layout object
+	* @brief Release a vertex buffer object
 	*
 	* @param[in] vertexBuffer	 RenderVertexBuffer object to release
 	*/
 	void ReleaseVertexBuffer(RenderVertexBuffer* vertexBuffer);
+
+	/**
+	* @brief Create a index buffer object
+	*
+	* @param[in] bufferInfo		Buffer create info
+	*
+	* @return RenderIndexBuffer object
+	*/
+	RenderIndexBuffer* CreateIndexBuffer(HalBufferInfo& bufferInfo);
+
+	/**
+	* @brief Release a index buffer object
+	*
+	* @param[in] indexBuffer	 RenderIndexBuffer object to release
+	*/
+	void ReleaseIndexBuffer(RenderIndexBuffer* indexBuffer);
 
 	/**
 	* @brief Create a render pass object
@@ -462,6 +479,17 @@ public:
 		, RenderVertexBuffer** vertexBuffers, const uint64_t* offsetArray);
 
 	/**
+	* @brief Bind index buffer to the pipeline
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	* @param[in] indexBuffer	RenderIndexBuffer pointer
+	* @param[in] offset			Offset into the buffer
+	* @param[in] indexType		Index tpye like uint16
+	*/
+	void CmdBindIndexBuffer(RenderCommandBuffer* commandBuffer
+		, RenderIndexBuffer* indexBuffer, const uint64_t offset, HalIndexType indexType);
+
+	/**
 	* @brief Draw command for non indexed drawing
 	*
 	* @param[in] commandBuffer	Command buffer we use for recording
@@ -472,6 +500,19 @@ public:
 	*/
 	void CmdDraw(RenderCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
 		, uint32_t firstVertex, uint32_t firstInstance);
+
+	/**
+	* @brief Draw command for indexed drawing
+	*
+	* @param[in] commandBuffer	Command buffer we use for recording
+	* @param[in] indexCount		Number of indices to draw
+	* @param[in] instanceCount	Number of instances to draw
+	* @param[in] firstIndex		Index of the first index to draw
+	* @param[in] vertexOffset	Value added to the vertex index before indexing into the vertex buffer.
+	* @param[in] firstInstance	Instance ID of the first instance to draw
+	*/
+	void CmdDrawIndexed(RenderCommandBuffer* commandBuffer, uint32_t indexCount, uint32_t instanceCount
+		, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance);
 
 	/**
 	* @brief A special submit for swap chain image presentation

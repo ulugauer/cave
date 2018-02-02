@@ -307,6 +307,15 @@ public:
 	* @return Vulkan VkMemoryPropertyFlags
 	*/
 	static VkMemoryPropertyFlags ConvertMemoryPropertiesToVulkan(HalMemoryPropertyFlags properties);
+
+	/**
+	* @brief Convert from genericindex type to vulkan index type
+	*
+	* @param[in] indexType		Generic index type
+	*
+	* @return Vulkan VkIndexType
+	*/
+	static VkIndexType ConvertIndexTypeToVulkan(HalIndexType indexType);
 };
 
 }

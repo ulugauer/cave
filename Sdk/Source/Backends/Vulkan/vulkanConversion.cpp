@@ -905,4 +905,26 @@ VulkanTypeConversion::ConvertMemoryPropertiesToVulkan(HalMemoryPropertyFlags pro
 	return vkFlags;
 }
 
+VkIndexType 
+VulkanTypeConversion::ConvertIndexTypeToVulkan(HalIndexType indexType)
+{
+	VkIndexType vkIndexType;
+
+	switch (indexType)
+	{
+	case HalIndexType::UInt16:
+		vkIndexType = VK_INDEX_TYPE_UINT16;
+		break;
+	case  HalIndexType::UInt32:
+		vkIndexType = VK_INDEX_TYPE_UINT32;
+		break;
+	default:
+		vkIndexType = VK_INDEX_TYPE_UINT16;
+		assert(false);
+		break;
+	}
+
+	return vkIndexType;
+}
+
 }

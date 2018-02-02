@@ -11,18 +11,53 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file caveSanityTestList.h
-///       This file has a list of all available tests. The macro CAVE_SANITY_DO_SOMETHING can be defined to execute tasks on each test.
+/// @file renderIndexBuffer.h
+///       Index data buffer interface
 
-#ifndef CAVE_SANITY_TEST_ITERATE
-#error CAVE_SANITY_TEST_ITERATE
-#endif
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
+#include "renderBuffer.h"
+#include "halTypes.h"
 
-// base functionality
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestDevice)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestMappedVbo)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestDeviceVbo)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestIndexBuffer)
+#include <memory>
+
+/** \addtogroup engine
+*  @{
+*		This module contains all code related to the engine
+*/
+
+namespace cave
+{
+
+
+/**
+* @brief Represents a index buffer interface
+*/
+class CAVE_INTERFACE RenderIndexBuffer : public RenderBuffer
+{
+public:
+
+	/**
+	* @brief Constructor
+	*
+	* @param[in] renderDevice		Pointer to render device
+	* @param[in] bufferInfo			HAL buffer create info
+	*
+	*/
+	RenderIndexBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo);
+	/** @brief destructor */
+	virtual ~RenderIndexBuffer();
+
+};
+
+}
+
+/** @}*/
+
+
+
+
 
 
