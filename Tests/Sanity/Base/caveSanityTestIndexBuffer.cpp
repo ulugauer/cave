@@ -105,10 +105,10 @@ bool CaveSanityTestIndexBuffer::Run(RenderDevice *device, RenderCommandPool* com
 		// bind vertex buffer
 		RenderVertexBuffer* vertexBuffers[] = { _vertexBuffer };
 		uint64_t offsets[] = { 0 };
-		device->CmdBindVertexBuffers(_commandBuffers[i], 0, 1, vertexBuffers, offsets);
-		device->CmdBindIndexBuffer(_commandBuffers[i], _indexBuffer, 0, HalIndexType::UInt16);
+		device->CmdBindVertexBuffers(_commandBuffers[i], _vertexInput->GetBaseBinding(), _vertexInput->GetBindingCount(), vertexBuffers, offsets);
+		device->CmdBindIndexBuffer(_commandBuffers[i], _indexBuffer, 0, _indexBuffer->GetIndexType());
 
-		device->CmdDrawIndexed(_commandBuffers[i], 6, 1, 0, 0, 0);
+		device->CmdDrawIndexed(_commandBuffers[i], _indexBuffer->GetIndexCount(), 1, 0, 0, 0);
 
 		device->CmdEndRenderPass(_commandBuffers[i]);
 		device->EndCommandBuffer(_commandBuffers[i]);
@@ -214,12 +214,12 @@ void CaveSanityTestIndexBuffer::CreateVertexSetup(cave::RenderDevice *device)
 	caveVector<HalVertexInputAttributeDescription> attribDescArray(device->GetEngineAllocator());
 	attribDescArray.Resize(2);
 	// position
-	attribDescArray[0]._binding = 0;
+	attribDescArray[0]._binding = bindingDesc._binding;
 	attribDescArray[0]._location = 0;
 	attribDescArray[0]._offset = 0;
 	attribDescArray[0]._format = HalImageFormat::R32G32SFloat;
 	// color
-	attribDescArray[1]._binding = 0;
+	attribDescArray[1]._binding = bindingDesc._binding;
 	attribDescArray[1]._location = 1;
 	attribDescArray[1]._offset = sizeof(float) * 2;
 	attribDescArray[1]._format = HalImageFormat::R32G32B32SFloat;
@@ -389,7 +389,7 @@ void CaveSanityTestIndexBuffer::CreateIndexBuffer(cave::RenderDevice *device)
 		| static_cast<HalBufferUsageFlags>(HalBufferUsage::IndexBuffer);
 	bufferInfo._shareMode = HalBufferShareMode::Exclusive;
 	bufferInfo._properties = static_cast<HalMemoryPropertyFlags>(HalMemoryPropertyBits::DeviceLocal);
-	_indexBuffer = device->CreateIndexBuffer(bufferInfo);
+	_indexBuffer = device->CreateIndexBuffer(bufferInfo, HalIndexType::UInt16);
 	if (!_indexBuffer)
 		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to create vertex buffer");
 

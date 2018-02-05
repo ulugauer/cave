@@ -33,4 +33,24 @@ HalBuffer::~HalBuffer()
 
 }
 
+const uint32_t HalBuffer::GetHalIndexTypeSize(HalIndexType type)
+{
+	assert((_bufferInfo._usage & static_cast<HalBufferUsageFlags>(HalBufferUsage::IndexBuffer)));
+
+	uint32_t size = 0;
+	switch (type)
+	{
+	case HalIndexType::UInt16:
+		size = sizeof(uint16_t);
+		break;
+	case HalIndexType::UInt32:
+		size = sizeof(uint32_t);
+		break;
+	default:
+		assert(false);
+	}
+
+	return size;
+}
+
 }

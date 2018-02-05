@@ -59,9 +59,27 @@ public:
 	*/
 	HalVertexInput* GetHalHandle() { return _halVertexInput; }
 
+	/**
+	* @brief Get start of binding index
+	*		 This basically tells you where your vertex buffers should be bound
+	*
+	* @return first binding point
+	*/
+	const uint32_t GetBaseBinding() { return _bindingBase; }
+
+	/**
+	* @brief Get number of binding descriptors
+	*		 This is usually 1 for interleaved buffers
+	*
+	* @return amount of vertex bindings
+	*/
+	const uint32_t GetBindingCount() { return _bindingCount; }
+
 private:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalVertexInput* _halVertexInput;	///< Pointer to low level shader object
+	uint32_t _bindingBase;	///< Base binding of first descriptor
+	uint32_t _bindingCount;	///< Number of bindings
 };
 
 }

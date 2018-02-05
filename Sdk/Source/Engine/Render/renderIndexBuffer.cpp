@@ -24,10 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
-RenderIndexBuffer::RenderIndexBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo)
+RenderIndexBuffer::RenderIndexBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo, HalIndexType inxdexType)
 	: RenderBuffer(renderDevice, bufferInfo)
+	, _inxdexType(inxdexType)
+	, _indexCount(0)
 {
-
+	uint32_t typeSize = _halBuffer->GetHalIndexTypeSize(inxdexType);
+	_indexCount = static_cast<uint32_t>(bufferInfo._size / typeSize);
 }
 
 RenderIndexBuffer::~RenderIndexBuffer()

@@ -47,6 +47,14 @@ public:
 
 	/** @brief Destructor */
 	virtual ~HalVertexInput();
+
+	/**
+	* @brief Get start of binding index
+	*		 This basically tells you where your vertex buffers should be bound
+	*
+	* @return first binding point
+	*/
+	virtual const uint32_t GetBindingBase() const;
 };
 
 }

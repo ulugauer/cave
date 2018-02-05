@@ -94,7 +94,7 @@ public:
 	*/
 	HalBuffer* GetHalHandle() { return _halBuffer; }
 
-private:
+protected:
 	RenderDevice& _renderDevice;	///< Render device object
 	HalBuffer* _halBuffer;			///< Pointer to low level data buffer object
 	uint64_t _size;					///< Buffer size

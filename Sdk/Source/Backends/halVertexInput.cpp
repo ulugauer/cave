@@ -30,4 +30,9 @@ HalVertexInput::~HalVertexInput()
 
 }
 
+const uint32_t HalVertexInput::GetBindingBase() const
+{
+	return 0;
+}
+
 }

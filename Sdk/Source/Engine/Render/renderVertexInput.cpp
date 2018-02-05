@@ -30,6 +30,11 @@ RenderVertexInput::RenderVertexInput(RenderDevice& renderDevice, HalVertexInputS
 	// Allocate low level object
 	_halVertexInput = renderDevice.GetHalRenderDevice()->CreateVertexInput(vertexInputState);
 	assert(_halVertexInput);
+	if (_halVertexInput)
+	{
+		_bindingBase = _halVertexInput->GetBindingBase();
+		_bindingCount = vertexInputState._vertexBindingDescriptionCount;
+	}
 }
 
 RenderVertexInput::~RenderVertexInput()

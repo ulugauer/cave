@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanApi.h"
 
 #include<limits>
+#include <algorithm>
 
 namespace cave
 {
@@ -31,6 +32,7 @@ VulkanVertexInput::VulkanVertexInput(VulkanRenderDevice* device, HalVertexInputS
 	, _pDevice(device)
 	, _bindingsDescArray(nullptr)
 	, _attributesDescArray(nullptr)
+	, _bindingBase(0)
 {
 	// Setup a default state
 	_vkVertexInputStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -50,6 +52,7 @@ VulkanVertexInput::VulkanVertexInput(VulkanRenderDevice* device, HalVertexInputS
 				_bindingsDescArray[i].binding = vertexInputState._pVertexBindingDescriptions[i]._binding;
 				_bindingsDescArray[i].stride = vertexInputState._pVertexBindingDescriptions[i]._stride;
 				_bindingsDescArray[i].inputRate = VulkanTypeConversion::ConvertVertexInputRateToVulkan(vertexInputState._pVertexBindingDescriptions[i]._inputRate);
+				_bindingBase = (std::min)(_bindingBase, _bindingsDescArray[i].binding);
 			}
 		}
 	}

@@ -83,6 +83,15 @@ public:
 	*/
 	virtual void Unmap() = 0;
 
+	/**
+	* @brief Query byte size of HalIndexType
+	*
+	* @param[in] type	HalIndexType type
+	*
+	* @return size in byte of type
+	*/
+	const uint32_t GetHalIndexTypeSize(HalIndexType type);
+
 private:
 	HalRenderDevice* _pDevice;	///< Pointer to device object
 	HalBufferInfo _bufferInfo;	///< Buffer create info

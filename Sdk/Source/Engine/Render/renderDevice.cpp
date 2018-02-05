@@ -436,12 +436,12 @@ void RenderDevice::ReleaseVertexBuffer(RenderVertexBuffer* vertexBuffer)
 	}
 }
 
-RenderIndexBuffer* RenderDevice::CreateIndexBuffer(HalBufferInfo& bufferInfo)
+RenderIndexBuffer* RenderDevice::CreateIndexBuffer(HalBufferInfo& bufferInfo, HalIndexType inxdexType)
 {
 	RenderIndexBuffer* indexBuffer = nullptr;
 	try
 	{
-		indexBuffer = AllocateObject<RenderIndexBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo);
+		indexBuffer = AllocateObject<RenderIndexBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo, inxdexType);
 		if (indexBuffer)
 			indexBuffer->IncrementUsageCount();
 

@@ -42,14 +42,34 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device
-	* @param[in] bufferInfo			HAL buffer create info
+	* @param[in] renderDevice	Pointer to render device
+	* @param[in] bufferInfo		HAL buffer create info
+	* @param[in] indexType		Index tpye like [uint16 | uint32]
 	*
 	*/
-	RenderIndexBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo);
+	RenderIndexBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo, HalIndexType inxdexType);
 	/** @brief destructor */
 	virtual ~RenderIndexBuffer();
 
+	/**
+	* @brief Query index type
+	*
+	* @return index type used for this index buffer
+	*
+	*/
+	const HalIndexType GetIndexType() const { return _inxdexType; }
+
+	/**
+	* @brief Query index count
+	*
+	* @return index count
+	*
+	*/
+	const uint32_t GetIndexCount() const { return _indexCount; }
+
+private:
+	HalIndexType _inxdexType;	///< Component type of the indices
+	uint32_t _indexCount;		///< Number of indices
 };
 
 }

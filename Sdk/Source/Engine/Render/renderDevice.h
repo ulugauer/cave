@@ -359,10 +359,11 @@ public:
 	* @brief Create a index buffer object
 	*
 	* @param[in] bufferInfo		Buffer create info
+	* @param[in] indexType		Index tpye like [uint16 | uint32]
 	*
 	* @return RenderIndexBuffer object
 	*/
-	RenderIndexBuffer* CreateIndexBuffer(HalBufferInfo& bufferInfo);
+	RenderIndexBuffer* CreateIndexBuffer(HalBufferInfo& bufferInfo, HalIndexType inxdexType);
 
 	/**
 	* @brief Release a index buffer object

@@ -51,6 +51,17 @@ public:
 	virtual ~VulkanVertexInput();
 
 	/**
+	* @brief Get start of binding index
+	*		 This basically tells you where your vertex buffers should be bound
+	*
+	* @return first binding point
+	*/
+	const uint32_t GetBindingBase() const
+	{
+		return _bindingBase;
+	}
+
+	/**
 	* @brief Get vertex input state info
 	*
 	* @return Vulkan VkPipelineRasterizationStateCreateInfo
@@ -64,6 +75,7 @@ private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
 	VkVertexInputBindingDescription* _bindingsDescArray;	///< Bindings description array
 	VkVertexInputAttributeDescription* _attributesDescArray;	///< Attribute description array
+	uint32_t _bindingBase;	///< First binding point
 	VkPipelineVertexInputStateCreateInfo _vkVertexInputStateInfo;		///< Vertex setup state info
 };
 

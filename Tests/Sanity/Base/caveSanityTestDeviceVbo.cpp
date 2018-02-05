@@ -103,7 +103,7 @@ bool CaveSanityTestDeviceVbo::Run(RenderDevice *device, RenderCommandPool* comma
 		// bind vertex buffer
 		RenderVertexBuffer* vertexBuffers[] = { _vertexBuffer };
 		uint64_t offsets[] = { 0 };
-		device->CmdBindVertexBuffers(_commandBuffers[i], 0, 1, vertexBuffers, offsets);
+		device->CmdBindVertexBuffers(_commandBuffers[i], _vertexInput->GetBaseBinding(), _vertexInput->GetBindingCount(), vertexBuffers, offsets);
 
 		device->CmdDraw(_commandBuffers[i], 3, 1, 0, 0);
 
@@ -209,12 +209,12 @@ void CaveSanityTestDeviceVbo::CreateVertexSetup(cave::RenderDevice *device)
 	caveVector<HalVertexInputAttributeDescription> attribDescArray(device->GetEngineAllocator());
 	attribDescArray.Resize(2);
 	// position
-	attribDescArray[0]._binding = 0;
+	attribDescArray[0]._binding = bindingDesc._binding;
 	attribDescArray[0]._location = 0;
 	attribDescArray[0]._offset = 0;
 	attribDescArray[0]._format = HalImageFormat::R32G32SFloat;
 	// color
-	attribDescArray[1]._binding = 0;
+	attribDescArray[1]._binding = bindingDesc._binding;
 	attribDescArray[1]._location = 1;
 	attribDescArray[1]._offset = sizeof(float) * 2;
 	attribDescArray[1]._format = HalImageFormat::R32G32B32SFloat;
