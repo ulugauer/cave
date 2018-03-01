@@ -223,9 +223,9 @@ void RenderDevice::ReleaseVertexInput(RenderVertexInput* vertexInput)
 	}
 }
 
-RenderInputAssembly* RenderDevice::CreateInputAssembly()
+RenderInputAssembly* RenderDevice::CreateInputAssembly(HalInputAssemblyInfo& inputAssemblyState)
 {
-	RenderInputAssembly* inputAssembly = AllocateObject<RenderInputAssembly>(*_pRenderInstance->GetEngineAllocator(), *this);
+	RenderInputAssembly* inputAssembly = AllocateObject<RenderInputAssembly>(*_pRenderInstance->GetEngineAllocator(), *this, inputAssemblyState);
 	if (inputAssembly)
 		inputAssembly->IncrementUsageCount();
 
@@ -436,12 +436,12 @@ void RenderDevice::ReleaseVertexBuffer(RenderVertexBuffer* vertexBuffer)
 	}
 }
 
-RenderIndexBuffer* RenderDevice::CreateIndexBuffer(HalBufferInfo& bufferInfo, HalIndexType inxdexType)
+RenderIndexBuffer* RenderDevice::CreateIndexBuffer(HalBufferInfo& bufferInfo, HalIndexType indexType)
 {
 	RenderIndexBuffer* indexBuffer = nullptr;
 	try
 	{
-		indexBuffer = AllocateObject<RenderIndexBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo, inxdexType);
+		indexBuffer = AllocateObject<RenderIndexBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo, indexType);
 		if (indexBuffer)
 			indexBuffer->IncrementUsageCount();
 

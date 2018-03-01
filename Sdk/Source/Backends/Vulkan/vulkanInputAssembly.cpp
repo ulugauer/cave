@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///        Vulkan input assembly state
 
 #include "vulkanInputAssembly.h"
+#include "vulkanConversion.h"
 #include "vulkanRenderDevice.h"
 #include "vulkanApi.h"
 
@@ -25,7 +26,7 @@ namespace cave
 {
 
 
-VulkanInputAssembly::VulkanInputAssembly(VulkanRenderDevice* device)
+VulkanInputAssembly::VulkanInputAssembly(VulkanRenderDevice* device, HalInputAssemblyInfo& inputAssemblyState)
 	: HalInputAssembly()
 	, _pDevice(device)
 {
@@ -33,8 +34,8 @@ VulkanInputAssembly::VulkanInputAssembly(VulkanRenderDevice* device)
 	_vkInputAssemblyStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	_vkInputAssemblyStateInfo.pNext = nullptr;
 	_vkInputAssemblyStateInfo.flags = 0;
-	_vkInputAssemblyStateInfo.primitiveRestartEnable = VK_FALSE;
-	_vkInputAssemblyStateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	_vkInputAssemblyStateInfo.primitiveRestartEnable = inputAssemblyState._primitiveRestartEnable;
+	_vkInputAssemblyStateInfo.topology = VulkanTypeConversion::ConvertPrimitiveTopologyToVulkan(inputAssemblyState._topology);
 }
 
 VulkanInputAssembly::~VulkanInputAssembly()

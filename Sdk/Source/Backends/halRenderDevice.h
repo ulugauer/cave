@@ -145,9 +145,11 @@ public:
 	/**
 	* @brief Create a low level input assembly state
 	*
+	* @param[in] inputAssemblyState		Vertex input assembley setup
+	*
 	* @return Input assembly abstraction interface
 	*/
-	virtual HalInputAssembly* CreateInputAssembly() = 0;
+	virtual HalInputAssembly* CreateInputAssembly(HalInputAssemblyInfo& inputAssemblyState) = 0;
 
 	/**
 	* @brief Create a low level viewport, scissor state

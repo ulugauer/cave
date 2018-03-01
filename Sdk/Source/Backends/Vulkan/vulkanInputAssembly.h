@@ -41,10 +41,11 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] device	Pointer to device object
+	* @param[in] device					Pointer to device object
+	* @param[in] inputAssemblyState		Vertex input assembley setup
 	*
 	*/
-	VulkanInputAssembly(VulkanRenderDevice* device);
+	VulkanInputAssembly(VulkanRenderDevice* device, HalInputAssemblyInfo& inputAssemblyState);
 
 	/** @brief Destructor */
 	virtual ~VulkanInputAssembly();

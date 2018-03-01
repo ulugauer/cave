@@ -414,12 +414,12 @@ HalVertexInput* VulkanRenderDevice::CreateVertexInput(HalVertexInputStateInfo& v
 	return vertexInput;
 }
 
-HalInputAssembly* VulkanRenderDevice::CreateInputAssembly()
+HalInputAssembly* VulkanRenderDevice::CreateInputAssembly(HalInputAssemblyInfo& inputAssemblyState)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
 		return nullptr;
 
-	VulkanInputAssembly* inputAssembly = AllocateObject<VulkanInputAssembly>(*_pInstance->GetEngineAllocator(), this);
+	VulkanInputAssembly* inputAssembly = AllocateObject<VulkanInputAssembly>(*_pInstance->GetEngineAllocator(), this, inputAssemblyState);
 
 	return inputAssembly;
 }

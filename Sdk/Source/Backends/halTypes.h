@@ -441,6 +441,24 @@ enum class HalBufferUsage
 typedef uint32_t HalBufferUsageFlags;	///< Buffer usage flags
 
 /**
+*  @brief A strongly typed enum class representing primitive topology
+*/
+enum class HalPrimitiveTopology
+{
+	PointList = 0,
+	LineList = 1,
+	LineStrip = 2,
+	TriangleList = 3,
+	TriangleStrip = 4,
+	TriangleFan = 5,
+	LineListWidthAdjacency = 6,
+	LineStripWidthAdjacency = 7,
+	TriangleListWidthAdjacency = 8,
+	TriangleStripWidthAdjacency = 9,
+	PatchList = 10,
+};
+
+/**
 *  @brief A strongly typed enum class representing buffer sharing mode
 */
 enum class HalBufferShareMode
@@ -758,7 +776,7 @@ struct CAVE_INTERFACE HalVertexInputAttributeDescription
 };
 
 /**
-* @brief Vertex binding description
+* @brief Vertex input description
 */
 struct CAVE_INTERFACE HalVertexInputStateInfo 
 {
@@ -766,6 +784,15 @@ struct CAVE_INTERFACE HalVertexInputStateInfo
 	const HalVertexInputBindingDescription* _pVertexBindingDescriptions;		///< Pointer to HalVertexInputBindingDescription array
 	uint32_t _vertexAttributeDescriptionCount;									///< Number of of vertex attribute descriptions
 	const HalVertexInputAttributeDescription* _pVertexAttributeDescriptions;	///< Pointer to HalVertexInputAttributeDescription array
+};
+
+/**
+* @brief Vertex asaembly description
+*/
+struct CAVE_INTERFACE HalInputAssemblyInfo
+{
+	HalPrimitiveTopology _topology;		///< Primitive topology
+	bool _primitiveRestartEnable;		///< Enable primitive restart
 };
 
 /**

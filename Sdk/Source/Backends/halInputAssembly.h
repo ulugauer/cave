@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Hardware input assembly abstraction
 
 #include "engineDefines.h"
+#include "halTypes.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling

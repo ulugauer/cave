@@ -927,4 +927,53 @@ VulkanTypeConversion::ConvertIndexTypeToVulkan(HalIndexType indexType)
 	return vkIndexType;
 }
 
+VkPrimitiveTopology 
+VulkanTypeConversion::ConvertPrimitiveTopologyToVulkan(HalPrimitiveTopology topology)
+{
+	VkPrimitiveTopology vkTopology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+
+	switch (topology)
+	{
+	case HalPrimitiveTopology::PointList:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+		break;
+	case HalPrimitiveTopology::LineList:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+		break;
+	case HalPrimitiveTopology::LineStrip:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+		break;
+	case HalPrimitiveTopology::TriangleList:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+		break;
+	case HalPrimitiveTopology::TriangleStrip:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+		break;
+	case HalPrimitiveTopology::TriangleFan:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN;
+		break;
+	case HalPrimitiveTopology::LineListWidthAdjacency:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY;
+		break;
+	case HalPrimitiveTopology::LineStripWidthAdjacency:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY;
+		break;
+	case HalPrimitiveTopology::TriangleListWidthAdjacency:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY;
+		break;
+	case HalPrimitiveTopology::TriangleStripWidthAdjacency:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY;
+		break;
+	case HalPrimitiveTopology::PatchList:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_PATCH_LIST;
+		break;
+	default:
+		vkTopology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+		assert(false);
+		break;
+	}
+
+	return vkTopology;
+}
+
 }

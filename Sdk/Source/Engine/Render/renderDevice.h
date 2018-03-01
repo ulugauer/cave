@@ -212,9 +212,11 @@ public:
 	/**
 	* @brief Create an input assembly object
 	*
+	* @param[in] inputAssemblyState		Vertex input assembley setup
+	*
 	* @return Input assembly object
 	*/
-	RenderInputAssembly* CreateInputAssembly();
+	RenderInputAssembly* CreateInputAssembly(HalInputAssemblyInfo& inputAssemblyState);
 
 	/**
 	* @brief Release an input assembly object
@@ -363,7 +365,7 @@ public:
 	*
 	* @return RenderIndexBuffer object
 	*/
-	RenderIndexBuffer* CreateIndexBuffer(HalBufferInfo& bufferInfo, HalIndexType inxdexType);
+	RenderIndexBuffer* CreateIndexBuffer(HalBufferInfo& bufferInfo, HalIndexType indexType);
 
 	/**
 	* @brief Release a index buffer object

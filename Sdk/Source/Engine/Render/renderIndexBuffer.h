@@ -47,7 +47,7 @@ public:
 	* @param[in] indexType		Index tpye like [uint16 | uint32]
 	*
 	*/
-	RenderIndexBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo, HalIndexType inxdexType);
+	RenderIndexBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo, HalIndexType indexType);
 	/** @brief destructor */
 	virtual ~RenderIndexBuffer();
 
@@ -57,7 +57,7 @@ public:
 	* @return index type used for this index buffer
 	*
 	*/
-	const HalIndexType GetIndexType() const { return _inxdexType; }
+	const HalIndexType GetIndexType() const { return _indexType; }
 
 	/**
 	* @brief Query index count
@@ -68,7 +68,7 @@ public:
 	const uint32_t GetIndexCount() const { return _indexCount; }
 
 private:
-	HalIndexType _inxdexType;	///< Component type of the indices
+	HalIndexType _indexType;	///< Component type of the indices
 	uint32_t _indexCount;		///< Number of indices
 };
 

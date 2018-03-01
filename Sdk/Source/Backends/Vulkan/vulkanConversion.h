@@ -309,13 +309,22 @@ public:
 	static VkMemoryPropertyFlags ConvertMemoryPropertiesToVulkan(HalMemoryPropertyFlags properties);
 
 	/**
-	* @brief Convert from genericindex type to vulkan index type
+	* @brief Convert from generic index type to vulkan index type
 	*
 	* @param[in] indexType		Generic index type
 	*
 	* @return Vulkan VkIndexType
 	*/
 	static VkIndexType ConvertIndexTypeToVulkan(HalIndexType indexType);
+
+	/**
+	* @brief Convert from generic primitive topology to vulkan primitive topology
+	*
+	* @param[in] topology		Generic primitive topology
+	*
+	* @return Vulkan VkPrimitiveTopology
+	*/
+	static VkPrimitiveTopology ConvertPrimitiveTopologyToVulkan(HalPrimitiveTopology topology);
 };
 
 }

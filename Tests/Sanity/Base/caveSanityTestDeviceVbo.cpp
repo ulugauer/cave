@@ -224,9 +224,12 @@ void CaveSanityTestDeviceVbo::CreateVertexSetup(cave::RenderDevice *device)
 	vertexInputInfo._pVertexBindingDescriptions = &bindingDesc;
 	vertexInputInfo._vertexAttributeDescriptionCount = static_cast<uint32_t>(attribDescArray.Size());
 	vertexInputInfo._pVertexAttributeDescriptions = attribDescArray.Data();
-
 	_vertexInput = device->CreateVertexInput(vertexInputInfo);
-	_inputAssembly = device->CreateInputAssembly();
+
+	HalInputAssemblyInfo inputAssemblyInfo;
+	inputAssemblyInfo._primitiveRestartEnable = false;
+	inputAssemblyInfo._topology = HalPrimitiveTopology::TriangleList;
+	_inputAssembly = device->CreateInputAssembly(inputAssemblyInfo);
 
 	if (!_vertexInput || !_inputAssembly)
 		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create vertex setup");

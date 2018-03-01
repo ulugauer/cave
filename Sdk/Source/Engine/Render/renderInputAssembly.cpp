@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
-RenderInputAssembly::RenderInputAssembly(RenderDevice& renderDevice)
+RenderInputAssembly::RenderInputAssembly(RenderDevice& renderDevice, HalInputAssemblyInfo& inputAssemblyState)
 	: _renderDevice(renderDevice)
 {
 	// Allocate low level object
-	_halInputAssembly = renderDevice.GetHalRenderDevice()->CreateInputAssembly();
+	_halInputAssembly = renderDevice.GetHalRenderDevice()->CreateInputAssembly(inputAssemblyState);
 	assert(_halInputAssembly);
 }
 
