@@ -10,10 +10,10 @@ Initially supported backend is Vulkan.
     # Upgrade to CMake 3.4+; https://cmake.org/download/
 
     # For Windows :
-    # Install Visual Studio 2015
+    # Install Visual Studio 2015 / 17
 
     # For Linux (Ubuntu 16.04) :
-    Install gcc 4.9
+    Minimum requirement gcc 4.9
 
 
 # Building from Command Line
@@ -31,3 +31,9 @@ First:
 ## Linux (Ubuntu 16.04) :
 
     cmake .. -DCMAKE_BUILD_TYPE=Release	
+
+# Sanity
+
+To run CAVE engine sanity navigate to [projctRoot]/binary/[platform]
+run CaveSanity -r for low level engine tests.
+run CaveSanity -h for more options.

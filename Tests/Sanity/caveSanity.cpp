@@ -115,12 +115,12 @@ static void
 printHelpMessage()
 {
 	string_type MsgStr = "NDDPathFinder display point clouds.\n\n";
-	MsgStr += " -h				- prints this help message\n";
-	MsgStr += " -noLogFile		- don't write a log file but output all messages to std out\n";
-	MsgStr += " -r				- path to resource files\n";
-	MsgStr += " -o [outdir]		- path to image output (directory must exist)\n";
-	MsgStr += " -g [comparedir] - directory which contains the gold images\n";
-	MsgStr += " -winSize x y	- Set window size\n";
+	MsgStr += " -h\t\t\t- prints this help message\n";
+	MsgStr += " -noLogFile\t\t- don't write a log file but output all messages to std out\n";
+	MsgStr += " -r\t\t\t- path to resource files\n";
+	MsgStr += " -o [outdir]\t\t- path to image output (directory must exist)\n";
+	MsgStr += " -g [comparedir]\t- directory which contains the gold images\n";
+	MsgStr += " -winSize x y\t\t- Set window size\n";
 
 	std::cerr << MsgStr.c_str();
 }
@@ -139,6 +139,14 @@ bool getComdLineArguments(int argc, char** argv)
 	for (int theIndex = 0; theIndex < argc; ++theIndex)
 	{
 		pArgStr = argv[theIndex];
+
+		// get resource directory
+		index = pArgStr.find("-h");
+		if (index != string_type::npos)
+		{
+			printHelpMessage();
+			return false;
+		}
 
 		// get resource directory
 		index = pArgStr.find("-r");
