@@ -28,6 +28,7 @@ public:
 	void LogCleanup();
 
 	void LogMessage(const char *string, ...);
+	void LogThumbnailImage(const char *imageFile, int width, int height);
 
 	void LogBeginParagraph();
 	void LogEndParagraph();

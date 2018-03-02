@@ -138,6 +138,22 @@ void CaveHtmlLog::LogMessage(const char *message, ...)
 	fprintf(logFile, "<br>");
 }
 
+/**
+* @brief Write an image link to the log file
+*
+* @param[in]  imageFile		Path to image file
+* @param[in]  width			Image width
+* @param[in]  height		Image height
+*
+* @return none
+*/
+void CaveHtmlLog::LogThumbnailImage(const char *imageFile, int width, int height)
+{
+	fprintf(logFile, "<a href = %s  target = \"_blank\">\n", imageFile);
+	fprintf(logFile,
+		"<img src = %s height = %d width = %d> </a>\n", imageFile, width, height);
+}
+
 ///< start a HTML paragraph
 void CaveHtmlLog::LogBeginParagraph()
 {

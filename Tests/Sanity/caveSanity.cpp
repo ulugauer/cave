@@ -405,6 +405,17 @@ int main(int argc, char* argv[])
 				"    <font color=\"%s\">%s</font>",
 				passed ? "#00FF00" : "#FF0000",
 				passed ? "passed" : "failed");
+
+			if (pixelBuffer && g_WriteImage)
+			{
+				string_type file = g_OutDirName;
+				file += testList[i].m_name;
+				file += ".png";
+
+				g_LogHMTL.LogNextColumn();
+				g_LogHMTL.LogThumbnailImage(file.c_str(), 50, 50);
+			}
+
 			g_LogHMTL.LogEndRow();
 		}
 		else if (g_WriteLog)
