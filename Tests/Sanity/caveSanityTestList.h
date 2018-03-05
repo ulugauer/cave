@@ -24,5 +24,6 @@ CAVE_SANITY_TEST_ITERATE(CaveSanityTestDevice)
 CAVE_SANITY_TEST_ITERATE(CaveSanityTestMappedVbo)
 CAVE_SANITY_TEST_ITERATE(CaveSanityTestDeviceVbo)
 CAVE_SANITY_TEST_ITERATE(CaveSanityTestIndexBuffer)
+CAVE_SANITY_TEST_ITERATE(CaveSanityTestUniformBuffer)
 
 

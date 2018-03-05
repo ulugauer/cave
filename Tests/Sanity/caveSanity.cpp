@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Base/caveSanityTestMappedVbo.h"
 #include "Base/caveSanityTestDeviceVbo.h"
 #include "Base/caveSanityTestIndexBuffer.h"
+#include "Base/caveSanityTestUniformBuffer.h"
 
 #include <iostream>
 #include <sstream>
@@ -141,7 +142,7 @@ bool getComdLineArguments(int argc, char** argv)
 		pArgStr = argv[theIndex];
 
 		// get resource directory
-		index = pArgStr.find("-h");
+		index = pArgStr.find("-help");
 		if (index != string_type::npos)
 		{
 			printHelpMessage();
@@ -402,7 +403,7 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
-				std::cerr << "NVRenderTest: gold image: " << refFile.c_str() << " not found\n";
+				std::cerr << "caveSanity Test: gold image: " << refFile.c_str() << " not found\n";
 			}
 
 		}

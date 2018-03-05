@@ -52,6 +52,7 @@ class RenderCommandBuffer;
 struct RenderCmdRenderPassInfo;
 class RenderVertexBuffer;
 class RenderIndexBuffer;
+class RenderUniformBuffer;
 
 /**
 * Abstraction type of a device instance
@@ -373,6 +374,22 @@ public:
 	* @param[in] indexBuffer	 RenderIndexBuffer object to release
 	*/
 	void ReleaseIndexBuffer(RenderIndexBuffer* indexBuffer);
+
+	/**
+	* @brief Create a index buffer object
+	*
+	* @param[in] bufferInfo		Buffer create info
+	*
+	* @return RenderIndexBuffer object
+	*/
+	RenderUniformBuffer* CreateUniformBuffer(HalBufferInfo& bufferInfo);
+
+	/**
+	* @brief Release a index buffer object
+	*
+	* @param[in] indexBuffer	 RenderIndexBuffer object to release
+	*/
+	void ReleaseUniformBuffer(RenderUniformBuffer* indexBuffer);
 
 	/**
 	* @brief Create a render pass object

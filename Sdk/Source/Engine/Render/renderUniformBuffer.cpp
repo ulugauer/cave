@@ -27,7 +27,7 @@ namespace cave
 RenderUniformBuffer::RenderUniformBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo)
 	: RenderBuffer(renderDevice, bufferInfo)
 {
-
+	assert(bufferInfo._usage &= static_cast<HalBufferUsageFlags>(HalBufferUsage::UniformBuffer));
 }
 
 RenderUniformBuffer::~RenderUniformBuffer()

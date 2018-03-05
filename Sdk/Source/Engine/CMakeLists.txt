@@ -56,7 +56,8 @@ set(MEMORY_SOURCE Memory/allocatorBase.h
 
 set(MATH_SOURCE Math/vector2.h
 				Math/vector3.h
-				Math/vector4.h )
+				Math/vector4.h 
+				Math/matrix4.h )
 
 set(COMMON_SOURCE Common/caveRefCount.h
 				  Common/caveVector.h )

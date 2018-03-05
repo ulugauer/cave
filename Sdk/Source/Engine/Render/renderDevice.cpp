@@ -31,6 +31,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderGraphicsPipeline.h"
 #include "renderVertexBuffer.h"
 #include "renderIndexBuffer.h"
+#include "renderUniformBuffer.h"
 #include "renderCommandBuffer.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
@@ -460,6 +461,33 @@ void RenderDevice::ReleaseIndexBuffer(RenderIndexBuffer* indexBuffer)
 		int32_t refCount = indexBuffer->DecrementUsageCount();
 		if (refCount == 0)
 			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *indexBuffer);
+	}
+}
+
+RenderUniformBuffer* RenderDevice::CreateUniformBuffer(HalBufferInfo& bufferInfo)
+{
+	RenderUniformBuffer* uniformBuffer = nullptr;
+	try
+	{
+		uniformBuffer = AllocateObject<RenderUniformBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo);
+		if (uniformBuffer)
+			uniformBuffer->IncrementUsageCount();
+
+		return uniformBuffer;
+	}
+	catch (std::exception&)
+	{
+		return uniformBuffer;
+	}
+}
+
+void RenderDevice::ReleaseUniformBuffer(RenderUniformBuffer* uniformBuffer)
+{
+	if (uniformBuffer)
+	{
+		int32_t refCount = uniformBuffer->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *uniformBuffer);
 	}
 }
 
