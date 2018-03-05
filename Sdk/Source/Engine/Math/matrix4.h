@@ -74,7 +74,6 @@ public:
 	* 
 	* @result return new matrix
 	*/
-	template<typename T>
 	Matrix4<T> operator *(const Matrix4<T>& m2)
 	{
 		Matrix4<T> result;
