@@ -351,7 +351,33 @@ enum class HalShaderStages
 };
 typedef uint32_t HalShaderStagesFlags;	///< Shader stages flags
 
-typedef struct DescriptorSetLayout_T *setLayout;	///< Opqaue handle
+/**
+*  @brief A strongly typed enum class representing descriptor types
+*/
+enum class HalDescriptorType 
+{
+	Sampler = 0,
+	CombinedImageSampler = 1,
+	SampledImage = 2,
+	StorageImage = 3,
+	UniformTexelBuffer = 4,
+	StorageTexelBuffer = 5,
+	UniformBuffer = 6,
+	StorageBuffer = 7,
+	UniformBufferDynamic = 8,
+	StorageBufferDynamic = 9,
+	InputAttachment = 10,
+};
+
+/**
+*  @brief A strongly typed enum class representing descriptor layout
+*/
+enum HalDescriptorSetLayoutCreateBits
+{
+	// empty right now
+};
+
+typedef uint32_t HalDescriptorSetLayoutCreateFlags;		///< Descriptor layout create flags
 
 /**
 *  @brief A strongly typed enum class representing input rate
@@ -616,6 +642,14 @@ struct CAVE_INTERFACE HalColorBlendAttachment
 };
 
 /**
+* @brief Sampler setup
+*/
+struct CAVE_INTERFACE HalSampler
+{
+
+};
+
+/**
 * @brief Color blending state
 */
 struct CAVE_INTERFACE HalColorBlendState
@@ -633,14 +667,6 @@ struct CAVE_INTERFACE HalColorBlendState
 		_blendConstants[2] = 0;
 		_blendConstants[3] = 0;
 	}
-};
-
-/**
-* @brief Pipeline descriptor set layout
-*/
-struct CAVE_INTERFACE HalDescriptorSetLayout
-{
-	setLayout _descriptorLayoutSet; ///< dummy for now
 };
 
 /**
@@ -793,6 +819,28 @@ struct CAVE_INTERFACE HalInputAssemblyInfo
 {
 	HalPrimitiveTopology _topology;		///< Primitive topology
 	bool _primitiveRestartEnable;		///< Enable primitive restart
+};
+
+/**
+* @brief Pipeline layout descriptor binding
+*/
+struct CAVE_INTERFACE HalDescriptorSetLayoutBinding
+{
+	uint32_t _binding;					///< Binding number of this entry. Relates to shader binding number	
+	HalDescriptorType _descriptorType;	///< Resource type
+	uint32_t _descriptorCount;			///< Number of descriptors (for arrays) otherwise set to 1
+	HalShaderStagesFlags _stageFlags;	///< In which pipeline stages can access this resource
+	HalSampler* _pImmutableSamplers;	///< Sampler pointer
+};
+
+/**
+* @brief Pipeline layout descriptor set layout
+*/
+struct CAVE_INTERFACE HalDescriptorSetLayout
+{
+	HalDescriptorSetLayoutCreateFlags _flags;			///< Creation flags
+	uint32_t _bindingCount;								///< Array count
+	const HalDescriptorSetLayoutBinding* _pBindings;	///< Array of bindings
 };
 
 /**

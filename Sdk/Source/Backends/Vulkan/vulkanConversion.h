@@ -325,6 +325,15 @@ public:
 	* @return Vulkan VkPrimitiveTopology
 	*/
 	static VkPrimitiveTopology ConvertPrimitiveTopologyToVulkan(HalPrimitiveTopology topology);
+
+	/**
+	* @brief Convert from generic descriptor type to vulkan descriptor type
+	*
+	* @param[in] descriptorType		Generic descriptor type
+	*
+	* @return Vulkan VkDescriptorType
+	*/
+	static VkDescriptorType ConvertDescriptorTypeToVulkan(HalDescriptorType descriptorType);
 };
 
 }

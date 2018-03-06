@@ -44,20 +44,14 @@ public:
 	* @brief Constructor
 	*
 	* @param[in] renderDevice			Pointer to render device object
-	* @param[in] descriptorSetLayouts	Pipeline set layouts array
-	* @param[in] pushConstants			Pipeline push constant ranges array
 	*/
-	HalPipelineLayout(HalRenderDevice* renderDevice
-					, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
-					, caveVector<HalPushConstantRange>& pushConstants);
+	HalPipelineLayout(HalRenderDevice* renderDevice);
 
 	/** @brief Destructor */
 	virtual ~HalPipelineLayout();
 
 private:
 	HalRenderDevice* _pDevice;	///< Pointer to device object
-	caveVector<HalDescriptorSetLayout> _descriptorSetLayouts;	///< Pipeline set layouts array
-	caveVector<HalPushConstantRange> _pushConstants;	///< Pipeline push constant ranges array
 };
 
 }

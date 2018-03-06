@@ -21,23 +21,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-HalPipelineLayout::HalPipelineLayout(HalRenderDevice* renderDevice
-	, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
-	, caveVector<HalPushConstantRange>& pushConstants)
+HalPipelineLayout::HalPipelineLayout(HalRenderDevice* renderDevice)
 	: _pDevice(renderDevice)
-	, _descriptorSetLayouts(renderDevice->GetEngineAllocator())
-	, _pushConstants(renderDevice->GetEngineAllocator())
 {
-	_descriptorSetLayouts = descriptorSetLayouts;
-	_pushConstants = pushConstants;
+
 }
 
 HalPipelineLayout::~HalPipelineLayout()
 {
-	if (!_descriptorSetLayouts.Empty())
-		_descriptorSetLayouts.Clear();
-	if (!_pushConstants.Empty())
-		_pushConstants.Clear();
+
 }
 
 }

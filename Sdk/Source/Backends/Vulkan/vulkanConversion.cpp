@@ -976,4 +976,53 @@ VulkanTypeConversion::ConvertPrimitiveTopologyToVulkan(HalPrimitiveTopology topo
 	return vkTopology;
 }
 
+VkDescriptorType
+VulkanTypeConversion::ConvertDescriptorTypeToVulkan(HalDescriptorType descriptorType)
+{
+	VkDescriptorType vkDescriptorType;
+
+	switch (descriptorType)
+	{
+	case HalDescriptorType::Sampler:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+		break;
+	case HalDescriptorType::CombinedImageSampler:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		break;
+	case HalDescriptorType::SampledImage:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+		break;
+	case HalDescriptorType::StorageImage:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+		break;
+	case HalDescriptorType::UniformTexelBuffer:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+		break;
+	case HalDescriptorType::StorageTexelBuffer:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+		break;
+	case HalDescriptorType::UniformBuffer:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		break;
+	case HalDescriptorType::StorageBuffer:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		break;
+	case HalDescriptorType::UniformBufferDynamic:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		break;
+	case HalDescriptorType::StorageBufferDynamic:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+		break;
+	case HalDescriptorType::InputAttachment:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+		break;
+	default:
+		vkDescriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+		assert(false);
+		break;
+	}
+
+	return vkDescriptorType;
+}
+
 }
