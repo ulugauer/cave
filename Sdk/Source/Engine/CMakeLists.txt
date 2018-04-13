@@ -95,6 +95,7 @@ target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Fronten
 target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Input)
 # 3rd party libs
 target_include_directories(cave PRIVATE ${PROJECT_3RDPARTY_JSON_DIR})
+target_include_directories(cave PRIVATE ${PROJECT_3RDPARTY_VULKANSDK_HEADER_DIR})
 
 # Creates folder "cave" and adds target project (cave.vcproj)
 set_property(TARGET cave PROPERTY FOLDER "sdk")
@@ -106,3 +107,9 @@ IF(WIN32)
 ELSE()  
 	set_target_properties(cave PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CAVE_RUNTIME_BIN_DIR})
 ENDIF()
+
+# copy files we need to output folder
+add_custom_command(TARGET cave POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                   ${PROJECT_3RDPARTY_VULKANSDK_LIB_DIR} $<TARGET_FILE_DIR:cave>)
+

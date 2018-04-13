@@ -68,6 +68,8 @@ target_include_directories(backends PRIVATE Vulkan )
 target_include_directories(backends PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Engine)
 target_include_directories(backends PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Os)
 
+# 3rd party includes
+target_include_directories(backends PRIVATE ${PROJECT_3RDPARTY_VULKANSDK_HEADER_DIR})
 
 # Creates folder "os" and adds target project (os.vcproj)
 set_property(TARGET backends PROPERTY FOLDER "sdk")

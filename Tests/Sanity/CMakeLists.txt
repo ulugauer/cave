@@ -62,6 +62,7 @@ target_include_directories(CaveSanity PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/I
 
 # 3rd party includes
 target_include_directories(CaveSanity PRIVATE ${PROJECT_3RDPARTY_PNG_HEADER_DIR})
+target_include_directories(CaveSanity PRIVATE ${PROJECT_3RDPARTY_VULKANSDK_HEADER_DIR})
 
 # Set OS related libs
 IF(UNIX)

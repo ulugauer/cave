@@ -19,7 +19,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineDefines.h"
 #include "Memory/allocatorBase.h"
 
-#include "Vulkan/vk_platform.h"
+#include "vulkan.h"
 
 #include <iostream>		// includes exception handling
 #include <memory>
