@@ -34,6 +34,6 @@ First:
 
 # Sanity
 
-To run CAVE engine sanity navigate to [projctRoot]/binary/[platform]
-run CaveSanity -r for low level engine tests.
-run CaveSanity -h for more options.
+To run CAVE engine sanity navigate to [projctRoot]/binary/[platform]  
+Run CaveSanity -r ../../Tests/Sanity for low level engine tests.  
+Run CaveSanity -h for more options.
