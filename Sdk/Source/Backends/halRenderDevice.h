@@ -35,7 +35,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halSemaphore.h"
 #include "halCommandBuffer.h"
 #include "halBuffer.h"
-#include "HalDescriptorSet.h"
+#include "halDescriptorSet.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
