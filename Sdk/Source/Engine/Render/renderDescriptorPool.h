@@ -13,55 +13,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halPipelineLayout.h
-///       Hardware pipeline layout abstraction
+/// @file renderDescriptorPool.h
+///       Render descriptor pool interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "halTypes.h"
-#include "Memory/allocatorBase.h"
-#include "Common/caveVector.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-///< forwards
-class HalDescriptorSet;
+/// forward declaration
+class RenderDevice;
+class HalDescriptorPool;
 
 /**
-* @brief Describes the pipeline layout
+* @brief Represents a command pool interface
 */
-class HalPipelineLayout
+class CAVE_INTERFACE RenderDescriptorPool : public CaveRefCount
 {
 public:
-	
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice	Pointer to render device object
-	* @param[in] descriptorSet	Pointer to descriptor set object
+	* @param[in] renderDevice		Pointer to render device
+	* @param[in] descriptorPoolInfo	Descriptor pool creation info
+	*
 	*/
-	HalPipelineLayout(HalRenderDevice* renderDevice, HalDescriptorSet* descriptorSet);
+	RenderDescriptorPool(RenderDevice& renderDevice, HalDescriptorPoolInfo& descriptorPoolInfo);
+	/** @brief destructor */
+	virtual ~RenderDescriptorPool();
 
-	/** @brief Destructor */
-	virtual ~HalPipelineLayout();
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalDescriptorPool handle
+	*/
+	HalDescriptorPool* GetHalHandle() { return _halDescriptorPool; }
 
 private:
-	HalRenderDevice* _pDevice;			///< Pointer to device object
-
-protected:
-	HalDescriptorSet* _pDescriptorSet;	///< Pointer to descriptor set object (can be nullptr)
+	RenderDevice& _renderDevice;	///< Render device object
+	HalDescriptorPool* _halDescriptorPool;	///< Pointer to low level descriptor pool object
 };
 
 }
-
 /** @}*/
+
 

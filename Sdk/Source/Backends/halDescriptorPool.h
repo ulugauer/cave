@@ -11,27 +11,53 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file halPipelineLayout.cpp
-///       Hardware pipeline layout abstraction
+/// @file halDescriptorPool.h
+///       Hardware descriptor pool abstraction
 
-#include "halPipelineLayout.h"
-#include "halDescriptorSet.h"
-#include "halRenderDevice.h"
+#include "engineDefines.h"
+#include "halInstance.h"
+#include "halTypes.h"
+#include "Memory/allocatorBase.h"
+
+#include <memory>
+
+/** \addtogroup backend
+*  @{
+*
+*/
 
 namespace cave
 {
 
-HalPipelineLayout::HalPipelineLayout(HalRenderDevice* renderDevice, HalDescriptorSet* descriptorSet)
-	: _pDevice(renderDevice)
-	, _pDescriptorSet(descriptorSet)
+///< forwards
+class HalRenderDevice;
+
+/**
+* @brief Represents a descriptor pool interface
+*/
+class HalDescriptorPool
 {
+public:
+	/**
+	* @brief Constructor
+	*
+	* @param[in] renderDevice			Pointer to render device object
+	* @param[in] descriptorPoolInfo		Descriptor pool creation info
+	*/
+	HalDescriptorPool(HalRenderDevice* renderDevice, HalDescriptorPoolInfo& descriptorPoolInfo);
+
+	/** @brief Destructor */
+	virtual ~HalDescriptorPool();
+
+private:
+	HalRenderDevice* _pDevice;	///< Pointer to device object
+	HalDescriptorPoolInfo _descriptorPoolInfo;	///< Descriptor pool create info
+};
 
 }
 
-HalPipelineLayout::~HalPipelineLayout()
-{
+/** @}*/
 
-}
 
-}

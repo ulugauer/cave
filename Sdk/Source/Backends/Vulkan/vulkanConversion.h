@@ -334,6 +334,15 @@ public:
 	* @return Vulkan VkDescriptorType
 	*/
 	static VkDescriptorType ConvertDescriptorTypeToVulkan(HalDescriptorType descriptorType);
+
+	/**
+	* @brief Convert from generic descriptor pool create flags to vulkan descriptor pool create flags
+	*
+	* @param[in] poolFlags		Generic descriptor pool create flags
+	*
+	* @return Vulkan VkDescriptorPoolCreateFlags
+	*/
+	static VkDescriptorPoolCreateFlags ConvertDescriptorPoolFlagsToVulkan(HalDescriptorPoolCreateFlags poolFlags);
 };
 
 }

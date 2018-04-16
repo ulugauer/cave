@@ -44,11 +44,13 @@ private:
 	void CreateDepthStencilState(cave::RenderDevice *device);
 	void CreateColorBlendState(cave::RenderDevice *device);
 	void CreateDynamicState(cave::RenderDevice *device);
+	void CreateDescriptorSetLayout(cave::RenderDevice *device);
 	void CreatePipelineLayout(cave::RenderDevice *device);
 	void CreateRenderPass(cave::RenderDevice *device);
 	void CreateVertexBuffer(cave::RenderDevice *device);
 	void CreateIndexBuffer(cave::RenderDevice *device);
 	void CreateUniformBuffer(cave::RenderDevice *device, userContextData* pUserData);
+	void CreateDescriptorPool(cave::RenderDevice *device);
 	void CreateGraphicsPipeline(cave::RenderDevice *device, cave::RenderPass* renderPass);
 	void AllocateCommandBuffers(cave::RenderDevice *device, cave::RenderCommandPool* commandPool);
 
@@ -67,6 +69,8 @@ private:
 	cave::RenderVertexBuffer* _vertexBuffer;
 	cave::RenderIndexBuffer* _indexBuffer;
 	cave::RenderUniformBuffer* _uniformBuffer;
+	cave::RenderDescriptorPool* _descriptorPool;
+	cave::RenderDescriptorSet* _descriptorSet;
 	cave::RenderGraphicsPipeline* _graphicsPipeline;
 	cave::RenderCommandBuffer** _commandBuffers;
 };

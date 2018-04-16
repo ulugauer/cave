@@ -25,6 +25,8 @@ set(BACKENDS_SOURCE halTypes.h
 					halGraphicsPipeline.h halGraphicsPipeline.cpp 
 					halCommandPool.h halCommandPool.cpp 
 					halCommandBuffer.h halCommandBuffer.cpp 
+					halDescriptorPool.h halDescriptorPool.cpp 
+					halDescriptorSet.h halDescriptorSet.cpp 
 					halSemaphore.h halSemaphore.cpp 
 					halBuffer.h halBuffer.cpp )
 
@@ -50,6 +52,8 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 						   Vulkan/vulkanGraphicsPipeline.h Vulkan/vulkanGraphicsPipeline.cpp 
 						   Vulkan/vulkanCommandPool.h Vulkan/vulkanCommandPool.cpp 
 						   Vulkan/vulkanCommandBuffer.h Vulkan/vulkanCommandBuffer.cpp 
+						   Vulkan/vulkanDescriptorPool.h Vulkan/vulkanDescriptorPool.cpp 
+						   Vulkan/vulkanDescriptorSet.h Vulkan/vulkanDescriptorSet.cpp 
 						   Vulkan/vulkanSemaphore.h Vulkan/vulkanSemaphore.cpp 
 						   Vulkan/vulkanBuffer.h Vulkan/vulkanBuffer.cpp )
 

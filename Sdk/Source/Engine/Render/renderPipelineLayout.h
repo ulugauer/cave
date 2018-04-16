@@ -33,6 +33,7 @@ namespace cave
 
 /// forward declaration
 class RenderDevice;
+class RenderDescriptorSet;
 class HalPipelineLayout;
 
 /**
@@ -45,13 +46,13 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice		Pointer to render device
-	* @param[in] descriptorSetLayouts	Pipeline set layouts array
-	* @param[in] pushConstants			Pipeline push constant ranges array
+	* @param[in] renderDevice	Pointer to render device
+	* @param[in] descriptorSet	Pointer to descriptor set layout
+	* @param[in] pushConstants	Pipeline push constant ranges array
 	*
 	*/
 	RenderPipelineLayout(RenderDevice& renderDevice
-		, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+		, RenderDescriptorSet* descriptorSet
 		, caveVector<HalPushConstantRange>& pushConstants);
 
 	/** @brief destructor */

@@ -13,55 +13,62 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halPipelineLayout.h
-///       Hardware pipeline layout abstraction
+/// @file renderDescriptorSet.h
+///       Render descriptor set layout interface
 
-#include "engineDefines.h"
-#include "halInstance.h"
-#include "halTypes.h"
-#include "Memory/allocatorBase.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 #include "Common/caveVector.h"
+#include "halTypes.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-///< forwards
+/// forward declaration
+class RenderDevice;
 class HalDescriptorSet;
 
 /**
-* @brief Describes the pipeline layout
+* @brief Interface for descriptor set layout setup
 */
-class HalPipelineLayout
+class CAVE_INTERFACE RenderDescriptorSet : public CaveRefCount
 {
 public:
-	
+
 	/**
 	* @brief Constructor
 	*
-	* @param[in] renderDevice	Pointer to render device object
-	* @param[in] descriptorSet	Pointer to descriptor set object
+	* @param[in] renderDevice			Pointer to render device
+	* @param[in] descriptorSetLayouts	Pipeline set layouts array
+	*
 	*/
-	HalPipelineLayout(HalRenderDevice* renderDevice, HalDescriptorSet* descriptorSet);
+	RenderDescriptorSet(RenderDevice& renderDevice
+		, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts);
 
-	/** @brief Destructor */
-	virtual ~HalPipelineLayout();
+	/** @brief destructor */
+	virtual ~RenderDescriptorSet();
+
+	/**
+	* @brief Get low level HAL handle
+	*
+	* @return HalPipelineLayout handle
+	*/
+	HalDescriptorSet* GetHalHandle() { return _halDescriptorSet; }
 
 private:
-	HalRenderDevice* _pDevice;			///< Pointer to device object
-
-protected:
-	HalDescriptorSet* _pDescriptorSet;	///< Pointer to descriptor set object (can be nullptr)
+	RenderDevice& _renderDevice;			///< Render device object
+	HalDescriptorSet* _halDescriptorSet;	///< Pointer to low level pipeline layout object
 };
 
 }
-
 /** @}*/
+
+
 

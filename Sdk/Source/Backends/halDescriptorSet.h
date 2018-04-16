@@ -11,27 +11,50 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file halPipelineLayout.cpp
-///       Hardware pipeline layout abstraction
+/// @file halDescriptorSet.h
+///       Hardware descriptor set layout abstraction
 
-#include "halPipelineLayout.h"
-#include "halDescriptorSet.h"
-#include "halRenderDevice.h"
+#include "engineDefines.h"
+#include "halInstance.h"
+#include "halTypes.h"
+#include "Memory/allocatorBase.h"
+#include "Common/caveVector.h"
+
+#include <iostream>		// includes exception handling
+#include <memory>
+
+/** \addtogroup backend
+*  @{
+*
+*/
 
 namespace cave
 {
 
-HalPipelineLayout::HalPipelineLayout(HalRenderDevice* renderDevice, HalDescriptorSet* descriptorSet)
-	: _pDevice(renderDevice)
-	, _pDescriptorSet(descriptorSet)
+/**
+* @brief Describes the descriptor set layout
+*/
+class HalDescriptorSet
 {
+public:
+
+	/**
+	* @brief Constructor
+	*
+	* @param[in] renderDevice			Pointer to render device object
+	*/
+	HalDescriptorSet(HalRenderDevice* renderDevice);
+
+	/** @brief Destructor */
+	virtual ~HalDescriptorSet();
+
+private:
+	HalRenderDevice* _pDevice;	///< Pointer to device object
+};
 
 }
 
-HalPipelineLayout::~HalPipelineLayout()
-{
+/** @}*/
 
-}
-
-}

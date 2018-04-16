@@ -380,6 +380,16 @@ enum HalDescriptorSetLayoutCreateBits
 typedef uint32_t HalDescriptorSetLayoutCreateFlags;		///< Descriptor layout create flags
 
 /**
+*  @brief A strongly typed enum class representing descriptor pool create flags
+*/
+enum class HalDescriptorPoolCreateFlagBits 
+{
+	FreeDescriptorSet = 0x01,
+};
+
+typedef uint32_t HalDescriptorPoolCreateFlags;		///< Descriptor pool create flags
+
+/**
 *  @brief A strongly typed enum class representing input rate
 */
 enum class HalVertexInputRate 
@@ -409,7 +419,7 @@ enum class HalCommandPoolUsage
 typedef uint32_t HalCommandPoolUsageFlags;	///< Command pool usage flags
 
 /**
-*  @brief A strongly typed enum class representing command pool level
+*  @brief A strongly typed enum class representing command buffer level
 */
 enum class HalCommandBufferLevel
 {
@@ -892,6 +902,26 @@ struct CAVE_INTERFACE HalBufferInfo
 		_queueFamilyIndexCount = 0;
 		_queueFamilyIndices = nullptr;
 	}
+};
+
+/**
+* @brief Structure specifying descriptor pool size
+*/
+struct HalDescriptorPoolSize 
+{
+	HalDescriptorType	_type;				///< Must be a valid HalDescriptorType value
+	uint32_t            _descriptorCount;	///< Must be greater than 0
+};
+
+/**
+* @brief Structure specifying parameters of a newly created descriptor pool
+*/
+struct CAVE_INTERFACE HalDescriptorPoolInfo 
+{
+	HalDescriptorPoolCreateFlags	_flags;			///< Bitmask of HalDescriptorPoolCreateFlagBits specifying certain supported operations on the pool.
+	uint32_t						_maxSets;		///< The maximum number of descriptor sets that can be allocated from the pool.
+	uint32_t						_poolSizeCount;	///< The number of elements in pPoolSizes.
+	const HalDescriptorPoolSize*	_pPoolSizes;	///< Pointer to an array of HalDescriptorPoolSize structures, each containing a descriptor type and number of descriptors of that type to be allocated in the pool.
 };
 
 /**

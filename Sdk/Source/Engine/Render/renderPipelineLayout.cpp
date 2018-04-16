@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Render pipeline layout interface
 
 #include "renderPipelineLayout.h"
+#include "renderDescriptorSet.h"
 #include "renderDevice.h"
 #include "engineError.h"
 #include "halPipelineLayout.h"
@@ -25,12 +26,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 RenderPipelineLayout::RenderPipelineLayout(RenderDevice& renderDevice
-		, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+		, RenderDescriptorSet* descriptorSet
 		, caveVector<HalPushConstantRange>& pushConstants)
 	: _renderDevice(renderDevice)
 {
+	HalDescriptorSet* pDescriptorSet = (descriptorSet) ? descriptorSet->GetHalHandle() : nullptr;
 	// Allocate low level object
-	_halPipelineLayout = renderDevice.GetHalRenderDevice()->CreatePipelineLayout(descriptorSetLayouts, pushConstants);
+	_halPipelineLayout = renderDevice.GetHalRenderDevice()->CreatePipelineLayout(pDescriptorSet, pushConstants);
 	assert(_halPipelineLayout);
 }
 

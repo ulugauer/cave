@@ -49,6 +49,8 @@ struct RenderGraphicsPipelineInfo;
 class RenderGraphicsPipeline;
 class RenderCommandPool;
 class RenderCommandBuffer;
+class RenderDescriptorPool;
+class RenderDescriptorSet;
 struct RenderCmdRenderPassInfo;
 class RenderVertexBuffer;
 class RenderIndexBuffer;
@@ -188,11 +190,43 @@ public:
 	RenderCommandPool* CreateCommandPool(HalCommandPoolInfo& commandPoolInfo);
 
 	/**
-	* @brief Release a vertex input object
+	* @brief Release a command pool object
 	*
 	* @param[in] commandPool	RenderCommandPool object to release
 	*/
 	void ReleaseCommandPool(RenderCommandPool* commandPool);
+
+	/**
+	* @brief Create a descriptor pool object
+	*
+	* @param[in] deescriptorPoolInfo	Descriptor pool creation info
+	*
+	* @return RenderDescriptorPool object
+	*/
+	RenderDescriptorPool* CreateDescriptorPool(HalDescriptorPoolInfo& deescriptorPoolInfo);
+
+	/**
+	* @brief Release a descriptor pool object
+	*
+	* @param[in] descriptorPool	RenderDescriptorPool object to release
+	*/
+	void ReleaseDescriptorPool(RenderDescriptorPool* descriptorPool);
+
+	/**
+	* @brief Create descriptor set layout objects
+	*
+	* @param[in] descriptorSetLayouts	Descriptor set layout array
+	*
+	* @return  RenderDescriptorSet object
+	*/
+	RenderDescriptorSet* CreateDescriptorSets(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts);
+
+	/**
+	* @brief Release a descriptor set object
+	*
+	* @param[in] descriptorSet	RenderDescriptorSet object to release
+	*/
+	void ReleaseDescriptorSets(RenderDescriptorSet* descriptorSet);
 
 	/**
 	* @brief Create a vertex input object
@@ -327,12 +361,12 @@ public:
 	/**
 	* @brief Create a pipeline layout object
 	*
-	* @param[in] descriptorSetLayouts	Pipeline set layouts array
-	* @param[in] pushConstants			Pipeline push constant ranges array
+	* @param[in] descriptorSet	Pointer to descriptor set layout object
+	* @param[in] pushConstants	Pipeline push constant ranges array
 	*
 	* @return RenderPipelineLayout object
 	*/
-	RenderPipelineLayout* CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+	RenderPipelineLayout* CreatePipelineLayout(RenderDescriptorSet* descriptorSet
 		, caveVector<HalPushConstantRange>& pushConstants);
 
 	/**

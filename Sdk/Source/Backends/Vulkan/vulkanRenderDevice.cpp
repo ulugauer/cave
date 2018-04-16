@@ -37,6 +37,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanSemaphore.h"
 #include "vulkanCommandPool.h"
 #include "vulkanCommandBuffer.h"
+#include "vulkanDescriptorPool.h"
+#include "vulkanDescriptorSet.h"
 #include "vulkanBuffer.h"
 #include "vulkanConversion.h"
 #include "vulkanApi.h"
@@ -394,6 +396,16 @@ HalCommandPool* VulkanRenderDevice::CreateCommandPool(HalCommandPoolInfo& comman
 	return commandPool;
 }
 
+HalDescriptorPool* VulkanRenderDevice::CreateDescriptorPool(HalDescriptorPoolInfo& descriptorPoolInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanDescriptorPool* descriptorPool = AllocateObject<VulkanDescriptorPool>(*_pInstance->GetEngineAllocator(), this, descriptorPoolInfo);
+
+	return descriptorPool;
+}
+
 HalShader* VulkanRenderDevice::CreateShader(ShaderType type, ShaderLanguage language)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
@@ -485,15 +497,24 @@ HalDynamicState* VulkanRenderDevice::CreateDynamicState(caveVector<HalDynamicSta
 	return dynamicState;
 }
 
-HalPipelineLayout* VulkanRenderDevice::CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
-	, caveVector<HalPushConstantRange>& pushConstants)
+HalPipelineLayout* VulkanRenderDevice::CreatePipelineLayout(HalDescriptorSet* descriptorSet, caveVector<HalPushConstantRange>& pushConstants)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
 		return nullptr;
 
-	VulkanPipelineLayout* pipelineLayout = AllocateObject<VulkanPipelineLayout>(*_pInstance->GetEngineAllocator(), this, descriptorSetLayouts, pushConstants);
+	VulkanPipelineLayout* pipelineLayout = AllocateObject<VulkanPipelineLayout>(*_pInstance->GetEngineAllocator(), this, descriptorSet, pushConstants);
 
 	return pipelineLayout;
+}
+
+HalDescriptorSet* VulkanRenderDevice::CreateDescriptorSetLayouts(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanDescriptorSet* descriptorSet = AllocateObject<VulkanDescriptorSet>(*_pInstance->GetEngineAllocator(), this, descriptorSetLayouts);
+
+	return descriptorSet;
 }
 
 HalRenderPass* VulkanRenderDevice::CreateRenderPass(HalRenderPassInfo& renderPassInfo)

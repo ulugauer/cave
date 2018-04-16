@@ -121,6 +121,8 @@ typedef VkResult	(VKAPI_PTR* vkCreatePipelineLayoutPtr) (VkDevice device, const 
 typedef void		(VKAPI_PTR* vkDestroyPipelineLayoutPtr) (VkDevice device, VkPipelineLayout pipelineLayout, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkCreateDescriptorSetLayoutPtr) (VkDevice device, const VkDescriptorSetLayoutCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDescriptorSetLayout* pSetLayout);
 typedef void		(VKAPI_PTR* vkDestroyDescriptorSetLayoutPtr) (VkDevice device, VkDescriptorSetLayout descriptorSetLayout, const VkAllocationCallbacks* pAllocator);
+typedef VkResult	(VKAPI_PTR* vkCreateDescriptorPoolPtr) (VkDevice device, const VkDescriptorPoolCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDescriptorPool* pDescriptorPool);
+typedef void		(VKAPI_PTR* vkDestroyDescriptorPoolPtr) (VkDevice device, VkDescriptorPool descriptorPool, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkCreateGraphicsPipelinesPtr) (VkDevice device, VkPipelineCache pipelineCache, uint32_t createInfoCount, const VkGraphicsPipelineCreateInfo* pCreateInfos, const VkAllocationCallbacks* pAllocator, VkPipeline* pPipelines);
 typedef VkResult	(VKAPI_PTR* vkCreateComputePipelinesPtr) (VkDevice device, VkPipelineCache pipelineCache, uint32_t createInfoCount, const VkComputePipelineCreateInfo* pCreateInfos, const VkAllocationCallbacks* pAllocator, VkPipeline* pPipelines);
 typedef void		(VKAPI_PTR* vkDestroyPipelinePtr) (VkDevice device, VkPipeline pipeline, const VkAllocationCallbacks* pAllocator);
@@ -401,6 +403,8 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyPipelineLayout", vkDestroyPipelineLayout);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateDescriptorSetLayout", vkCreateDescriptorSetLayout);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyDescriptorSetLayout", vkDestroyDescriptorSetLayout);
+			retValue &= LoadDeviceFunction(pDevice, "vkCreateDescriptorPool", vkCreateDescriptorPool);
+			retValue &= LoadDeviceFunction(pDevice, "vkDestroyDescriptorPool", vkDestroyDescriptorPool);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateGraphicsPipelines", vkCreateGraphicsPipelines);
 			retValue &= LoadDeviceFunction(pDevice, "vkCreateComputePipelines", vkCreateComputePipelines);
 			retValue &= LoadDeviceFunction(pDevice, "vkDestroyPipeline", vkDestroyPipeline);
@@ -542,6 +546,8 @@ public:
 	vkDestroyPipelineLayoutPtr					vkDestroyPipelineLayout;
 	vkCreateDescriptorSetLayoutPtr				vkCreateDescriptorSetLayout;
 	vkDestroyDescriptorSetLayoutPtr				vkDestroyDescriptorSetLayout;
+	vkCreateDescriptorPoolPtr					vkCreateDescriptorPool;
+	vkDestroyDescriptorPoolPtr					vkDestroyDescriptorPool;
 	vkCreateGraphicsPipelinesPtr				vkCreateGraphicsPipelines;
 	vkCreateComputePipelinesPtr					vkCreateComputePipelines;
 	vkDestroyPipelinePtr						vkDestroyPipeline;

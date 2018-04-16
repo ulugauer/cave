@@ -19,6 +19,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineDefines.h"
 #include "halInstance.h"
 #include "halCommandPool.h"
+#include "halDescriptorPool.h"
 #include "halShader.h"
 #include "halVertexInput.h"
 #include "halInputAssembly.h"
@@ -34,6 +35,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halSemaphore.h"
 #include "halCommandBuffer.h"
 #include "halBuffer.h"
+#include "HalDescriptorSet.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -134,6 +136,15 @@ public:
 	virtual HalCommandPool* CreateCommandPool(HalCommandPoolInfo& commandPoolInfo) = 0;
 
 	/**
+	* @brief Create a low level descriptor pool object
+	*
+	* @param[in] descriptorPoolInfo	Descriptor pool creation info
+	*
+	* @return HalDescriptorPool abstraction interface
+	*/
+	virtual HalDescriptorPool* CreateDescriptorPool(HalDescriptorPoolInfo& descriptorPoolInfo) = 0;
+
+	/**
 	* @brief Create a low level vertex input state
 	*
 	* @param[in] vertexInputState	Vertex input setup struct
@@ -211,13 +222,21 @@ public:
 	/**
 	* @brief Create a pipeline layout object
 	*
-	* @param[in] descriptorSetLayouts	Pipeline set layouts array
-	* @param[in] pushConstants			Pipeline push constant ranges array
+	* @param[in] descriptorSet	Pointer to HAL descriptor set object
+	* @param[in] pushConstants	Pipeline push constant ranges array
 	*
 	* @return  HalPipelineLayout abstraction interface
 	*/
-	virtual HalPipelineLayout* CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
-		, caveVector<HalPushConstantRange>& pushConstants) = 0;
+	virtual HalPipelineLayout* CreatePipelineLayout(HalDescriptorSet* descriptorSet, caveVector<HalPushConstantRange>& pushConstants) = 0;
+
+	/**
+	* @brief Create descriptor set layout objects
+	*
+	* @param[in] descriptorSetLayouts	Descriptor set layout array
+	*
+	* @return  HalDescriptorSet abstraction interface
+	*/
+	virtual HalDescriptorSet* CreateDescriptorSetLayouts(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts) = 0;
 
 	/**
 	* @brief Create a low level render pass object

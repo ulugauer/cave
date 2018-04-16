@@ -40,12 +40,12 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] device					Pointer to device object
-	* @param[in] descriptorSetLayout	Descriptor set layout array
-	* @param[in] pushConstants			Pipeline push constant ranges array
+	* @param[in] device			Pointer to device object
+	* @param[in] descriptorSet	Pointer to descriptor set object
+	* @param[in] pushConstants	Pipeline push constant ranges array
 	*/
 	VulkanPipelineLayout(VulkanRenderDevice* device
-		, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+		, HalDescriptorSet* descriptorSet
 		, caveVector<HalPushConstantRange>& pushConstants);
 
 	/** @brief Destructor */
@@ -60,9 +60,7 @@ public:
 	VkPipelineLayout GetPipelineLayout();
 
 private:
-	VulkanRenderDevice* _pDevice;	///< Pointer to device object
-	caveVector<VkDescriptorSetLayoutCreateInfo> _vkDescriptorSetLayoutsInfo;	///< Vulkan descriptor set layout infos
-	caveVector<VkDescriptorSetLayout> _vkDescriptorSetLayouts;	///< Array of vulkan pdescriptor set layouts
+	VulkanRenderDevice* _pDevice;		///< Pointer to device object
 	caveVector<VkPushConstantRange> _vkPushConstantRange;	///< Array of vulkan push constant ranges
 	VkPipelineLayout _vkPipelineLayout;	///< Vulkan pipeline layout handle
 	VkPipelineLayoutCreateInfo _vkPipelineLayoutInfo;	///< Vulkan layoute set setup

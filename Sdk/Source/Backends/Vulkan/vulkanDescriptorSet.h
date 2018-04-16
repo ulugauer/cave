@@ -11,27 +11,59 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file halPipelineLayout.cpp
-///       Hardware pipeline layout abstraction
+/// @file vulkanDescriptorSet.h
+///       Vulkan descriptor set layout
 
-#include "halPipelineLayout.h"
 #include "halDescriptorSet.h"
-#include "halRenderDevice.h"
+
+#include "vulkan.h"
+
+/** \addtogroup backend
+*  @{
+*
+*/
 
 namespace cave
 {
 
-HalPipelineLayout::HalPipelineLayout(HalRenderDevice* renderDevice, HalDescriptorSet* descriptorSet)
-	: _pDevice(renderDevice)
-	, _pDescriptorSet(descriptorSet)
+///< forwards
+class VulkanRenderDevice;
+
+/**
+* @brief Vulkan descriptor set layout
+*/
+class VulkanDescriptorSet : public HalDescriptorSet
 {
+public:
+	/**
+	* @brief Constructor
+	*
+	* @param[in] device					Pointer to device object
+	* @param[in] descriptorSetLayouts	Descriptor set layout array
+	*/
+	VulkanDescriptorSet(VulkanRenderDevice* device
+		, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts);
+
+	/** @brief Destructor */
+	virtual ~VulkanDescriptorSet();
+
+	/**
+	* @brief Get pointer to descriptor set layout
+	*
+	* @return Vulkan VkDescriptorSetLayout array
+	*/
+	caveVector<VkDescriptorSetLayout>& GetDescriptorSets();
+
+private:
+	VulkanRenderDevice* _pDevice;	///< Pointer to device object
+	caveVector<VkDescriptorSetLayoutCreateInfo> _vkDescriptorSetLayoutsInfo;	///< Vulkan descriptor set layout infos
+	caveVector<VkDescriptorSetLayout> _vkDescriptorSetLayouts;	///< Array of vulkan pdescriptor set layouts
+};
 
 }
 
-HalPipelineLayout::~HalPipelineLayout()
-{
+/** @}*/
 
-}
 
-}

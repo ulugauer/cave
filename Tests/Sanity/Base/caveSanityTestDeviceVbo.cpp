@@ -293,7 +293,7 @@ void CaveSanityTestDeviceVbo::CreatePipelineLayout(cave::RenderDevice *device)
 {
 	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(device->GetEngineAllocator());
 	caveVector<HalPushConstantRange> pushConstants(device->GetEngineAllocator());
-	_pipelineLayout = device->CreatePipelineLayout(descriptorSetLayouts, pushConstants);
+	_pipelineLayout = device->CreatePipelineLayout(nullptr, pushConstants);
 
 	if (!_pipelineLayout)
 		throw CaveSanityTestException("CaveSanityTestMappedVbo: Failed to create pipeline layout");

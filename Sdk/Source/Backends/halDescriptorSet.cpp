@@ -12,24 +12,22 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file halPipelineLayout.cpp
-///       Hardware pipeline layout abstraction
+/// @file halDescriptorSet.cpp
+///       Hardware descriptor set layout abstraction
 
-#include "halPipelineLayout.h"
 #include "halDescriptorSet.h"
 #include "halRenderDevice.h"
 
 namespace cave
 {
 
-HalPipelineLayout::HalPipelineLayout(HalRenderDevice* renderDevice, HalDescriptorSet* descriptorSet)
+HalDescriptorSet::HalDescriptorSet(HalRenderDevice* renderDevice)
 	: _pDevice(renderDevice)
-	, _pDescriptorSet(descriptorSet)
 {
 
 }
 
-HalPipelineLayout::~HalPipelineLayout()
+HalDescriptorSet::~HalDescriptorSet()
 {
 
 }

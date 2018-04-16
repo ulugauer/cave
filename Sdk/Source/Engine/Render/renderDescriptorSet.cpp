@@ -12,26 +12,31 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file halPipelineLayout.cpp
-///       Hardware pipeline layout abstraction
+/// @file renderDescriptorSet.cpp
+///       Render descriptor set layout interface
 
-#include "halPipelineLayout.h"
+#include "renderDescriptorSet.h"
+#include "renderDevice.h"
+#include "engineError.h"
 #include "halDescriptorSet.h"
-#include "halRenderDevice.h"
+
+#include <cassert>
 
 namespace cave
 {
-
-HalPipelineLayout::HalPipelineLayout(HalRenderDevice* renderDevice, HalDescriptorSet* descriptorSet)
-	: _pDevice(renderDevice)
-	, _pDescriptorSet(descriptorSet)
+RenderDescriptorSet::RenderDescriptorSet(RenderDevice& renderDevice
+	, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts)
+	: _renderDevice(renderDevice)
 {
-
+	// Allocate low level object
+	_halDescriptorSet = renderDevice.GetHalRenderDevice()->CreateDescriptorSetLayouts(descriptorSetLayouts);
+	assert(_halDescriptorSet);
 }
 
-HalPipelineLayout::~HalPipelineLayout()
+RenderDescriptorSet::~RenderDescriptorSet()
 {
-
+	if (_halDescriptorSet)
+		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halDescriptorSet);
 }
 
 }

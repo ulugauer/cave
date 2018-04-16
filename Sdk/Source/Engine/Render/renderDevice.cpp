@@ -18,6 +18,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderDevice.h"
 #include "renderInstance.h"
 #include "renderCommandPool.h"
+#include "renderDescriptorPool.h"
+#include "renderDescriptorSet.h"
 #include "renderVertexInput.h"
 #include "renderInputAssembly.h"
 #include "renderLayerSection.h"
@@ -205,6 +207,44 @@ void RenderDevice::ReleaseCommandPool(RenderCommandPool* commandPool)
 	}
 }
 
+RenderDescriptorPool* RenderDevice::CreateDescriptorPool(HalDescriptorPoolInfo& deescriptorPoolInfo)
+{
+	RenderDescriptorPool* descriptorPool = AllocateObject<RenderDescriptorPool>(*_pRenderInstance->GetEngineAllocator(), *this, deescriptorPoolInfo);
+	if (descriptorPool)
+		descriptorPool->IncrementUsageCount();
+
+	return  descriptorPool;
+}
+
+void RenderDevice::ReleaseDescriptorPool(RenderDescriptorPool* descriptorPool)
+{
+	if (descriptorPool)
+	{
+		int32_t refCount = descriptorPool->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *descriptorPool);
+	}
+}
+
+RenderDescriptorSet* RenderDevice::CreateDescriptorSets(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts)
+{
+	RenderDescriptorSet* descriptorSest = AllocateObject<RenderDescriptorSet>(*_pRenderInstance->GetEngineAllocator(), *this, descriptorSetLayouts);
+	if (descriptorSest)
+		descriptorSest->IncrementUsageCount();
+
+	return  descriptorSest;
+}
+
+void RenderDevice::ReleaseDescriptorSets(RenderDescriptorSet* descriptorSet)
+{
+	if (descriptorSet)
+	{
+		int32_t refCount = descriptorSet->DecrementUsageCount();
+		if (refCount == 0)
+			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *descriptorSet);
+	}
+}
+
 RenderVertexInput* RenderDevice::CreateVertexInput(HalVertexInputStateInfo& vertexInputState)
 {
 	RenderVertexInput* vertexInput = AllocateObject<RenderVertexInput>(*_pRenderInstance->GetEngineAllocator(), *this, vertexInputState);
@@ -352,10 +392,9 @@ void RenderDevice::ReleaseDynamicState(RenderDynamicState* dynamicState)
 	}
 }
 
-RenderPipelineLayout* RenderDevice::CreatePipelineLayout(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
-	, caveVector<HalPushConstantRange>& pushConstants)
+RenderPipelineLayout* RenderDevice::CreatePipelineLayout(RenderDescriptorSet* descriptorSet, caveVector<HalPushConstantRange>& pushConstants)
 {
-	RenderPipelineLayout* pipelineLayout = AllocateObject<RenderPipelineLayout>(*_pRenderInstance->GetEngineAllocator(), *this, descriptorSetLayouts, pushConstants);
+	RenderPipelineLayout* pipelineLayout = AllocateObject<RenderPipelineLayout>(*_pRenderInstance->GetEngineAllocator(), *this, descriptorSet, pushConstants);
 	if (pipelineLayout)
 		pipelineLayout->IncrementUsageCount();
 

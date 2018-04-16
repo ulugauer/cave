@@ -1025,4 +1025,15 @@ VulkanTypeConversion::ConvertDescriptorTypeToVulkan(HalDescriptorType descriptor
 	return vkDescriptorType;
 }
 
+VkDescriptorPoolCreateFlags
+ VulkanTypeConversion::ConvertDescriptorPoolFlagsToVulkan(HalDescriptorPoolCreateFlags poolFlags)
+{
+	VkDescriptorPoolCreateFlags vkFlags = 0;
+
+	if (poolFlags & static_cast<uint32_t>(HalDescriptorPoolCreateFlagBits::FreeDescriptorSet))
+		vkFlags |= VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+
+	return vkFlags;
+}
+
 }

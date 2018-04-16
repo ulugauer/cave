@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineInstance.h"
 #include "engineError.h"
 #include "Render/renderCommandPool.h"
+#include "Render/renderDescriptorPool.h"
 #include "Math/vector4.h"
 #include "Math/matrix4.h"
 
@@ -42,6 +43,8 @@ CaveSanityTestUniformBuffer::CaveSanityTestUniformBuffer()
 	, _vertexBuffer(nullptr)
 	, _indexBuffer(nullptr)
 	, _uniformBuffer(nullptr)
+	, _descriptorPool(nullptr)
+	, _descriptorSet(nullptr)
 	, _graphicsPipeline(nullptr)
 	, _commandBuffers(nullptr)
 {
@@ -71,11 +74,13 @@ bool CaveSanityTestUniformBuffer::Run(RenderDevice *device, RenderCommandPool* c
 		CreateDepthStencilState(device);
 		CreateColorBlendState(device);
 		CreateDynamicState(device);
+		CreateDescriptorSetLayout(device);
 		CreatePipelineLayout(device);
 		//CreateRenderPass(device);
 		CreateVertexBuffer(device);
 		CreateIndexBuffer(device);
 		CreateUniformBuffer(device, pUserData);
+		CreateDescriptorPool(device);
 		CreateGraphicsPipeline(device, renderPass);
 		AllocateCommandBuffers(device, commandPool);
 	}
@@ -155,6 +160,10 @@ void CaveSanityTestUniformBuffer::Cleanup(RenderDevice *device, userContextData*
 		device->ReleaseIndexBuffer(_indexBuffer);
 	if (_uniformBuffer)
 		device->ReleaseUniformBuffer(_uniformBuffer);
+	if (_descriptorPool)
+		device->ReleaseDescriptorPool(_descriptorPool);
+	if (_descriptorSet)
+		device->ReleaseDescriptorSets(_descriptorSet);
 	if (_pipelineLayout)
 		device->ReleasePipelineLayout(_pipelineLayout);
 	if (_dynamicState)
@@ -190,10 +199,10 @@ void CaveSanityTestUniformBuffer::LoadResource(cave::RenderDevice *device)
 {
 	_material = AllocateObject<RenderMaterial>(*device->GetEngineAllocator(), *device);
 	ResourceManager& rm = device->GetResourceManager();
-	*_material = rm.LoadMaterialAsset("CaveSanityTestIndexBuffer.asset");
+	*_material = rm.LoadMaterialAsset("CaveSanityTestUniformBuffer.asset");
 
 	if (!_material || _material->GetStageCount() == 0)
-		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to load material");
+		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to load material");
 }
 
 void CaveSanityTestUniformBuffer::CreateRenderSection(RenderDevice *device, userContextData* pUserData)
@@ -300,11 +309,48 @@ void CaveSanityTestUniformBuffer::CreateDynamicState(cave::RenderDevice *device)
 		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to create dynamic state");
 }
 
+void CaveSanityTestUniformBuffer::CreateDescriptorSetLayout(cave::RenderDevice *device)
+{
+	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(device->GetEngineAllocator());
+	caveVector<HalDescriptorSetLayoutBinding> LayoutBindingArray(device->GetEngineAllocator());
+	HalDescriptorSetLayoutBinding uboLayoutBinding;
+	uboLayoutBinding._binding = 0;
+	uboLayoutBinding._descriptorType = HalDescriptorType::UniformBuffer;
+	uboLayoutBinding._descriptorCount = 1;
+	uboLayoutBinding._stageFlags = static_cast<HalShaderStagesFlags>(HalShaderStages::Vertex);
+	uboLayoutBinding._pImmutableSamplers = nullptr;
+	LayoutBindingArray.Push(uboLayoutBinding);
+
+	HalDescriptorSetLayout setLayoutInfo = {};
+	setLayoutInfo._bindingCount = static_cast<uint32_t>(LayoutBindingArray.Size());
+	setLayoutInfo._pBindings = LayoutBindingArray.Data();
+	descriptorSetLayouts.Push(setLayoutInfo);
+
+	_descriptorSet = device->CreateDescriptorSets(descriptorSetLayouts);
+
+	if (!_descriptorSet)
+		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to create descriptor set layouts");
+}
+
 void CaveSanityTestUniformBuffer::CreatePipelineLayout(cave::RenderDevice *device)
 {
 	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(device->GetEngineAllocator());
+	caveVector<HalDescriptorSetLayoutBinding> LayoutBindingArray(device->GetEngineAllocator());
+	HalDescriptorSetLayoutBinding uboLayoutBinding;
+	uboLayoutBinding._binding = 0;
+	uboLayoutBinding._descriptorType = HalDescriptorType::UniformBuffer;
+	uboLayoutBinding._descriptorCount = 1;
+	uboLayoutBinding._stageFlags = static_cast<HalShaderStagesFlags>(HalShaderStages::Vertex);
+	uboLayoutBinding._pImmutableSamplers = nullptr;
+	LayoutBindingArray.Push(uboLayoutBinding);
+
+	HalDescriptorSetLayout setLayoutInfo = {};
+	setLayoutInfo._bindingCount = static_cast<uint32_t>(LayoutBindingArray.Size());
+	setLayoutInfo._pBindings = LayoutBindingArray.Data();
+	descriptorSetLayouts.Push(setLayoutInfo);
+
 	caveVector<HalPushConstantRange> pushConstants(device->GetEngineAllocator());
-	_pipelineLayout = device->CreatePipelineLayout(descriptorSetLayouts, pushConstants);
+	_pipelineLayout = device->CreatePipelineLayout(_descriptorSet, pushConstants);
 
 	if (!_pipelineLayout)
 		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to create pipeline layout");
@@ -440,7 +486,7 @@ void CaveSanityTestUniformBuffer::CreateUniformBuffer(cave::RenderDevice *device
 	bufferInfo._properties = static_cast<HalMemoryPropertyFlags>(HalMemoryPropertyBits::DeviceLocal);
 	_uniformBuffer = device->CreateUniformBuffer(bufferInfo);
 	if (!_uniformBuffer)
-		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to create vertex buffer");
+		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to create uniform buffer");
 
 	// fill with data
 	try
@@ -454,6 +500,24 @@ void CaveSanityTestUniformBuffer::CreateUniformBuffer(cave::RenderDevice *device
 		throw CaveSanityTestException(err.what());
 		return;
 	}
+}
+
+void CaveSanityTestUniformBuffer::CreateDescriptorPool(cave::RenderDevice *device)
+{
+	HalDescriptorPoolInfo poolInfo;
+	HalDescriptorPoolSize poolSize;
+
+	poolSize._type = HalDescriptorType::UniformBuffer;
+	poolSize._descriptorCount = 1;
+
+	poolInfo._flags = 0;
+	poolInfo._poolSizeCount = 1;
+	poolInfo._pPoolSizes = &poolSize;
+	poolInfo._maxSets = 1;
+
+	_descriptorPool = device->CreateDescriptorPool(poolInfo);
+	if (!_descriptorPool)
+		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to descriptor pool");
 }
 
 void CaveSanityTestUniformBuffer::CreateGraphicsPipeline(cave::RenderDevice *device, cave::RenderPass* renderPass)

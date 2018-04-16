@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///        Vulkan pipeline layout
 
 #include "vulkanPipelineLayout.h"
+#include "vulkanDescriptorSet.h"
 #include "vulkanRenderDevice.h"
 #include "vulkanConversion.h"
 
@@ -28,12 +29,10 @@ namespace cave
 {
 
 VulkanPipelineLayout::VulkanPipelineLayout(VulkanRenderDevice* device
-		, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts
+		, HalDescriptorSet* descriptorSet
 		, caveVector<HalPushConstantRange>& pushConstants)
-	: HalPipelineLayout(device)
+	: HalPipelineLayout(device, descriptorSet)
 	, _pDevice(device)
-	, _vkDescriptorSetLayoutsInfo(device->GetEngineAllocator())
-	, _vkDescriptorSetLayouts(device->GetEngineAllocator())
 	, _vkPushConstantRange(device->GetEngineAllocator())
 	, _vkPipelineLayout(VK_NULL_HANDLE)
 {
@@ -54,41 +53,6 @@ VulkanPipelineLayout::VulkanPipelineLayout(VulkanRenderDevice* device
 		}
 	}
 
-	// first convert descriptor layouts
-	for (size_t l = 0; l < descriptorSetLayouts.Size(); ++l)
-	{
-		_vkDescriptorSetLayoutsInfo.Reserve(descriptorSetLayouts.Size());
-		HalDescriptorSetLayout& descriptorSetLayout = descriptorSetLayouts[l];
-
-		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo;
-		descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		descriptorSetLayoutCreateInfo.pNext = nullptr;
-		descriptorSetLayoutCreateInfo.flags = 0;
-		descriptorSetLayoutCreateInfo.bindingCount = descriptorSetLayout._bindingCount;
-		// allocte memory
-		size_t descriptorSetBindingsArraySize = descriptorSetLayout._bindingCount * sizeof(VkDescriptorSetLayoutBinding);
-		VkDescriptorSetLayoutBinding *descriptorBindings = static_cast<VkDescriptorSetLayoutBinding*>(device->GetEngineAllocator()->Allocate(descriptorSetBindingsArraySize, 4));
-
-		if (descriptorBindings)
-		{
-			for (size_t i = 0; i < descriptorSetLayout._bindingCount; ++i)
-			{
-				//_vkDescriptorSetLayouts.Push(descriptorSetLayoutCreateInfo);
-				const HalDescriptorSetLayoutBinding& layoutBinding = descriptorSetLayout._pBindings[i];
-				VkDescriptorSetLayoutBinding& vkLayoutBinidng = descriptorBindings[i];
-				
-				vkLayoutBinidng.binding = layoutBinding._binding;
-				vkLayoutBinidng.descriptorCount = layoutBinding._descriptorCount;
-				vkLayoutBinidng.pImmutableSamplers = nullptr; // not supported yet
-				vkLayoutBinidng.descriptorType = VulkanTypeConversion::ConvertDescriptorTypeToVulkan(layoutBinding._descriptorType);
-				vkLayoutBinidng.stageFlags = VulkanTypeConversion::ConvertBlendOpToVulkan(layoutBinding._stageFlags);
-			}
-
-			descriptorSetLayoutCreateInfo.pBindings = descriptorBindings;
-			_vkDescriptorSetLayoutsInfo.Push(descriptorSetLayoutCreateInfo);
-		}
-	}
-
 	// setup struct
 	_vkPipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	_vkPipelineLayoutInfo.pNext = nullptr;
@@ -103,18 +67,6 @@ VulkanPipelineLayout::~VulkanPipelineLayout()
 {
 	if (!_vkPushConstantRange.Empty())
 		_vkPushConstantRange.Clear();
-	if (!_vkDescriptorSetLayoutsInfo.Empty())
-		_vkDescriptorSetLayoutsInfo.Clear();
-
-	if (!_vkDescriptorSetLayouts.Empty())
-	{
-		for (size_t i = 0; i < _vkDescriptorSetLayouts.Size(); ++i)
-		{
-			if (_vkDescriptorSetLayouts[i] != VK_NULL_HANDLE)
-				VulkanApi::GetApi()->vkDestroyDescriptorSetLayout(_pDevice->GetDeviceHandle(), _vkDescriptorSetLayouts[i], nullptr);
-		}
-		_vkDescriptorSetLayouts.Clear();
-	}
 
 	if (_vkPipelineLayout != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkDestroyPipelineLayout(_pDevice->GetDeviceHandle(), _vkPipelineLayout, nullptr);
@@ -124,16 +76,15 @@ VkPipelineLayout VulkanPipelineLayout::GetPipelineLayout()
 {
 	if (_vkPipelineLayout == VK_NULL_HANDLE)
 	{
-		// first create descriptor set layouts
-		for (size_t i = 0; i < _vkDescriptorSetLayoutsInfo.Size(); ++i)
+		// query descriptor set layouts
+		if (_pDescriptorSet)
 		{
-			VkDescriptorSetLayout vkDescriptorLayout = VK_NULL_HANDLE;
-			VulkanApi::GetApi()->vkCreateDescriptorSetLayout(_pDevice->GetDeviceHandle(), &_vkDescriptorSetLayoutsInfo[i], nullptr, &vkDescriptorLayout);
-			if (vkDescriptorLayout != VK_NULL_HANDLE)
-				_vkDescriptorSetLayouts.Push(vkDescriptorLayout);
+			VulkanDescriptorSet* vkDescriptor = static_cast<VulkanDescriptorSet*>(_pDescriptorSet);
+			caveVector<VkDescriptorSetLayout>& descriptorSets = vkDescriptor->GetDescriptorSets();
+
+			_vkPipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSets.Size());
+			_vkPipelineLayoutInfo.pSetLayouts = (descriptorSets.Empty()) ? nullptr : descriptorSets.Data();
 		}
-		_vkPipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(_vkDescriptorSetLayouts.Size());
-		_vkPipelineLayoutInfo.pSetLayouts = (_vkDescriptorSetLayouts.Empty()) ? nullptr : _vkDescriptorSetLayouts.Data();
 
 		// create
 		VulkanApi::GetApi()->vkCreatePipelineLayout(_pDevice->GetDeviceHandle(), &_vkPipelineLayoutInfo, nullptr, &_vkPipelineLayout);
