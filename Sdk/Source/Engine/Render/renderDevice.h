@@ -51,6 +51,8 @@ class RenderCommandPool;
 class RenderCommandBuffer;
 class RenderDescriptorPool;
 class RenderDescriptorSet;
+struct RenderDescriptorBufferInfo;
+struct RenderWriteDescriptorSet;
 struct RenderCmdRenderPassInfo;
 class RenderVertexBuffer;
 class RenderIndexBuffer;
@@ -227,6 +229,15 @@ public:
 	* @param[in] descriptorSet	RenderDescriptorSet object to release
 	*/
 	void ReleaseDescriptorSets(RenderDescriptorSet* descriptorSet);
+
+	/**
+	* @brief Update a descriptor set object
+	* Note do not overwrite descriptor sets while used in command buffer recording
+	* or rendering
+	*
+	* @param[in] descriptorWrites	Array of RenderWriteDescriptorSet
+	*/
+	void UpdateDescriptorSets(caveVector<RenderWriteDescriptorSet>& descriptorWrites);
 
 	/**
 	* @brief Create a vertex input object
@@ -521,7 +532,7 @@ public:
 	void CmdBindGraphicsPipeline(RenderCommandBuffer* commandBuffer, RenderGraphicsPipeline* graphicsPipelineInfo);
 
 	/**
-	* @brief Bind vertex buffers to the pipeline
+	* @brief Bind vertex buffers to the command buffer
 	*
 	* @param[in] commandBuffer	Command buffer we use for recording
 	* @param[in] firstBinding	First binding point
@@ -533,7 +544,7 @@ public:
 		, RenderVertexBuffer** vertexBuffers, const uint64_t* offsetArray);
 
 	/**
-	* @brief Bind index buffer to the pipeline
+	* @brief Bind index buffer to the command buffer
 	*
 	* @param[in] commandBuffer	Command buffer we use for recording
 	* @param[in] indexBuffer	RenderIndexBuffer pointer
@@ -542,6 +553,22 @@ public:
 	*/
 	void CmdBindIndexBuffer(RenderCommandBuffer* commandBuffer
 		, RenderIndexBuffer* indexBuffer, const uint64_t offset, HalIndexType indexType);
+
+	/**
+	* @brief Binds descriptor sets to a command buffer
+	*
+	* @param[in] commandBuffer		Command buffer we use for recording
+	* @param[in] pipelineBindPoint	Bound to graphics or compute pipeline
+	* @param[in] layout				Layout is a RenderPipelineLayout object used to program the bindings
+	* @param[in] firstSet			The set number of the first descriptor set to be bound.
+	* @param[in] descriptorSetCount	The number of elements in the pDescriptorSets array.
+	* @param[in] descriptorSets		Array of handles to RenderDescriptorSet objects describing the descriptor sets to write to.
+	* @param[in] dynamicOffsetCount	The number of dynamic offsets in the pDynamicOffsets array.
+	* @param[in] dynamicOffsets 	Pointer to an array of uint32_t values specifying dynamic offsets.
+	*/
+	void CmdBindDescriptorSets(RenderCommandBuffer* commandBuffer, HalPipelineBindPoints pipelineBindPoint
+		, RenderPipelineLayout* layout, uint32_t firstSet, uint32_t descriptorSetCount
+		, RenderDescriptorSet** descriptorSets, uint32_t dynamicOffsetCount, const uint32_t* dynamicOffsets);
 
 	/**
 	* @brief Draw command for non indexed drawing

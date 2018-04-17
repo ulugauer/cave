@@ -33,7 +33,42 @@ namespace cave
 
 /// forward declaration
 class RenderDevice;
+class RenderDescriptorPool;
+class RenderUniformBuffer;
+class RenderDescriptorSet;
 class HalDescriptorSet;
+
+/**
+* @brief Structure specifying descriptor buffer info
+*/
+struct CAVE_INTERFACE RenderDescriptorBufferInfo
+{
+	RenderUniformBuffer* _buffer;	///< The render buffer resource.
+	uint64_t _offset;	///< The offset in bytes from the start of buffer.
+	uint64_t _range;	///< The size in bytes that is used for this descriptor update.
+};
+
+/**
+* @brief Structure specifying the parameters of a descriptor set write operation
+*/
+struct CAVE_INTERFACE RenderWriteDescriptorSet
+{
+	RenderDescriptorSet* _dstSet;					///< The destination descriptor set to update.
+	uint32_t _dstBinding;							///< The descriptor binding within that set.
+	uint32_t _dstArrayElement;						///< The starting element in that array.
+	uint32_t _descriptorCount;						///< The number of descriptors to update.
+	HalDescriptorType _descriptorType;				///< Specifying the type of each descriptor in _pBufferInfo
+	//const HalDescriptorImageInfo* _pImageInfo;
+	const RenderDescriptorBufferInfo* _pBufferInfo;	///< Info points to an array of RenderDescriptorBufferInfo structures or is ignored.
+	//const HalBufferView* _pTexelBufferView;
+
+	RenderWriteDescriptorSet()
+		: _dstSet(nullptr)
+		, _dstArrayElement(0)
+		, _descriptorCount(0)
+		, _pBufferInfo(nullptr)
+	{}
+};
 
 /**
 * @brief Interface for descriptor set layout setup
@@ -56,6 +91,15 @@ public:
 	virtual ~RenderDescriptorSet();
 
 	/**
+	* @brief Allocate a descriptor set from descriptorPool.
+	*
+	* @param[in] descriptorPool	Valid pointer to a descriptor pool object to allocate from
+	*
+	* @return true on success
+	*/
+	bool AllocateDescriptorSet(RenderDescriptorPool *descriptorPool);
+
+	/**
 	* @brief Get low level HAL handle
 	*
 	* @return HalPipelineLayout handle
@@ -64,6 +108,7 @@ public:
 
 private:
 	RenderDevice& _renderDevice;			///< Render device object
+	RenderDescriptorPool* _descriptorPool;	///< Pointer to a RenderDescriptorPool object
 	HalDescriptorSet* _halDescriptorSet;	///< Pointer to low level pipeline layout object
 };
 

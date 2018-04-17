@@ -137,32 +137,43 @@ Matrix4<T> Multiply(const Matrix4<T>& m1, const Matrix4<T>& m2)
 }
 
 /**
-* @brief Create a orthograpic projection matrix
+* @brief Create a orthograpic projection matrix left handed
 *
-* @param left	Left boundary
-* @param right	Right boundary
-* @param top	Top boundary
-* @param bottom	Bottom boundary
+* @param width	dimension
+* @param height	dimension
 * @param znear	Z near boundary
 * @param zfar	Z far boundary
 *
 * @result return ortho matrix
 */
 template<typename T>
-Matrix4<T> Ortho(T left, T right, T top, T bottom, T znear, T zfar)
+Matrix4<T> Ortho(T width, T height, T znear, T zfar)
 {
 	Matrix4<T> result(true);
 
-	T rightMinusLeftInv = 1 / (right - left);
-	T topMinusBottomInv = 1 / (top - bottom);
-	T farMinusNearInv = 1 / (zfar - znear);
+	result._m[0][0] = 2 / width;
+	result._m[1][1] = 2 / height;
+	result._m[2][2] = 1 / (zfar - znear);
+	result._m[2][3] = znear / (znear - zfar);
 
-	result._m[0][0] = 2 * rightMinusLeftInv;
-	result._m[1][1] = 2 * topMinusBottomInv;
-	result._m[2][2] = -2 * farMinusNearInv;
-	result._m[0][3] = -(right + left) * rightMinusLeftInv;
-	result._m[1][3] = -(top + bottom) * topMinusBottomInv;
-	result._m[2][3] = -(zfar + znear) * farMinusNearInv;
+	return result;
+}
+
+/**
+* @brief Create a transposed matrix
+*
+* @param A		Matrix
+*
+* @result return transposed matrix
+*/
+template<typename T>
+Matrix4<T> Transpose(const Matrix4<T>& A)
+{
+	Matrix4<T> result(false);
+	result._m[0][0] = A._m[0][0]; result._m[0][1] = A._m[1][0]; result._m[0][2] = A._m[2][0]; result._m[0][3] = A._m[3][0];
+	result._m[1][0] = A._m[0][1]; result._m[1][1] = A._m[1][1]; result._m[1][2] = A._m[2][1]; result._m[1][3] = A._m[3][1];
+	result._m[2][0] = A._m[0][2]; result._m[2][1] = A._m[1][2]; result._m[2][2] = A._m[2][2]; result._m[2][3] = A._m[3][2];
+	result._m[3][0] = A._m[0][3]; result._m[3][1] = A._m[1][3]; result._m[3][2] = A._m[2][3]; result._m[3][3] = A._m[3][3];
 
 	return result;
 }

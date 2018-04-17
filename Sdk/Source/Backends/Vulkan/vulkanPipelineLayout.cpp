@@ -80,7 +80,7 @@ VkPipelineLayout VulkanPipelineLayout::GetPipelineLayout()
 		if (_pDescriptorSet)
 		{
 			VulkanDescriptorSet* vkDescriptor = static_cast<VulkanDescriptorSet*>(_pDescriptorSet);
-			caveVector<VkDescriptorSetLayout>& descriptorSets = vkDescriptor->GetDescriptorSets();
+			caveVector<VkDescriptorSetLayout>& descriptorSets = vkDescriptor->GetDescriptorSetLayouts();
 
 			_vkPipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSets.Size());
 			_vkPipelineLayoutInfo.pSetLayouts = (descriptorSets.Empty()) ? nullptr : descriptorSets.Data();

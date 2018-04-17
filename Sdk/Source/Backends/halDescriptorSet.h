@@ -33,6 +33,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+// forwards
+class HalDescriptorPool;
+class HalDescriptorSet;
+class HalBuffer;
+
+/**
+* @brief Structure specifying descriptor buffer info
+*/
+struct HalDescriptorBufferInfo
+{
+	HalBuffer* _buffer;	///< The buffer resource.
+	uint64_t _offset;	///< The offset in bytes from the start of buffer.
+	uint64_t _range;	///< The size in bytes that is used for this descriptor update.
+};
+
+/**
+* @brief Structure specifying the parameters of a descriptor set write operation
+*/
+struct HalWriteDescriptorSet
+{
+	HalDescriptorSet* _dstSet;						///< The destination descriptor set to update.
+	uint32_t _dstBinding;							///< The descriptor binding within that set.
+	uint32_t _dstArrayElement;						///< The starting element in that array.
+	uint32_t _descriptorCount;						///< The number of descriptors to update.
+	HalDescriptorType _descriptorType;				///< Specifying the type of each descriptor in _pBufferInfo
+	//const HalDescriptorImageInfo* _pImageInfo;
+	HalDescriptorBufferInfo* _pBufferInfo;	///< Info points to an array of HalDescriptorBufferInfo structures or is ignored.
+	//const HalBufferView* _pTexelBufferView;
+
+	HalWriteDescriptorSet()
+		: _dstSet(nullptr)
+		, _dstArrayElement(0)
+		, _descriptorCount(0)
+		, _pBufferInfo(nullptr)
+	{}
+};
+
 /**
 * @brief Describes the descriptor set layout
 */
@@ -49,6 +86,14 @@ public:
 
 	/** @brief Destructor */
 	virtual ~HalDescriptorSet();
+
+	/**
+	* @brief Allocate a descriptor set based on the set layouts
+	* Note that descriptorSetLayouts must be alread set before calling this
+	*
+	* @return true on success
+	*/
+	virtual bool AllocateDescriptorSet(HalDescriptorPool *descriptorPool) = 0;
 
 private:
 	HalRenderDevice* _pDevice;	///< Pointer to device object

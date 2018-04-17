@@ -16,8 +16,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Render descriptor set layout interface
 
 #include "renderDescriptorSet.h"
+#include "renderDescriptorPool.h"
 #include "renderDevice.h"
 #include "engineError.h"
+#include "halDescriptorPool.h"
 #include "halDescriptorSet.h"
 
 #include <cassert>
@@ -27,6 +29,7 @@ namespace cave
 RenderDescriptorSet::RenderDescriptorSet(RenderDevice& renderDevice
 	, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts)
 	: _renderDevice(renderDevice)
+	, _descriptorPool(nullptr)
 {
 	// Allocate low level object
 	_halDescriptorSet = renderDevice.GetHalRenderDevice()->CreateDescriptorSetLayouts(descriptorSetLayouts);
@@ -37,6 +40,17 @@ RenderDescriptorSet::~RenderDescriptorSet()
 {
 	if (_halDescriptorSet)
 		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halDescriptorSet);
+}
+
+bool RenderDescriptorSet::AllocateDescriptorSet(RenderDescriptorPool *descriptorPool)
+{
+	assert(_halDescriptorSet);
+
+	if (!_halDescriptorSet || !descriptorPool)
+		return false;
+
+	_descriptorPool = descriptorPool;
+	return _halDescriptorSet->AllocateDescriptorSet(descriptorPool->GetHalHandle());
 }
 
 }

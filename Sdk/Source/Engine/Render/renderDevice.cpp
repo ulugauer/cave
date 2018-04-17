@@ -245,6 +245,57 @@ void RenderDevice::ReleaseDescriptorSets(RenderDescriptorSet* descriptorSet)
 	}
 }
 
+static void UpdateDescriptorSetBufferInfo(const RenderDescriptorBufferInfo** inBufferInfos, HalDescriptorBufferInfo** outBufferInfos, uint32_t count)
+{
+	for (size_t i = 0; i < count; ++i)
+	{
+		outBufferInfos[i]->_buffer = inBufferInfos[i]->_buffer->GetHalHandle();
+		outBufferInfos[i]->_offset = inBufferInfos[i]->_offset;
+		outBufferInfos[i]->_range = inBufferInfos[i]->_range;
+	}
+}
+
+void RenderDevice::UpdateDescriptorSets(caveVector<RenderWriteDescriptorSet>& descriptorWrites)
+{
+	//Convert descriptor writes
+	caveVector<HalWriteDescriptorSet> halDescriptorWrites(GetEngineAllocator());
+	for (size_t i = 0; i < descriptorWrites.Size(); ++i)
+	{
+		// Set general values
+		HalWriteDescriptorSet halDescriptorWriteSet;
+		halDescriptorWriteSet._dstSet = descriptorWrites[i]._dstSet->GetHalHandle();
+		halDescriptorWriteSet._dstBinding = descriptorWrites[i]._dstBinding;
+		halDescriptorWriteSet._descriptorType = descriptorWrites[i]._descriptorType;
+		halDescriptorWriteSet._dstArrayElement = descriptorWrites[i]._dstArrayElement;
+		halDescriptorWriteSet._descriptorCount = descriptorWrites[i]._descriptorCount;
+
+		// update depending on the type
+		if (descriptorWrites[i]._pBufferInfo)
+		{
+			size_t descriptorInfoSize = descriptorWrites[i]._descriptorCount * sizeof(HalDescriptorBufferInfo);
+			HalDescriptorBufferInfo *descriptorBufferInfos = static_cast<HalDescriptorBufferInfo*>(GetEngineAllocator()->Allocate(descriptorInfoSize, 4));
+			if (descriptorBufferInfos)
+				UpdateDescriptorSetBufferInfo(&descriptorWrites[i]._pBufferInfo, &descriptorBufferInfos, descriptorWrites[i]._descriptorCount);
+
+			halDescriptorWriteSet._pBufferInfo = descriptorBufferInfos;
+		}
+
+		halDescriptorWrites.Push(halDescriptorWriteSet);
+	}
+
+	// update to hardware
+	_pHalRenderDevice->UpdateDescriptorSets(halDescriptorWrites);
+
+	// Relase memory
+	for (size_t i = 0; i < halDescriptorWrites.Size(); ++i)
+	{
+		if (halDescriptorWrites[i]._pBufferInfo)
+		{
+			GetEngineAllocator()->Deallocate((void *)halDescriptorWrites[i]._pBufferInfo);
+		}
+	}
+}
+
 RenderVertexInput* RenderDevice::CreateVertexInput(HalVertexInputStateInfo& vertexInputState)
 {
 	RenderVertexInput* vertexInput = AllocateObject<RenderVertexInput>(*_pRenderInstance->GetEngineAllocator(), *this, vertexInputState);
@@ -622,6 +673,23 @@ void RenderDevice::CmdBindIndexBuffer(RenderCommandBuffer* commandBuffer
 {
 	if (commandBuffer)
 		_pHalRenderDevice->CmdBindIndexBuffer(commandBuffer->GetHalHandle(), indexBuffer->GetHalHandle(), offset, indexType);
+}
+
+void RenderDevice::CmdBindDescriptorSets(RenderCommandBuffer* commandBuffer, HalPipelineBindPoints pipelineBindPoint
+	, RenderPipelineLayout* layout, uint32_t firstSet, uint32_t descriptorSetCount
+	, RenderDescriptorSet** descriptorSets, uint32_t dynamicOffsetCount, const uint32_t* dynamicOffsets)
+{
+	if (commandBuffer)
+	{
+		// tmp buffer
+		caveVector<HalDescriptorSet*> halDescriptorSets(_pRenderInstance->GetEngineAllocator());
+		halDescriptorSets.Resize(descriptorSetCount);
+		for (uint32_t i = 0; i < descriptorSetCount; i++)
+			halDescriptorSets[i] = descriptorSets[i]->GetHalHandle();
+
+		_pHalRenderDevice->CmdBindDescriptorSets(commandBuffer->GetHalHandle(), pipelineBindPoint, layout->GetHalHandle()
+			, firstSet, descriptorSetCount, halDescriptorSets.Data(), dynamicOffsetCount, dynamicOffsets);
+	}
 }
 
 void RenderDevice::CmdDraw(RenderCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount

@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///        Vulkan descriptor set layout
 
 #include "vulkanDescriptorSet.h"
+#include "vulkanDescriptorPool.h"
 #include "vulkanRenderDevice.h"
 #include "vulkanConversion.h"
 
@@ -33,6 +34,7 @@ VulkanDescriptorSet::VulkanDescriptorSet(VulkanRenderDevice* device
 	, _pDevice(device)
 	, _vkDescriptorSetLayoutsInfo(device->GetEngineAllocator())
 	, _vkDescriptorSetLayouts(device->GetEngineAllocator())
+	, _vkDescriptorSet(VK_NULL_HANDLE)
 {
 	//Convert descriptor layouts
 	for (size_t l = 0; l < descriptorSetLayouts.Size(); ++l)
@@ -67,6 +69,15 @@ VulkanDescriptorSet::VulkanDescriptorSet(VulkanRenderDevice* device
 			_vkDescriptorSetLayoutsInfo.Push(descriptorSetLayoutCreateInfo);
 		}
 	}
+
+	// Create vulkan descriptor set layouts
+	for (size_t i = 0; i < _vkDescriptorSetLayoutsInfo.Size(); ++i)
+	{
+		VkDescriptorSetLayout vkDescriptorLayout = VK_NULL_HANDLE;
+		VulkanApi::GetApi()->vkCreateDescriptorSetLayout(_pDevice->GetDeviceHandle(), &_vkDescriptorSetLayoutsInfo[i], nullptr, &vkDescriptorLayout);
+		if (vkDescriptorLayout != VK_NULL_HANDLE)
+			_vkDescriptorSetLayouts.Push(vkDescriptorLayout);
+	}
 }
 
 VulkanDescriptorSet::~VulkanDescriptorSet()
@@ -89,20 +100,33 @@ VulkanDescriptorSet::~VulkanDescriptorSet()
 	}
 }
 
-caveVector<VkDescriptorSetLayout>& VulkanDescriptorSet::GetDescriptorSets()
+bool VulkanDescriptorSet::AllocateDescriptorSet(HalDescriptorPool *descriptorPool)
 {
-	if (_vkDescriptorSetLayouts.Empty())
+	VkResult res = VK_ERROR_OUT_OF_HOST_MEMORY;
+	// there should be created layouts already
+	assert(_vkDescriptorSetLayouts.Size());
+	// do not allocate twice
+	assert(_vkDescriptorSet == VK_NULL_HANDLE);
+
+	if (descriptorPool && _vkDescriptorSet == VK_NULL_HANDLE)
 	{
-		// Create descriptor set layouts
-		for (size_t i = 0; i < _vkDescriptorSetLayoutsInfo.Size(); ++i)
-		{
-			VkDescriptorSetLayout vkDescriptorLayout = VK_NULL_HANDLE;
-			VulkanApi::GetApi()->vkCreateDescriptorSetLayout(_pDevice->GetDeviceHandle(), &_vkDescriptorSetLayoutsInfo[i], nullptr, &vkDescriptorLayout);
-			if (vkDescriptorLayout != VK_NULL_HANDLE)
-				_vkDescriptorSetLayouts.Push(vkDescriptorLayout);
-		}
+		VulkanDescriptorPool* pool = static_cast<VulkanDescriptorPool*>(descriptorPool);
+
+		VkDescriptorSetAllocateInfo allocInfo;
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.pNext = nullptr;
+		allocInfo.descriptorPool = pool->GetDescriptorPool();
+		allocInfo.descriptorSetCount = static_cast<uint32_t>(_vkDescriptorSetLayouts.Size());
+		allocInfo.pSetLayouts = _vkDescriptorSetLayouts.Data();
+
+		res = VulkanApi::GetApi()->vkAllocateDescriptorSets(_pDevice->GetDeviceHandle(), &allocInfo, &_vkDescriptorSet);
 	}
 
+	return (res == VK_SUCCESS);
+}
+
+caveVector<VkDescriptorSetLayout>& VulkanDescriptorSet::GetDescriptorSetLayouts()
+{
 	return _vkDescriptorSetLayouts;
 }
 

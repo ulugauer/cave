@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Vulkan descriptor set layout
 
 #include "halDescriptorSet.h"
+#include "halDescriptorPool.h"
 
 #include "vulkan.h"
 
@@ -50,16 +51,34 @@ public:
 	virtual ~VulkanDescriptorSet();
 
 	/**
+	* @brief Allocate a descriptor set based on the set layouts
+	* Note that descriptorSetLayouts must be alread set before calling this
+	*
+	* @return true on success
+	*/
+	bool AllocateDescriptorSet(HalDescriptorPool *descriptorPool) override;
+
+	/**
 	* @brief Get pointer to descriptor set layout
 	*
 	* @return Vulkan VkDescriptorSetLayout array
 	*/
-	caveVector<VkDescriptorSetLayout>& GetDescriptorSets();
+	caveVector<VkDescriptorSetLayout>& GetDescriptorSetLayouts();
+
+	/**
+	* @brief Get pointer to descriptor set layout
+	*
+	* @return Vulkan VkDescriptorSetLayout array
+	*/
+	VkDescriptorSet GetDescriptorSet() {
+		return _vkDescriptorSet;
+	}
 
 private:
 	VulkanRenderDevice* _pDevice;	///< Pointer to device object
 	caveVector<VkDescriptorSetLayoutCreateInfo> _vkDescriptorSetLayoutsInfo;	///< Vulkan descriptor set layout infos
 	caveVector<VkDescriptorSetLayout> _vkDescriptorSetLayouts;	///< Array of vulkan pdescriptor set layouts
+	VkDescriptorSet _vkDescriptorSet;
 };
 
 }

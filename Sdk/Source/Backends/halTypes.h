@@ -844,13 +844,22 @@ struct CAVE_INTERFACE HalDescriptorSetLayoutBinding
 };
 
 /**
-* @brief Pipeline layout descriptor set layout
+* @brief Structure specifying a descriptor set layout
 */
 struct CAVE_INTERFACE HalDescriptorSetLayout
 {
 	HalDescriptorSetLayoutCreateFlags _flags;			///< Creation flags
 	uint32_t _bindingCount;								///< Array count
 	const HalDescriptorSetLayoutBinding* _pBindings;	///< Array of bindings
+};
+
+/**
+* @brief Structure specifying the allocation parameters for descriptor sets
+*/
+struct HalDescriptorSetAllocateInfo 
+{
+	uint32_t _descriptorSetCount; ///< Determines the number of descriptor sets to be allocated from the pool
+	const HalDescriptorSetLayout* _pSetLayouts;	///< Sn array of descriptor set layouts, with each member specifying how the corresponding descriptor set is allocated.
 };
 
 /**

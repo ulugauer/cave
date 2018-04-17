@@ -517,6 +517,77 @@ HalDescriptorSet* VulkanRenderDevice::CreateDescriptorSetLayouts(caveVector<HalD
 	return descriptorSet;
 }
 
+static void UpdateDescriptorSetBufferInfo(HalDescriptorBufferInfo** inBufferInfos, VkDescriptorBufferInfo** outBufferInfos, uint32_t count)
+{
+	for (size_t i = 0; i < count; ++i)
+	{
+		VulkanBuffer* buffer = static_cast<VulkanBuffer*>(inBufferInfos[i]->_buffer);
+		outBufferInfos[i]->buffer = buffer->GetBuffer();
+		outBufferInfos[i]->offset = inBufferInfos[i]->_offset;
+		outBufferInfos[i]->range = inBufferInfos[i]->_range;
+	}
+}
+
+void VulkanRenderDevice::UpdateDescriptorSets(caveVector<HalWriteDescriptorSet>& descriptorWrites)
+{
+	uint32_t descriptorWritesCount = static_cast<uint32_t>(descriptorWrites.Size());
+	size_t descriptorWriteSize = descriptorWrites.Size() * sizeof(VkWriteDescriptorSet);
+	VkWriteDescriptorSet *vkWriteDescriptorSets = static_cast<VkWriteDescriptorSet*>(GetEngineAllocator()->Allocate(descriptorWriteSize, 4));
+
+	if (vkWriteDescriptorSets)
+	{
+		for (size_t i = 0; i < descriptorWrites.Size(); ++i)
+		{
+			VulkanDescriptorSet* descriptorSet = static_cast<VulkanDescriptorSet*>(descriptorWrites[i]._dstSet);
+			// Set general values
+			vkWriteDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			vkWriteDescriptorSets[i].pNext = nullptr;
+			vkWriteDescriptorSets[i].dstSet = descriptorSet->GetDescriptorSet();
+			vkWriteDescriptorSets[i].dstBinding = descriptorWrites[i]._dstBinding;
+			vkWriteDescriptorSets[i].descriptorType = VulkanTypeConversion::ConvertDescriptorTypeToVulkan(descriptorWrites[i]._descriptorType);
+			vkWriteDescriptorSets[i].dstArrayElement = descriptorWrites[i]._dstArrayElement;
+			vkWriteDescriptorSets[i].descriptorCount = descriptorWrites[i]._descriptorCount;
+			vkWriteDescriptorSets[i].pBufferInfo = nullptr;
+			vkWriteDescriptorSets[i].pImageInfo = nullptr;
+			vkWriteDescriptorSets[i].pTexelBufferView = nullptr;
+
+			// update depending on the type
+			if (descriptorWrites[i]._pBufferInfo)
+			{
+				// this descriptor write contains buffer updates
+				assert(descriptorWrites[i]._descriptorType == HalDescriptorType::UniformBuffer ||
+					descriptorWrites[i]._descriptorType == HalDescriptorType::StorageBuffer ||
+					descriptorWrites[i]._descriptorType == HalDescriptorType::UniformBufferDynamic ||
+					descriptorWrites[i]._descriptorType == HalDescriptorType::StorageBufferDynamic);
+
+				size_t descriptorInfoSize = descriptorWrites[i]._descriptorCount * sizeof(VkDescriptorBufferInfo);
+				VkDescriptorBufferInfo  *descriptorBufferInfos = static_cast<VkDescriptorBufferInfo *>(GetEngineAllocator()->Allocate(descriptorInfoSize, 4));
+
+				if (descriptorBufferInfos)
+					UpdateDescriptorSetBufferInfo(&descriptorWrites[i]._pBufferInfo, &descriptorBufferInfos, descriptorWrites[i]._descriptorCount);
+
+				vkWriteDescriptorSets[i].pBufferInfo = descriptorBufferInfos;
+			}
+		}
+
+		VulkanApi::GetApi()->vkUpdateDescriptorSets(_vkDevice, descriptorWritesCount, vkWriteDescriptorSets, 0, nullptr);
+	}
+
+	// Relase memory
+	if (vkWriteDescriptorSets)
+	{
+		for (uint32_t i = 0; i < descriptorWritesCount; ++i)
+		{
+			if (vkWriteDescriptorSets[i].pBufferInfo)
+			{
+				GetEngineAllocator()->Deallocate((void *)vkWriteDescriptorSets[i].pBufferInfo);
+			}
+		}
+
+		GetEngineAllocator()->Deallocate((void *)vkWriteDescriptorSets);
+	}
+}
+
 HalRenderPass* VulkanRenderDevice::CreateRenderPass(HalRenderPassInfo& renderPassInfo)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
@@ -680,6 +751,28 @@ void VulkanRenderDevice::CmdBindVertexBuffers(HalCommandBuffer* commandBuffer, u
 
 	VulkanApi::GetApi()->vkCmdBindVertexBuffers(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer()
 		, firstBinding, bindingCount, vkBuffers.Data(), offsetArray);
+}
+
+void VulkanRenderDevice::CmdBindDescriptorSets(HalCommandBuffer* commandBuffer, HalPipelineBindPoints pipelineBindPoint
+	, HalPipelineLayout* layout, uint32_t firstSet, uint32_t descriptorSetCount
+	, HalDescriptorSet** descriptorSets, uint32_t dynamicOffsetCount, const uint32_t* dynamicOffsets)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	// tmp buffer
+	caveVector<VkDescriptorSet> vkDescriptorSets(_pInstance->GetEngineAllocator());
+	vkDescriptorSets.Resize(descriptorSetCount);
+	for (uint32_t i = 0; i < descriptorSetCount; i++)
+	{
+		VulkanDescriptorSet* descriptorSet = static_cast<VulkanDescriptorSet*>(descriptorSets[i]);
+		vkDescriptorSets[i] = descriptorSet->GetDescriptorSet();
+	}
+
+	VulkanApi::GetApi()->vkCmdBindDescriptorSets(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer()
+		, VulkanTypeConversion::ConvertPipelineBindPointToVulkan(pipelineBindPoint)
+		, static_cast<VulkanPipelineLayout*>(layout)->GetPipelineLayout()
+		, firstSet, descriptorSetCount, vkDescriptorSets.Data(), dynamicOffsetCount, dynamicOffsets);
 }
 
 void VulkanRenderDevice::CmdBindIndexBuffer(HalCommandBuffer* commandBuffer

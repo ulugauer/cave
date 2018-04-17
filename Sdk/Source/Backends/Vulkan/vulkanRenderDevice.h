@@ -248,6 +248,13 @@ public:
 	HalDescriptorSet* CreateDescriptorSetLayouts(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts) override;
 
 	/**
+	* @brief Update descriptor set objects
+	*
+	* @param[in] descriptorWrites	Array of HalWriteDescriptorSet
+	*/
+	void UpdateDescriptorSets(caveVector<HalWriteDescriptorSet>& descriptorWrites) override;
+
+	/**
 	* @brief Create a low level render pass object
 	*
 	* @param[in] renderPassInfo	Render pass setup info
@@ -355,6 +362,22 @@ public:
 	*/
 	void CmdBindIndexBuffer(HalCommandBuffer* commandBuffer
 		, HalBuffer* indexBuffer, const uint64_t offset, HalIndexType indexType) override;
+
+	/**
+	* @brief Binds descriptor sets to a command buffer
+	*
+	* @param[in] commandBuffer		Command buffer we use for recording
+	* @param[in] pipelineBindPoint	Bound to graphics or compute pipeline
+	* @param[in] layout				Layout is a RenderPipelineLayout object used to program the bindings
+	* @param[in] firstSet			The set number of the first descriptor set to be bound.
+	* @param[in] descriptorSetCount	The number of elements in the pDescriptorSets array.
+	* @param[in] descriptorSets		Array of handles to RenderDescriptorSet objects describing the descriptor sets to write to.
+	* @param[in] dynamicOffsetCount	The number of dynamic offsets in the pDynamicOffsets array.
+	* @param[in] dynamicOffsets 	Pointer to an array of uint32_t values specifying dynamic offsets.
+	*/
+	void CmdBindDescriptorSets(HalCommandBuffer* commandBuffer, HalPipelineBindPoints pipelineBindPoint
+		, HalPipelineLayout* layout, uint32_t firstSet, uint32_t descriptorSetCount
+		, HalDescriptorSet** descriptorSets, uint32_t dynamicOffsetCount, const uint32_t* dynamicOffsets) override;
 
 	/**
 	* @brief Draw command for non indexed drawing
