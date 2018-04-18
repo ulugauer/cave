@@ -73,6 +73,15 @@ VulkanTypeConversion::ConvertImageFormatToVulkan(HalImageFormat imageFormat)
 	case HalImageFormat::R32G32B32SFloat:
 		vkImageFormat = VK_FORMAT_R32G32B32_SFLOAT;
 		break;
+	case HalImageFormat::D32SFloat:
+		vkImageFormat = VK_FORMAT_D32_SFLOAT;
+		break;
+	case HalImageFormat::D24UnormS8Uint:
+		vkImageFormat = VK_FORMAT_D24_UNORM_S8_UINT;
+		break;
+	case HalImageFormat::D32SFloatS8Uint:
+		vkImageFormat = VK_FORMAT_D32_SFLOAT_S8_UINT;
+		break;
 	default:
 		vkImageFormat = VK_FORMAT_UNDEFINED;
 		assert(false);
@@ -106,6 +115,15 @@ VulkanTypeConversion::ConvertImageFormatFromVulkan(VkFormat imageFormat)
 		break;
 	case VK_FORMAT_R32G32B32_SFLOAT:
 		format = HalImageFormat::R32G32B32SFloat;
+		break;
+	case VK_FORMAT_D32_SFLOAT:
+		format = HalImageFormat::D32SFloat;
+		break;
+	case VK_FORMAT_D24_UNORM_S8_UINT:
+		format = HalImageFormat::D24UnormS8Uint;
+		break;
+	case VK_FORMAT_D32_SFLOAT_S8_UINT:
+		format = HalImageFormat::D32SFloatS8Uint;
 		break;
 	default:
 		format = HalImageFormat::Undefined;

@@ -421,6 +421,13 @@ public:
 	virtual const HalImageFormat GetSwapChainImageFormat() = 0;
 
 	/**
+	* @brief Get swap depth chain image format
+	*
+	* @return Depth image format
+	*/
+	virtual const HalImageFormat GetSwapChainDepthImageFormat() = 0;
+
+	/**
 	* @brief Get swap chain image count
 	*
 	* @return Image count

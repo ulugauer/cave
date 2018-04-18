@@ -53,6 +53,13 @@ public:
 	/** @brief Destructor */
 	virtual ~HalRenderPass();
 
+	/**
+	* @brief Query attachment count
+	*
+	* @return Number of attachments
+	*/
+	uint32_t GetAttachmentCount() { return _renderPassInfo._attachmentCount; }
+
 private:
 	HalRenderDevice* _pDevice;	///< Pointer to device object
 	HalRenderPassInfo _renderPassInfo;	///< Hal render pass create info

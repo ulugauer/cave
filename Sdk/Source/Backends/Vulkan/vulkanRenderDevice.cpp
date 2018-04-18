@@ -231,6 +231,25 @@ void VulkanRenderDevice::GetPhysicalDeviceMemoryProperties(VkPhysicalDeviceMemor
 	VulkanApi::GetApi()->vkGetPhysicalDeviceMemoryProperties(_pPhysicalDevice->GetPhysicalDeviceHandle(), &deviceMemProperties);
 }
 
+VkFormat VulkanRenderDevice::FindMatchingImageFormat(caveVector<VkFormat>& formats, VkImageTiling tiling, VkFormatFeatureFlags features)
+{
+	for (size_t i = 0; i < formats.Size(); i++)
+	{
+		VkFormatProperties formatProperties;
+		VulkanApi::GetApi()->vkGetPhysicalDeviceFormatProperties(_pPhysicalDevice->GetPhysicalDeviceHandle(), formats[i], &formatProperties);
+
+		if (tiling == VK_IMAGE_TILING_LINEAR && (formatProperties.linearTilingFeatures & features) == features) {
+			return formats[i];
+		}
+		else if (tiling == VK_IMAGE_TILING_OPTIMAL && (formatProperties.optimalTilingFeatures & features) == features) {
+			return formats[i];
+		}
+	}
+
+	// no matching format found
+	return VK_FORMAT_UNDEFINED;
+}
+
 void VulkanRenderDevice::GetApiVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
 {
 	if (!_pPhysicalDevice)
@@ -261,7 +280,7 @@ void VulkanRenderDevice::WaitIdle()
 		VulkanApi::GetApi()->vkDeviceWaitIdle(_vkDevice);
 }
 
-void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
+void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& swapChainInfo)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
 		throw BackendException("Vulkan device not properly setup");
@@ -273,7 +292,7 @@ void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& )
 	if (_pSwapChain)
 		return;
 
-	_pSwapChain = AllocateObject<VulkanSwapChain>(*_pInstance->GetEngineAllocator(), _pInstance, _pPhysicalDevice, this);
+	_pSwapChain = AllocateObject<VulkanSwapChain>(*_pInstance->GetEngineAllocator(), _pInstance, _pPhysicalDevice, this, swapChainInfo);
 
 	// allocate command buffer
 	if (_pSwapChain && _presentQueueCommandPool)
@@ -316,23 +335,26 @@ void VulkanRenderDevice::CreateSwapChainFramebuffers(HalRenderPass* renderPass)
 	VulkanRenderPass* vulkanRenderPass = static_cast<VulkanRenderPass*>(renderPass);
 	VkExtent2D swapChainExtend = _pSwapChain->GetSwapChainImageExtend();
 
+	// We have a max of 2 attachments
+	VkImageView attachments[2];
+	assert(renderPass->GetAttachmentCount() <= 2);
+
 	for (size_t i = 0; i < _presentationFramebuffers.Size(); i++)
 	{
 		// do not create twice
 		if (_presentationFramebuffers[i] != VK_NULL_HANDLE)
 			continue;
 
-		VkImageView attachments[] = 
-		{
-			_pSwapChain->GetSwapChainImageView(i)
-		};
+		attachments[0] = _pSwapChain->GetSwapChainImageView(i);
+		if (renderPass->GetAttachmentCount() > 1)
+			attachments[1] = _pSwapChain->GetSwapChainDepthImageView();
 
 		VkFramebufferCreateInfo framebufferInfo;
 		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		framebufferInfo.pNext = nullptr;
 		framebufferInfo.flags = 0;
 		framebufferInfo.renderPass = vulkanRenderPass->GetRenderPass();
-		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.attachmentCount = renderPass->GetAttachmentCount();
 		framebufferInfo.pAttachments = attachments;
 		framebufferInfo.layers = 1;
 		framebufferInfo.width = swapChainExtend.width;
@@ -351,6 +373,15 @@ const HalImageFormat VulkanRenderDevice::GetSwapChainImageFormat()
 	HalImageFormat format = HalImageFormat::Undefined;
 	if (_pSwapChain)
 		format = VulkanTypeConversion::ConvertImageFormatFromVulkan(_pSwapChain->GetSwapChainImageFormat());
+
+	return format;
+}
+
+const HalImageFormat VulkanRenderDevice::GetSwapChainDepthImageFormat()
+{
+	HalImageFormat format = HalImageFormat::Undefined;
+	if (_pSwapChain)
+		format = VulkanTypeConversion::ConvertImageFormatFromVulkan(_pSwapChain->GetSwapChainDepthImageFormat());
 
 	return format;
 }
@@ -701,15 +732,15 @@ void VulkanRenderDevice::CmdBeginRenderPass(HalCommandBuffer* commandBuffer, Hal
 	// copy clear values
 	caveVector<VkClearValue> vkClearValueArray(_pInstance->GetEngineAllocator());
 	vkClearValueArray.Resize(renderPassBeginInfo._clearValueCount);
-	for (size_t i = 0; i < vkClearValueArray.Size(); ++i)
+	for (size_t i = 0; i < renderPassBeginInfo._clearValueCount; ++i)
 	{
-		vkClearValueArray[i].color.float32[0] = renderPassBeginInfo._clearValues->_color.float32[0];
-		vkClearValueArray[i].color.float32[1] = renderPassBeginInfo._clearValues->_color.float32[1];
-		vkClearValueArray[i].color.float32[2] = renderPassBeginInfo._clearValues->_color.float32[2];
-		vkClearValueArray[i].color.float32[3] = renderPassBeginInfo._clearValues->_color.float32[3];
+		vkClearValueArray[i].color.float32[0] = renderPassBeginInfo._clearValues[i]._color.float32[0];
+		vkClearValueArray[i].color.float32[1] = renderPassBeginInfo._clearValues[i]._color.float32[1];
+		vkClearValueArray[i].color.float32[2] = renderPassBeginInfo._clearValues[i]._color.float32[2];
+		vkClearValueArray[i].color.float32[3] = renderPassBeginInfo._clearValues[i]._color.float32[3];
 
-		vkClearValueArray[i].depthStencil.depth = renderPassBeginInfo._clearValues->_depthStencil._depth;
-		vkClearValueArray[i].depthStencil.stencil = renderPassBeginInfo._clearValues->_depthStencil._stencil;
+		vkClearValueArray[i].depthStencil.depth = renderPassBeginInfo._clearValues[i]._depthStencil._depth;
+		vkClearValueArray[i].depthStencil.stencil = renderPassBeginInfo._clearValues[i]._depthStencil._stencil;
 	}
 	vkRenderPassInfo.pClearValues = vkClearValueArray.Data();
 	VkSubpassContents content = VulkanTypeConversion::ConvertSubpassContentToVulkan(subpass);

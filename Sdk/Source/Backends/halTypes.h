@@ -42,7 +42,10 @@ enum class HalImageFormat
 	B8G8R8A8UNorm = 44,
 	B8G8R8A8SNorm = 50,
 	R32G32SFloat = 103,
-	R32G32B32SFloat = 106
+	R32G32B32SFloat = 106,
+	D32SFloat = 126,
+	D24UnormS8Uint = 129,
+	D32SFloatS8Uint = 130,
 };
 
 /**

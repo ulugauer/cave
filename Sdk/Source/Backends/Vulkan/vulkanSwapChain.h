@@ -47,10 +47,11 @@ public:
 	* @param[in] instance	Pointer to instance
 	* @param[in] physicalDevice	Pointer to physical device
 	* @param[in] renderDevice	Pointer to render device
+	* @param[in] swapChainInfo	Pointer SwapChainInfo struct
 	*
 	*/
 	VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice
-					, VulkanRenderDevice* renderDevice);
+					, VulkanRenderDevice* renderDevice, SwapChainInfo& swapChainInfo);
 
 	/** @brief Destructor */
 	virtual ~VulkanSwapChain();
@@ -77,6 +78,13 @@ public:
 	const VkFormat GetSwapChainImageFormat() const { return _swapChainImageFormat; }
 
 	/**
+	* @brief Get swap image depth format
+	*
+	* @return Image format
+	*/
+	const VkFormat GetSwapChainDepthImageFormat() const { return _swapChainDepthImageFormat; }
+
+	/**
 	* @brief Get swap image view handle
 	*
 	* @param[in] index	Index into image view array
@@ -84,6 +92,13 @@ public:
 	* @return Image view handle or null handle
 	*/
 	const VkImageView GetSwapChainImageView(size_t index) const;
+
+	/**
+	* @brief Get swap depth image view handle
+	*
+	* @return Image view handle or null handle
+	*/
+	const VkImageView GetSwapChainDepthImageView() const;
 
 	/**
 	* @brief Get next available swap chain image
@@ -139,6 +154,17 @@ private:
 	*
 	*/
 	void CreateImageViews();
+
+	/**
+	* @brief Create depth buffer resource
+	* 
+	* This functions allocates everything need for using depth buffering.
+	* E.g a vkImage, vkImageView, memory
+	*
+	* @param[in] depthBits		Requested depth bits
+	* @param[in] stencilBits	Requested stencil bits
+	*/
+	void CreateDepthResource(uint32_t depthBits, uint32_t StencilBits);
 
 	/**
 	* @brief Create swap presentsation semaphores
@@ -211,6 +237,10 @@ private:
 	caveVector<VkImageView> _swapChainImageViewVector; ///< Array of generated swap images views
 	uint32_t _imageIndex;	///< Current used image index
 	VkFormat _swapChainImageFormat;	///< The chosen image format
+	VkFormat _swapChainDepthImageFormat;	///< The chosen depth image format
+	VkImage _swapChainDepthImage;	/// swap chain depth image
+	VkDeviceMemory _swapChainDepthImageMemory;	///< swap chain depth image memory
+	VkImageView _swapChainDepthImageView;	/// swap chain depth image view
 	VkExtent2D _swapChainExtent;	///< The current extend
 	VkSemaphore _ImageAvailableSemaphore; ///< Next image available semaphore
 	VkSemaphore _RenderingFinishedSemaphore; ///< Rendering done semaphore

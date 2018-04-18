@@ -147,6 +147,13 @@ public:
 	const HalImageFormat GetSwapChainImageFormat();
 
 	/**
+	* @brief Get swap chain depth image format
+	*
+	* @return Image format
+	*/
+	const HalImageFormat GetSwapChainDepthImageFormat();
+
+	/**
 	* @brief Get swap chain image count
 	*
 	* @return Image count

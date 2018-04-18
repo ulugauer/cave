@@ -25,6 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderLayerSection.h"
 #include "Render/renderGraphicsPipeline.h"
 #include "Render/renderCommandBuffer.h"
+#include "Render/renderCommandPool.h"
+#include "Render/renderDescriptorSet.h"
 
 #include <iostream>		// includes exception handling
 #include <memory>

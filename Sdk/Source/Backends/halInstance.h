@@ -83,8 +83,9 @@ typedef struct SwapChainInfo
 {
 	uint32_t surfaceWidth;	///< Surface width
 	uint32_t surfaceHeight;	///< Surface height
-	uint32_t colorBits;		///< Amount of total colorbits (24, 32)
-	uint32_t depthBits;		///< Amount of total depthbits (24, 32)
+	uint32_t colorBits;		///< Amount of total color bits (24, 32)
+	uint32_t depthBits;		///< Amount of total depth bits (24, 32)
+	uint32_t stencilBits;	///< Amount of total stencil bits (0, 8)
 	bool fullscreen;	///< Create fullscreen window
 	bool offscreen;	///< We do not render to a window
 #ifdef VK_USE_PLATFORM_WIN32_KHR

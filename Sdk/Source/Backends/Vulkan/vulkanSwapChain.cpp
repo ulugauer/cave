@@ -27,7 +27,7 @@ namespace cave
 {
 
 VulkanSwapChain::VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice
-								, VulkanRenderDevice* renderDevice)
+	, VulkanRenderDevice* renderDevice, SwapChainInfo& swapChainInfo)
 	: _pInstance(instance)
 	, _pPhysicalDevice(physicalDevice)
 	, _pRenderDevice(renderDevice)
@@ -35,11 +35,17 @@ VulkanSwapChain::VulkanSwapChain(VulkanInstance* instance, VulkanPhysicalDevice*
 	, _swapChainImageVector(instance->GetEngineAllocator())
 	, _swapChainImageViewVector(instance->GetEngineAllocator())
 	, _imageIndex(0)
+	, _swapChainImageFormat(VK_FORMAT_UNDEFINED)
+	, _swapChainDepthImageFormat(VK_FORMAT_UNDEFINED)
+	, _swapChainDepthImage(VK_NULL_HANDLE)
+	, _swapChainDepthImageMemory(VK_NULL_HANDLE)
+	, _swapChainDepthImageView(VK_NULL_HANDLE)
 	, _ImageAvailableSemaphore(VK_NULL_HANDLE)
 	, _RenderingFinishedSemaphore(VK_NULL_HANDLE)
 {
 	CreateSwapChain();
 	CreateImageViews();
+	CreateDepthResource(swapChainInfo.depthBits, swapChainInfo.stencilBits);
 	CreatePresentationSemaphores();
 }
 
@@ -55,6 +61,15 @@ VulkanSwapChain::~VulkanSwapChain()
 
 	_swapChainImageViewVector.Clear();
 	_swapChainImageVector.Clear();
+
+	if (_swapChainDepthImageView != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkDestroyImageView(_pRenderDevice->GetDeviceHandle(), _swapChainDepthImageView, nullptr);
+
+	if (_swapChainDepthImage != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkDestroyImage(_pRenderDevice->GetDeviceHandle(), _swapChainDepthImage, nullptr);
+
+	if (_swapChainDepthImageMemory != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkFreeMemory(_pRenderDevice->GetDeviceHandle(), _swapChainDepthImageMemory, nullptr);
 
 	if (_ImageAvailableSemaphore)
 		VulkanApi::GetApi()->vkDestroySemaphore(_pRenderDevice->GetDeviceHandle(), _ImageAvailableSemaphore, nullptr);
@@ -172,6 +187,88 @@ void VulkanSwapChain::CreateImageViews()
 	}
 }
 
+void VulkanSwapChain::CreateDepthResource(uint32_t depthBits, uint32_t StencilBits)
+{
+	// Check if we are required to allocate depth resource
+	if (depthBits == 0)
+		return; // We do not support stencil only
+
+	// 1. Select and find matching format in order
+	caveVector<VkFormat> formats(_pInstance->GetEngineAllocator());
+	if (depthBits == 32 && StencilBits == 8)
+	{
+		formats.Push(VK_FORMAT_D32_SFLOAT_S8_UINT);
+		formats.Push(VK_FORMAT_D24_UNORM_S8_UINT);
+		formats.Push(VK_FORMAT_D32_SFLOAT);
+	}
+	if (depthBits == 32)
+	{
+		formats.Push(VK_FORMAT_D32_SFLOAT);
+		formats.Push(VK_FORMAT_D32_SFLOAT_S8_UINT);
+		formats.Push(VK_FORMAT_D24_UNORM_S8_UINT);
+	}
+	if (depthBits == 24)
+	{
+		formats.Push(VK_FORMAT_D24_UNORM_S8_UINT);
+		formats.Push(VK_FORMAT_D32_SFLOAT_S8_UINT);
+		formats.Push(VK_FORMAT_D32_SFLOAT);
+	}
+
+	_swapChainDepthImageFormat = _pRenderDevice->FindMatchingImageFormat(formats, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+
+	if (_swapChainDepthImageFormat == VK_FORMAT_UNDEFINED)
+		throw BackendException("Error image depth format not supported");
+
+	// 2. Create image
+	VkImageCreateInfo imageInfo = {};
+	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageInfo.imageType = VK_IMAGE_TYPE_2D;
+	imageInfo.extent.width = _swapChainExtent.width;
+	imageInfo.extent.height = _swapChainExtent.height;
+	imageInfo.extent.depth = 1;
+	imageInfo.mipLevels = 1;
+	imageInfo.arrayLayers = 1;
+	imageInfo.format = _swapChainDepthImageFormat;
+	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (VulkanApi::GetApi()->vkCreateImage(_pRenderDevice->GetDeviceHandle(), &imageInfo, nullptr, &_swapChainDepthImage) != VK_SUCCESS)
+		throw BackendException("Error creating swapchain depthimage!");
+
+	VkMemoryRequirements memRequirements;
+	VulkanApi::GetApi()->vkGetImageMemoryRequirements(_pRenderDevice->GetDeviceHandle(), _swapChainDepthImage, &memRequirements);
+
+	VulkanMemoryManager* memManager = _pRenderDevice->GetMemoryManager();
+
+	VkMemoryAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = memManager->ChooseMemoryType(memRequirements, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+	if (VulkanApi::GetApi()->vkAllocateMemory(_pRenderDevice->GetDeviceHandle(), &allocInfo, nullptr, &_swapChainDepthImageMemory) != VK_SUCCESS)
+		throw BackendException("Error allocating depth image memory!");
+
+	VulkanApi::GetApi()->vkBindImageMemory(_pRenderDevice->GetDeviceHandle(), _swapChainDepthImage, _swapChainDepthImageMemory, 0);
+
+	// 3. Create depth image view
+	VkImageViewCreateInfo viewInfo = {};
+	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	viewInfo.image = _swapChainDepthImage;
+	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	viewInfo.format = _swapChainDepthImageFormat;
+	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+	viewInfo.subresourceRange.baseMipLevel = 0;
+	viewInfo.subresourceRange.levelCount = 1;
+	viewInfo.subresourceRange.baseArrayLayer = 0;
+	viewInfo.subresourceRange.layerCount = 1;
+
+	if (VulkanApi::GetApi()->vkCreateImageView(_pRenderDevice->GetDeviceHandle(), &viewInfo, nullptr, &_swapChainDepthImageView) != VK_SUCCESS) 
+		throw BackendException("Error creating swapchain depth image view!");
+}
+
 void VulkanSwapChain::CreatePresentationSemaphores()
 {
 	VkSemaphoreCreateInfo semaphoreCreateInfo = {};
@@ -196,6 +293,11 @@ const VkImageView VulkanSwapChain::GetSwapChainImageView(size_t index) const
 	}
 
 	return imageView;
+}
+
+const VkImageView VulkanSwapChain::GetSwapChainDepthImageView() const
+{
+	return _swapChainDepthImageView;
 }
 
 uint32_t VulkanSwapChain::GetSwapChainNumImages(VkSurfaceCapabilitiesKHR &surfaceCapabilities)

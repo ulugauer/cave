@@ -19,8 +19,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "engineInstance.h"
 #include "engineError.h"
-#include "Render/renderCommandPool.h"
-#include "Render/renderDescriptorSet.h"
 #include "Math/vector4.h"
 #include "Math/matrix4.h"
 
@@ -100,7 +98,9 @@ bool CaveSanityTestUniformBuffer::Run(RenderDevice *device, RenderCommandPool* c
 	// start command buffer recording
 	HalCommandBufferBeginInfo beginInfo; // always the same here
 	beginInfo._flags = static_cast<uint32_t>(HalCommandBufferUsage::SimultaneousUse);
-	HalClearValue clearValues = { 0.0f, 0.0f, 0.0f, 1.0f };
+	HalClearValue clearValues[2];
+	clearValues[0]._color = { 0.0f, 0.0f, 0.0f, 1.0f };
+	clearValues[1]._depthStencil = { 1.0f, 0 };
 	HalRect2D renderArea;
 	renderArea._x = 0; renderArea._y = 0;
 	renderArea._height = pUserData->winHeight;
@@ -112,8 +112,8 @@ bool CaveSanityTestUniformBuffer::Run(RenderDevice *device, RenderCommandPool* c
 		RenderCmdRenderPassInfo renderPassBeginInfo;
 		renderPassBeginInfo._renderPass = renderPass;
 		renderPassBeginInfo._swapChainIndex = static_cast<int32_t>(i); ///< fetch framebuffer from swap chain
-		renderPassBeginInfo._clearValueCount = 1;
-		renderPassBeginInfo._clearValues = &clearValues;
+		renderPassBeginInfo._clearValueCount = 2;
+		renderPassBeginInfo._clearValues = clearValues;
 		renderPassBeginInfo._renderRect = renderArea;
 		device->CmdBeginRenderPass(_commandBuffers[i], renderPassBeginInfo, HalSubpassContents::Inline);
 		device->CmdBindGraphicsPipeline(_commandBuffers[i], _graphicsPipeline);
@@ -557,7 +557,7 @@ void CaveSanityTestUniformBuffer::CreateGraphicsPipeline(cave::RenderDevice *dev
 	grpahicsPipelineInfo._viewport = _layerSection->GetViewport();
 	grpahicsPipelineInfo._raterizer = _rasterizerState;
 	grpahicsPipelineInfo._multisample = _multisampleState;
-	grpahicsPipelineInfo._depthStencil = nullptr;
+	grpahicsPipelineInfo._depthStencil = _depthStencilState;
 	grpahicsPipelineInfo._colorBlend = _colorBlendState;
 	grpahicsPipelineInfo._dynamicState = nullptr;
 	grpahicsPipelineInfo._layout = _pipelineLayout;

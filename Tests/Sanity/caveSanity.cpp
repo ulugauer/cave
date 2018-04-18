@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Base/caveSanityTestDeviceVbo.h"
 #include "Base/caveSanityTestIndexBuffer.h"
 #include "Base/caveSanityTestUniformBuffer.h"
+#include "Base/caveSanityTestDepth.h"
 
 #include <iostream>
 #include <sstream>
@@ -232,6 +233,7 @@ int main(int argc, char* argv[])
 	windowInfo.offscreen = false;
 	windowInfo.colorBits = 32;
 	windowInfo.depthBits = 24;
+	windowInfo.stencilBits = 8;
 	windowInfo.windowTitle = "caveSanity";
 
 	try
@@ -284,22 +286,40 @@ int main(int argc, char* argv[])
 
 	// Right now we need a common render pass for all tests.
 	// This will change one we can do offscreen rendering.
-	HalRenderPassAttachment renderAttachment;
-	renderAttachment._format = renderDevice->GetSwapChainImageFormat();
-	renderAttachment._samples = HalSampleCount::SampleCount1;
-	renderAttachment._loadOp = HalAttachmentLoadOperation::Clear;
-	renderAttachment._storeOp = HalAttachmentStoreOperation::Store;
-	renderAttachment._loadStencilOp = HalAttachmentLoadOperation::DontCare;
-	renderAttachment._storeStencilOp = HalAttachmentStoreOperation::DontCare;
-	renderAttachment._initialLayout = HalImageLayout::Undefined;
-	renderAttachment._finalLayout = HalImageLayout::PresentSrcKHR;
-	HalAttachmentReference attachRef;
-	attachRef._attachment = 0;
-	attachRef._layout = HalImageLayout::ColorAttachment;
+	HalRenderPassAttachment renderAttachments[2];
+	renderAttachments[0]._format = renderDevice->GetSwapChainImageFormat();
+	renderAttachments[0]._samples = HalSampleCount::SampleCount1;
+	renderAttachments[0]._loadOp = HalAttachmentLoadOperation::Clear;
+	renderAttachments[0]._storeOp = HalAttachmentStoreOperation::Store;
+	renderAttachments[0]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
+	renderAttachments[0]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
+	renderAttachments[0]._initialLayout = HalImageLayout::Undefined;
+	renderAttachments[0]._finalLayout = HalImageLayout::PresentSrcKHR;
+
+	HalAttachmentReference colorAttachRef;
+	colorAttachRef._attachment = 0;
+	colorAttachRef._layout = HalImageLayout::ColorAttachment;
+
+	// depth attachment
+	renderAttachments[1]._format = renderDevice->GetSwapChainDepthImageFormat();
+	renderAttachments[1]._samples = HalSampleCount::SampleCount1;
+	renderAttachments[1]._loadOp = HalAttachmentLoadOperation::Clear;
+	renderAttachments[1]._storeOp = HalAttachmentStoreOperation::DontCare;
+	renderAttachments[1]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
+	renderAttachments[1]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
+	renderAttachments[1]._initialLayout = HalImageLayout::Undefined;
+	renderAttachments[1]._finalLayout = HalImageLayout::DepthStencilAttachment;
+
+	HalAttachmentReference depthAttachRef;
+	depthAttachRef._attachment = 1;
+	depthAttachRef._layout = HalImageLayout::DepthStencilAttachment;
+
 	HalSubpassDescription subpassDesc;
 	subpassDesc._pipelineBindPoint = HalPipelineBindPoints::Graphics;
 	subpassDesc._colorAttachmentCount = 1;
-	subpassDesc._pColorAttachments = &attachRef;
+	subpassDesc._pColorAttachments = &colorAttachRef;
+	subpassDesc._pDepthStencilAttachment = &depthAttachRef;
+
 	HalSubpassDependency dependency;
 	dependency._srcSubpass = HAL_SUBPASS_EXTERNAL;	// special subpass
 	dependency._dstSubpass = 0;	// our subpass
@@ -308,9 +328,10 @@ int main(int argc, char* argv[])
 	dependency._dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
 	dependency._dstAccessMask = HalAccessBits::ColorAttachmentRead | HalAccessBits::ColorAttachmentWrite;
 	dependency._dependencyFlags = static_cast<HalDependencyFlags>(HalDependencyBits::DependencyNone);
+
 	HalRenderPassInfo renderPassInfo;
-	renderPassInfo._attachmentCount = 1;
-	renderPassInfo._pAttachments = &renderAttachment;
+	renderPassInfo._attachmentCount = 2;
+	renderPassInfo._pAttachments = renderAttachments;
 	renderPassInfo._subpassCount = 1;
 	renderPassInfo._pSubpasses = &subpassDesc;
 	renderPassInfo._dependencyCount = 1;

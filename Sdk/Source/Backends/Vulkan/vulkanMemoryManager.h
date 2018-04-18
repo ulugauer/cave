@@ -187,7 +187,6 @@ public:
 	*/
 	void WaitForCopies();
 
-private:
 	/**
 	* @brief Select memory type from property flags
 	*
@@ -197,6 +196,8 @@ private:
 	* return index into memory type array
 	*/
 	uint32_t ChooseMemoryType(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties);
+
+private:
 
 	/**
 	* @brief Allocate host visible memory for memory copy

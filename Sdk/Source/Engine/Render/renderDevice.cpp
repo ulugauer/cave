@@ -51,6 +51,7 @@ RenderDevice::RenderDevice(RenderInstance* renderInstance, HalInstance* halInsta
 	// first copy data
 	_swapChainInfo.colorBits = windowInfo.colorBits;
 	_swapChainInfo.depthBits = windowInfo.depthBits;
+	_swapChainInfo.stencilBits = windowInfo.stencilBits;
 	_swapChainInfo.fullscreen = windowInfo.fullscreen;
 	_swapChainInfo.offscreen = windowInfo.offscreen;
 	_swapChainInfo.surfaceHeight = windowInfo.windowHeight;
@@ -167,6 +168,15 @@ const HalImageFormat RenderDevice::GetSwapChainImageFormat()
 	HalImageFormat format = HalImageFormat::Undefined;
 	if (_pHalRenderDevice)
 		format = _pHalRenderDevice->GetSwapChainImageFormat();
+
+	return format;
+}
+
+const HalImageFormat RenderDevice::GetSwapChainDepthImageFormat()
+{
+	HalImageFormat format = HalImageFormat::Undefined;
+	if (_pHalRenderDevice)
+		format = _pHalRenderDevice->GetSwapChainDepthImageFormat();
 
 	return format;
 }

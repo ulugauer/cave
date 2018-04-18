@@ -57,6 +57,7 @@ VulkanDepthStencil::VulkanDepthStencil(VulkanRenderDevice* device, HalDepthStenc
 	_depthStencilStateInfo.depthBoundsTestEnable = depthStencilSetup._depthBoundsTestEnable;
 	_depthStencilStateInfo.minDepthBounds = depthStencilSetup._minDepthBounds;
 	_depthStencilStateInfo.maxDepthBounds = depthStencilSetup._maxDepthBounds;
+	_depthStencilStateInfo.stencilTestEnable = depthStencilSetup._stencilTestEnable;
 	GetStencilState(depthStencilSetup._front, _depthStencilStateInfo.front);
 	GetStencilState(depthStencilSetup._back, _depthStencilStateInfo.back);
 }

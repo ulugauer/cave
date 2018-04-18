@@ -77,6 +77,17 @@ public:
 	void GetPhysicalDeviceMemoryProperties(VkPhysicalDeviceMemoryProperties& deviceMemProperties);
 
 	/**
+	* @brief Query physical device memory proeprties
+	*
+	* @param[in] formats	List of formats we are looking for
+	* @param[in] tiling		Requested tiling mode
+	* @param[in] features	Requested format features
+	*
+	* @return matching image format or undefined format
+	*/
+	VkFormat FindMatchingImageFormat(caveVector<VkFormat>& formats, VkImageTiling tiling, VkFormatFeatureFlags features);
+
+	/**
 	* @brief Query API version number
 	*
 	* @param[out] major		Major API version number
@@ -426,6 +437,13 @@ public:
 	* @return Image format
 	*/
 	const HalImageFormat GetSwapChainImageFormat() override;
+
+	/**
+	* @brief Get swap depth chain image format
+	*
+	* @return Depth image format
+	*/
+	const HalImageFormat GetSwapChainDepthImageFormat() override;
 
 	/**
 	* @brief Get swap chain image count
