@@ -75,6 +75,15 @@ public:
 	}
 
 	/**
+	* @brief Query device capabilities
+	*
+	* @param[in] cap		Capability to query
+	*
+	* @return true if supported
+	*/
+	bool GetDeviceCap(HalExtensionCaps cap);
+
+	/**
 	* @brief Query API version number
 	*
 	* @param[out] major		Major API version number
@@ -473,6 +482,9 @@ public:
 
 private:
 	HalInstance* _pInstance;	///< Pointer to instance object
+
+protected:
+	HalDeviceExtensions _deviceExtensions; ///< Supported extesnion by this device
 };
 
 }

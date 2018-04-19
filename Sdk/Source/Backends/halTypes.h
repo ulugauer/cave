@@ -32,6 +32,15 @@ namespace cave
 #define HAL_WHOLE_SIZE					(~0ULL)	///< Special value for memory size
 
 /**
+*  @brief A strongly typed enum class representing device extension queries
+*/
+enum class HalExtensionCaps
+{
+	SwapChainSupport = 0,		///< Device supports swap chains
+	DirectGLSL = 1,				///< Device supports GLSL shaders (vulkan only)
+};
+
+/**
 *  @brief A strongly typed enum class representing image formts
 */
 enum class HalImageFormat
@@ -514,6 +523,24 @@ enum class HalSubpassContents
 	Inline = 0,					// render pass commands are in primary command buffer
 	SecondarCommandBuffer = 1	// render pass command are in secondary command buffer
 };
+
+/**
+* @brief Structure for device capabilities
+*/
+struct CAVE_INTERFACE HalDeviceExtensions
+{
+	union
+	{
+		struct {
+			bool bSwapChainSupport : 1;		///< swap chain support
+			bool bGLSLSupport : 1;			///< GLSL shader supported (Vulkan only)
+		} bits;
+
+		uint32_t u32Values;
+	} caps;
+};
+
+
 
 /**
 * @brief Rasterizer state setup

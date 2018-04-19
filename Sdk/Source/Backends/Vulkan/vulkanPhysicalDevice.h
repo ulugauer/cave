@@ -72,6 +72,14 @@ public:
 	VkPhysicalDevice GetPhysicalDeviceHandle() { return _vkPhysicalDevice; }
 
 	/**
+	* @brief Query the phyiscal device extension and fill in struct
+	*
+	* @param deviceExtensionsCaps	Pointer to HalDeviceExtensions struct
+	*
+	*/
+	void SetupPhysicalDeviceExtension(HalDeviceExtensions& deviceExtensionsCaps);
+
+	/**
 	* @brief Check if this physical device supportes the
 	*		 requested queues.
 	*

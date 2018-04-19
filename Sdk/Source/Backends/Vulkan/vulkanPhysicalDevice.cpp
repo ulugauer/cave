@@ -79,6 +79,30 @@ void VulkanPhysicalDevice::SetPhysicalDeviceHandle(std::shared_ptr<AllocatorBase
 	}
 }
 
+void VulkanPhysicalDevice::SetupPhysicalDeviceExtension(HalDeviceExtensions& deviceExtensionsCaps)
+{
+	uint32_t deviceExtensionCount = 0;
+	if (VulkanApi::GetApi()->vkEnumerateDeviceExtensionProperties(_vkPhysicalDevice, nullptr, &deviceExtensionCount, nullptr) != VK_SUCCESS)
+	{
+		return;
+	}
+	std::vector<VkExtensionProperties> deviceExtensions(deviceExtensionCount);
+	if (VulkanApi::GetApi()->vkEnumerateDeviceExtensionProperties(_vkPhysicalDevice, nullptr, &deviceExtensionCount, &deviceExtensions[0]) != VK_SUCCESS)
+	{
+		return;
+	}
+
+	// A list of extension we currently looking for
+	if (CheckExtensionAvailability(VK_KHR_SWAPCHAIN_EXTENSION_NAME, deviceExtensions))
+	{
+		deviceExtensionsCaps.caps.bits.bSwapChainSupport = true;
+	}
+	if (CheckExtensionAvailability(VK_NV_GLSL_SHADER_EXTENSION_NAME, deviceExtensions))
+	{
+		deviceExtensionsCaps.caps.bits.bGLSLSupport = true;
+	}
+}
+
 void VulkanPhysicalDevice::GetApiVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
 {
 	major = VK_VERSION_MAJOR(_physicalDeviceProperties.apiVersion);

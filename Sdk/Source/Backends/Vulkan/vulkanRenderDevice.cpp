@@ -83,9 +83,11 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	}
 
 
-	// extensions
+	// setup extensions
+	physicalDevice->SetupPhysicalDeviceExtension(_deviceExtensions);
+
 	std::vector<const char*> extensions;
-	if (surface && physicalDevice->HasSwapChainSupport())
+	if (surface && _deviceExtensions.caps.bits.bSwapChainSupport)
 	{
 		extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
