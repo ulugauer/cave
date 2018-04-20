@@ -32,7 +32,7 @@ namespace cave
 * @brief Vector 3 implementation
 */
 template<typename T>
-class CAVE_INTERFACE Vector3
+class Vector3
 {
 public:
 	T _x;	///< x componente
@@ -91,7 +91,7 @@ public:
 	/** operator scalar div */
 	Vector3<T> operator/(T s) const
 	{
-		T inverseS = 1.0 / s;
+		T inverseS = 1 / s;
 		return Vector3<T>(_x*inverseS, _y*inverseS, _z*inverseS);
 	}
 
@@ -101,7 +101,7 @@ public:
 		T magSquared = _x*_x + _y*_y + _z*_z;
 		if (magSquared > 0)
 		{
-			T inverseMag = 1.0 / std::sqrt(magSquared);
+			T inverseMag = 1 / std::sqrt(magSquared);
 			_x *= inverseMag;
 			_y *= inverseMag;
 			_z *= inverseMag;
@@ -112,6 +112,53 @@ public:
 
 typedef Vector3<float> Vector3f;	///< type specialization
 typedef Vector3<double> Vector3d;	///< type specialization
+
+/**
+* @brief normalize a vector
+*
+* @param vec	vector to normalize
+*
+* @result return normalized vector
+*/
+template<typename T>
+inline Vector3<T> Normalize(const Vector3<T>& vec)
+{
+	Vector3<T> res(vec);
+	res.Normalize();
+	return res;
+}
+
+/**
+* @brief cross product of a x b
+*
+* @param a	vector a
+* @param b	vector b
+*
+* @result return cross product vector
+*/
+template<typename T>
+inline Vector3<T> CrossProduct(const Vector3<T>& a , const Vector3<T>& b)
+{
+	Vector3<T> res;
+	res._x = a._y*b._z - a._z*b._y;
+	res._y = a._z*b._x - a._x*b._z;
+	res._z = a._x*b._y - a._y*b._x;
+	return res;
+}
+
+/**
+* @brief dot product of a x b
+*
+* @param a	vector a
+* @param b	vector b
+*
+* @result return dot product value
+*/
+template<typename T>
+inline T DotProduct(const Vector3<T>& a, const Vector3<T>& b)
+{
+	return a._x*b._x + a._y*b._y + a._z*b._z;
+}
 
 /**
 * @brief Compute vector magniture (specialized template)

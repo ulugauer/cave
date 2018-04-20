@@ -46,7 +46,7 @@ VulkanPipelineLayout::VulkanPipelineLayout(VulkanRenderDevice* device
 			assert((pushConstants[i]._size % 4) == 0);
 			assert((pushConstants[i]._offset % 4) == 0);
 			VkPushConstantRange constantRange;
-			constantRange.stageFlags = VulkanTypeConversion::ConvertBlendOpToVulkan(pushConstants[i]._shaderStagesFlags);
+			constantRange.stageFlags = VulkanTypeConversion::ConvertShaderStagesToVulkan(pushConstants[i]._shaderStagesFlags);
 			constantRange.offset = pushConstants[i]._offset;
 			constantRange.size = pushConstants[i]._size;
 			_vkPushConstantRange.Push(constantRange);

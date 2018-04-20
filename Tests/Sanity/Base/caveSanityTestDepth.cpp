@@ -487,7 +487,7 @@ void CaveSanityTestDepth::CreateUniformBuffer(cave::RenderDevice *device)
 	XTransform XForm;
 	XForm.model.SetIdentity();
 	XForm.view.SetIdentity();
-	XForm.proj = Ortho<float>(4, 4, 1, 10);
+	XForm.proj = OrthoLH<float>(4, 4, 0, 10);
 
 	Matrix4f res = XForm.model * XForm.view;
 

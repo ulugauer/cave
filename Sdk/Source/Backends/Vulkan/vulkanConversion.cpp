@@ -556,7 +556,7 @@ VulkanTypeConversion::ConvertDynamicStateToVulkan(HalDynamicStates state)
 }
 
 VkShaderStageFlags 
-VulkanTypeConversion::ConvertBlendOpToVulkan(HalShaderStagesFlags flags)
+VulkanTypeConversion::ConvertShaderStagesToVulkan(HalShaderStagesFlags flags)
 {
 	VkShaderStageFlags shaderStageFlags = 0;
 

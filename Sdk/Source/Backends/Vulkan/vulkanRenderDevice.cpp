@@ -808,6 +808,18 @@ void VulkanRenderDevice::CmdBindDescriptorSets(HalCommandBuffer* commandBuffer, 
 		, firstSet, descriptorSetCount, vkDescriptorSets.Data(), dynamicOffsetCount, dynamicOffsets);
 }
 
+void VulkanRenderDevice::CmdPushConstants(HalCommandBuffer* commandBuffer, HalPipelineLayout* layout
+	, HalShaderStagesFlags shaderStagesFlags, uint32_t offset, uint32_t size, const void* pData)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return;
+
+	VulkanApi::GetApi()->vkCmdPushConstants(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer()
+		, static_cast<VulkanPipelineLayout*>(layout)->GetPipelineLayout()
+		, VulkanTypeConversion::ConvertShaderStagesToVulkan(shaderStagesFlags)
+		, offset, size, pData);
+}
+
 void VulkanRenderDevice::CmdBindIndexBuffer(HalCommandBuffer* commandBuffer
 	, HalBuffer* indexBuffer, const uint64_t offset, HalIndexType indexType)
 {

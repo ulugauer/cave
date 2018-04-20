@@ -12,10 +12,10 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file caveSanityTestUniformBuffer.cpp
-///       Draw simple index quad with device index buffer and vertex buffer
+/// @file caveSanityTestPushConstants.cpp
+///       Draw simple indexed quad transformed by a data stored in push constants
 
-#include "caveSanityTestUniformBuffer.h"
+#include "caveSanityTestPushConstants.h"
 
 #include "engineInstance.h"
 #include "engineError.h"
@@ -28,12 +28,16 @@ using namespace cave;
 
 typedef struct UniformBufferObject
 {
-	Matrix4f model;
-	Matrix4f view;
 	Matrix4f proj;
 }XTransform;
 
-CaveSanityTestUniformBuffer::CaveSanityTestUniformBuffer()
+typedef struct PushConstantObject
+{
+	Matrix4f model;
+	Matrix4f view;
+}XObjectTransform;
+
+CaveSanityTestPushConstansts::CaveSanityTestPushConstansts()
 	: _material(nullptr)
 	, _layerSection(nullptr)
 	, _inputAssembly(nullptr)
@@ -56,17 +60,17 @@ CaveSanityTestUniformBuffer::CaveSanityTestUniformBuffer()
 
 }
 
-CaveSanityTestUniformBuffer::~CaveSanityTestUniformBuffer()
+CaveSanityTestPushConstansts::~CaveSanityTestPushConstansts()
 {
 
 }
 
-bool CaveSanityTestUniformBuffer::IsSupported(RenderDevice*)
+bool CaveSanityTestPushConstansts::IsSupported(RenderDevice*)
 {
 	return true;
 }
 
-bool CaveSanityTestUniformBuffer::Run(RenderDevice *device, RenderCommandPool* commandPool, cave::RenderPass* renderPass, userContextData* pUserData)
+bool CaveSanityTestPushConstansts::Run(RenderDevice *device, RenderCommandPool* commandPool, cave::RenderPass* renderPass, userContextData* pUserData)
 {
 	try
 	{
@@ -124,6 +128,12 @@ bool CaveSanityTestUniformBuffer::Run(RenderDevice *device, RenderCommandPool* c
 		device->CmdBindVertexBuffers(_commandBuffers[i], _vertexInput->GetBaseBinding(), _vertexInput->GetBindingCount(), vertexBuffers, offsets);
 		device->CmdBindIndexBuffer(_commandBuffers[i], _indexBuffer, 0, _indexBuffer->GetIndexType());
 
+		XObjectTransform objectTransform;
+		objectTransform.model = Translation(0.5f, 0.5f, 3.0f);
+		objectTransform.view.SetIdentity();
+		device->CmdPushConstants(_commandBuffers[i], _pipelineLayout, static_cast<HalShaderStagesFlags>(HalShaderStages::Vertex)
+			, 0, sizeof(objectTransform), &objectTransform);
+
 		device->CmdBindDescriptorSets(_commandBuffers[i], HalPipelineBindPoints::Graphics, _pipelineLayout, 0, 1, &_descriptorSet, 0, nullptr);
 
 		device->CmdDrawIndexed(_commandBuffers[i], _indexBuffer->GetIndexCount(), 1, 0, 0, 0);
@@ -141,7 +151,7 @@ bool CaveSanityTestUniformBuffer::Run(RenderDevice *device, RenderCommandPool* c
 	return true;
 }
 
-void CaveSanityTestUniformBuffer::Cleanup(RenderDevice *device, userContextData*)
+void CaveSanityTestPushConstansts::Cleanup(RenderDevice *device, userContextData*)
 {
 	// before we cleanup make sure everything is processed
 	device->WaitIdle();
@@ -195,7 +205,7 @@ void CaveSanityTestUniformBuffer::Cleanup(RenderDevice *device, userContextData*
 		DeallocateDelete(*device->GetEngineAllocator(), *_material);
 }
 
-bool CaveSanityTestUniformBuffer::RunPerformance(RenderDevice*, userContextData*)
+bool CaveSanityTestPushConstansts::RunPerformance(RenderDevice*, userContextData*)
 {
 	return true;
 }
@@ -204,17 +214,17 @@ bool CaveSanityTestUniformBuffer::RunPerformance(RenderDevice*, userContextData*
 // Setup functions
 //-----------------------------------------------------------------------------
 
-void CaveSanityTestUniformBuffer::LoadResource(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::LoadResource(cave::RenderDevice *device)
 {
 	_material = AllocateObject<RenderMaterial>(*device->GetEngineAllocator(), *device);
 	ResourceManager& rm = device->GetResourceManager();
-	*_material = rm.LoadMaterialAsset("CaveSanityTestUniformBuffer.asset");
+	*_material = rm.LoadMaterialAsset("CaveSanityTestPushConstants.asset");
 
 	if (!_material || _material->GetStageCount() == 0)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to load material");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to load material");
 }
 
-void CaveSanityTestUniformBuffer::CreateRenderSection(RenderDevice *device, userContextData* pUserData)
+void CaveSanityTestPushConstansts::CreateRenderSection(RenderDevice *device, userContextData* pUserData)
 {
 	// Render section
 	RenderLayerSectionInfo sectionInfo;
@@ -224,10 +234,10 @@ void CaveSanityTestUniformBuffer::CreateRenderSection(RenderDevice *device, user
 	_layerSection = device->CreateLayerSection(sectionInfo);
 
 	if (!_layerSection)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create layer section");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create layer section");
 }
 
-void CaveSanityTestUniformBuffer::CreateVertexSetup(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateVertexSetup(cave::RenderDevice *device)
 {
 	// Vertex setup
 	HalVertexInputBindingDescription bindingDesc;
@@ -261,10 +271,10 @@ void CaveSanityTestUniformBuffer::CreateVertexSetup(cave::RenderDevice *device)
 	_inputAssembly = device->CreateInputAssembly(inputAssemblyInfo);
 
 	if (!_vertexInput || !_inputAssembly)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create vertex setup");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create vertex setup");
 }
 
-void CaveSanityTestUniformBuffer::CreateRasterizerState(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateRasterizerState(cave::RenderDevice *device)
 {
 	// rasterizer state
 	HalRasterizerSetup rasterizerInfo;
@@ -272,30 +282,30 @@ void CaveSanityTestUniformBuffer::CreateRasterizerState(cave::RenderDevice *devi
 	_rasterizerState = device->CreateRasterizerState(rasterizerInfo);
 
 	if (!_rasterizerState)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create rasterizer state");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create rasterizer state");
 }
 
-void CaveSanityTestUniformBuffer::CreateMultisampleState(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateMultisampleState(cave::RenderDevice *device)
 {
 	// multisample state
 	HalMultisampleState multisampleInfo;
 	_multisampleState = device->CreateMultisampleState(multisampleInfo);
 
 	if (!_multisampleState)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create multisample state");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create multisample state");
 }
 
-void CaveSanityTestUniformBuffer::CreateDepthStencilState(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateDepthStencilState(cave::RenderDevice *device)
 {
 	// depth stencil state
 	HalDepthStencilSetup depthStencilInfo;
 	_depthStencilState = device->CreateDepthStencilState(depthStencilInfo);
 
 	if (!_depthStencilState)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create depth stencil state");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create depth stencil state");
 }
 
-void CaveSanityTestUniformBuffer::CreateColorBlendState(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateColorBlendState(cave::RenderDevice *device)
 {
 	HalColorBlendState colorBlendInfo;
 	HalColorBlendAttachment blendAttachment;
@@ -304,10 +314,10 @@ void CaveSanityTestUniformBuffer::CreateColorBlendState(cave::RenderDevice *devi
 	_colorBlendState = device->CreateColorBlendState(colorBlendInfo, blendAttachmentArray);
 
 	if (!_colorBlendState)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create color blend state");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create color blend state");
 }
 
-void CaveSanityTestUniformBuffer::CreateDynamicState(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateDynamicState(cave::RenderDevice *device)
 {
 	caveVector<HalDynamicStates> dynamicStates(device->GetEngineAllocator());
 	dynamicStates.Push(HalDynamicStates::Viewport);
@@ -315,10 +325,10 @@ void CaveSanityTestUniformBuffer::CreateDynamicState(cave::RenderDevice *device)
 	_dynamicState = device->CreateDynamicState(dynamicStates);
 
 	if (!_dynamicState)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create dynamic state");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create dynamic state");
 }
 
-void CaveSanityTestUniformBuffer::CreateDescriptorSetLayout(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateDescriptorSetLayout(cave::RenderDevice *device)
 {
 	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(device->GetEngineAllocator());
 	caveVector<HalDescriptorSetLayoutBinding> LayoutBindingArray(device->GetEngineAllocator());
@@ -338,10 +348,10 @@ void CaveSanityTestUniformBuffer::CreateDescriptorSetLayout(cave::RenderDevice *
 	_descriptorSet = device->CreateDescriptorSets(descriptorSetLayouts);
 
 	if (!_descriptorSet)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create descriptor set layouts");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create descriptor set layouts");
 }
 
-void CaveSanityTestUniformBuffer::CreatePipelineLayout(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreatePipelineLayout(cave::RenderDevice *device)
 {
 	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(device->GetEngineAllocator());
 	caveVector<HalDescriptorSetLayoutBinding> LayoutBindingArray(device->GetEngineAllocator());
@@ -359,13 +369,19 @@ void CaveSanityTestUniformBuffer::CreatePipelineLayout(cave::RenderDevice *devic
 	descriptorSetLayouts.Push(setLayoutInfo);
 
 	caveVector<HalPushConstantRange> pushConstants(device->GetEngineAllocator());
+	HalPushConstantRange objectTransforms;
+	objectTransforms._shaderStagesFlags = static_cast<HalShaderStagesFlags>(HalShaderStages::Vertex);
+	objectTransforms._offset = 0;
+	objectTransforms._size = sizeof(XObjectTransform); // View and Model matrix
+	pushConstants.Push(objectTransforms);
+
 	_pipelineLayout = device->CreatePipelineLayout(_descriptorSet, pushConstants);
 
 	if (!_pipelineLayout)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create pipeline layout");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create pipeline layout");
 }
 
-void CaveSanityTestUniformBuffer::CreateRenderPass(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateRenderPass(cave::RenderDevice *device)
 {
 	HalRenderPassAttachment renderAttachment;
 	renderAttachment._format = device->GetSwapChainImageFormat();
@@ -401,10 +417,10 @@ void CaveSanityTestUniformBuffer::CreateRenderPass(cave::RenderDevice *device)
 	_renderPass = device->CreateRenderPass(renderPassInfo);
 
 	if (!_renderPass)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create render pass");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create render pass");
 }
 
-void CaveSanityTestUniformBuffer::CreateVertexBuffer(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateVertexBuffer(cave::RenderDevice *device)
 {
 	// Vertex Data
 	const std::vector<float> vertices = {
@@ -423,7 +439,7 @@ void CaveSanityTestUniformBuffer::CreateVertexBuffer(cave::RenderDevice *device)
 	bufferInfo._properties = static_cast<HalMemoryPropertyFlags>(HalMemoryPropertyBits::DeviceLocal);
 	_vertexBuffer = device->CreateVertexBuffer(bufferInfo);
 	if (!_vertexBuffer)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create vertex buffer");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create vertex buffer");
 
 	// fill with data
 	try
@@ -439,7 +455,7 @@ void CaveSanityTestUniformBuffer::CreateVertexBuffer(cave::RenderDevice *device)
 	}
 }
 
-void CaveSanityTestUniformBuffer::CreateIndexBuffer(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateIndexBuffer(cave::RenderDevice *device)
 {
 	// Index data
 	const std::vector<uint16_t> indices = {
@@ -455,7 +471,7 @@ void CaveSanityTestUniformBuffer::CreateIndexBuffer(cave::RenderDevice *device)
 	bufferInfo._properties = static_cast<HalMemoryPropertyFlags>(HalMemoryPropertyBits::DeviceLocal);
 	_indexBuffer = device->CreateIndexBuffer(bufferInfo, HalIndexType::UInt16);
 	if (!_indexBuffer)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create vertex buffer");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create vertex buffer");
 
 	// fill with data
 	try
@@ -471,14 +487,17 @@ void CaveSanityTestUniformBuffer::CreateIndexBuffer(cave::RenderDevice *device)
 	}
 }
 
-void CaveSanityTestUniformBuffer::CreateUniformBuffer(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateUniformBuffer(cave::RenderDevice *device)
 {
 	XTransform XForm;
-	XForm.model.SetIdentity();
-	XForm.view.SetIdentity();
-	XForm.proj = OrthoLH<float>(4, 4, 0, 10);
+	XForm.proj = OrthoLH(4.0f, 4.0f, 1.0f, 10.0f);
 
-	Matrix4f res = XForm.model * XForm.view;
+	Vector3f eye(0, 0, -3);
+	Vector3f at(0, 0, 0);
+	Vector3f up(0, 1, 0);
+	Matrix4f lookAt = LookAtMatrixLH(eye, at, up);
+	Matrix4f trans = Translation(0.5f, 0.5f, 0.0f);
+	Matrix4f transform = lookAt * trans;
 
 	// allocate uniform buffer
 	HalBufferInfo bufferInfo;
@@ -489,7 +508,7 @@ void CaveSanityTestUniformBuffer::CreateUniformBuffer(cave::RenderDevice *device
 	bufferInfo._properties = static_cast<HalMemoryPropertyFlags>(HalMemoryPropertyBits::DeviceLocal);
 	_uniformBuffer = device->CreateUniformBuffer(bufferInfo);
 	if (!_uniformBuffer)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create uniform buffer");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create uniform buffer");
 
 	// fill with data
 	try
@@ -505,7 +524,7 @@ void CaveSanityTestUniformBuffer::CreateUniformBuffer(cave::RenderDevice *device
 	}
 }
 
-void CaveSanityTestUniformBuffer::CreateDescriptorPool(cave::RenderDevice *device)
+void CaveSanityTestPushConstansts::CreateDescriptorPool(cave::RenderDevice *device)
 {
 	HalDescriptorPoolInfo poolInfo;
 	HalDescriptorPoolSize poolSize;
@@ -520,11 +539,11 @@ void CaveSanityTestUniformBuffer::CreateDescriptorPool(cave::RenderDevice *devic
 
 	_descriptorPool = device->CreateDescriptorPool(poolInfo);
 	if (!_descriptorPool)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to descriptor pool");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to descriptor pool");
 
 	// allocate descriptor set
 	if (_descriptorSet && !_descriptorSet->AllocateDescriptorSet(_descriptorPool))
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to descriptor pool");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to descriptor pool");
 
 	// update descriptor set
 	if (_uniformBuffer)
@@ -548,7 +567,7 @@ void CaveSanityTestUniformBuffer::CreateDescriptorPool(cave::RenderDevice *devic
 	}
 }
 
-void CaveSanityTestUniformBuffer::CreateGraphicsPipeline(cave::RenderDevice *device, cave::RenderPass* renderPass)
+void CaveSanityTestPushConstansts::CreateGraphicsPipeline(cave::RenderDevice *device, cave::RenderPass* renderPass)
 {
 	RenderGraphicsPipelineInfo grpahicsPipelineInfo;
 	grpahicsPipelineInfo._material = _material;
@@ -568,12 +587,12 @@ void CaveSanityTestUniformBuffer::CreateGraphicsPipeline(cave::RenderDevice *dev
 	_graphicsPipeline = device->CreateGraphicsPipeline(grpahicsPipelineInfo);
 
 	if (!_graphicsPipeline)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to create graphics pipiline");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to create graphics pipiline");
 
 	_graphicsPipeline->Update();
 }
 
-void CaveSanityTestUniformBuffer::AllocateCommandBuffers(cave::RenderDevice *device, cave::RenderCommandPool* commandPool)
+void CaveSanityTestPushConstansts::AllocateCommandBuffers(cave::RenderDevice *device, cave::RenderCommandPool* commandPool)
 {
 	// allocate command buffers
 	HalCommandBufferInfo allocInfo;
@@ -582,12 +601,12 @@ void CaveSanityTestUniformBuffer::AllocateCommandBuffers(cave::RenderDevice *dev
 	caveVector<RenderCommandBuffer*> commandBuffers(device->GetEngineAllocator());
 	commandBuffers.Resize(allocInfo._bufferCount);
 	if (!device->AllocateCommandBuffers(commandPool, allocInfo, commandBuffers))
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to allocate command buffers");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to allocate command buffers");
 
 	// copy buffer pointer
 	_commandBuffers = AllocateArray<RenderCommandBuffer*>(*device->GetEngineAllocator(), allocInfo._bufferCount);
 	if (!_commandBuffers)
-		throw CaveSanityTestException("CaveSanityTestUniformBuffer: Failed to allocate command buffers");
+		throw CaveSanityTestException("CaveSanityTestPushConstansts: Failed to allocate command buffers");
 
 	for (uint32_t i = 0; i < allocInfo._bufferCount; ++i)
 	{

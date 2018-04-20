@@ -171,7 +171,7 @@ public:
 	*
 	* @return Vulkan shader stage flags
 	*/
-	static VkShaderStageFlags ConvertBlendOpToVulkan(HalShaderStagesFlags flags);
+	static VkShaderStageFlags ConvertShaderStagesToVulkan(HalShaderStagesFlags flags);
 
 	/**
 	* @brief Convert from generic attachment load op to vulkan load op

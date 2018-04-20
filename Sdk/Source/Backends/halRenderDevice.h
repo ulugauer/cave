@@ -380,6 +380,19 @@ public:
 		, HalDescriptorSet** descriptorSets, uint32_t dynamicOffsetCount, const uint32_t* dynamicOffsets) = 0;
 
 	/**
+	* @brief Update the values of push constants
+	*
+	* @param[in] commandBuffer		Command buffer we use for recording
+	* @param[in] layout				Layout is a RenderPipelineLayout object used to program the bindings
+	* @param[in] shaderStagesFlags	Bitmask of HalShaderStagesFlags specifying the shader stages that will use the push constants in the updated range.
+	* @param[in] offset				The start offset of the push constant range to update, in units of bytes.
+	* @param[in] size				The size of the push constant range to update, in units of bytes.
+	* @param[in] pData				An array of size bytes containing the new push constant values.
+	*/
+	virtual void CmdPushConstants(HalCommandBuffer* commandBuffer, HalPipelineLayout* layout
+		, HalShaderStagesFlags shaderStagesFlags, uint32_t offset, uint32_t size, const void* pData) = 0;
+
+	/**
 	* @brief Draw command for non indexed drawing
 	*
 	* @param[in] commandBuffer	Command buffer we use for recording

@@ -537,10 +537,8 @@ struct CAVE_INTERFACE HalDeviceExtensions
 		} bits;
 
 		uint32_t u32Values;
-	} caps;
+	} caps;	///< combiend value
 };
-
-
 
 /**
 * @brief Rasterizer state setup
@@ -710,7 +708,7 @@ struct CAVE_INTERFACE HalColorBlendState
 };
 
 /**
-* @brief Pipeline push constants setup
+* @brief Structure specifying a push constant range
 */
 struct CAVE_INTERFACE HalPushConstantRange
 {

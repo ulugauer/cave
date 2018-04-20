@@ -62,7 +62,7 @@ VulkanDescriptorSet::VulkanDescriptorSet(VulkanRenderDevice* device
 				vkLayoutBinidng.descriptorCount = layoutBinding._descriptorCount;
 				vkLayoutBinidng.pImmutableSamplers = nullptr; // not supported yet
 				vkLayoutBinidng.descriptorType = VulkanTypeConversion::ConvertDescriptorTypeToVulkan(layoutBinding._descriptorType);
-				vkLayoutBinidng.stageFlags = VulkanTypeConversion::ConvertBlendOpToVulkan(layoutBinding._stageFlags);
+				vkLayoutBinidng.stageFlags = VulkanTypeConversion::ConvertShaderStagesToVulkan(layoutBinding._stageFlags);
 			}
 
 			descriptorSetLayoutCreateInfo.pBindings = descriptorBindings;

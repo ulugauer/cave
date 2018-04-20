@@ -702,6 +702,14 @@ void RenderDevice::CmdBindDescriptorSets(RenderCommandBuffer* commandBuffer, Hal
 	}
 }
 
+void RenderDevice::CmdPushConstants(RenderCommandBuffer* commandBuffer, RenderPipelineLayout* layout
+	, HalShaderStagesFlags shaderStagesFlags, uint32_t offset, uint32_t size, const void* pData)
+{
+	if (commandBuffer)
+		_pHalRenderDevice->CmdPushConstants(commandBuffer->GetHalHandle(), layout->GetHalHandle(), shaderStagesFlags, offset, size, pData);
+	
+}
+
 void RenderDevice::CmdDraw(RenderCommandBuffer* commandBuffer, uint32_t vertexCount, uint32_t instanceCount
 	, uint32_t firstVertex, uint32_t firstInstance)
 {

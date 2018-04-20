@@ -134,6 +134,7 @@ typedef void		(VKAPI_PTR* vkCmdBindPipelinePtr) (VkCommandBuffer commandBuffer, 
 typedef void		(VKAPI_PTR* vkCmdBindDescriptorSetsPtr)(VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint, VkPipelineLayout layout, uint32_t firstSet, uint32_t descriptorSetCount, const VkDescriptorSet* pDescriptorSets, uint32_t dynamicOffsetCount, const uint32_t* pDynamicOffsets);
 typedef void		(VKAPI_PTR* vkCmdBindIndexBufferPtr)(VkCommandBuffer commandBuffer, VkBuffer buffer, VkDeviceSize offset, VkIndexType indexType);
 typedef void		(VKAPI_PTR* vkCmdBindVertexBuffersPtr)(VkCommandBuffer commandBuffer, uint32_t firstBinding, uint32_t bindingCount, const VkBuffer* pBuffers, const VkDeviceSize* pOffsets);
+typedef void		(VKAPI_PTR* vkCmdPushConstantsPtr)(VkCommandBuffer commandBuffer, VkPipelineLayout layout, VkShaderStageFlags stageFlags, uint32_t offset, uint32_t size, const void* pValues);
 typedef void		(VKAPI_PTR* vkCmdBeginRenderPassPtr) (VkCommandBuffer commandBuffer, const VkRenderPassBeginInfo* pRenderPassBegin, VkSubpassContents contents);
 typedef void		(VKAPI_PTR* vkCmdNextSubpassPtr) (VkCommandBuffer commandBuffer, VkSubpassContents contents);
 typedef void		(VKAPI_PTR* vkCmdEndRenderPassPtr) (VkCommandBuffer commandBuffer);
@@ -421,6 +422,7 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdBindDescriptorSets", vkCmdBindDescriptorSets);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdBindIndexBuffer", vkCmdBindIndexBuffer);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdBindVertexBuffers", vkCmdBindVertexBuffers);
+			retValue &= LoadDeviceFunction(pDevice, "vkCmdPushConstants", vkCmdPushConstants);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdBeginRenderPass", vkCmdBeginRenderPass);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdNextSubpass", vkCmdNextSubpass);
 			retValue &= LoadDeviceFunction(pDevice, "vkCmdEndRenderPass", vkCmdEndRenderPass);
@@ -569,6 +571,7 @@ public:
 	vkCmdBindDescriptorSetsPtr					vkCmdBindDescriptorSets;
 	vkCmdBindIndexBufferPtr						vkCmdBindIndexBuffer;
 	vkCmdBindVertexBuffersPtr					vkCmdBindVertexBuffers;
+	vkCmdPushConstantsPtr						vkCmdPushConstants;
 	vkCmdBeginRenderPassPtr						vkCmdBeginRenderPass;
 	vkCmdNextSubpassPtr							vkCmdNextSubpass;
 	vkCmdEndRenderPassPtr						vkCmdEndRenderPass;
