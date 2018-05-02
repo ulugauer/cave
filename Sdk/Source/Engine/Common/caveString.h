@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include <memory>
 #include <cassert>
-
+#include <cstring>
 
 namespace cave
 {
@@ -154,7 +154,7 @@ public:
 		if (str != 0)
 		{
 			size_type oldSize = Length();
-			size_type newSize = oldSize + strlen(str) + 1;
+			size_type newSize = oldSize + std::strlen(str) + 1;
 			_str.Resize(newSize);
 
 			// copy the string (including the \0)
@@ -236,7 +236,7 @@ private:
 */
 inline bool operator==(const caveString& a, const caveString& b)
 {
-	return strcmp(a.c_str(), b.c_str()) == 0;
+	return std::strcmp(a.c_str(), b.c_str()) == 0;
 }
 
 
