@@ -123,13 +123,18 @@ typedef Vector4<float> Vector4f;	///< type specialization
 typedef Vector4<double> Vector4d;	///< type specialization
 
 /**
-* @brief Compute vector magniture (specialized template)
+* @brief normalize a vector
 *
-* @param[in] v	Pointer to vector
+* @param vec	vector to normalize
+*
+* @result return normalized vector
 */
-inline float Magnitude(const Vector4f& v)
+template<typename T> CAVE_INTERFACE
+inline Vector4<T> Normalize(const Vector4<T>& vec)
 {
-	return std::sqrt(v._x * v._x + v._y * v._y + v._z * v._z + v._w * v._w);
+	Vector4<T> res(vec);
+	res.Normalize();
+	return res;
 }
 
 /**
@@ -137,7 +142,8 @@ inline float Magnitude(const Vector4f& v)
 *
 * @param[in] v	Pointer to vector
 */
-inline double Magnitude(const Vector4d& v)
+template<typename T> CAVE_INTERFACE
+inline T Magnitude(const Vector4<T>& v)
 {
 	return std::sqrt(v._x * v._x + v._y * v._y + v._z * v._z + v._w * v._w);
 }

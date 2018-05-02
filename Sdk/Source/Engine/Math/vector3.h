@@ -113,6 +113,7 @@ public:
 typedef Vector3<float> Vector3f;	///< type specialization
 typedef Vector3<double> Vector3d;	///< type specialization
 
+
 /**
 * @brief normalize a vector
 *
@@ -120,7 +121,7 @@ typedef Vector3<double> Vector3d;	///< type specialization
 *
 * @result return normalized vector
 */
-template<typename T>
+template<typename T> 
 inline Vector3<T> Normalize(const Vector3<T>& vec)
 {
 	Vector3<T> res(vec);
@@ -136,7 +137,7 @@ inline Vector3<T> Normalize(const Vector3<T>& vec)
 *
 * @result return cross product vector
 */
-template<typename T>
+template<typename T> 
 inline Vector3<T> CrossProduct(const Vector3<T>& a , const Vector3<T>& b)
 {
 	Vector3<T> res;
@@ -154,7 +155,7 @@ inline Vector3<T> CrossProduct(const Vector3<T>& a , const Vector3<T>& b)
 *
 * @result return dot product value
 */
-template<typename T>
+template<typename T> 
 inline T DotProduct(const Vector3<T>& a, const Vector3<T>& b)
 {
 	return a._x*b._x + a._y*b._y + a._z*b._z;
@@ -165,17 +166,8 @@ inline T DotProduct(const Vector3<T>& a, const Vector3<T>& b)
 *
 * @param[in] v	Pointer to vector
 */
-inline float Magnitude(const Vector3f& v)
-{
-	return std::sqrt(v._x * v._x + v._y * v._y + v._z * v._z);
-}
-
-/**
-* @brief Compute vector magniture (specialized template)
-*
-* @param[in] v	Pointer to vector
-*/
-inline double Magnitude(const Vector3d& v)
+template<typename T> 
+inline T Magnitude(const Vector3<T>& v)
 {
 	return std::sqrt(v._x * v._x + v._y * v._y + v._z * v._z);
 }
