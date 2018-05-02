@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "Common/caveRefCount.h"
 #include "Memory/allocatorGlobal.h"
+#include "Common/caveString.h"
 
 #include <memory>
 
@@ -44,9 +45,10 @@ class CAVE_INTERFACE ComponentBase : public CaveRefCount
 	*
 	* @param[in] renderDevice	Pointer to render device
 	* @param[in] owner			Pointer to scene object which owns this component
+	* @param[in] name			Name of the component
 	*
 	*/
-	ComponentBase(RenderDevice& renderDevice, SceneNodeBase& owner);
+	ComponentBase(RenderDevice& renderDevice, SceneNodeBase& owner, const char* name);
 
 	/** @brief destructor */
 	~ComponentBase();
@@ -55,7 +57,7 @@ protected:
 	RenderDevice& _renderDevice;	///< Render device object
 	SceneNodeBase& _owner;			///< Owner of this component
 	ComponentBase* _parent;			///< Parent of this component
-
+	class CAVE_INTERFACE caveString _name;	///< Object name
 };
 
 }

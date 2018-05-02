@@ -145,6 +145,28 @@ public:
 		return _data[index];
 	}
 
+	/**
+	* @brief Returns a random-access iterator to the first element in the container
+	*
+	* @return A random-access iterator addressing the first element in the vector or to the
+	*         location succeeding an empty vector
+	*/
+	inline iterator Begin()
+	{
+		return &_data[0];
+	}
+
+	/**
+	* @brief Returns a random-access iterator that points just beyond the end of the vector
+	*
+	* @return A random-access iterator to the end of the vector object. If the vector is
+	*         empty, ctkVector::end == ctkVector::begin
+	*/
+	inline iterator End() const
+	{
+		return &_data[_size];
+	}
+
 
 	/** @brief Erases the elements of the vector */
 	void Clear()

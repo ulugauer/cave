@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       Base interface to all scene objects available
 
 #include "Common/caveRefCount.h"
+#include "Common/caveString.h"
 #include "Memory/allocatorGlobal.h"
 
 #include <memory>
@@ -42,15 +43,17 @@ class CAVE_INTERFACE SceneNodeBase : public CaveRefCount
 	* @brief Constructor
 	*
 	* @param[in] renderDevice		Pointer to render device
+	* @param[in] name				Name of the scene node
 	*
 	*/
-	SceneNodeBase(RenderDevice& renderDevice);
+	SceneNodeBase(RenderDevice& renderDevice, const char* name);
 
 	/** @brief destructor */
 	~SceneNodeBase();
 
 protected:
-	RenderDevice& _renderDevice;	///< Render device object
+	RenderDevice& _renderDevice;			///< Render device object
+	class CAVE_INTERFACE caveString _name;	///< Object name
 };
 
 }

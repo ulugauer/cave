@@ -23,8 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 namespace cave
 {
-SceneNodeBase::SceneNodeBase(RenderDevice& renderDevice)
+SceneNodeBase::SceneNodeBase(RenderDevice& renderDevice, const char* name)
 	: _renderDevice(renderDevice)
+	, _name(renderDevice.GetEngineAllocator(), name)
 {}
 
 SceneNodeBase::~SceneNodeBase()
