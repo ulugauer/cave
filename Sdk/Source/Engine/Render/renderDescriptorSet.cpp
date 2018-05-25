@@ -28,7 +28,8 @@ namespace cave
 {
 RenderDescriptorSet::RenderDescriptorSet(RenderDevice& renderDevice
 	, caveVector<HalDescriptorSetLayout>& descriptorSetLayouts)
-	: _renderDevice(renderDevice)
+	: CaveRefCount(renderDevice.GetEngineAllocator())
+	, _renderDevice(renderDevice)
 	, _descriptorPool(nullptr)
 {
 	// Allocate low level object

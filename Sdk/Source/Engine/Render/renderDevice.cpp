@@ -202,7 +202,7 @@ RenderCommandPool* RenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPo
 {
 	RenderCommandPool* commandPool = AllocateObject<RenderCommandPool>(*_pRenderInstance->GetEngineAllocator(), *this, commandPoolInfo);
 	if (commandPool)
-		commandPool->IncrementUsageCount();
+		commandPool->AddRef();
 
 	return  commandPool;
 }
@@ -211,9 +211,7 @@ void RenderDevice::ReleaseCommandPool(RenderCommandPool* commandPool)
 {
 	if (commandPool)
 	{
-		int32_t refCount = commandPool->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *commandPool);
+		commandPool->Relase();
 	}
 }
 
@@ -221,7 +219,7 @@ RenderDescriptorPool* RenderDevice::CreateDescriptorPool(HalDescriptorPoolInfo& 
 {
 	RenderDescriptorPool* descriptorPool = AllocateObject<RenderDescriptorPool>(*_pRenderInstance->GetEngineAllocator(), *this, deescriptorPoolInfo);
 	if (descriptorPool)
-		descriptorPool->IncrementUsageCount();
+		descriptorPool->AddRef();
 
 	return  descriptorPool;
 }
@@ -230,28 +228,24 @@ void RenderDevice::ReleaseDescriptorPool(RenderDescriptorPool* descriptorPool)
 {
 	if (descriptorPool)
 	{
-		int32_t refCount = descriptorPool->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *descriptorPool);
+		descriptorPool->Relase();
 	}
 }
 
 RenderDescriptorSet* RenderDevice::CreateDescriptorSets(caveVector<HalDescriptorSetLayout>& descriptorSetLayouts)
 {
-	RenderDescriptorSet* descriptorSest = AllocateObject<RenderDescriptorSet>(*_pRenderInstance->GetEngineAllocator(), *this, descriptorSetLayouts);
-	if (descriptorSest)
-		descriptorSest->IncrementUsageCount();
+	RenderDescriptorSet* descriptorSet = AllocateObject<RenderDescriptorSet>(*_pRenderInstance->GetEngineAllocator(), *this, descriptorSetLayouts);
+	if (descriptorSet)
+		descriptorSet->AddRef();
 
-	return  descriptorSest;
+	return  descriptorSet;
 }
 
 void RenderDevice::ReleaseDescriptorSets(RenderDescriptorSet* descriptorSet)
 {
 	if (descriptorSet)
 	{
-		int32_t refCount = descriptorSet->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *descriptorSet);
+		descriptorSet->Relase();
 	}
 }
 
@@ -310,7 +304,7 @@ RenderVertexInput* RenderDevice::CreateVertexInput(HalVertexInputStateInfo& vert
 {
 	RenderVertexInput* vertexInput = AllocateObject<RenderVertexInput>(*_pRenderInstance->GetEngineAllocator(), *this, vertexInputState);
 	if (vertexInput)
-		vertexInput->IncrementUsageCount();
+		vertexInput->AddRef();
 
 	return vertexInput;
 }
@@ -319,9 +313,7 @@ void RenderDevice::ReleaseVertexInput(RenderVertexInput* vertexInput)
 {
 	if (vertexInput)
 	{
-		int32_t refCount = vertexInput->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *vertexInput);
+		vertexInput->Relase();
 	}
 }
 
@@ -329,7 +321,7 @@ RenderInputAssembly* RenderDevice::CreateInputAssembly(HalInputAssemblyInfo& inp
 {
 	RenderInputAssembly* inputAssembly = AllocateObject<RenderInputAssembly>(*_pRenderInstance->GetEngineAllocator(), *this, inputAssemblyState);
 	if (inputAssembly)
-		inputAssembly->IncrementUsageCount();
+		inputAssembly->AddRef();
 
 	return inputAssembly;
 }
@@ -338,9 +330,7 @@ void RenderDevice::ReleaseInputAssembly(RenderInputAssembly* inputAssembly)
 {
 	if (inputAssembly)
 	{
-		int32_t refCount = inputAssembly->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *inputAssembly);
+		inputAssembly->Relase();
 	}
 }
 
@@ -361,7 +351,7 @@ RenderRasterizerState* RenderDevice::CreateRasterizerState(HalRasterizerSetup& r
 {
 	RenderRasterizerState* rasterizerState = AllocateObject<RenderRasterizerState>(*_pRenderInstance->GetEngineAllocator(), *this, rasterizerInfo);
 	if (rasterizerState)
-		rasterizerState->IncrementUsageCount();
+		rasterizerState->AddRef();
 
 	return rasterizerState;
 }
@@ -370,9 +360,7 @@ void RenderDevice::ReleaseRasterizerState(RenderRasterizerState* rasterizerState
 {
 	if (rasterizerState)
 	{
-		int32_t refCount = rasterizerState->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *rasterizerState);
+		rasterizerState->Relase();
 	}
 }
 
@@ -380,7 +368,7 @@ RenderMultisample* RenderDevice::CreateMultisampleState(HalMultisampleState& mul
 {
 	RenderMultisample* multisampleState = AllocateObject<RenderMultisample>(*_pRenderInstance->GetEngineAllocator(), *this, multisampleInfo);
 	if (multisampleState)
-		multisampleState->IncrementUsageCount();
+		multisampleState->AddRef();
 
 	return multisampleState;
 }
@@ -389,9 +377,7 @@ void RenderDevice::ReleaseMultisampleState(RenderMultisample* multisampleState)
 {
 	if (multisampleState)
 	{
-		int32_t refCount = multisampleState->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *multisampleState);
+		multisampleState->Relase();
 	}
 }
 
@@ -399,7 +385,7 @@ RenderDepthStencil* RenderDevice::CreateDepthStencilState(HalDepthStencilSetup& 
 {
 	RenderDepthStencil* depthStencilState = AllocateObject<RenderDepthStencil>(*_pRenderInstance->GetEngineAllocator(), *this, depthStencilInfo);
 	if (depthStencilState)
-		depthStencilState->IncrementUsageCount();
+		depthStencilState->AddRef();
 
 	return depthStencilState;
 }
@@ -408,9 +394,7 @@ void RenderDevice::ReleaseDepthStencilState(RenderDepthStencil* depthStencilStat
 {
 	if (depthStencilState)
 	{
-		int32_t refCount = depthStencilState->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *depthStencilState);
+		depthStencilState->Relase();
 	}
 }
 
@@ -419,7 +403,7 @@ RenderColorBlend* RenderDevice::CreateColorBlendState(HalColorBlendState& colorB
 {
 	RenderColorBlend* colorBlendState = AllocateObject<RenderColorBlend>(*_pRenderInstance->GetEngineAllocator(), *this, colorBlendInfo, blendAttachments);
 	if (colorBlendState)
-		colorBlendState->IncrementUsageCount();
+		colorBlendState->AddRef();
 
 	return colorBlendState;
 }
@@ -428,9 +412,7 @@ void RenderDevice::ReleaseColorBlendState(RenderColorBlend* colorBlendState)
 {
 	if (colorBlendState)
 	{
-		int32_t refCount = colorBlendState->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *colorBlendState);
+		colorBlendState->Relase();
 	}
 }
 
@@ -438,7 +420,7 @@ RenderDynamicState* RenderDevice::CreateDynamicState(caveVector<HalDynamicStates
 {
 	RenderDynamicState* dynamicState = AllocateObject<RenderDynamicState>(*_pRenderInstance->GetEngineAllocator(), *this, dynamicStates);
 	if (dynamicState)
-		dynamicState->IncrementUsageCount();
+		dynamicState->AddRef();
 
 	return dynamicState;
 }
@@ -447,9 +429,7 @@ void RenderDevice::ReleaseDynamicState(RenderDynamicState* dynamicState)
 {
 	if (dynamicState)
 	{
-		int32_t refCount = dynamicState->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *dynamicState);
+		dynamicState->Relase();
 	}
 }
 
@@ -457,7 +437,7 @@ RenderPipelineLayout* RenderDevice::CreatePipelineLayout(RenderDescriptorSet* de
 {
 	RenderPipelineLayout* pipelineLayout = AllocateObject<RenderPipelineLayout>(*_pRenderInstance->GetEngineAllocator(), *this, descriptorSet, pushConstants);
 	if (pipelineLayout)
-		pipelineLayout->IncrementUsageCount();
+		pipelineLayout->AddRef();
 
 	return pipelineLayout;
 }
@@ -466,9 +446,7 @@ void RenderDevice::ReleasePipelineLayout(RenderPipelineLayout* pipelineLayout)
 {
 	if (pipelineLayout)
 	{
-		int32_t refCount = pipelineLayout->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *pipelineLayout);
+		pipelineLayout->Relase();
 	}
 }
 
@@ -476,7 +454,7 @@ RenderPass* RenderDevice::CreateRenderPass(HalRenderPassInfo& renderPassInfo)
 {
 	RenderPass* renderPass = AllocateObject<RenderPass>(*_pRenderInstance->GetEngineAllocator(), *this, renderPassInfo);
 	if (renderPass)
-		renderPass->IncrementUsageCount();
+		renderPass->AddRef();
 
 	return renderPass;
 }
@@ -485,9 +463,7 @@ void RenderDevice::ReleaseRenderPass(RenderPass* renderPass)
 {
 	if (renderPass)
 	{
-		int32_t refCount = renderPass->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *renderPass);
+		renderPass->Relase();
 	}
 }
 
@@ -495,7 +471,7 @@ RenderGraphicsPipeline* RenderDevice::CreateGraphicsPipeline(RenderGraphicsPipel
 {
 	RenderGraphicsPipeline* graphicsPipeline = AllocateObject<RenderGraphicsPipeline>(*_pRenderInstance->GetEngineAllocator(), *this, graphicsPipelineInfo);
 	if (graphicsPipeline)
-		graphicsPipeline->IncrementUsageCount();
+		graphicsPipeline->AddRef();
 
 	return graphicsPipeline;
 }
@@ -504,9 +480,7 @@ void RenderDevice::ReleaseGraphicsPipeline(RenderGraphicsPipeline* graphicsPipel
 {
 	if (graphicsPipeline)
 	{
-		int32_t refCount = graphicsPipeline->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *graphicsPipeline);
+		graphicsPipeline->Relase();
 	}
 }
 
@@ -517,7 +491,7 @@ RenderVertexBuffer* RenderDevice::CreateVertexBuffer(HalBufferInfo& bufferInfo)
 	{
 		vertexBuffer = AllocateObject<RenderVertexBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo);
 		if (vertexBuffer)
-			vertexBuffer->IncrementUsageCount();
+			vertexBuffer->AddRef();
 
 		return vertexBuffer;
 	}
@@ -531,9 +505,7 @@ void RenderDevice::ReleaseVertexBuffer(RenderVertexBuffer* vertexBuffer)
 {
 	if (vertexBuffer)
 	{
-		int32_t refCount = vertexBuffer->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *vertexBuffer);
+		vertexBuffer->Relase();
 	}
 }
 
@@ -544,7 +516,7 @@ RenderIndexBuffer* RenderDevice::CreateIndexBuffer(HalBufferInfo& bufferInfo, Ha
 	{
 		indexBuffer = AllocateObject<RenderIndexBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo, indexType);
 		if (indexBuffer)
-			indexBuffer->IncrementUsageCount();
+			indexBuffer->AddRef();
 
 		return indexBuffer;
 	}
@@ -558,9 +530,7 @@ void RenderDevice::ReleaseIndexBuffer(RenderIndexBuffer* indexBuffer)
 {
 	if (indexBuffer)
 	{
-		int32_t refCount = indexBuffer->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *indexBuffer);
+		indexBuffer->Relase();
 	}
 }
 
@@ -571,7 +541,7 @@ RenderUniformBuffer* RenderDevice::CreateUniformBuffer(HalBufferInfo& bufferInfo
 	{
 		uniformBuffer = AllocateObject<RenderUniformBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, bufferInfo);
 		if (uniformBuffer)
-			uniformBuffer->IncrementUsageCount();
+			uniformBuffer->AddRef();
 
 		return uniformBuffer;
 	}
@@ -585,9 +555,7 @@ void RenderDevice::ReleaseUniformBuffer(RenderUniformBuffer* uniformBuffer)
 {
 	if (uniformBuffer)
 	{
-		int32_t refCount = uniformBuffer->DecrementUsageCount();
-		if (refCount == 0)
-			DeallocateDelete(*_pRenderInstance->GetEngineAllocator(), *uniformBuffer);
+		uniformBuffer->Relase();
 	}
 }
 

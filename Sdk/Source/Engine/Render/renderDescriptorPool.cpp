@@ -25,7 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 RenderDescriptorPool::RenderDescriptorPool(RenderDevice& renderDevice, HalDescriptorPoolInfo& descriptorPoolInfo)
-	: _renderDevice(renderDevice)
+	: CaveRefCount(renderDevice.GetEngineAllocator())
+	, _renderDevice(renderDevice)
 {
 	// Allocate low level object
 	_halDescriptorPool = renderDevice.GetHalRenderDevice()->CreateDescriptorPool(descriptorPoolInfo);

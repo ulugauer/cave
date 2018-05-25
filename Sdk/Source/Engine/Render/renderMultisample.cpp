@@ -25,7 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 RenderMultisample::RenderMultisample(RenderDevice& renderDevice, HalMultisampleState& multisampleInfo)
-	: _renderDevice(renderDevice)
+	: CaveRefCount(renderDevice.GetEngineAllocator())
+	, _renderDevice(renderDevice)
 {
 	// Allocate low level object
 	_halMultisample = renderDevice.GetHalRenderDevice()->CreateMultisampleState(multisampleInfo);

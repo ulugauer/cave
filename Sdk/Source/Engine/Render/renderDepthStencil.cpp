@@ -25,7 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 RenderDepthStencil::RenderDepthStencil(RenderDevice& renderDevice, HalDepthStencilSetup& depthStencilInfo)
-	: _renderDevice(renderDevice)
+	: CaveRefCount(renderDevice.GetEngineAllocator())
+	, _renderDevice(renderDevice)
 {
 	// Allocate low level object
 	_halDepthStencil = renderDevice.GetHalRenderDevice()->CreateDepthStencilState(depthStencilInfo);

@@ -25,7 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 RenderBuffer::RenderBuffer(RenderDevice& renderDevice, HalBufferInfo& bufferInfo)
-	: _renderDevice(renderDevice)
+	: CaveRefCount(renderDevice.GetEngineAllocator())
+	, _renderDevice(renderDevice)
 	, _halBuffer(nullptr)
 	, _size(0)
 	, _mapped(false)

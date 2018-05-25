@@ -40,37 +40,46 @@ namespace cave
 class CAVE_INTERFACE CaveRefCount
 {
 public:
-	/** @brief Destructor */
-	CaveRefCount() : _refCount(0) {}
+	/** @brief Constructor */
+	CaveRefCount(std::shared_ptr<AllocatorBase> pAllocator)
+		: _refCount(0)
+		, _pAllocator(pAllocator)
+	{}
+
 	/** @brief Destructor */
 	virtual ~CaveRefCount() {}
 
 	/**
-	* @brief Increment usage count of this shader module
+	* @brief Increment usage count of object
 	*
 	* @return new ref count value
 	*/
-	int32_t IncrementUsageCount()
+	int32_t AddRef()
 	{
 		std::lock_guard<std::mutex> lock(_refCountMutex);
 		_refCount++;
 		return _refCount;
 	}
+
 	/**
-	* @brief Decrement usage count of this shader module
+	* @brief Decrement usage count and release object at zero
 	*
-	* @return new ref count value
 	*/
-	int32_t DecrementUsageCount()
+	void Relase()
 	{
-		std::lock_guard<std::mutex> lock(_refCountMutex);
+		_refCountMutex.lock();
 		_refCount--;
-		return _refCount;
+		_refCountMutex.unlock();
+		if (_refCount == 0 && _pAllocator)
+		{ 
+			DeallocateDelete(*_pAllocator, *(CaveRefCount *)this);
+		}
 	}
 
 protected:
 	int32_t _refCount;	///< Our reference count
 	class CAVE_INTERFACE std::mutex _refCountMutex; ///< mutex object for ref counter
+	class CAVE_INTERFACE std::shared_ptr<AllocatorBase> _pAllocator; ///< pointer to base allocator
 };
 
 }

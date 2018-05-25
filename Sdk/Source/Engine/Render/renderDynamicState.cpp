@@ -26,7 +26,8 @@ namespace cave
 {
 RenderDynamicState::RenderDynamicState(RenderDevice& renderDevice
 	, caveVector<HalDynamicStates>& dynamicStates)
-	: _renderDevice(renderDevice)
+	: CaveRefCount(renderDevice.GetEngineAllocator())
+	, _renderDevice(renderDevice)
 {
 	// Allocate low level object
 	_halDynamicState = renderDevice.GetHalRenderDevice()->CreateDynamicState(dynamicStates);

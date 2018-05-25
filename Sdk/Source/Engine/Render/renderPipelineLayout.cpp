@@ -28,7 +28,8 @@ namespace cave
 RenderPipelineLayout::RenderPipelineLayout(RenderDevice& renderDevice
 		, RenderDescriptorSet* descriptorSet
 		, caveVector<HalPushConstantRange>& pushConstants)
-	: _renderDevice(renderDevice)
+	: CaveRefCount(renderDevice.GetEngineAllocator())
+	, _renderDevice(renderDevice)
 {
 	HalDescriptorSet* pDescriptorSet = (descriptorSet) ? descriptorSet->GetHalHandle() : nullptr;
 	// Allocate low level object

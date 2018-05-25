@@ -41,7 +41,8 @@ namespace cave
 {
 RenderGraphicsPipeline::RenderGraphicsPipeline(RenderDevice& renderDevice
 	, RenderGraphicsPipelineInfo& graphicsPipelineInfo)
-	: _renderDevice(renderDevice)
+	: CaveRefCount(renderDevice.GetEngineAllocator())
+	, _renderDevice(renderDevice)
 {
 	HalGraphicsPipelineInfo graphicsPipeline;
 

@@ -27,7 +27,8 @@ namespace cave
 RenderColorBlend::RenderColorBlend(RenderDevice& renderDevice
 		, HalColorBlendState& colorBlendInfo
 		, caveVector<HalColorBlendAttachment>& blendAttachments)
-	: _renderDevice(renderDevice)
+	: CaveRefCount(renderDevice.GetEngineAllocator())
+	, _renderDevice(renderDevice)
 {
 	// Allocate low level object
 	_halColorBlend = renderDevice.GetHalRenderDevice()->CreateColorBlendState(colorBlendInfo, blendAttachments);
