@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 /// Exclude rarely-used stuff from Windows headers
 #define VC_EXTRALEAN
 #include <windows.h>
+#include <codecvt>
+#include <locale>
 
 #include "osPlatformLib.h"
 
@@ -31,11 +33,12 @@ namespace cave
 // load a library
 osLibraryHandle OsPlatformLib::OsLoadLibrary(const char *name, const char* )
 {
-    // build name
-    std::string dllName;
-    dllName = name;
-    dllName += ".dll"; 
-	osLibraryHandle handle = LoadLibrary((LPCSTR)dllName.c_str());
+    // build name in utf8 fashion
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
+    std::wstring dllName;
+    dllName = wcu8.from_bytes(name);
+    dllName += L".dll"; 
+	osLibraryHandle handle = LoadLibrary(dllName.c_str());
 
     return handle;
 }

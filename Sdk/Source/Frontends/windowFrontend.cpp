@@ -17,6 +17,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "windowFrontend.h"
 
+#include <codecvt>
+#include <locale>
+
 namespace cave
 {
 
@@ -80,7 +83,7 @@ WindowFrontend::~WindowFrontend()
 
 bool WindowFrontend::CreateOsWindow(RenderWindowInfo& windowInfo)
 {
-	WNDCLASSA   wc;                     // Windows Class Structure
+	WNDCLASS    wc;                     // Windows Class Structure
 	DWORD       dwExStyle;              // Window Extended Style
 	DWORD       dwStyle;                // Window Style
 	RECT		WindowRect;
@@ -101,10 +104,10 @@ bool WindowFrontend::CreateOsWindow(RenderWindowInfo& windowInfo)
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);			// Load The Arrow Pointer
 	wc.hbrBackground = NULL;                            // No Background Required For GL
 	wc.lpszMenuName = NULL;                             // We Don't Want A Menu
-	wc.lpszClassName = "CaveFrontend";             // Set The Class Name
+	wc.lpszClassName = L"CaveFrontend";             // Set The Class Name
 
 	//register the class but ignore the error; you will get an error if it is already registered.
-	RegisterClassA(&wc);
+	RegisterClass(&wc);
 
 	// common Window Extended Style
 	dwExStyle = WS_EX_APPWINDOW;
@@ -126,11 +129,12 @@ bool WindowFrontend::CreateOsWindow(RenderWindowInfo& windowInfo)
 
 	AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);     // Adjust window to true size
 
-	char* title = (windowInfo.windowTitle) ? windowInfo.windowTitle : "caveEngine";
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> wcu8;
+	std::wstring title = (windowInfo.windowTitle) ? wcu8.from_bytes(windowInfo.windowTitle) : L"caveEngine";
 
-	_hWnd = CreateWindowExA(dwExStyle,							// Extended Style For The Window
-		"CaveFrontend",											// Class Name
-		title,													// Window Title
+	_hWnd = CreateWindowEx(dwExStyle,							// Extended Style For The Window
+		L"CaveFrontend",										// Class Name
+		title.c_str(),											// Window Title
 		dwStyle |												// Defined Window Style
 		WS_CLIPSIBLINGS |										// Required Window Style
 		WS_CLIPCHILDREN,										// Required Window Style

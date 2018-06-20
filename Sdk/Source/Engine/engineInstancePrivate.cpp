@@ -34,9 +34,12 @@ static std::string GetAppPath()
 {
 	static std::string theAppDir;
 #if defined(_WIN32)
-	char theBuf[_MAX_PATH];
+	wchar_t theBuf[_MAX_PATH];
 	GetModuleFileName(0, theBuf, _MAX_PATH);
-	theAppDir.assign(theBuf);
+	char mbString[_MAX_PATH];
+	size_t pReturnValue;
+	wcstombs_s(&pReturnValue, mbString, _MAX_PATH, theBuf, _MAX_PATH);
+	theAppDir.assign(mbString);
 	size_t theSlashPos = theAppDir.find_last_of("\\/");
 	if (theSlashPos != std::string::npos)
 	{

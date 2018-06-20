@@ -63,6 +63,10 @@ ELSEIF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	add_definitions(-DVK_USE_PLATFORM_XCB_KHR) 
 ENDIF()
 
+IF(MSVC)
+	add_definitions(-DUNICODE -D_UNICODE)
+ENDIF()
+
 # add postfix for debug builds
 SET(CMAKE_DEBUG_POSTFIX d)
 
