@@ -36,6 +36,7 @@ typedef PFN_vkVoidFunction	(VKAPI_PTR* vkGetInstanceProcAddrPtr) (VkInstance ins
 typedef VkResult	(VKAPI_PTR* vkEnumerateInstanceExtensionPropertiesPtr) (const char* pLayerName, uint32_t* pPropertyCount, VkExtensionProperties* pProperties);
 typedef VkResult	(VKAPI_PTR* vkEnumerateInstanceLayerPropertiesPtr)(uint32_t* pPropertyCount, VkLayerProperties* pProperties);
 typedef VkResult	(VKAPI_PTR* vkCreateInstancePtr) (const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance);
+typedef VkResult	(VKAPI_PTR* vkEnumerateInstanceVersionPtr)(uint32_t* pApiVersion);
 typedef void		(VKAPI_PTR* vkDestroyInstancePtr) (VkInstance instance, const VkAllocationCallbacks* pAllocator);
 typedef VkResult	(VKAPI_PTR* vkEnumeratePhysicalDevicesPtr) (VkInstance instance, uint32_t* pPhysicalDeviceCount, VkPhysicalDevice* pPhysicalDevices);
 typedef VkResult	(VKAPI_PTR* vkCreateDebugReportCallbackEXTPtr)(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
@@ -92,6 +93,7 @@ typedef VkResult	(VKAPI_PTR* vkFlushMappedMemoryRangesPtr)(VkDevice device, uint
 typedef VkResult	(VKAPI_PTR* vkQueueSubmitPtr) (VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence);
 typedef VkResult	(VKAPI_PTR* vkQueueWaitIdlePtr)(VkQueue queue);
 typedef void		(VKAPI_PTR* vkGetBufferMemoryRequirementsPtr)(VkDevice device, VkBuffer buffer, VkMemoryRequirements* pMemoryRequirements);
+typedef void		(VKAPI_PTR* vkGetBufferMemoryRequirements2Ptr)(VkDevice device, const VkBufferMemoryRequirementsInfo2* pInfo, VkMemoryRequirements2* pMemoryRequirements);
 typedef void		(VKAPI_PTR* vkGetImageMemoryRequirementsPtr)(VkDevice device, VkImage image, VkMemoryRequirements* pMemoryRequirements);
 typedef VkResult	(VKAPI_PTR* vkCreateCommandPoolPtr) (VkDevice device, const VkCommandPoolCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkCommandPool* pCommandPool);
 typedef VkResult	(VKAPI_PTR* vkAllocateCommandBuffersPtr) (VkDevice device, const VkCommandBufferAllocateInfo* pAllocateInfo, VkCommandBuffer* pCommandBuffers);
@@ -161,6 +163,7 @@ private:
 	*/
 	VulkanApi() 
 	{
+		_vulkanVersion = 1.0f;
 #if defined(_WIN32)		
 		_hVulkan = OsPlatformLib::OsLoadLibrary("vulkan-1", "");
 #else
@@ -281,6 +284,19 @@ public:
 				retValue &= LoadGlobalFunction("vkEnumerateInstanceExtensionProperties", vkEnumerateInstanceExtensionProperties);
 				retValue &= LoadGlobalFunction("vkEnumerateInstanceLayerProperties", vkEnumerateInstanceLayerProperties);
 				retValue &= LoadGlobalFunction("vkCreateInstance", vkCreateInstance);
+				// needs 1.1 loader -> don't error out if not available
+				LoadGlobalFunction("vkEnumerateInstanceVersion", vkEnumerateInstanceVersion);
+				if (vkEnumerateInstanceVersion)
+				{
+					uint32_t apiVersion = 0;
+					vkEnumerateInstanceVersion(&apiVersion);
+					if (apiVersion >= VK_MAKE_VERSION(1, 1, 0))
+					{
+						// 1.1 or newer is available at least from the loader side and instance side.
+						// Does not mean a device supports that version.
+						_vulkanVersion = 1.1f;
+					}
+				}
 			}
 		}
 
@@ -438,6 +454,11 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkGetSwapchainImagesKHR", vkGetSwapchainImagesKHR);
 			retValue &= LoadDeviceFunction(pDevice, "vkAcquireNextImageKHR", vkAcquireNextImageKHR);
 			retValue &= LoadDeviceFunction(pDevice, "vkQueuePresentKHR", vkQueuePresentKHR);
+
+			if (_vulkanVersion >= 1.1)
+			{
+				retValue &= LoadDeviceFunction(pDevice, "vkGetBufferMemoryRequirements2", vkGetBufferMemoryRequirements2);
+			}
 		}
 
 		return retValue;
@@ -445,6 +466,7 @@ public:
 
 private:
     osLibraryHandle _hVulkan;	///< Vulkan library handle
+	float _vulkanVersion;		///< supported vulkan version
 
 public:
 	/** function pointers into Vulkan ICD
@@ -467,6 +489,7 @@ public:
 	vkEnumerateInstanceExtensionPropertiesPtr	vkEnumerateInstanceExtensionProperties;
 	vkEnumerateInstanceLayerPropertiesPtr		vkEnumerateInstanceLayerProperties;
 	vkCreateInstancePtr							vkCreateInstance;
+	vkEnumerateInstanceVersionPtr				vkEnumerateInstanceVersion;
 
 	// ************************************************************ //
 	// Instance level functions                                     //
@@ -533,6 +556,7 @@ public:
 	vkQueueSubmitPtr							vkQueueSubmit;
 	vkQueueWaitIdlePtr							vkQueueWaitIdle;
 	vkGetBufferMemoryRequirementsPtr			vkGetBufferMemoryRequirements;
+	vkGetBufferMemoryRequirements2Ptr			vkGetBufferMemoryRequirements2;
 	vkGetImageMemoryRequirementsPtr				vkGetImageMemoryRequirements;
 	vkCreateCommandPoolPtr						vkCreateCommandPool;
 	vkAllocateCommandBuffersPtr					vkAllocateCommandBuffers;

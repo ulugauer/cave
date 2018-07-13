@@ -166,6 +166,13 @@ VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, Backend
 		}
 	}
 
+	// Check available vulkan version
+	uint32_t apiVersion = 0;
+	if (pApi->vkEnumerateInstanceVersion)
+		pApi->vkEnumerateInstanceVersion(&apiVersion);
+	else
+		apiVersion = VK_MAKE_VERSION(1, 0, 3);
+
 	// create the instance
 	VkResult result = VK_SUCCESS;
 	VkApplicationInfo appInfo = {};
@@ -177,7 +184,7 @@ VulkanInstance::VulkanInstance(std::shared_ptr<AllocatorBase> allocator, Backend
 	appInfo.applicationVersion = 0;
 	appInfo.pEngineName = "cave";
 	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 3);
+	appInfo.apiVersion = apiVersion;
 	// setup instance
 	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCreateInfo.pNext = nullptr;
