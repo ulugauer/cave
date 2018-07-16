@@ -133,8 +133,10 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 		throw BackendException("Failed to create vulkan device");
 	}
 
+	uint32_t major, minor, patch;
+	physicalDevice->GetApiVersion(major, minor, patch);
 	// finally load device level functions
-	if (!VulkanApi::GetApi()->LoadDeviceFunctions(&_vkDevice))
+	if (!VulkanApi::GetApi()->LoadDeviceFunctions(&_vkDevice, VK_MAKE_VERSION(major, minor, patch)))
 	{
 		throw BackendException("Failed to create vulkan device");
 	}

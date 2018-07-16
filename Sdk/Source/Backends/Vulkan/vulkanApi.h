@@ -163,7 +163,6 @@ private:
 	*/
 	VulkanApi() 
 	{
-		_vulkanVersion = 1.0f;
 #if defined(_WIN32)		
 		_hVulkan = OsPlatformLib::OsLoadLibrary("vulkan-1", "");
 #else
@@ -286,17 +285,6 @@ public:
 				retValue &= LoadGlobalFunction("vkCreateInstance", vkCreateInstance);
 				// needs 1.1 loader -> don't error out if not available
 				LoadGlobalFunction("vkEnumerateInstanceVersion", vkEnumerateInstanceVersion);
-				if (vkEnumerateInstanceVersion)
-				{
-					uint32_t apiVersion = 0;
-					vkEnumerateInstanceVersion(&apiVersion);
-					if (apiVersion >= VK_MAKE_VERSION(1, 1, 0))
-					{
-						// 1.1 or newer is available at least from the loader side and instance side.
-						// Does not mean a device supports that version.
-						_vulkanVersion = 1.1f;
-					}
-				}
 			}
 		}
 
@@ -375,7 +363,7 @@ public:
 	*
 	* @return true if loading succeded
 	*/
-	bool LoadDeviceFunctions(VkDevice* pDevice)
+	bool LoadDeviceFunctions(VkDevice* pDevice, uint32_t apiVersion)
 	{
 		bool retValue = false;
 		if (_hVulkan && pDevice)
@@ -455,7 +443,7 @@ public:
 			retValue &= LoadDeviceFunction(pDevice, "vkAcquireNextImageKHR", vkAcquireNextImageKHR);
 			retValue &= LoadDeviceFunction(pDevice, "vkQueuePresentKHR", vkQueuePresentKHR);
 
-			if (_vulkanVersion >= 1.1)
+			if (apiVersion >= VK_MAKE_VERSION(1, 1, 0))
 			{
 				retValue &= LoadDeviceFunction(pDevice, "vkGetBufferMemoryRequirements2", vkGetBufferMemoryRequirements2);
 			}
@@ -466,7 +454,6 @@ public:
 
 private:
     osLibraryHandle _hVulkan;	///< Vulkan library handle
-	float _vulkanVersion;		///< supported vulkan version
 
 public:
 	/** function pointers into Vulkan ICD
