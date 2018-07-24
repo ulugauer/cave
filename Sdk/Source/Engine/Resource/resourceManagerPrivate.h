@@ -40,6 +40,7 @@ class RenderShader;
 // forwards
 class ResourceManagerPrivate;
 class MaterialResource;
+class ImageResource;
 
 /**
 * A helper class to find resources
@@ -198,9 +199,18 @@ public:
 	*
 	* @param[in] file String to file
 	*
-	* @return true if successful
+	* @return RenderMaterial object
 	*/
 	RenderMaterial* LoadMaterialAsset(const char* file);
+
+	/**
+	* @brief Load an image asset
+	*
+	* @param[in] file					String to file
+	*
+	* @return true if successful
+	*/
+	void LoadImageAssest(const char* file);
 
 private:
 	RenderDevice* _pRenderDevice;	///< Pointer to the render device we belong to

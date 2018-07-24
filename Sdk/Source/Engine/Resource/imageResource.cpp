@@ -12,21 +12,43 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file caveSanityTestList.h
-///       This file has a list of all available tests. The macro CAVE_SANITY_DO_SOMETHING can be defined to execute tasks on each test.
+/// @file materialResource.cpp
+///        Handles material assets
 
-#ifndef CAVE_SANITY_TEST_ITERATE
-#error CAVE_SANITY_TEST_ITERATE
-#endif
+#include "imageResource.h"
+#include "engineError.h"
+#include "Math/vector4.h"
 
-// base functionality
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestDevice)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestMappedVbo)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestDeviceVbo)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestIndexBuffer)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestUniformBuffer)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestDepth)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestPushConstansts)
-CAVE_SANITY_TEST_ITERATE(CaveSanityTestTexture2D)
+#include <fstream>
+#include <iostream>
 
 
+namespace cave
+{
+
+// our default relative locations for materials and shaders
+static const char* g_imageLocation = "Images/";
+
+ImageResource::ImageResource(ResourceManagerPrivate* rm)
+	: _pResourceManagerPrivate(rm)
+{
+
+}
+
+ImageResource::~ImageResource()
+{
+}
+
+bool ImageResource::IsImageFormatSupported(ResourceObjectFinder& objectFinder, const char* ext)
+{
+	// supported formats
+	std::string dds("dds");
+	std::string filext = ext;
+
+	if (objectFinder.CaseInsensitiveStringCompare(filext, dds))
+		return true;
+
+	return false;
+}
+
+}

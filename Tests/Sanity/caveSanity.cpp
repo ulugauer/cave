@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Base/caveSanityTestUniformBuffer.h"
 #include "Base/caveSanityTestDepth.h"
 #include "Base/caveSanityTestPushConstants.h"
+#include "Base/caveSanityTestTexture2D.h"
 
 #include <iostream>
 #include <sstream>

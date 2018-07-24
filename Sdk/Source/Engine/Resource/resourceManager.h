@@ -67,6 +67,15 @@ public:
 	*/
 	virtual RenderMaterial LoadMaterialAsset(const char* file);
 
+	/**
+	* @brief Load an image asset
+	*
+	* @param[in] file					String to file
+	*
+	* @return true if successful
+	*/
+	virtual void LoadImageAssest(const char* file);
+
 
 private:
 	ResourceManagerPrivate* _pResourceManagerPrivate;	///< Pointer to private resource manger

@@ -69,7 +69,11 @@ set(RESOURCE_SOURCE Resource/resourceManagerPrivate.h
 					Resource/resourceManager.h 
 					Resource/resourceManager.cpp 
 					Resource/materialResource.h 
-					Resource/materialResource.cpp )
+					Resource/materialResource.cpp 
+					Resource/imageResource.h 
+					Resource/imageResource.cpp 
+					Resource/imageResourceDds.h 
+					Resource/imageResourceDds.cpp )
 
 set(COMPONENT_SOURCE Components/componentBase.h Components/componentBase.cpp )
 

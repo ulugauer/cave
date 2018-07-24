@@ -17,6 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "resourceManagerPrivate.h"
 #include "materialResource.h"
+#include "imageResourceDds.h"
 #include "engineInstancePrivate.h"
 #include "engineError.h"
 #include "Render/renderMaterial.h"
@@ -262,5 +263,15 @@ RenderMaterial* ResourceManagerPrivate::LoadMaterialAsset(const char* file)
 	return material;
 }
 
+void ResourceManagerPrivate::LoadImageAssest(const char* file)
+{
+	ResourceObjectFinder objectFinder(*this);
+
+	std::string ext = objectFinder.GetFileExt(file);
+	if (!ImageResource::IsImageFormatSupported(objectFinder, ext.c_str()))
+		return;
+
+	std::string stringKey(file);
+}
 
 }

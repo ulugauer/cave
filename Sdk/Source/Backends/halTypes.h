@@ -50,11 +50,45 @@ enum class HalImageFormat
 	R8G8B8A8SNorm = 38,
 	B8G8R8A8UNorm = 44,
 	B8G8R8A8SNorm = 50,
+	R16G16B16A16SFloat = 97,
 	R32G32SFloat = 103,
 	R32G32B32SFloat = 106,
+	R32G32B32A32SFloat = 109,
 	D32SFloat = 126,
 	D24UnormS8Uint = 129,
 	D32SFloatS8Uint = 130,
+	BC1RgbUnorm = 131,
+	BC1RgbSrgb = 132,
+	BC1RgbaUnorm = 133,
+	BC1RgbaSrgb = 134,
+	BC2Unorm = 135,
+	BC2Srgb = 136,
+	BC3Unorm = 137,
+	BC3Srgb = 138,
+	BC4Unorm = 139,
+	BC4Srgb = 140,
+	BC5Unorm = 141,
+	BC5Srgb = 142,
+	BC7Unorm = 145,
+	BC7Srgb = 146,
+};
+
+/**
+*  @brief A strongly typed enum class representing component types
+*/
+enum class HalComponentType
+{
+	UInt8 = 1,
+	Int8 = 2,
+	UInt16 = 3,
+	Int16 = 4,
+	UInt32 = 5,
+	Int32 = 6,
+	UInt64 = 7,
+	Int64 = 8,
+	Float16 = 9,
+	Float32 = 10,
+	Float64 = 11,
 };
 
 /**

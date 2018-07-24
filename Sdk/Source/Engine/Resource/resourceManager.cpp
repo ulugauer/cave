@@ -63,4 +63,15 @@ RenderMaterial ResourceManager::LoadMaterialAsset(const char* file)
 	return RenderMaterial(*material);
 }
 
+void ResourceManager::LoadImageAssest(const char* file)
+{
+	if (!file)
+	{
+		_pResourceManagerPrivate->_pRenderDevice->GetEngineLog()->Error("Could not find file %s", file);
+		return;
+	}
+
+	_pResourceManagerPrivate->LoadImageAssest(file);
+}
+
 }
