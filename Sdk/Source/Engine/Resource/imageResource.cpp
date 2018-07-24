@@ -27,7 +27,7 @@ namespace cave
 {
 
 // our default relative locations for materials and shaders
-static const char* g_imageLocation = "Images/";
+//static const char* g_imageLocation = "Images/";
 
 ImageResource::ImageResource(ResourceManagerPrivate* rm)
 	: _pResourceManagerPrivate(rm)

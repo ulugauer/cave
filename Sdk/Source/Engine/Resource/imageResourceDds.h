@@ -112,14 +112,14 @@ public:
 	*
 	* @return true if successfuly loaded
 	*/
-	virtual bool decode(bool flipVertical, std::ifstream& dataStream);
+	bool decode(bool flipVertical, std::ifstream& dataStream);
 
 	/*
 	* @brief Query the image host data.
 	*
 	* @return a struct with information about the image and a pointer to the host data
 	*/
-	virtual ImageData getImageData();
+	ImageData getImageData();
 
 	/*
 	* @brief Query the image host data at specified cube face and mip level.
@@ -131,12 +131,12 @@ public:
 	*
 	* @return Return a struct with information about the level and a pointer to host data
 	*/
-	virtual ImageLevelData getLevelData(uint32_t face, uint32_t mipLevel);
+	ImageLevelData getLevelData(uint32_t face, uint32_t mipLevel);
 
 	/*
 	* @brief Relase all internal memory allocated
 	*/
-	virtual void releaseImageData() = 0;
+	void releaseImageData();
 
 private:
 	DDSImageInfo m_imageInfo;	///< DDS image data and info
