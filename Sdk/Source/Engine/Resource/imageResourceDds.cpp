@@ -406,7 +406,7 @@ static void flip_blocks_dxtc5(DXTColBlock *line, int32_t numBlocks)
 	}
 }
 
-static void flip_data_vertical(int8_t *image, int32_t width, int32_t height, DDSImageInfo* info)
+static void flip_data_vertical(int8_t *image, int32_t width, int32_t height, DDSImageInfo* info, AllocatorBase& allocator)
 {
 	if (info->compressed)
 	{
@@ -438,7 +438,7 @@ static void flip_data_vertical(int8_t *image, int32_t width, int32_t height, DDS
 		}
 
 		linesize = xblocks * blocksize;
-		tmp = new int8_t[linesize];
+		tmp = AllocateArray<int8_t>(allocator, linesize);
 		if (!tmp)
 			return;
 
@@ -464,7 +464,7 @@ static void flip_data_vertical(int8_t *image, int32_t width, int32_t height, DDS
 			(*flipblocks)(middle, xblocks);
 		}
 
-		delete[] tmp;
+		DeallocateArray<int8_t>(allocator, tmp);
 	}
 	else
 	{
@@ -475,7 +475,7 @@ static void flip_data_vertical(int8_t *image, int32_t width, int32_t height, DDS
 		int8_t *tmp;
 
 		// much simpler - just compute the line length and swap each row
-		tmp = new int8_t[linesize];
+		tmp = AllocateArray<int8_t>(allocator, linesize);
 		if (!tmp)
 			return;
 
@@ -489,7 +489,7 @@ static void flip_data_vertical(int8_t *image, int32_t width, int32_t height, DDS
 			std::memcpy(top, tmp, linesize);
 		}
 
-		delete[] tmp;
+		DeallocateArray<int8_t>(allocator, tmp);
 	}
 }
 
@@ -538,12 +538,12 @@ static int32_t total_image_data_size(DDSImageInfo* image)
 	return(size);
 }
 
-void* DDSAllocDataBlock(DDSImageInfo* image)
+void* DDSAllocDataBlock(DDSImageInfo* image, AllocatorBase& allocator)
 {
 	if (image)
 	{
 		int32_t size = total_image_data_size(image);
-		image->dataBlock = new int8_t[size];
+		image->dataBlock = AllocateArray<int8_t>(allocator, size);
 		if (image->dataBlock == nullptr)
 		{
 			return nullptr;
@@ -1033,7 +1033,7 @@ bool ImageResourceDds::decode(bool flipVertical, std::ifstream& dataStream)
 	}
 
 	// allocate the meta datablock for all mip storage.
-	DDSAllocDataBlock(&m_imageInfo);
+	DDSAllocDataBlock(&m_imageInfo, *_pResourceManagerPrivate->GetEngineAllocator());
 	if (m_imageInfo.dataBlock == nullptr)
 	{
 		return false;
@@ -1055,7 +1055,7 @@ bool ImageResourceDds::decode(bool flipVertical, std::ifstream& dataStream)
 
 			// Flip in Y for OpenGL if needed
 			if (flipVertical)
-				flip_data_vertical(static_cast<int8_t*>(m_imageInfo.data[index]), width, height, &m_imageInfo);
+				flip_data_vertical(static_cast<int8_t*>(m_imageInfo.data[index]), width, height, &m_imageInfo, *_pResourceManagerPrivate->GetEngineAllocator());
 
 			// shrink to next power of 2
 			width >>= 1;
@@ -1157,10 +1157,9 @@ void ImageResourceDds::releaseImageData()
 {
 	if (m_imageInfo.dataBlock)
 	{
-		delete[] m_imageInfo.dataBlock;
+		DeallocateArray<int8_t>(*_pResourceManagerPrivate->GetEngineAllocator(), m_imageInfo.dataBlock);
 		m_imageInfo.dataBlock = nullptr;
 	}
-
 }
 
 
