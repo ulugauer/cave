@@ -285,6 +285,10 @@ int main(int argc, char* argv[])
 	// Initialization went successful dispaly window
 	frontend->DisplayWindow();
 
+	// asynchronously load our image assets for lader usage
+	ResourceManager& rm = renderDevice->GetResourceManager();
+	rm.LoadImageAsset("UVChecker-dxt5.dds");
+
 
 	// Right now we need a common render pass for all tests.
 	// This will change one we can do offscreen rendering.

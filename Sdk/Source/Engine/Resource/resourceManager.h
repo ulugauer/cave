@@ -74,7 +74,7 @@ public:
 	*
 	* @return true if successful
 	*/
-	virtual void LoadImageAssest(const char* file);
+	virtual void LoadImageAsset(const char* file);
 
 
 private:

@@ -16,6 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///        Handles material assets
 
 #include "imageResource.h"
+#include "imageResourceDds.h"
 #include "engineError.h"
 #include "Math/vector4.h"
 
@@ -27,7 +28,7 @@ namespace cave
 {
 
 // our default relative locations for materials and shaders
-//static const char* g_imageLocation = "Images/";
+static const char* g_imageLocation = "Images/";
 
 ImageResource::ImageResource(ResourceManagerPrivate* rm)
 	: _pResourceManagerPrivate(rm)
@@ -49,6 +50,63 @@ bool ImageResource::IsImageFormatSupported(ResourceObjectFinder& objectFinder, c
 		return true;
 
 	return false;
+}
+
+bool ImageResource::ImageFileExists(ResourceObjectFinder& objectFinder, const char* filename)
+{
+	std::string fileString = objectFinder.GetFileName(filename);
+	std::string directory = objectFinder.GetDirectory(filename);
+
+	// add local search path
+	if (!directory.empty())
+		objectFinder._localSearchPath.push_back(directory);
+
+	// add default local serach path
+	objectFinder._localSearchPath.push_back(g_imageLocation);
+
+	std::ifstream fileStream;
+	if (!objectFinder.OpenFileBinary(fileString.c_str(), fileStream))
+	{
+		return false;
+	}
+
+	fileStream.close();
+	return true;
+}
+
+ImageResource* ImageResource::CreateImageResource(ResourceManagerPrivate* rm, ResourceObjectFinder& objectFinder, const char* filename)
+{
+	std::string ext = objectFinder.GetFileExt(filename);
+	std::string dds("dds");
+	std::string filext = ext;
+
+	ImageResource* image = nullptr;
+	if (objectFinder.CaseInsensitiveStringCompare(filext, dds))
+	{
+		image = AllocateObject<ImageResourceDds>(*rm->GetEngineAllocator(), rm);
+	}
+
+	return image;
+}
+
+void ImageResource::LoadImageResource(ResourceObjectFinder& objectFinder, ImageResource* image, const char* filename)
+{
+	std::string fileString = objectFinder.GetFileName(filename);
+	std::string directory = objectFinder.GetDirectory(filename);
+
+	// add local search path
+	if (!directory.empty())
+		objectFinder._localSearchPath.push_back(directory);
+
+	// add default local serach path
+	objectFinder._localSearchPath.push_back(g_imageLocation);
+
+	std::ifstream fileStream;
+	if (objectFinder.OpenFileBinary(fileString.c_str(), fileStream))
+	{
+		image->decode(true, fileStream);
+		fileStream.close();
+	}
 }
 
 }

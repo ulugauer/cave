@@ -103,16 +103,6 @@ public:
 	/** @brief Destructor */
 	virtual ~ImageResourceDds();
 
-	/*
-	* @brief Load an image from the specifed stream.
-	*		 All classes derived from this must provide this function
-	*
-	* @param[in] flipVertical	Flipe image vertical
-	* @param[in] dataStream		A valid file stream
-	*
-	* @return true if successfuly loaded
-	*/
-	bool decode(bool flipVertical, std::ifstream& dataStream);
 
 	/*
 	* @brief Query the image host data.
@@ -137,6 +127,18 @@ public:
 	* @brief Relase all internal memory allocated
 	*/
 	void releaseImageData();
+
+protected:
+	/*
+	* @brief Load an image from the specifed stream.
+	*		 All classes derived from this must provide this function
+	*
+	* @param[in] flipVertical	Flipe image vertical
+	* @param[in] dataStream		A valid file stream
+	*
+	* @return true if successfuly loaded
+	*/
+	bool decode(bool flipVertical, std::ifstream& dataStream);
 
 private:
 	DDSImageInfo m_imageInfo;	///< DDS image data and info

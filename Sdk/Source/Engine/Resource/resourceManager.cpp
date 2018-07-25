@@ -63,7 +63,7 @@ RenderMaterial ResourceManager::LoadMaterialAsset(const char* file)
 	return RenderMaterial(*material);
 }
 
-void ResourceManager::LoadImageAssest(const char* file)
+void ResourceManager::LoadImageAsset(const char* file)
 {
 	if (!file)
 	{
@@ -71,7 +71,7 @@ void ResourceManager::LoadImageAssest(const char* file)
 		return;
 	}
 
-	_pResourceManagerPrivate->LoadImageAssest(file);
+	_pResourceManagerPrivate->LoadImageAsset(file);
 }
 
 }

@@ -17,7 +17,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "resourceManagerPrivate.h"
 #include "materialResource.h"
-#include "imageResourceDds.h"
+#include "imageResource.h"
 #include "engineInstancePrivate.h"
 #include "engineError.h"
 #include "Render/renderMaterial.h"
@@ -216,6 +216,26 @@ ResourceManagerPrivate::~ResourceManagerPrivate()
 	}
 	_materialMap.clear();
 
+	// stop threads
+	TResourceLoadingThreadMap::iterator threadIter;
+	for (threadIter = _loadingThreadMap.begin(); threadIter != _loadingThreadMap.end(); ++threadIter)
+	{
+		if (threadIter->second.valid())
+			threadIter->second.wait();
+	}
+	_loadingThreadMap.clear();
+
+	// release image resources
+	TResourceImageMap::iterator imageIter;
+	for (imageIter = _imageMap.begin(); imageIter != _imageMap.end(); ++imageIter)
+	{
+		if (imageIter->second)
+		{
+			DeallocateDelete(*_pRenderDevice->GetEngineAllocator(), *imageIter->second);
+		}
+	}
+	_imageMap.clear();
+
 }
 
 std::shared_ptr<AllocatorGlobal>
@@ -263,15 +283,58 @@ RenderMaterial* ResourceManagerPrivate::LoadMaterialAsset(const char* file)
 	return material;
 }
 
-void ResourceManagerPrivate::LoadImageAssest(const char* file)
+void ResourceManagerPrivate::LoadImageAsset(const char* file)
 {
 	ResourceObjectFinder objectFinder(*this);
 
 	std::string ext = objectFinder.GetFileExt(file);
-	if (!ImageResource::IsImageFormatSupported(objectFinder, ext.c_str()))
+	if (!ImageResource::IsImageFormatSupported(objectFinder, ext.c_str()) ||
+		!ImageResource::ImageFileExists(objectFinder, file))
+	{
 		return;
+	}
 
 	std::string stringKey(file);
+	// check if image already exists
+	TResourceImageMap::const_iterator entry = _imageMap.find(stringKey);
+	if (entry != _imageMap.end())
+		return;
+
+	// create a new object and start async loading
+	ImageResource* image = ImageResource::CreateImageResource(this, objectFinder, file);
+	if (image)
+	{
+		_imageMap.insert(TResourceImageMap::value_type(stringKey, image));
+		_loadingThreadMap.insert(TResourceLoadingThreadMap::value_type(stringKey, std::async(&ResourceManagerPrivate::LoadImageFile, this, file, image)));
+	}
 }
+
+ImageResource* ResourceManagerPrivate::GetImageResource(const char* file)
+{
+	std::string stringKey(file);
+
+	// Make sure data is available
+	TResourceLoadingThreadMap::const_iterator threadEntry = _loadingThreadMap.find(stringKey);
+	if (threadEntry != _loadingThreadMap.end())
+		threadEntry->second.wait();
+
+	// return image resource
+	TResourceImageMap::const_iterator imageEntry = _imageMap.find(stringKey);
+	if (imageEntry != _imageMap.end())
+		return imageEntry->second;
+
+	// not found
+	return nullptr;
+}
+
+/**
+* Note this function is called in a thread
+*/
+void ResourceManagerPrivate::LoadImageFile(const char* file, ImageResource* image)
+{
+	ResourceObjectFinder objectFinder(*this);
+	ImageResource::LoadImageResource(objectFinder, image, file);
+}
+
 
 }

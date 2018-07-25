@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <string>
 #include <vector>
 #include <map>
+#include <future>
 
 /** \addtogroup engine
 *  @{
@@ -121,6 +122,8 @@ public:
 
 typedef std::map<std::string, RenderMaterial*> TResourceMaterialMap;	///< Material objects map
 typedef std::map<std::string, RenderShader*> TResourceShaderMap;	///< Shader objects map
+typedef std::map<std::string, ImageResource*> TResourceImageMap;	///< Image objects map
+typedef std::map<std::string, std::future<void>> TResourceLoadingThreadMap;	///< laoding threads map
 
 /**
 * Global Resource Manager
@@ -206,18 +209,40 @@ public:
 	/**
 	* @brief Load an image asset
 	*
-	* @param[in] file					String to file
+	* @param[in] file	String to file
 	*
 	* @return true if successful
 	*/
-	void LoadImageAssest(const char* file);
+	void LoadImageAsset(const char* file);
+
+	/**
+	* @brief Get an image resource
+	* Note: The image MUST have been loaded before with a call to LoadImageAsset
+	*
+	* @param[in] file	String to file
+	*
+	* @return ImageResource if available or nullptr
+	*/
+	ImageResource* GetImageResource(const char* file);
 
 private:
+
+	/**
+	* @brief Load an image async
+	*
+	* @param[in] file	String to file
+	* @param[in] image	Pointer to image resource
+	*
+	*/
+	void LoadImageFile(const char* file, ImageResource* image);
+
 	RenderDevice* _pRenderDevice;	///< Pointer to the render device we belong to
 	std::string _appPath;		///< Application runtime path
 	std::string _projectPath;	///< Project root path
 	TResourceMaterialMap _materialMap;	///< RenderMaterial object map
 	TResourceShaderMap _shaderMap;	///< ShaderMaterial object map
+	TResourceImageMap _imageMap;	///< Image object map
+	TResourceLoadingThreadMap _loadingThreadMap;	///< Loading threads
 };
 
 }

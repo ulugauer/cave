@@ -73,25 +73,45 @@ public:
 	virtual ~ImageResource();
 
 	/**
-	* @brief Check if shader languge is supported
+	* @brief Check if image format is supported
 	*
-	* @param[in] objectFinder	Helper class to find resource
+	* @param[in]	objectFinder	Helper class to find resource
 	* @param ext	Filename extension (dds, png, ...)
 	*
 	* @return true if supported
 	*/
 	static bool IsImageFormatSupported(ResourceObjectFinder& objectFinder, const char* ext);
 
-	/*
-	* @brief Load an image from the specifed stream.
-	*		 All classes derived from this must provide this function
+	/**
+	* @brief Check if image file exists
 	*
-	* @param[in] flipVertical	Flipe image vertical
-	* @param[in] dataStream		A valid file stream
+	* @param[in]		objectFinder	Helper class to find resource
+	* @param filename	filename extension (dds, png, ...)
 	*
-	* @return true if successfuly loaded
+	* @return true if supported
 	*/
-	virtual bool decode(bool flipVertical, std::ifstream& dataStream) = 0;
+	static bool ImageFileExists(ResourceObjectFinder& objectFinder, const char* filename);
+
+	/**
+	* @brief Create an image resource object based on type
+	*
+	* @param[in] rm				Pointer to resource manager
+	* @param[in] objectFinder	Helper class to find resource
+	* @param[in] filename		filename 
+	*
+	* @return ImageResource on success or nullptr
+	*/
+	static ImageResource* CreateImageResource(ResourceManagerPrivate* rm, ResourceObjectFinder& objectFinder, const char* filename);
+
+	/**
+	* @brief Load an image resource object
+	*
+	* @param[in] objectFinder	Helper class to find resource
+	* @param[in] image			Pointer to a ImageResource object create by a CreateImageResource call
+	* @param[in] filename		filename
+	*
+	*/
+	static void LoadImageResource(ResourceObjectFinder& objectFinder, ImageResource* image, const char* filename);
 
 	/*
 	* @brief Query the image host data.
@@ -119,6 +139,17 @@ public:
 
 
 protected:
+	/*
+	* @brief Load an image from the specifed stream.
+	*		 All classes derived from this must provide this function
+	*
+	* @param[in] flipVertical	Flipe image vertical
+	* @param[in] dataStream		A valid file stream
+	*
+	* @return true if successfuly loaded
+	*/
+	virtual bool decode(bool flipVertical, std::ifstream& dataStream) = 0;
+
 	ResourceManagerPrivate * _pResourceManagerPrivate;	///< Pointer to private resource manger
 };
 
