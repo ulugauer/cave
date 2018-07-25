@@ -81,10 +81,6 @@ void VulkanImage::Bind()
 	VkMemoryRequirements memRequirements;
 	VulkanApi::GetApi()->vkGetImageMemoryRequirements(_pDevice->GetDeviceHandle(), _vkImage, &memRequirements);
 
-	VkMemoryAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-
 	// allcoate memory
 	memManager->AllocateBufferMemory(memRequirements, _vkMemProperties, _deviceMemory);
 
