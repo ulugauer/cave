@@ -95,12 +95,9 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 
 	// enable minimum features
 	VkPhysicalDeviceFeatures supportedFeatures = _pPhysicalDevice->GetPhysicalDeviceFeatures();
-	VkPhysicalDeviceFeatures requiredFeatures = { 0 };
 
-	requiredFeatures.tessellationShader = supportedFeatures.tessellationShader;
-	requiredFeatures.geometryShader = supportedFeatures.geometryShader;
-	requiredFeatures.multiDrawIndirect = supportedFeatures.multiDrawIndirect;
-	requiredFeatures.textureCompressionBC = supportedFeatures.textureCompressionBC;
+	// store some device features for later queries
+	_deviceFeatures.caps.bits.bTextureCompressionBC = supportedFeatures.textureCompressionBC;
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	float queuePriority = 1.0f;
@@ -125,7 +122,7 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 		nullptr,                                       
 		static_cast<uint32_t>(extensions.size()),
 		&extensions[0],
-		&requiredFeatures
+		&supportedFeatures
 	};
 
 	VkResult result = VulkanApi::GetApi()->vkCreateDevice(physicalDevice->GetPhysicalDeviceHandle(), &deviceCreateInfo, nullptr, &_vkDevice);
@@ -134,9 +131,6 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	{
 		throw BackendException("Failed to create vulkan device");
 	}
-
-	// successfuly created a device store some features
-	_deviceFeatures.caps.bits.bTextureCompressionBC = supportedFeatures.textureCompressionBC;
 
 	uint32_t major, minor, patch;
 	physicalDevice->GetApiVersion(major, minor, patch);
