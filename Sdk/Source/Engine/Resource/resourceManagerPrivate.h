@@ -37,6 +37,7 @@ namespace cave
 class RenderDevice;
 class RenderMaterial;
 class RenderShader;
+class RenderTexture;
 
 // forwards
 class ResourceManagerPrivate;
@@ -122,6 +123,7 @@ public:
 
 typedef std::map<std::string, RenderMaterial*> TResourceMaterialMap;	///< Material objects map
 typedef std::map<std::string, RenderShader*> TResourceShaderMap;	///< Shader objects map
+typedef std::map<std::string, RenderTexture*> TResourceTextureMap;	///< Texture objects map
 typedef std::map<std::string, ImageResource*> TResourceImageMap;	///< Image objects map
 typedef std::map<std::string, std::future<void>> TResourceLoadingThreadMap;	///< laoding threads map
 
@@ -216,14 +218,23 @@ public:
 	void LoadImageAsset(const char* file);
 
 	/**
-	* @brief Get an image resource
+	* @brief Get/create a texture object
+	* Don't use this function externally. Use CreateTexture from RenderDevice class.
 	* Note: The image MUST have been loaded before with a call to LoadImageAsset
 	*
 	* @param[in] file	String to file
 	*
-	* @return ImageResource if available or nullptr
+	* @return RenderTexture if available or nullptr
 	*/
-	ImageResource* GetImageResource(const char* file);
+	RenderTexture* GetTexture(const char* file);
+
+	/**
+	* @brief release a texture object
+	*
+	* @param[in] texture	Pointer to RenderTexture object
+	*
+	*/
+	void ReleaseTexture(RenderTexture* texture);
 
 private:
 
@@ -236,12 +247,24 @@ private:
 	*/
 	void LoadImageFile(const char* file, ImageResource* image);
 
+	/**
+	* @brief Get an image resource
+	* Note: The image MUST have been loaded before with a call to LoadImageAsset
+	*
+	* @param[in] file	String to file
+	*
+	* @return ImageResource if available or nullptr
+	*/
+	ImageResource* GetImageResource(const char* file);
+
+
 	RenderDevice* _pRenderDevice;	///< Pointer to the render device we belong to
 	std::string _appPath;		///< Application runtime path
 	std::string _projectPath;	///< Project root path
 	TResourceMaterialMap _materialMap;	///< RenderMaterial object map
 	TResourceShaderMap _shaderMap;	///< ShaderMaterial object map
 	TResourceImageMap _imageMap;	///< Image object map
+	TResourceTextureMap _textureMap; /// Texture objecty map
 	TResourceLoadingThreadMap _loadingThreadMap;	///< Loading threads
 };
 

@@ -74,4 +74,14 @@ void ResourceManager::LoadImageAsset(const char* file)
 	_pResourceManagerPrivate->LoadImageAsset(file);
 }
 
+RenderTexture* ResourceManager::GetTexture(const char* file)
+{
+	return _pResourceManagerPrivate->GetTexture(file);
+}
+
+void ResourceManager::ReleaseTexture(RenderTexture* texture)
+{
+	_pResourceManagerPrivate->ReleaseTexture(texture);
+}
+
 }

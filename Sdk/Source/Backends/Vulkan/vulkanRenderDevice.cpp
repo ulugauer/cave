@@ -40,6 +40,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanDescriptorPool.h"
 #include "vulkanDescriptorSet.h"
 #include "vulkanBuffer.h"
+#include "vulkanImage.h"
 #include "vulkanConversion.h"
 #include "vulkanApi.h"
 
@@ -99,6 +100,7 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	requiredFeatures.tessellationShader = supportedFeatures.tessellationShader;
 	requiredFeatures.geometryShader = supportedFeatures.geometryShader;
 	requiredFeatures.multiDrawIndirect = supportedFeatures.multiDrawIndirect;
+	requiredFeatures.textureCompressionBC = supportedFeatures.textureCompressionBC;
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	float queuePriority = 1.0f;
@@ -132,6 +134,9 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	{
 		throw BackendException("Failed to create vulkan device");
 	}
+
+	// successfuly created a device store some features
+	_deviceFeatures.caps.bits.bTextureCompressionBC = supportedFeatures.textureCompressionBC;
 
 	uint32_t major, minor, patch;
 	physicalDevice->GetApiVersion(major, minor, patch);
@@ -661,6 +666,16 @@ HalBuffer* VulkanRenderDevice::CreateBuffer(HalBufferInfo& bufferInfo)
 	VulkanBuffer *buffer = AllocateObject<VulkanBuffer>(*_pInstance->GetEngineAllocator(), this, bufferInfo);
 
 	return buffer;
+}
+
+HalImage* VulkanRenderDevice::CreateImage(HalImageInfo& imageInfo)
+{
+	if (!_pPhysicalDevice || !_vkDevice)
+		return nullptr;
+
+	VulkanImage *image = AllocateObject<VulkanImage>(*_pInstance->GetEngineAllocator(), this, imageInfo);
+
+	return image;
 }
 
 bool VulkanRenderDevice::AllocateCommandBuffers(HalCommandPool* commandPool

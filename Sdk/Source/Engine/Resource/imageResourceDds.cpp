@@ -723,6 +723,7 @@ void getImageFormatInfo(DDSImageInfo& imageInfo, DXGI_FORMAT format)
 	case cave::DXGI_FORMAT_BC1_UNORM:
 		imageInfo.format = HalImageFormat::BC1RgbaUnorm;
 		imageInfo.components = 4;
+		imageInfo.bytesPerPixel = 16;
 		imageInfo.compressed = 1;
 		imageInfo.alpha = 1;
 		break;
@@ -733,12 +734,14 @@ void getImageFormatInfo(DDSImageInfo& imageInfo, DXGI_FORMAT format)
 	case cave::DXGI_FORMAT_BC2_UNORM:
 		imageInfo.format = HalImageFormat::BC2Unorm;
 		imageInfo.components = 4;
+		imageInfo.bytesPerPixel = 16;
 		imageInfo.compressed = 1;
 		imageInfo.alpha = 1;
 		break;
 	case cave::DXGI_FORMAT_BC2_UNORM_SRGB:
 		imageInfo.format = HalImageFormat::BC2Unorm;
 		imageInfo.components = 4;
+		imageInfo.bytesPerPixel = 16;
 		imageInfo.compressed = 1;
 		imageInfo.alpha = 1;
 		break;
@@ -747,12 +750,14 @@ void getImageFormatInfo(DDSImageInfo& imageInfo, DXGI_FORMAT format)
 	case cave::DXGI_FORMAT_BC3_UNORM:
 		imageInfo.format = HalImageFormat::BC3Unorm;
 		imageInfo.components = 4;
+		imageInfo.bytesPerPixel = 16;
 		imageInfo.compressed = 1;
 		imageInfo.alpha = 1;
 		break;
 	case cave::DXGI_FORMAT_BC3_UNORM_SRGB:
 		imageInfo.format = HalImageFormat::BC3Unorm;
 		imageInfo.components = 4;
+		imageInfo.bytesPerPixel = 16;
 		imageInfo.compressed = 1;
 		imageInfo.alpha = 1;
 		break;
@@ -797,12 +802,14 @@ void getImageFormatInfo(DDSImageInfo& imageInfo, DXGI_FORMAT format)
 	case cave::DXGI_FORMAT_BC7_UNORM:
 		imageInfo.format = HalImageFormat::BC7Unorm;
 		imageInfo.components = 4;
+		imageInfo.bytesPerPixel = 16;
 		imageInfo.compressed = 1;
 		imageInfo.alpha = 1;
 		break;
 	case cave::DXGI_FORMAT_BC7_UNORM_SRGB:
 		imageInfo.format = HalImageFormat::BC7Srgb;
 		imageInfo.components = 4;
+		imageInfo.bytesPerPixel = 16;
 		imageInfo.compressed = 1;
 		imageInfo.alpha = 1;
 		break;
@@ -925,18 +932,21 @@ bool ImageResourceDds::decode(bool flipVertical, std::ifstream& dataStream)
 		case FOURCC_DXT1:
 			m_imageInfo.format = HalImageFormat::BC1RgbaUnorm;
 			m_imageInfo.components = 4;
+			m_imageInfo.bytesPerPixel = 16;
 			m_imageInfo.compressed = 1;
 			m_imageInfo.alpha = 1;
 			break;
 		case FOURCC_DXT3:
 			m_imageInfo.format = HalImageFormat::BC2Unorm;
 			m_imageInfo.components = 4;
+			m_imageInfo.bytesPerPixel = 16;
 			m_imageInfo.compressed = 1;
 			m_imageInfo.alpha = 1;
 			break;
 		case FOURCC_DXT5:
 			m_imageInfo.format = HalImageFormat::BC3Unorm;
 			m_imageInfo.components = 4;
+			m_imageInfo.bytesPerPixel = 16;
 			m_imageInfo.compressed = 1;
 			m_imageInfo.alpha = 1;
 			break;

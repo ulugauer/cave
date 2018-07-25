@@ -24,6 +24,7 @@ HalRenderDevice::HalRenderDevice(HalInstance* instance)
 	: _pInstance(instance)
 {
 	_deviceExtensions.caps.u32Values = 0;
+	_deviceFeatures.caps.u32Values = 0;
 }
 
 HalRenderDevice::~HalRenderDevice()
@@ -42,6 +43,23 @@ bool HalRenderDevice::GetDeviceCap(HalExtensionCaps cap)
 		break;
 	case HalExtensionCaps::DirectGLSL:
 		bSupported = _deviceExtensions.caps.bits.bGLSLSupport;
+		break;
+	default:
+		bSupported = false;
+		break;
+	}
+
+	return bSupported;
+}
+
+bool HalRenderDevice::GetDeviceFeature(HalDeviceFeatureCaps cap)
+{
+	bool bSupported = false;
+
+	switch (cap)
+	{
+	case HalDeviceFeatureCaps::TextureCompressionBC:
+		bSupported = _deviceFeatures.caps.bits.bTextureCompressionBC;
 		break;
 	default:
 		bSupported = false;

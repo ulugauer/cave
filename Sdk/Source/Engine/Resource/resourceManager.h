@@ -76,6 +76,24 @@ public:
 	*/
 	virtual void LoadImageAsset(const char* file);
 
+	/**
+	* @brief Get/create a texture object
+	* Don't use this function externally. Use CreateTexture from RenderDevice class.
+	* Note: The image MUST have been loaded before with a call to LoadImageAsset
+	*
+	* @param[in] file	String to file
+	*
+	* @return RenderTexture if available or nullptr
+	*/
+	RenderTexture* GetTexture(const char* file);
+
+	/**
+	* @brief release a texture object
+	*
+	* @param[in] texture	Pointer to RenderTexture object
+	*
+	*/
+	void ReleaseTexture(RenderTexture* texture);
 
 private:
 	ResourceManagerPrivate* _pResourceManagerPrivate;	///< Pointer to private resource manger

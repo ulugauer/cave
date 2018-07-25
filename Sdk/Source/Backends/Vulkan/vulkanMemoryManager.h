@@ -144,6 +144,24 @@ public:
 	void ReleaseBufferMemory(VulkanDeviceMemory& deviceMemory);
 
 	/**
+	* @brief Allocate device memory for any image usage
+	*
+	* @param[in] memRequirements	VkMemoryRequirements struct
+	* @param[in] properties			VkMemoryPropertyFlags required memory properties
+	* @param[out] deviceMemory		Filled in VulkanDeviceMemory struct on success
+	*
+	*/
+	void AllocateImageMemory(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VulkanDeviceMemory& deviceMemory);
+
+	/**
+	* @brief Release device memory back to system
+	*
+	* @param[in] deviceMemory		VulkanDeviceMemory struct returned on AllocateBufferMemory call
+	*
+	*/
+	void ReleaseImageMemory(VulkanDeviceMemory& deviceMemory);
+
+	/**
 	* @brief Allocate host visible staging buffer
 	*
 	* @param[in] size				Required Size

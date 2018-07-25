@@ -35,6 +35,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halSemaphore.h"
 #include "halCommandBuffer.h"
 #include "halBuffer.h"
+#include "halImage.h"
 #include "halDescriptorSet.h"
 #include "Memory/allocatorBase.h"
 
@@ -82,6 +83,15 @@ public:
 	* @return true if supported
 	*/
 	bool GetDeviceCap(HalExtensionCaps cap);
+
+	/**
+	* @brief Query device feature
+	*
+	* @param[in] cap		Capability to query
+	*
+	* @return true if supported
+	*/
+	bool GetDeviceFeature(HalDeviceFeatureCaps cap);
 
 	/**
 	* @brief Query API version number
@@ -287,6 +297,15 @@ public:
 	* @return  HalBuffer abstraction interface
 	*/
 	virtual HalBuffer* CreateBuffer(HalBufferInfo& bufferInfo) = 0;
+
+	/**
+	* @brief Create a texture object
+	*
+	* @param[in] imageInfo		Image create info
+	*
+	* @return  HalImage abstraction interface
+	*/
+	virtual HalImage* CreateImage(HalImageInfo& imageInfo) = 0;
 
 	/**
 	* @brief Allocate command buffers
@@ -497,7 +516,8 @@ private:
 	HalInstance* _pInstance;	///< Pointer to instance object
 
 protected:
-	HalDeviceExtensions _deviceExtensions; ///< Supported extesnion by this device
+	HalDeviceExtensions _deviceExtensions; ///< Supported extensions by this device
+	HalDeviceFeatures _deviceFeatures;	///<Supported features by this device
 };
 
 }

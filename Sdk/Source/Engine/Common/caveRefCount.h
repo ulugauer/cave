@@ -62,6 +62,17 @@ public:
 	}
 
 	/**
+	* @brief Query usage count of object
+	*
+	* @return ref count value
+	*/
+	int32_t GetRefCount()
+	{
+		std::lock_guard<std::mutex> lock(_refCountMutex);
+		return _refCount;
+	}
+
+	/**
 	* @brief Decrement usage count and release object at zero
 	*
 	*/

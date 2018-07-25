@@ -21,6 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineTypes.h"
 #include "frontend.h"
 
+#include <map>
+
 /** @addtogroup engine
 *  @{
 *		This module contains all code related to the engine
@@ -57,6 +59,8 @@ struct RenderCmdRenderPassInfo;
 class RenderVertexBuffer;
 class RenderIndexBuffer;
 class RenderUniformBuffer;
+class RenderTexture;
+
 
 /**
 * Abstraction type of a device instance
@@ -428,7 +432,7 @@ public:
 	void ReleaseIndexBuffer(RenderIndexBuffer* indexBuffer);
 
 	/**
-	* @brief Create a index buffer object
+	* @brief Create a uniform buffer object
 	*
 	* @param[in] bufferInfo		Buffer create info
 	*
@@ -437,11 +441,29 @@ public:
 	RenderUniformBuffer* CreateUniformBuffer(HalBufferInfo& bufferInfo);
 
 	/**
-	* @brief Release a index buffer object
+	* @brief Release a uniform buffer object
 	*
 	* @param[in] indexBuffer	 RenderIndexBuffer object to release
 	*/
 	void ReleaseUniformBuffer(RenderUniformBuffer* indexBuffer);
+
+	/**
+	* @brief Create a texture object
+	* Note the image specified in file needs to be loaded before this call
+	* using the resource manager.
+	*
+	* @param[in] file		Filename
+	*
+	* @return RenderIndexBuffer object
+	*/
+	RenderTexture* CreateTexture(const char* file);
+
+	/**
+	* @brief Release a texture object
+	*
+	* @param[in] texture	 RenderTexture object to release
+	*/
+	void ReleaseTexture(RenderTexture* texture);
 
 	/**
 	* @brief Create a render pass object

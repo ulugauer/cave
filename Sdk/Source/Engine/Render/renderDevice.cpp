@@ -34,6 +34,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderVertexBuffer.h"
 #include "renderIndexBuffer.h"
 #include "renderUniformBuffer.h"
+#include "renderTexture.h"
 #include "renderCommandBuffer.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
@@ -556,6 +557,30 @@ void RenderDevice::ReleaseUniformBuffer(RenderUniformBuffer* uniformBuffer)
 	if (uniformBuffer)
 	{
 		uniformBuffer->Relase();
+	}
+}
+
+RenderTexture* RenderDevice::CreateTexture(const char* file)
+{
+	RenderTexture* texture = nullptr;
+
+	try
+	{
+		texture = _pResourceManager->GetTexture(file);
+
+		return texture;
+	}
+	catch (std::exception&)
+	{
+		return texture;
+	}
+}
+
+void RenderDevice::ReleaseTexture(RenderTexture* texture)
+{
+	if (texture)
+	{
+		_pResourceManager->ReleaseTexture(texture);
 	}
 }
 

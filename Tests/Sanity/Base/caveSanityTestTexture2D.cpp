@@ -27,6 +27,7 @@ using namespace cave;
 
 CaveSanityTestTexture2D::CaveSanityTestTexture2D()
 	: _material(nullptr)
+	, _texture(nullptr)
 	, _layerSection(nullptr)
 	, _inputAssembly(nullptr)
 	, _vertexInput(nullptr)
@@ -171,6 +172,8 @@ void CaveSanityTestTexture2D::Cleanup(RenderDevice *device, userContextData*)
 		device->ReleaseLayerSection(_layerSection);
 	if (_material)
 		DeallocateDelete(*device->GetEngineAllocator(), *_material);
+	if (_texture)
+		device->ReleaseTexture(_texture);
 }
 
 bool CaveSanityTestTexture2D::RunPerformance(RenderDevice*, userContextData*)
@@ -190,6 +193,14 @@ void CaveSanityTestTexture2D::LoadResource(cave::RenderDevice *device)
 
 	if (!_material || _material->GetStageCount() == 0)
 		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to load material");
+
+	// Create texture
+	_texture = device->CreateTexture("UVChecker-dxt5.dds");
+	if (!_texture)
+		throw CaveSanityTestException("CaveSanityTestTexture2D: Failed to load texture");
+
+	// allocate memory
+	_texture->Bind();
 }
 
 void CaveSanityTestTexture2D::CreateRenderSection(RenderDevice *device, userContextData* pUserData)

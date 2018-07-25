@@ -41,6 +41,14 @@ enum class HalExtensionCaps
 };
 
 /**
+*  @brief A strongly typed enum class representing device capabilities query
+*/
+enum class HalDeviceFeatureCaps
+{
+	TextureCompressionBC = 0,		///< Are BC compressed texture are supported
+};
+
+/**
 *  @brief A strongly typed enum class representing image formts
 */
 enum class HalImageFormat
@@ -66,9 +74,9 @@ enum class HalImageFormat
 	BC3Unorm = 137,
 	BC3Srgb = 138,
 	BC4Unorm = 139,
-	BC4Srgb = 140,
+	BC4Snorm = 140,
 	BC5Unorm = 141,
-	BC5Srgb = 142,
+	BC5Snorm = 142,
 	BC7Unorm = 145,
 	BC7Srgb = 146,
 };
@@ -575,6 +583,21 @@ struct CAVE_INTERFACE HalDeviceExtensions
 };
 
 /**
+* @brief Structure for device features
+*/
+struct CAVE_INTERFACE HalDeviceFeatures
+{
+	union
+	{
+		struct {
+			bool bTextureCompressionBC : 1;		///< Support of BC compressed textures
+		} bits;
+
+		uint32_t u32Values;
+	} caps;	///< combiend value
+};
+
+/**
 * @brief Rasterizer state setup
 */
 struct CAVE_INTERFACE HalRasterizerSetup
@@ -969,6 +992,43 @@ struct CAVE_INTERFACE HalBufferInfo
 		_create = 0;
 		_usage = static_cast<HalBufferUsageFlags>(HalBufferUsage::UniformBuffer);
 		_shareMode = HalBufferShareMode::Exclusive;
+		_properties = 0;
+		_queueFamilyIndexCount = 0;
+		_queueFamilyIndices = nullptr;
+	}
+};
+
+/**
+* @brief Device image create info
+*/
+struct CAVE_INTERFACE HalImageInfo
+{
+	HalImageFormat _format;					///< Image format
+	uint32_t _width;						///< Image width in pixels
+	uint32_t _height;						///< Image height in pixels
+	uint32_t _depth;						///< Image depth
+	uint32_t _slices;						///< Image array count
+	uint32_t _level;						///< Image level count
+	uint32_t _componentCount;				///< amount of components (1-4)
+	uint32_t _componentSize;				///< size of a single component in bytes (1-4)
+	HalSampleCount _sampleCount;			///< MSAA sample count
+	bool _useAsRenderTarget;				///< Use this texture as render target
+	HalMemoryPropertyFlags _properties;		///< Memory properties
+	uint32_t _queueFamilyIndexCount;		///< Index count
+	const uint32_t* _queueFamilyIndices;	///< Queue family indices array
+
+	HalImageInfo()
+	{
+		_format = HalImageFormat::Undefined;
+		_width = 0;
+		_height = 0;
+		_depth = 0;
+		_slices = 0;
+		_level = 0;
+		_componentCount = 0;
+		_componentSize = 0;
+		_sampleCount = HalSampleCount::SampleCount1;
+		_useAsRenderTarget = false;
 		_properties = 0;
 		_queueFamilyIndexCount = 0;
 		_queueFamilyIndices = nullptr;

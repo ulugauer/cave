@@ -300,6 +300,15 @@ public:
 	HalBuffer* CreateBuffer(HalBufferInfo& bufferInfo) override;
 
 	/**
+	* @brief Create a texture object
+	*
+	* @param[in] imageInfo		Image create info
+	*
+	* @return  HalImage abstraction interface
+	*/
+	HalImage* CreateImage(HalImageInfo& imageInfo) override;
+
+	/**
 	* @brief Allocate command buffers
 	*
 	* @param[in] commandPool		Command pool object

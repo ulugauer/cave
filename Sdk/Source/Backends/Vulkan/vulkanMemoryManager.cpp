@@ -148,6 +148,37 @@ void VulkanMemoryManager::ReleaseBufferMemory(VulkanDeviceMemory& deviceMemory)
 	}
 }
 
+void VulkanMemoryManager::AllocateImageMemory(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VulkanDeviceMemory& deviceMemory)
+{
+	uint32_t memoryTypeIndex = ChooseMemoryType(memRequirements, properties);
+	if (memoryTypeIndex != ~0u)
+	{
+		// Allocate memory
+		VkMemoryAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = memRequirements.size;
+		allocInfo.memoryTypeIndex = memoryTypeIndex;
+		if (VulkanApi::GetApi()->vkAllocateMemory(_pRenderDevice->GetDeviceHandle(), &allocInfo, nullptr, &deviceMemory._vkDeviceMemory) != VK_SUCCESS)
+		{
+			throw BackendException("Error failed to allocate device memory");
+		}
+
+		deviceMemory._offset = 0;
+		deviceMemory._size = memRequirements.size;
+	}
+}
+
+void VulkanMemoryManager::ReleaseImageMemory(VulkanDeviceMemory& deviceMemory)
+{
+	if (deviceMemory._size && deviceMemory._vkDeviceMemory)
+	{
+		VulkanApi::GetApi()->vkFreeMemory(_pRenderDevice->GetDeviceHandle(), deviceMemory._vkDeviceMemory, nullptr);
+		deviceMemory._offset = 0;
+		deviceMemory._size = 0;
+		deviceMemory._vkDeviceMemory = nullptr;
+	}
+}
+
 void VulkanMemoryManager::WaitForCopies()
 {
 	VkResult result = VulkanApi::GetApi()->vkGetFenceStatus(_pRenderDevice->GetDeviceHandle(), _vkBufferCopyFence);

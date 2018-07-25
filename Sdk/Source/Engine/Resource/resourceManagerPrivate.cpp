@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "engineError.h"
 #include "Render/renderMaterial.h"
 #include "Render/renderShader.h"
+#include "Render/renderTexture.h"
 
 #include <fstream>
 
@@ -307,6 +308,68 @@ void ResourceManagerPrivate::LoadImageAsset(const char* file)
 		_imageMap.insert(TResourceImageMap::value_type(stringKey, image));
 		_loadingThreadMap.insert(TResourceLoadingThreadMap::value_type(stringKey, std::async(&ResourceManagerPrivate::LoadImageFile, this, file, image)));
 	}
+}
+
+RenderTexture* ResourceManagerPrivate::GetTexture(const char* file)
+{
+	std::string stringKey(file);
+	// check if image already exists
+	TResourceTextureMap::const_iterator entry = _textureMap.find(stringKey);
+	if (entry != _textureMap.end())
+		return entry->second;
+
+	// find matching imageResource object
+	ImageResource* image = GetImageResource(file);
+	if (image == nullptr)
+		return nullptr;
+
+	// Get image data
+	ImageData imageData = image->getImageData();
+	// Fill in data
+	HalImageInfo imageInfo;
+	imageInfo._width = imageData.width;
+	imageInfo._height = imageData.height;
+	imageInfo._depth = 1;
+	imageInfo._slices = 1;
+	imageInfo._level = imageData.levels;
+	imageInfo._format = imageData.format;
+	imageInfo._componentCount = imageData.componentCount;
+	imageInfo._componentSize = imageData.componentSize;
+
+	RenderTexture* texture = nullptr;
+	try
+	{
+		texture = AllocateObject<RenderTexture>(*GetEngineAllocator(), *_pRenderDevice, imageInfo, file);
+		if (texture)
+		{
+			texture->AddRef();
+			_textureMap.insert(TResourceTextureMap::value_type(stringKey, texture));
+			// upload data
+			texture->Update(imageData.data);
+		}
+	}
+	catch (std::exception&)
+	{
+		return texture;
+	}
+
+	return texture;
+}
+
+void ResourceManagerPrivate::ReleaseTexture(RenderTexture* texture)
+{
+	std::string stringKey(texture->GetFileName());
+	// check if image already exists
+	TResourceTextureMap::const_iterator entry = _textureMap.find(stringKey);
+	if (entry == _textureMap.end())
+		return;
+
+	if (texture->GetRefCount() == 1)
+	{
+		// final release
+		_textureMap.erase(stringKey);
+		texture->Relase();
+	};
 }
 
 ImageResource* ResourceManagerPrivate::GetImageResource(const char* file)

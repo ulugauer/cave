@@ -67,11 +67,17 @@ VulkanTypeConversion::ConvertImageFormatToVulkan(HalImageFormat imageFormat)
 	case HalImageFormat::B8G8R8A8SNorm:
 		vkImageFormat = VK_FORMAT_B8G8R8A8_SRGB;
 		break;
+	case HalImageFormat::R16G16B16A16SFloat:
+		vkImageFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
+		break;
 	case HalImageFormat::R32G32SFloat:
 		vkImageFormat = VK_FORMAT_R32G32_SFLOAT;
 		break;
 	case HalImageFormat::R32G32B32SFloat:
 		vkImageFormat = VK_FORMAT_R32G32B32_SFLOAT;
+		break;
+	case HalImageFormat::R32G32B32A32SFloat:
+		vkImageFormat = VK_FORMAT_R32G32B32A32_SFLOAT;
 		break;
 	case HalImageFormat::D32SFloat:
 		vkImageFormat = VK_FORMAT_D32_SFLOAT;
@@ -81,6 +87,48 @@ VulkanTypeConversion::ConvertImageFormatToVulkan(HalImageFormat imageFormat)
 		break;
 	case HalImageFormat::D32SFloatS8Uint:
 		vkImageFormat = VK_FORMAT_D32_SFLOAT_S8_UINT;
+		break;
+	case HalImageFormat::BC1RgbUnorm:
+		vkImageFormat = VK_FORMAT_BC1_RGB_UNORM_BLOCK;
+		break;
+	case HalImageFormat::BC1RgbSrgb:
+		vkImageFormat = VK_FORMAT_BC1_RGB_SRGB_BLOCK;
+		break;
+	case HalImageFormat::BC1RgbaUnorm:
+		vkImageFormat = VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
+		break;
+	case HalImageFormat::BC1RgbaSrgb:
+		vkImageFormat = VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+		break;
+	case HalImageFormat::BC2Unorm:
+		vkImageFormat = VK_FORMAT_BC2_UNORM_BLOCK;
+		break;
+	case HalImageFormat::BC2Srgb:
+		vkImageFormat = VK_FORMAT_BC2_SRGB_BLOCK;
+		break;
+	case HalImageFormat::BC3Unorm:
+		vkImageFormat = VK_FORMAT_BC3_UNORM_BLOCK;
+		break;
+	case HalImageFormat::BC3Srgb:
+		vkImageFormat = VK_FORMAT_BC3_SRGB_BLOCK;
+		break;
+	case HalImageFormat::BC4Unorm:
+		vkImageFormat = VK_FORMAT_BC4_UNORM_BLOCK;
+		break;
+	case HalImageFormat::BC4Snorm:
+		vkImageFormat = VK_FORMAT_BC4_SNORM_BLOCK;
+		break;
+	case HalImageFormat::BC5Unorm:
+		vkImageFormat = VK_FORMAT_BC5_UNORM_BLOCK;
+		break;
+	case HalImageFormat::BC5Snorm:
+		vkImageFormat = VK_FORMAT_BC5_SNORM_BLOCK;
+		break;
+	case HalImageFormat::BC7Unorm:
+		vkImageFormat = VK_FORMAT_BC7_UNORM_BLOCK;
+		break;
+	case HalImageFormat::BC7Srgb:
+		vkImageFormat = VK_FORMAT_BC7_SRGB_BLOCK;
 		break;
 	default:
 		vkImageFormat = VK_FORMAT_UNDEFINED;
@@ -110,11 +158,17 @@ VulkanTypeConversion::ConvertImageFormatFromVulkan(VkFormat imageFormat)
 	case VK_FORMAT_B8G8R8A8_SRGB:
 		format = HalImageFormat::B8G8R8A8SNorm;
 		break;
+	case VK_FORMAT_R16G16B16A16_SFLOAT:
+		format = HalImageFormat::R16G16B16A16SFloat;
+		break;
 	case VK_FORMAT_R32G32_SFLOAT:
 		format = HalImageFormat::R32G32SFloat;
 		break;
 	case VK_FORMAT_R32G32B32_SFLOAT:
 		format = HalImageFormat::R32G32B32SFloat;
+		break;
+	case VK_FORMAT_R32G32B32A32_SFLOAT:
+		format = HalImageFormat::R32G32B32A32SFloat;
 		break;
 	case VK_FORMAT_D32_SFLOAT:
 		format = HalImageFormat::D32SFloat;
@@ -124,6 +178,48 @@ VulkanTypeConversion::ConvertImageFormatFromVulkan(VkFormat imageFormat)
 		break;
 	case VK_FORMAT_D32_SFLOAT_S8_UINT:
 		format = HalImageFormat::D32SFloatS8Uint;
+		break;
+	case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
+		format = HalImageFormat::BC1RgbUnorm;
+		break;
+	case VK_FORMAT_BC1_RGB_SRGB_BLOCK:
+		format = HalImageFormat::BC1RgbSrgb;
+		break;
+	case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
+		format = HalImageFormat::BC1RgbaUnorm;
+		break;
+	case VK_FORMAT_BC1_RGBA_SRGB_BLOCK:
+		format = HalImageFormat::BC1RgbaSrgb;
+		break;
+	case VK_FORMAT_BC2_UNORM_BLOCK:
+		format = HalImageFormat::BC2Unorm;
+		break;
+	case VK_FORMAT_BC2_SRGB_BLOCK:
+		format = HalImageFormat::BC2Srgb;
+		break;
+	case VK_FORMAT_BC3_UNORM_BLOCK:
+		format = HalImageFormat::BC3Unorm;
+		break;
+	case VK_FORMAT_BC3_SRGB_BLOCK:
+		format = HalImageFormat::BC3Srgb;
+		break;
+	case VK_FORMAT_BC4_UNORM_BLOCK:
+		format = HalImageFormat::BC4Unorm;
+		break;
+	case VK_FORMAT_BC4_SNORM_BLOCK:
+		format = HalImageFormat::BC4Snorm;
+		break;
+	case VK_FORMAT_BC5_UNORM_BLOCK:
+		format = HalImageFormat::BC5Unorm;
+		break;
+	case VK_FORMAT_BC5_SNORM_BLOCK:
+		format = HalImageFormat::BC5Snorm;
+		break;
+	case VK_FORMAT_BC7_UNORM_BLOCK:
+		format = HalImageFormat::BC7Unorm;
+		break;
+	case VK_FORMAT_BC7_SRGB_BLOCK:
+		format = HalImageFormat::BC7Srgb;
 		break;
 	default:
 		format = HalImageFormat::Undefined;
