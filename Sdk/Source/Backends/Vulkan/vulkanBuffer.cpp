@@ -103,7 +103,6 @@ void VulkanBuffer::Update(uint64_t offset, uint64_t size, const void* pData)
 		return;
 
 	VulkanMemoryManager* memManager = _pDevice->GetMemoryManager();
-	memManager->WaitForCopies();
 
 	VulkanStagingBufferInfo stagingBufferInfo;
 	memManager->GetStagingBuffer(size, stagingBufferInfo);
@@ -120,9 +119,6 @@ void VulkanBuffer::Update(uint64_t offset, uint64_t size, const void* pData)
 
 	// copy buffer
 	memManager->CopyBuffer(stagingBufferInfo._stagingBuffer, _vkBuffer, stagingBufferInfo.GetOffset(), offset, size);
-
-	// clean up
-	memManager->ReleaseStagingBuffer(stagingBufferInfo);
 }
 
 void VulkanBuffer::Map(uint64_t offset, uint64_t size, void** ppData)
@@ -141,6 +137,13 @@ void VulkanBuffer::Map(uint64_t offset, uint64_t size, void** ppData)
 void VulkanBuffer::Unmap()
 {
 	VulkanApi::GetApi()->vkUnmapMemory(_pDevice->GetDeviceHandle(), _deviceMemory._vkDeviceMemory);
+}
+
+size_t VulkanBuffer::GetDataAlignment()
+{
+	VkMemoryRequirements reqs;
+	VulkanApi::GetApi()->vkGetBufferMemoryRequirements(_pDevice->GetDeviceHandle(), _vkBuffer, &reqs);
+	return reqs.alignment;
 }
 
 }

@@ -82,6 +82,12 @@ public:
 	void Unmap() override;
 
 	/**
+	* @brief Get alignment size for device buffers
+	*
+	*/
+	size_t GetDataAlignment() override;
+
+	/**
 	* @brief Get pipeline layout object
 	*
 	* @return Vulkan buffer object

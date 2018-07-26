@@ -27,6 +27,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
+#define align_to(_alignment, _val) (((_val + _alignment - 1) / _alignment) * _alignment)
+
+
 VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysicalDevice* physicalDevice, VulkanRenderDevice* renderDevice)
 	: _pInstance(instance)
 	, _pPhysicalDevice(physicalDevice)
@@ -35,9 +38,10 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 	, _vkCommandPool(VK_NULL_HANDLE)
 	, _vkTransferCommandBuffer(VK_NULL_HANDLE)
 	, _vkImageTransferCommandBuffer(VK_NULL_HANDLE)
-	, _vkBufferCopyFence(VK_NULL_HANDLE)
-	, _vkImageCopyFence(VK_NULL_HANDLE)
-	, _vkStagingBuffer(VK_NULL_HANDLE)
+	, _vkCopyFence(VK_NULL_HANDLE)
+	, _stagingMemoryPages(renderDevice->GetEngineAllocator())
+	, _copyCount(0)
+	, _copyWaitCount(0)
 {
 	// store some physical device properties
 	VkPhysicalDeviceProperties deviceProperties = physicalDevice->GetPhysicalDeviceProperties();
@@ -72,34 +76,19 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceInfo.pNext = nullptr;
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-	if (VulkanApi::GetApi()->vkCreateFence(_pRenderDevice->GetDeviceHandle(), &fenceInfo, nullptr, &_vkBufferCopyFence) != VK_SUCCESS)
+	if (VulkanApi::GetApi()->vkCreateFence(_pRenderDevice->GetDeviceHandle(), &fenceInfo, nullptr, &_vkCopyFence) != VK_SUCCESS)
 		throw BackendException("Error failed to create GPU device memory manager");
 
-	// create image transfer sync fence
-	if (VulkanApi::GetApi()->vkCreateFence(_pRenderDevice->GetDeviceHandle(), &fenceInfo, nullptr, &_vkImageCopyFence) != VK_SUCCESS)
-		throw BackendException("Error failed to create GPU device memory manager");
+	VulkanApi::GetApi()->vkResetFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyFence);
 
-	// create staging buffer
-	// create temporay staging buffer
-	VkBufferCreateInfo stagingCreateInfo = {};
-	stagingCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	stagingCreateInfo.size = StagingBufferSize;
-	stagingCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	stagingCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-	if (VulkanApi::GetApi()->vkCreateBuffer(_pRenderDevice->GetDeviceHandle(), &stagingCreateInfo, NULL, &_vkStagingBuffer) != VK_SUCCESS)
-		return;
+	// Allocate a page at start
+	AllocateStagingPage(StagingBufferSize);
 }
 
 VulkanMemoryManager::~VulkanMemoryManager()
 {
 	// Wait until the device is idle before deleting
 	VulkanApi::GetApi()->vkQueueWaitIdle(_pRenderDevice->GetGraphicsQueue());
-
-	ReleaseStagingMemory(_stagingBufferDeviceMemeory);
-
-	if (_vkStagingBuffer != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroyBuffer(_pRenderDevice->GetDeviceHandle(), _vkStagingBuffer, nullptr);
 
 	if (_vkTransferCommandBuffer != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkFreeCommandBuffers(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, 1, &_vkTransferCommandBuffer);
@@ -110,11 +99,16 @@ VulkanMemoryManager::~VulkanMemoryManager()
 	if (_vkCommandPool != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkDestroyCommandPool(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, nullptr);
 
-	if (_vkBufferCopyFence != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkBufferCopyFence, nullptr);
+	if (_vkCopyFence != VK_NULL_HANDLE)
+		VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkCopyFence, nullptr);
 
-	if (_vkImageCopyFence != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkImageCopyFence, nullptr);
+	CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageIter = _stagingMemoryPages.begin();
+	for (; pageIter != _stagingMemoryPages.end(); pageIter++)
+	{
+		ReleaseStagingMemory(pageIter->_deviceMemory);
+		if (pageIter->_vkBuffer != VK_NULL_HANDLE)
+			VulkanApi::GetApi()->vkDestroyBuffer(_pRenderDevice->GetDeviceHandle(), pageIter->_vkBuffer, nullptr);
+	}
 }
 
 void VulkanMemoryManager::AllocateBufferMemory(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VulkanDeviceMemory& deviceMemory)
@@ -179,15 +173,60 @@ void VulkanMemoryManager::ReleaseImageMemory(VulkanDeviceMemory& deviceMemory)
 	}
 }
 
+void VulkanMemoryManager::SubmitCopies()
+{
+	if (_copyCount == 0)
+		return;
+
+	VulkanApi::GetApi()->vkEndCommandBuffer(_vkTransferCommandBuffer);
+
+	// submit job
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &_vkTransferCommandBuffer;
+
+	VulkanApi::GetApi()->vkQueueSubmit(_pRenderDevice->GetGraphicsQueue(), 1, &submitInfo, _vkCopyFence);
+	
+	_copyCount = 0;
+}
+
 void VulkanMemoryManager::WaitForCopies()
 {
-	VkResult result = VulkanApi::GetApi()->vkGetFenceStatus(_pRenderDevice->GetDeviceHandle(), _vkBufferCopyFence);
-	if (result == VK_SUCCESS)
-		return; // nothing to wait for
+	SubmitCopies(); // just in case it did not happen already
+
+	if (_copyWaitCount == 0)
+		return;
+
+	VkResult result = VulkanApi::GetApi()->vkGetFenceStatus(_pRenderDevice->GetDeviceHandle(), _vkCopyFence);
 	if (result == VK_NOT_READY)
 	{
-		// Wait and reset
-		VulkanApi::GetApi()->vkWaitForFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkBufferCopyFence, VK_TRUE, (std::numeric_limits<uint64_t>::max)());
+		// Wait for fence
+		VulkanApi::GetApi()->vkWaitForFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyFence, VK_TRUE, (std::numeric_limits<uint64_t>::max)());
+	}
+
+	_copyWaitCount = 0;
+
+	// Reset fence for re-use
+	VulkanApi::GetApi()->vkResetFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyFence);
+
+	// we re-use the command buffer which is safe after we waited for the fence
+	VulkanApi::GetApi()->vkResetCommandBuffer(_vkTransferCommandBuffer, 0);
+
+	// Make staging buffers available again
+	// Reset first page remove others
+	CaveList<VulkanDeviceMemoryPageEntry>::Iterator begin = _stagingMemoryPages.begin();
+	begin->_deviceMemory._offset = 0;
+	begin++;
+	
+	CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageIter = begin;
+	for (; pageIter != _stagingMemoryPages.end(); pageIter++)
+	{
+		ReleaseStagingMemory(pageIter->_deviceMemory);
+		if (pageIter->_vkBuffer != VK_NULL_HANDLE)
+			VulkanApi::GetApi()->vkDestroyBuffer(_pRenderDevice->GetDeviceHandle(), pageIter->_vkBuffer, nullptr);
+
+		_stagingMemoryPages.Erase(pageIter);
 	}
 }
 
@@ -235,11 +274,6 @@ void VulkanMemoryManager::GetStagingBuffer(uint64_t size, VulkanStagingBufferInf
 	}
 }
 
-void VulkanMemoryManager::ReleaseStagingBuffer(VulkanStagingBufferInfo& )
-{
-	// nothing to do right now
-}
-
 void VulkanMemoryManager::ReleaseStagingMemory(VulkanDeviceMemory& deviceMemory)
 {
 	if (deviceMemory._size && deviceMemory._vkDeviceMemory)
@@ -284,35 +318,78 @@ uint32_t VulkanMemoryManager::ChooseMemoryType(VkMemoryRequirements& memRequirem
 
 VkBuffer VulkanMemoryManager::FindStagingBuffer(uint64_t size, VulkanDeviceMemory& memoryInfo)
 {
-	// For now we support only a single staging buffer with fixed size
-	if (size > StagingBufferSize)
-		return VK_NULL_HANDLE;
-
-	if (_stagingBufferDeviceMemeory._vkDeviceMemory != VK_NULL_HANDLE)
+	// iterate over the pages and find a spot
+	CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageIter = _stagingMemoryPages.begin();
+	for (; pageIter != _stagingMemoryPages.end(); pageIter++)
 	{
-		// Fill in data
-		memoryInfo._offset = _stagingBufferDeviceMemeory._offset;
-		memoryInfo._size = size;
-		memoryInfo._vkDeviceMemory = _stagingBufferDeviceMemeory._vkDeviceMemory;
-		memoryInfo._mappedAddress = _stagingBufferDeviceMemeory._mappedAddress;
-		return _vkStagingBuffer;
+		VkMemoryRequirements reqs;
+		VulkanApi::GetApi()->vkGetBufferMemoryRequirements(_pRenderDevice->GetDeviceHandle(), pageIter->_vkBuffer, &reqs);
+		size_t currentOffset = align_to(reqs.alignment, pageIter->_deviceMemory._offset);
+		if ((currentOffset + size) < pageIter->_deviceMemory._size)
+		{
+			// found a space
+			// Fill in data
+			memoryInfo._offset = currentOffset;
+			memoryInfo._size = size;
+			memoryInfo._vkDeviceMemory = pageIter->_deviceMemory._vkDeviceMemory;
+			memoryInfo._mappedAddress = static_cast<uint8_t*>(pageIter->_deviceMemory._mappedAddress) + currentOffset;
+			// update entries
+			pageIter->_deviceMemory._offset = currentOffset + size;
+
+			return pageIter->_vkBuffer;
+		}
 	}
 
-	// lazy allocation
+	// alocate new page
+	if (pageIter == _stagingMemoryPages.end())
+	{
+		uint64_t allocSize = (size < StagingBufferSize) ? StagingBufferSize : size;
+		AllocateStagingPage(allocSize);
+		CaveList<VulkanDeviceMemoryPageEntry>::Iterator last = _stagingMemoryPages.tail();
+		VkMemoryRequirements reqs;
+		VulkanApi::GetApi()->vkGetBufferMemoryRequirements(_pRenderDevice->GetDeviceHandle(), last->_vkBuffer, &reqs);
+		size_t currentOffset = align_to(reqs.alignment, last->_deviceMemory._offset);
+		if ((currentOffset + size) < last->_deviceMemory._size)
+		{
+			// found a space
+			// Fill in data
+			memoryInfo._offset = currentOffset;
+			memoryInfo._size = size;
+			memoryInfo._vkDeviceMemory = last->_deviceMemory._vkDeviceMemory;
+			memoryInfo._mappedAddress = static_cast<uint8_t*>(last->_deviceMemory._mappedAddress) + currentOffset;
+			// update entries
+			last->_deviceMemory._offset = currentOffset + size;
+
+			return last->_vkBuffer;
+		}
+	}
+
+	// no success 
+	return VK_NULL_HANDLE;
+}
+
+void VulkanMemoryManager::AllocateStagingPage(uint64_t pageSize)
+{
+	// new entry
+	_stagingMemoryPages.PushBack(VulkanDeviceMemoryPageEntry());
+	CaveList<VulkanDeviceMemoryPageEntry>::Iterator last = _stagingMemoryPages.tail();
+
+	// create staging buffer
+	VkBufferCreateInfo stagingCreateInfo = {};
+	stagingCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingCreateInfo.size = pageSize;
+	stagingCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	stagingCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (VulkanApi::GetApi()->vkCreateBuffer(_pRenderDevice->GetDeviceHandle(), &stagingCreateInfo, NULL, &last->_vkBuffer) != VK_SUCCESS)
+		return;
+
+	VulkanDeviceMemory deviceMemory;
 	VkMemoryRequirements memRequirements;
-	VulkanApi::GetApi()->vkGetBufferMemoryRequirements(_pRenderDevice->GetDeviceHandle(), _vkStagingBuffer, &memRequirements);
-	AllocateStagingMemory(memRequirements, _stagingBufferDeviceMemeory);
-	if (_stagingBufferDeviceMemeory._mappedAddress == nullptr)
-		return VK_NULL_HANDLE;
+	VulkanApi::GetApi()->vkGetBufferMemoryRequirements(_pRenderDevice->GetDeviceHandle(), last->_vkBuffer, &memRequirements);
+	AllocateStagingMemory(memRequirements, last->_deviceMemory);
 
-	// Fill in data
-	memoryInfo._offset = _stagingBufferDeviceMemeory._offset;
-	memoryInfo._size = size;
-	memoryInfo._vkDeviceMemory = _stagingBufferDeviceMemeory._vkDeviceMemory;
-	memoryInfo._mappedAddress = _stagingBufferDeviceMemeory._mappedAddress;
-
-	VulkanApi::GetApi()->vkBindBufferMemory(_pRenderDevice->GetDeviceHandle(), _vkStagingBuffer, _stagingBufferDeviceMemeory._vkDeviceMemory, 0);
-	return _vkStagingBuffer;
+	VulkanApi::GetApi()->vkBindBufferMemory(_pRenderDevice->GetDeviceHandle(), last->_vkBuffer, last->_deviceMemory._vkDeviceMemory, 0);
 }
 
 void VulkanMemoryManager::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64_t srcOffset, uint64_t dstOffset, uint64_t size)
@@ -320,18 +397,14 @@ void VulkanMemoryManager::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uin
 	if (_vkCommandPool == VK_NULL_HANDLE || _vkTransferCommandBuffer == VK_NULL_HANDLE)
 		return;
 
-	// wait unitl last copy command has finished
-	if (VulkanApi::GetApi()->vkWaitForFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkBufferCopyFence, VK_TRUE, (std::numeric_limits<uint64_t>::max)()) != VK_SUCCESS)
-		return;
+	if (_copyCount == 0)
+	{
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-	// we re-use the command buffer which is safe after we waited for the fence
-	VulkanApi::GetApi()->vkResetCommandBuffer(_vkTransferCommandBuffer, 0);
-
-	VkCommandBufferBeginInfo beginInfo = {};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-	VulkanApi::GetApi()->vkBeginCommandBuffer(_vkTransferCommandBuffer, &beginInfo);
+		VulkanApi::GetApi()->vkBeginCommandBuffer(_vkTransferCommandBuffer, &beginInfo);
+	}
 
 	VkBufferCopy copyRegion = {};
 	copyRegion.srcOffset = srcOffset;
@@ -339,17 +412,8 @@ void VulkanMemoryManager::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uin
 	copyRegion.size = size;
 	VulkanApi::GetApi()->vkCmdCopyBuffer(_vkTransferCommandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	VulkanApi::GetApi()->vkEndCommandBuffer(_vkTransferCommandBuffer);
-
-	// Reset fence for re-use
-	VulkanApi::GetApi()->vkResetFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkBufferCopyFence);
-	// submit job
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &_vkTransferCommandBuffer;
-
-	VulkanApi::GetApi()->vkQueueSubmit(_pRenderDevice->GetGraphicsQueue(), 1, &submitInfo, _vkBufferCopyFence);
+	_copyCount++;
+	_copyWaitCount++;
 }
 
 }

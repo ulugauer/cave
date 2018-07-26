@@ -84,6 +84,12 @@ public:
 	virtual void Unmap() = 0;
 
 	/**
+	* @brief Get alignment size for device buffers
+	*
+	*/
+	virtual size_t GetDataAlignment() = 0;
+
+	/**
 	* @brief Query byte size of HalIndexType
 	*
 	* @param[in] type	HalIndexType type

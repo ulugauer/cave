@@ -97,7 +97,7 @@ public:
 		{
 			node* tmp = _head;
 			_head = _head->_next;
-			DeallocateDelete(_allocator, *tmp);
+			DeallocateDelete(*_allocator, *tmp);
 		}
 		_head = nullptr;
 		_tail = nullptr;
@@ -112,7 +112,7 @@ public:
 	*/
 	inline bool PushBack(const T& t)
 	{
-		node* tmp = AllocateObject<node>(_allocator, t);
+		node* tmp = AllocateObject<node>(*_allocator, t);
 
 		if (!tmp)
 			return false;
@@ -145,7 +145,7 @@ public:
 	*/
 	inline bool PushFront(const T& t)
 	{
-		node* tmp = AllocateObject<node>(_allocator, t);
+		node* tmp = AllocateObject<node>(*_allocator, t);
 
 		if (!tmp)
 			return false;
@@ -181,9 +181,9 @@ public:
 
 		iter++;
 
-		unqueue(tmp);
+		Unqueue(tmp);
 
-		DeallocateDelete(_allocator, *tmp);
+		DeallocateDelete(*_allocator, *tmp);
 	}
 
 	/**

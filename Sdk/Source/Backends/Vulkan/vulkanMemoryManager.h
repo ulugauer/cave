@@ -35,6 +35,7 @@ class VulkanInstance;
 class VulkanPhysicalDevice;
 class VulkanRenderDevice;
 
+
 /**
 * Vulkan device memory allocation
 */
@@ -53,6 +54,22 @@ struct VulkanDeviceMemory
 	VkDeviceMemory _vkDeviceMemory;		///< Vulkan device memory handle
 	bool _needsFlush;		///< does this memory need a flush before usage
 	void* _mappedAddress;	///< Pointer to virtual memory if mapped
+};
+
+/**
+* Vulkan device memory page allocation
+* This represents a page entry from where
+* we do sub-allocations
+*/
+struct VulkanDeviceMemoryPageEntry
+{
+	VulkanDeviceMemoryPageEntry()
+	{
+		_vkBuffer = VK_NULL_HANDLE;
+	}
+
+	VulkanDeviceMemory _deviceMemory;
+	VkBuffer _vkBuffer;	///< buffer for this page
 };
 
 /**
@@ -171,14 +188,6 @@ public:
 	void GetStagingBuffer(uint64_t size, VulkanStagingBufferInfo& stagingBufferInfo);
 
 	/**
-	* @brief Allocate host visible memory for memory copy
-	*
-	* @param[in] stagingBufferInfo	Returned from a call to GetStagingBuffer
-	*
-	*/
-	void ReleaseStagingBuffer(VulkanStagingBufferInfo& stagingBufferInfo);
-
-	/**
 	* @brief Flush host visible memory
 	*
 	* @param[in] deviceMemory	VulkanDeviceMemory struct returned on AllocateBufferMemory call
@@ -199,7 +208,14 @@ public:
 	void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uint64_t srcOffset, uint64_t dstOffset, uint64_t size);
 
 	/**
-	* @brief Wai for possibly scheduled copies
+	* @brief Submit possibly scheduled copies
+	*
+	*
+	*/
+	void SubmitCopies();
+
+	/**
+	* @brief Wait for possibly scheduled copies
 	*
 	*
 	*/
@@ -216,6 +232,16 @@ public:
 	uint32_t ChooseMemoryType(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties);
 
 private:
+
+	/**
+	* @brief Allocate host visible new page for sub-allocations
+	* Note: We keep always one page arround for temp copies.
+	* On a per frame basis we free temp allocations and remove additional pages
+	*
+	* @param[in] pageSize	Allocation size
+	*
+	*/
+	void AllocateStagingPage(uint64_t pageSize);
 
 	/**
 	* @brief Allocate host visible memory for memory copy
@@ -252,10 +278,10 @@ private:
 	VkCommandPool _vkCommandPool;	///< Vulkan command pool handle
 	VkCommandBuffer _vkTransferCommandBuffer;	///< Vulkan command buffer for data transfers
 	VkCommandBuffer _vkImageTransferCommandBuffer;	///< Vulkan command buffer for image transfers
-	VkFence _vkBufferCopyFence;	///< Fence used to wait submited buffer copies
-	VkFence _vkImageCopyFence;	///< Fence used to wait submited image copies
-	VkBuffer _vkStagingBuffer;	///< Our big staging buffe we use for copies
-	VulkanDeviceMemory _stagingBufferDeviceMemeory; ///< Memory bound to _vkStagingBuffer;
+	VkFence _vkCopyFence;	///< Fence used to wait submited buffer copies
+	CaveList<VulkanDeviceMemoryPageEntry> _stagingMemoryPages;	///< Memory pages allocated for staging operations
+	size_t _copyCount;	///< keep track of submitted copies
+	size_t _copyWaitCount;	///< keep track if we need to wait
 };
 
 }
