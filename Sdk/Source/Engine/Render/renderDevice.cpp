@@ -717,6 +717,11 @@ void RenderDevice::CmdDrawIndexed(RenderCommandBuffer* commandBuffer, uint32_t i
 		_pHalRenderDevice->CmdDrawIndexed(commandBuffer->GetHalHandle(), indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
+void RenderDevice::FlushCopies()
+{
+	_pHalRenderDevice->FlushCopies();
+}
+
 bool RenderDevice::PresentQueueSubmit(RenderCommandBuffer* commandBuffer)
 {
 	if (commandBuffer)

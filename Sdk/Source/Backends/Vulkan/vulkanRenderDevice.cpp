@@ -862,6 +862,12 @@ void VulkanRenderDevice::CmdDrawIndexed(HalCommandBuffer* commandBuffer, uint32_
 		, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
+void VulkanRenderDevice::FlushCopies()
+{
+	// flush outstanding copies
+	_pMemoryManager->SubmitCopies();
+}
+
 bool VulkanRenderDevice::PresentQueueSubmit(HalCommandBuffer* commandBuffer)
 {
 	if (!_pSwapChain)

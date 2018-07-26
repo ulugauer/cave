@@ -438,6 +438,13 @@ public:
 		, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) override;
 
 	/**
+	* @brief Submit scheduled copies
+	* Note that this call just submits scheduled copies but we do not wait for it.
+	*
+	*/
+	void FlushCopies() override;
+
+	/**
 	* @brief A special submit for swap chain image presentation
 	*
 	* @param[in] commandBuffer			Command buffer we use for recording

@@ -399,6 +399,10 @@ void VulkanMemoryManager::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uin
 
 	if (_copyCount == 0)
 	{
+		// If we already submited some copies we need to wait before restart
+		if (_copyWaitCount > 0)
+			WaitForCopies();
+
 		VkCommandBufferBeginInfo beginInfo = {};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
