@@ -118,7 +118,7 @@ executeTest(RenderDevice *device, RenderCommandPool* commandPool, RenderPass* re
 static void
 printHelpMessage()
 {
-	string_type MsgStr = "NDDPathFinder display point clouds.\n\n";
+	string_type MsgStr = "Cave sanity application .\n\n";
 	MsgStr += " -h\t\t\t- prints this help message\n";
 	MsgStr += " -noLogFile\t\t- don't write a log file but output all messages to std out\n";
 	MsgStr += " -r\t\t\t- path to resource files\n";

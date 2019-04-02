@@ -26,7 +26,7 @@ First:
 
 ## Windows :
 
-	start cmake ../.. -G "Visual Studio 14 2015 Win64" 
+	start cmake .. -G "Visual Studio 14 2015 Win64" 
 
 ## Linux (Ubuntu 16.04) :
 
