@@ -38,6 +38,7 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 	, _vkCommandPool(VK_NULL_HANDLE)
 	, _vkTransferCommandBuffer(VK_NULL_HANDLE)
 	, _vkImageTransferCommandBuffer(VK_NULL_HANDLE)
+	, _bufferMemoryPages(renderDevice->GetEngineAllocator())
 	, _vkCopyFence(VK_NULL_HANDLE)
 	, _stagingMemoryPages(renderDevice->GetEngineAllocator())
 	, _copyCount(0)
@@ -102,12 +103,21 @@ VulkanMemoryManager::~VulkanMemoryManager()
 	if (_vkCopyFence != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkCopyFence, nullptr);
 
+	// Release staging memory pages
 	CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageIter = _stagingMemoryPages.begin();
 	for (; pageIter != _stagingMemoryPages.end(); pageIter++)
 	{
 		ReleaseStagingMemory(pageIter->_deviceMemory);
 		if (pageIter->_vkBuffer != VK_NULL_HANDLE)
 			VulkanApi::GetApi()->vkDestroyBuffer(_pRenderDevice->GetDeviceHandle(), pageIter->_vkBuffer, nullptr);
+	}
+
+	// Release buffer memory pages
+	CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageBufferIter = _bufferMemoryPages.begin();
+	for (; pageBufferIter != _bufferMemoryPages.end(); pageBufferIter++)
+	{
+		if (pageBufferIter->_deviceMemory._vkDeviceMemory != VK_NULL_HANDLE)
+			VulkanApi::GetApi()->vkFreeMemory(_pRenderDevice->GetDeviceHandle(), pageBufferIter->_deviceMemory._vkDeviceMemory, nullptr);
 	}
 }
 
@@ -116,30 +126,89 @@ void VulkanMemoryManager::AllocateBufferMemory(VkMemoryRequirements& memRequirem
 	uint32_t memoryTypeIndex = ChooseMemoryType(memRequirements, properties);
 	if (memoryTypeIndex != ~0u)
 	{
-		// Allocate memory
+		// Search for a place in a memory page
+		CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageBufferIter = _bufferMemoryPages.begin();
+		for (; pageBufferIter != _bufferMemoryPages.end(); pageBufferIter++)
+		{
+			size_t currentOffset = align_to(memRequirements.alignment, pageBufferIter->_deviceMemory._offset);
+			if ((currentOffset + memRequirements.size) < pageBufferIter->_deviceMemory._size && 
+				memoryTypeIndex == pageBufferIter->_deviceMemory._memoryTypeIndex)
+			{
+				// Found a match. Fill in values
+				deviceMemory._offset = currentOffset;
+				deviceMemory._size = memRequirements.size;
+				deviceMemory._vkDeviceMemory = pageBufferIter->_deviceMemory._vkDeviceMemory;
+
+				// update page entries
+				pageBufferIter->_allocationCount++;
+				pageBufferIter->_deviceMemory._offset = currentOffset + memRequirements.size;
+
+				return;
+			}
+		}
+
+		// Allocate new memory page
+		// new page
+		_bufferMemoryPages.PushBack(VulkanDeviceMemoryPageEntry());
+		CaveList<VulkanDeviceMemoryPageEntry>::Iterator last = _bufferMemoryPages.tail();
+
+		uint64_t allocSize = (memRequirements.size < StagingBufferSize) ? StagingBufferSize : memRequirements.size;
 		VkMemoryAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		allocInfo.allocationSize = memRequirements.size;
+		allocInfo.allocationSize = allocSize;
 		allocInfo.memoryTypeIndex = memoryTypeIndex;
-		if (VulkanApi::GetApi()->vkAllocateMemory(_pRenderDevice->GetDeviceHandle(), &allocInfo, nullptr, &deviceMemory._vkDeviceMemory) != VK_SUCCESS)
+		if (VulkanApi::GetApi()->vkAllocateMemory(_pRenderDevice->GetDeviceHandle(), &allocInfo, nullptr, &last->_deviceMemory._vkDeviceMemory) != VK_SUCCESS)
 		{
 			throw BackendException("Error failed to allocate device memory");
 		}
+		last->_allocationCount++;
+		last->_deviceMemory._memoryTypeIndex = memoryTypeIndex;
+		last->_deviceMemory._size = allocSize;
+		last->_deviceMemory._offset = memRequirements.size;
 
 		deviceMemory._offset = 0;
 		deviceMemory._size = memRequirements.size;
+		deviceMemory._vkDeviceMemory = last->_deviceMemory._vkDeviceMemory;
 	}
 }
 
 void VulkanMemoryManager::ReleaseBufferMemory(VulkanDeviceMemory& deviceMemory)
 {
-	if (deviceMemory._size && deviceMemory._vkDeviceMemory)
-	{
-		VulkanApi::GetApi()->vkFreeMemory(_pRenderDevice->GetDeviceHandle(), deviceMemory._vkDeviceMemory, nullptr);
-		deviceMemory._offset = 0;
-		deviceMemory._size = 0;
-		deviceMemory._vkDeviceMemory = nullptr;
-	}
+    if (deviceMemory._vkDeviceMemory)
+    {
+        // Search for a place in a memory page
+        CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageBufferIter = _bufferMemoryPages.begin();
+        for (; pageBufferIter != _bufferMemoryPages.end(); pageBufferIter++)
+        {
+            if (pageBufferIter->_deviceMemory._vkDeviceMemory == deviceMemory._vkDeviceMemory)
+            {
+                // found page
+                pageBufferIter->_allocationCount--;
+                break;
+            }
+        }
+
+        if (pageBufferIter != _bufferMemoryPages.end())
+        {
+            // Last allocation release page
+            if (pageBufferIter->_allocationCount == 0)
+            {
+                VulkanApi::GetApi()->vkFreeMemory(_pRenderDevice->GetDeviceHandle(), pageBufferIter->_deviceMemory._vkDeviceMemory, nullptr);
+                _bufferMemoryPages.Erase(pageBufferIter);
+            }
+            else
+            {
+                // Check if it was the last allcoation done on this page
+                // If this is the case we can rollback the offset
+                if (deviceMemory._offset + deviceMemory._size == pageBufferIter->_deviceMemory._offset)
+                    pageBufferIter->_deviceMemory._offset = deviceMemory._offset;
+            }
+        }
+
+        deviceMemory._offset = 0;
+        deviceMemory._size = 0;
+        deviceMemory._vkDeviceMemory = nullptr;
+    }
 }
 
 void VulkanMemoryManager::AllocateImageMemory(VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VulkanDeviceMemory& deviceMemory)

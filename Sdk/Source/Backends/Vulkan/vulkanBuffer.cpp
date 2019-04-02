@@ -93,7 +93,7 @@ void VulkanBuffer::Bind()
 	memManager->AllocateBufferMemory(memRequirements, _vkMemProperties, _deviceMemory);
 
 	// bind Memory to buffer object
-	if (VulkanApi::GetApi()->vkBindBufferMemory(_pDevice->GetDeviceHandle(), _vkBuffer, _deviceMemory._vkDeviceMemory, 0) != VK_SUCCESS)
+	if (VulkanApi::GetApi()->vkBindBufferMemory(_pDevice->GetDeviceHandle(), _vkBuffer, _deviceMemory._vkDeviceMemory, _deviceMemory._offset) != VK_SUCCESS)
 		throw BackendException("Error failed to bind device memory");
 }
 
@@ -131,7 +131,7 @@ void VulkanBuffer::Map(uint64_t offset, uint64_t size, void** ppData)
 	if ((size > _vkCreateInfo.size) || (offset + size > _vkCreateInfo.size))
 		return;
 
-	VulkanApi::GetApi()->vkMapMemory(_pDevice->GetDeviceHandle(), _deviceMemory._vkDeviceMemory, offset, size, 0, ppData);
+	VulkanApi::GetApi()->vkMapMemory(_pDevice->GetDeviceHandle(), _deviceMemory._vkDeviceMemory, _deviceMemory._offset + offset, size, 0, ppData);
 }
 
 void VulkanBuffer::Unmap()

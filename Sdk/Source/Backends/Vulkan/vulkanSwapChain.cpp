@@ -471,7 +471,7 @@ void VulkanSwapChain::ReadPixels(VkCommandPool commandPool, void* data)
 	// allcoate memory
 	VulkanDeviceMemory destMemory;
 	memManager->AllocateBufferMemory(memRequirements, memProperties, destMemory);
-	VulkanApi::GetApi()->vkBindBufferMemory(_pRenderDevice->GetDeviceHandle(), destBuffer, destMemory._vkDeviceMemory, 0);
+	VulkanApi::GetApi()->vkBindBufferMemory(_pRenderDevice->GetDeviceHandle(), destBuffer, destMemory._vkDeviceMemory, destMemory._offset);
 
 	// allocate command buffer used for read backs
 	VkCommandBufferAllocateInfo allocInfo = {};
@@ -507,7 +507,7 @@ void VulkanSwapChain::ReadPixels(VkCommandPool commandPool, void* data)
 
 	// copy image to buffer
 	VkBufferImageCopy bufferImageCopy = {};
-	bufferImageCopy.bufferOffset = destMemory._offset;
+	bufferImageCopy.bufferOffset = 0;
 	bufferImageCopy.bufferRowLength = 0;		// tightly packed
 	bufferImageCopy.bufferImageHeight = 0;		// tightly packed
 	bufferImageCopy.imageExtent.width = _swapChainExtent.width;

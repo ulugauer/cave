@@ -45,12 +45,14 @@ struct VulkanDeviceMemory
 	{
 		_offset = _size = 0;
 		_vkDeviceMemory = VK_NULL_HANDLE;
+		_memoryTypeIndex = 0;
 		_needsFlush = false;
 		_mappedAddress = nullptr;
 	}
 
 	uint64_t _offset;	///< Memory offset
 	uint64_t _size;		///< Actual allocated size
+	uint32_t _memoryTypeIndex; ///< type of memory
 	VkDeviceMemory _vkDeviceMemory;		///< Vulkan device memory handle
 	bool _needsFlush;		///< does this memory need a flush before usage
 	void* _mappedAddress;	///< Pointer to virtual memory if mapped
@@ -65,9 +67,11 @@ struct VulkanDeviceMemoryPageEntry
 {
 	VulkanDeviceMemoryPageEntry()
 	{
+		_allocationCount = 0;
 		_vkBuffer = VK_NULL_HANDLE;
 	}
 
+	uint64_t _allocationCount;
 	VulkanDeviceMemory _deviceMemory;
 	VkBuffer _vkBuffer;	///< buffer for this page
 };
@@ -278,6 +282,7 @@ private:
 	VkCommandPool _vkCommandPool;	///< Vulkan command pool handle
 	VkCommandBuffer _vkTransferCommandBuffer;	///< Vulkan command buffer for data transfers
 	VkCommandBuffer _vkImageTransferCommandBuffer;	///< Vulkan command buffer for image transfers
+	CaveList<VulkanDeviceMemoryPageEntry> _bufferMemoryPages;	///< Memory pages allocated for bufferse
 	VkFence _vkCopyFence;	///< Fence used to wait submited buffer copies
 	CaveList<VulkanDeviceMemoryPageEntry> _stagingMemoryPages;	///< Memory pages allocated for staging operations
 	size_t _copyCount;	///< keep track of submitted copies
