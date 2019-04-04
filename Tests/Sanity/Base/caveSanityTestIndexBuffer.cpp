@@ -55,7 +55,7 @@ bool CaveSanityTestIndexBuffer::IsSupported(RenderDevice*)
 	return true;
 }
 
-bool CaveSanityTestIndexBuffer::Run(RenderDevice *device, RenderCommandPool* commandPool, cave::RenderPass* renderPass, userContextData* pUserData)
+bool CaveSanityTestIndexBuffer::Run(RenderDevice *device, RenderCommandPool* commandPool, userContextData* pUserData)
 {
 	try
 	{
@@ -69,10 +69,10 @@ bool CaveSanityTestIndexBuffer::Run(RenderDevice *device, RenderCommandPool* com
 		CreateColorBlendState(device);
 		CreateDynamicState(device);
 		CreatePipelineLayout(device);
-		//CreateRenderPass(device);
+		CreateRenderPass(device);
 		CreateVertexBuffer(device);
 		CreateIndexBuffer(device);
-		CreateGraphicsPipeline(device, renderPass);
+		CreateGraphicsPipeline(device, _renderPass);
 		AllocateCommandBuffers(device, commandPool);
 	}
 	catch (CaveSanityTestException err)
@@ -96,7 +96,7 @@ bool CaveSanityTestIndexBuffer::Run(RenderDevice *device, RenderCommandPool* com
 		device->BeginCommandBuffer(_commandBuffers[i], beginInfo);
 		// render pass begin
 		RenderCmdRenderPassInfo renderPassBeginInfo;
-		renderPassBeginInfo._renderPass = renderPass;
+		renderPassBeginInfo._renderPass = _renderPass;
 		renderPassBeginInfo._swapChainIndex = static_cast<int32_t>(i); ///< fetch framebuffer from swap chain
 		renderPassBeginInfo._clearValueCount = 2;
 		renderPassBeginInfo._clearValues = clearValues;
@@ -308,38 +308,57 @@ void CaveSanityTestIndexBuffer::CreatePipelineLayout(cave::RenderDevice *device)
 
 void CaveSanityTestIndexBuffer::CreateRenderPass(cave::RenderDevice *device)
 {
-	HalRenderPassAttachment renderAttachment;
-	renderAttachment._format = device->GetSwapChainImageFormat();
-	renderAttachment._samples = HalSampleCount::SampleCount1;
-	renderAttachment._loadOp = HalAttachmentLoadOperation::Clear;
-	renderAttachment._storeOp = HalAttachmentStoreOperation::Store;
-	renderAttachment._loadStencilOp = HalAttachmentLoadOperation::DontCare;
-	renderAttachment._storeStencilOp = HalAttachmentStoreOperation::DontCare;
-	renderAttachment._initialLayout = HalImageLayout::Undefined;
-	renderAttachment._finalLayout = HalImageLayout::PresentSrcKHR;
-	HalAttachmentReference attachRef;
-	attachRef._attachment = 0;
-	attachRef._layout = HalImageLayout::ColorAttachment;
-	HalSubpassDescription subpassDesc;
-	subpassDesc._pipelineBindPoint = HalPipelineBindPoints::Graphics;
-	subpassDesc._colorAttachmentCount = 1;
-	subpassDesc._pColorAttachments = &attachRef;
-	HalSubpassDependency dependency;
-	dependency._srcSubpass = HAL_SUBPASS_EXTERNAL;	// special subpass
-	dependency._dstSubpass = 0;	// our subpass
-	dependency._srcStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
-	dependency._srcAccessMask = HalAccessBits::AccessNone;
-	dependency._dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
-	dependency._dstAccessMask = HalAccessBits::ColorAttachmentRead | HalAccessBits::ColorAttachmentWrite;
-	dependency._dependencyFlags = static_cast<HalDependencyFlags>(HalDependencyBits::DependencyNone);
-	HalRenderPassInfo renderPassInfo;
-	renderPassInfo._attachmentCount = 1;
-	renderPassInfo._pAttachments = &renderAttachment;
-	renderPassInfo._subpassCount = 1;
-	renderPassInfo._pSubpasses = &subpassDesc;
-	renderPassInfo._dependencyCount = 1;
-	renderPassInfo._pDependencies = &dependency;
-	_renderPass = device->CreateRenderPass(renderPassInfo);
+    HalRenderPassAttachment renderAttachments[2];
+    renderAttachments[0]._format = device->GetSwapChainImageFormat();
+    renderAttachments[0]._samples = HalSampleCount::SampleCount1;
+    renderAttachments[0]._loadOp = HalAttachmentLoadOperation::Clear;
+    renderAttachments[0]._storeOp = HalAttachmentStoreOperation::Store;
+    renderAttachments[0]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
+    renderAttachments[0]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
+    renderAttachments[0]._initialLayout = HalImageLayout::Undefined;
+    renderAttachments[0]._finalLayout = HalImageLayout::PresentSrcKHR;
+
+    HalAttachmentReference colorAttachRef;
+    colorAttachRef._attachment = 0;
+    colorAttachRef._layout = HalImageLayout::ColorAttachment;
+
+    // depth attachment
+    renderAttachments[1]._format = device->GetSwapChainDepthImageFormat();
+    renderAttachments[1]._samples = HalSampleCount::SampleCount1;
+    renderAttachments[1]._loadOp = HalAttachmentLoadOperation::Clear;
+    renderAttachments[1]._storeOp = HalAttachmentStoreOperation::DontCare;
+    renderAttachments[1]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
+    renderAttachments[1]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
+    renderAttachments[1]._initialLayout = HalImageLayout::Undefined;
+    renderAttachments[1]._finalLayout = HalImageLayout::DepthStencilAttachment;
+
+    HalAttachmentReference depthAttachRef;
+    depthAttachRef._attachment = 1;
+    depthAttachRef._layout = HalImageLayout::DepthStencilAttachment;
+
+    HalSubpassDescription subpassDesc;
+    subpassDesc._pipelineBindPoint = HalPipelineBindPoints::Graphics;
+    subpassDesc._colorAttachmentCount = 1;
+    subpassDesc._pColorAttachments = &colorAttachRef;
+    subpassDesc._pDepthStencilAttachment = &depthAttachRef;
+
+    HalSubpassDependency dependency;
+    dependency._srcSubpass = HAL_SUBPASS_EXTERNAL;	// special subpass
+    dependency._dstSubpass = 0;	// our subpass
+    dependency._srcStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
+    dependency._srcAccessMask = HalAccessBits::AccessNone;
+    dependency._dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
+    dependency._dstAccessMask = HalAccessBits::ColorAttachmentRead | HalAccessBits::ColorAttachmentWrite;
+    dependency._dependencyFlags = static_cast<HalDependencyFlags>(HalDependencyBits::DependencyNone);
+
+    HalRenderPassInfo renderPassInfo;
+    renderPassInfo._attachmentCount = 2;
+    renderPassInfo._pAttachments = renderAttachments;
+    renderPassInfo._subpassCount = 1;
+    renderPassInfo._pSubpasses = &subpassDesc;
+    renderPassInfo._dependencyCount = 1;
+    renderPassInfo._pDependencies = &dependency;
+    _renderPass = device->CreateRenderPass(renderPassInfo);
 
 	if (!_renderPass)
 		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to create render pass");

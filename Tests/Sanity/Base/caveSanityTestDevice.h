@@ -30,7 +30,7 @@ public:
 	~CaveSanityTestDevice();
 
 	bool IsSupported(cave::RenderDevice *device);
-	bool Run(cave::RenderDevice *device, cave::RenderCommandPool* commandPool, cave::RenderPass* renderPass, userContextData* pUserData);
+	bool Run(cave::RenderDevice *device, cave::RenderCommandPool* commandPool, userContextData* pUserData);
 	void Cleanup(cave::RenderDevice *device, userContextData* pUserData);
 	bool RunPerformance(cave::RenderDevice *device, userContextData* pContextData);
 

@@ -108,12 +108,11 @@ public:
 	*
 	* @param device[in]			Pointer to a RenderDevice
 	* @param commandPool[in]	Pointer to a command pool object
-	* @param renderPass[in]		Pointer to a RenderPass object
 	* @param pUserData[in]		Pointer to pUserData
 	*
 	* @return false if failed
 	*/
-	virtual bool Run(cave::RenderDevice *device, cave::RenderCommandPool* commandPool, cave::RenderPass* renderPass, userContextData* pUserData) = 0;
+	virtual bool Run(cave::RenderDevice *device, cave::RenderCommandPool* commandPool, userContextData* pUserData) = 0;
 
 	/**
 	* @brief This cleans up state after the test if needed

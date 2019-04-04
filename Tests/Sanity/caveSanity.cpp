@@ -92,7 +92,7 @@ destroyTestList()
 }
 
 static bool
-executeTest(RenderDevice *device, RenderCommandPool* commandPool, RenderPass* renderPass, CaveSanityTestBase *curTest, const char *testName, userContextData* pUserData)
+executeTest(RenderDevice *device, RenderCommandPool* commandPool, CaveSanityTestBase *curTest, const char *testName, userContextData* pUserData)
 {
 	bool success = true;
 
@@ -107,7 +107,7 @@ executeTest(RenderDevice *device, RenderCommandPool* commandPool, RenderPass* re
 
 	if (curTest->IsSupported(device))
 	{
-		success = curTest->Run(device, commandPool, renderPass, pUserData);
+		success = curTest->Run(device, commandPool, pUserData);
 		curTest->Cleanup(device, pUserData);
 	}
 
@@ -398,7 +398,7 @@ int main(int argc, char* argv[])
 	// run tests
 	for (uint32_t i = 0; i < sizeof(testList) / sizeof(testList[0]); i++)
 	{
-		bool passed = executeTest(renderDevice, graphicsCommandPool, renderPass, testList[i].m_test, testList[i].m_name, &userData);
+		bool passed = executeTest(renderDevice, graphicsCommandPool, testList[i].m_test, testList[i].m_name, &userData);
 
 		if (pixelBuffer && (g_WriteImage || g_CompareImage))
 			renderDevice->ReadPixels(pixelBuffer);
