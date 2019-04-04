@@ -35,6 +35,7 @@ class VulkanInstance;
 class VulkanPhysicalDevice;
 class VulkanSwapChain;
 class VulkanMemoryManager;
+class VulkanRenderPass;
 
 /**
 * Vulkan render device
@@ -502,10 +503,8 @@ public:
 	*		 This functions creates as much framebuffers as swap chain images.
 	*		 This functions throws an exception if soemthing goes wrong
 	*
-	* @param[in] renderPass		RenderPass object which we need to attach to the framebuffers
-	*
 	*/
-	void CreateSwapChainFramebuffers(HalRenderPass* renderPass) override;
+	void CreateSwapChainFramebuffers() override;
 
 	/**
 	* @brief Get graphics familiy index
@@ -566,6 +565,7 @@ private:
 	VkCommandPool _presentQueueCommandPool;	///< Command pool used for presentations
 	VkCommandPool _graphicsQueueCommandPool;	///< Command pool used for rendering
 	VkCommandBuffer* _presentCommandBufferArray;	///< Presentation command buffer
+    VulkanRenderPass* _presentRenderPass;   ///< Render pass created along with the presentation framebuffers
 	caveVector<VkFramebuffer> _presentationFramebuffers; ///< Array of framebuffers used for presentation
 	uint32_t _presentationQueueFamilyIndex; ///< Index of present queue familiy
 	uint32_t _graphicsQueueFamilyIndex; ///< Index of graphics queue familiy

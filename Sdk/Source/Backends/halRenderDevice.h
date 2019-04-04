@@ -503,10 +503,8 @@ public:
 	*		 This functions creates as much framebuffers as swap chain images.
 	*		 This functions throws an exception if soemthing goes wrong
 	*
-	* @param[in] renderPass		RenderPass object which we need to attach to the framebuffers
-	*
 	*/
-	virtual void CreateSwapChainFramebuffers(HalRenderPass* renderPass) = 0;
+	virtual void CreateSwapChainFramebuffers() = 0;
 
 	/**
 	* @brief Read pixels from the last used swap chain image

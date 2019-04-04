@@ -147,14 +147,11 @@ void RenderDevice::CreateSwapChain()
 	}
 }
 
-bool RenderDevice::CreateSwapChainFramebuffers(RenderPass* renderPass)
+bool RenderDevice::CreateSwapChainFramebuffers()
 {
-	if (renderPass == nullptr)
-		return false;
-
 	try
 	{
-		_pHalRenderDevice->CreateSwapChainFramebuffers(renderPass->GetHalHandle());
+		_pHalRenderDevice->CreateSwapChainFramebuffers();
 	}
 	catch (std::exception& )
 	{

@@ -63,6 +63,7 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 	, _presentQueueCommandPool(VK_NULL_HANDLE)
 	, _graphicsQueueCommandPool(VK_NULL_HANDLE)
 	, _presentCommandBufferArray(nullptr)
+    , _presentRenderPass(nullptr)
 	, _presentationFramebuffers(instance->GetEngineAllocator())
 {
 	std::set<int> uniqueQueueFamilies;
@@ -183,6 +184,9 @@ VulkanRenderDevice::~VulkanRenderDevice()
 		// Shutdown savely. Wait that the device is idle
 		VulkanApi::GetApi()->vkDeviceWaitIdle(_vkDevice);
 	}
+
+    if (_presentRenderPass)
+        DeallocateDelete(*_pInstance->GetEngineAllocator(), *_presentRenderPass);
 
 	if (!_presentationFramebuffers.Empty())
 	{
@@ -328,19 +332,79 @@ void VulkanRenderDevice::CreateSwapChain(SwapChainInfo& swapChainInfo)
 	}
 }
 
-void VulkanRenderDevice::CreateSwapChainFramebuffers(HalRenderPass* renderPass)
+void VulkanRenderDevice::CreateSwapChainFramebuffers()
 {
 	if (_presentationFramebuffers.Size() != _pSwapChain->GetSwapChainImageCount())
 	{
 		throw BackendException("Error: presentation framebuffers not equal swap chain images");
 	}
 
-	VulkanRenderPass* vulkanRenderPass = static_cast<VulkanRenderPass*>(renderPass);
+    const VkImageView depthImageView = _pSwapChain->GetSwapChainDepthImageView();
+    // we have always a color attachment
+    uint32_t attachmentCount = 1;
+    if (depthImageView != VK_NULL_HANDLE)
+        attachmentCount++;
+
+    // create render pass first
+    HalRenderPassAttachment renderAttachments[2];
+    renderAttachments[0]._format = GetSwapChainImageFormat();
+    renderAttachments[0]._samples = HalSampleCount::SampleCount1;
+    renderAttachments[0]._loadOp = HalAttachmentLoadOperation::Clear;
+    renderAttachments[0]._storeOp = HalAttachmentStoreOperation::Store;
+    renderAttachments[0]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
+    renderAttachments[0]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
+    renderAttachments[0]._initialLayout = HalImageLayout::Undefined;
+    renderAttachments[0]._finalLayout = HalImageLayout::PresentSrcKHR;
+
+    HalAttachmentReference colorAttachRef;
+    colorAttachRef._attachment = 0;
+    colorAttachRef._layout = HalImageLayout::ColorAttachment;
+
+    // depth attachment
+    renderAttachments[1]._format = GetSwapChainDepthImageFormat();
+    renderAttachments[1]._samples = HalSampleCount::SampleCount1;
+    renderAttachments[1]._loadOp = HalAttachmentLoadOperation::Clear;
+    renderAttachments[1]._storeOp = HalAttachmentStoreOperation::DontCare;
+    renderAttachments[1]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
+    renderAttachments[1]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
+    renderAttachments[1]._initialLayout = HalImageLayout::Undefined;
+    renderAttachments[1]._finalLayout = HalImageLayout::DepthStencilAttachment;
+
+    HalAttachmentReference depthAttachRef;
+    depthAttachRef._attachment = 1;
+    depthAttachRef._layout = HalImageLayout::DepthStencilAttachment;
+
+    HalSubpassDescription subpassDesc;
+    subpassDesc._pipelineBindPoint = HalPipelineBindPoints::Graphics;
+    subpassDesc._colorAttachmentCount = 1;
+    subpassDesc._pColorAttachments = &colorAttachRef;
+    if (depthImageView != VK_NULL_HANDLE)
+        subpassDesc._pDepthStencilAttachment = &depthAttachRef;
+    else
+        subpassDesc._pDepthStencilAttachment = nullptr;
+
+    HalSubpassDependency dependency;
+    dependency._srcSubpass = HAL_SUBPASS_EXTERNAL;	// special subpass
+    dependency._dstSubpass = 0;	// our subpass
+    dependency._srcStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
+    dependency._srcAccessMask = HalAccessBits::AccessNone;
+    dependency._dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
+    dependency._dstAccessMask = HalAccessBits::ColorAttachmentRead | HalAccessBits::ColorAttachmentWrite;
+    dependency._dependencyFlags = static_cast<HalDependencyFlags>(HalDependencyBits::DependencyNone);
+
+    HalRenderPassInfo renderPassInfo;
+    renderPassInfo._attachmentCount = attachmentCount;
+    renderPassInfo._pAttachments = renderAttachments;
+    renderPassInfo._subpassCount = 1;
+    renderPassInfo._pSubpasses = &subpassDesc;
+    renderPassInfo._dependencyCount = 1;
+    renderPassInfo._pDependencies = &dependency;
+    _presentRenderPass = AllocateObject<VulkanRenderPass>(*_pInstance->GetEngineAllocator(), this, renderPassInfo);
+
 	VkExtent2D swapChainExtend = _pSwapChain->GetSwapChainImageExtend();
 
 	// We have a max of 2 attachments
 	VkImageView attachments[2];
-	assert(renderPass->GetAttachmentCount() <= 2);
 
 	for (size_t i = 0; i < _presentationFramebuffers.Size(); i++)
 	{
@@ -349,15 +413,15 @@ void VulkanRenderDevice::CreateSwapChainFramebuffers(HalRenderPass* renderPass)
 			continue;
 
 		attachments[0] = _pSwapChain->GetSwapChainImageView(i);
-		if (renderPass->GetAttachmentCount() > 1)
+		if (attachmentCount > 1)
 			attachments[1] = _pSwapChain->GetSwapChainDepthImageView();
 
 		VkFramebufferCreateInfo framebufferInfo;
 		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		framebufferInfo.pNext = nullptr;
 		framebufferInfo.flags = 0;
-		framebufferInfo.renderPass = vulkanRenderPass->GetRenderPass();
-		framebufferInfo.attachmentCount = renderPass->GetAttachmentCount();
+		framebufferInfo.renderPass = _presentRenderPass->GetRenderPass();
+		framebufferInfo.attachmentCount = attachmentCount;
 		framebufferInfo.pAttachments = attachments;
 		framebufferInfo.layers = 1;
 		framebufferInfo.width = swapChainExtend.width;

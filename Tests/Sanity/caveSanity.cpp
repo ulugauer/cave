@@ -288,64 +288,9 @@ int main(int argc, char* argv[])
 	// asynchronously load our image assets for lader usage
 	ResourceManager& rm = renderDevice->GetResourceManager();
 	rm.LoadImageAsset("UVChecker-dxt5.dds");
-
-
-	// Right now we need a common render pass for all tests.
-	// This will change one we can do offscreen rendering.
-	HalRenderPassAttachment renderAttachments[2];
-	renderAttachments[0]._format = renderDevice->GetSwapChainImageFormat();
-	renderAttachments[0]._samples = HalSampleCount::SampleCount1;
-	renderAttachments[0]._loadOp = HalAttachmentLoadOperation::Clear;
-	renderAttachments[0]._storeOp = HalAttachmentStoreOperation::Store;
-	renderAttachments[0]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
-	renderAttachments[0]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
-	renderAttachments[0]._initialLayout = HalImageLayout::Undefined;
-	renderAttachments[0]._finalLayout = HalImageLayout::PresentSrcKHR;
-
-	HalAttachmentReference colorAttachRef;
-	colorAttachRef._attachment = 0;
-	colorAttachRef._layout = HalImageLayout::ColorAttachment;
-
-	// depth attachment
-	renderAttachments[1]._format = renderDevice->GetSwapChainDepthImageFormat();
-	renderAttachments[1]._samples = HalSampleCount::SampleCount1;
-	renderAttachments[1]._loadOp = HalAttachmentLoadOperation::Clear;
-	renderAttachments[1]._storeOp = HalAttachmentStoreOperation::DontCare;
-	renderAttachments[1]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
-	renderAttachments[1]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
-	renderAttachments[1]._initialLayout = HalImageLayout::Undefined;
-	renderAttachments[1]._finalLayout = HalImageLayout::DepthStencilAttachment;
-
-	HalAttachmentReference depthAttachRef;
-	depthAttachRef._attachment = 1;
-	depthAttachRef._layout = HalImageLayout::DepthStencilAttachment;
-
-	HalSubpassDescription subpassDesc;
-	subpassDesc._pipelineBindPoint = HalPipelineBindPoints::Graphics;
-	subpassDesc._colorAttachmentCount = 1;
-	subpassDesc._pColorAttachments = &colorAttachRef;
-	subpassDesc._pDepthStencilAttachment = &depthAttachRef;
-
-	HalSubpassDependency dependency;
-	dependency._srcSubpass = HAL_SUBPASS_EXTERNAL;	// special subpass
-	dependency._dstSubpass = 0;	// our subpass
-	dependency._srcStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
-	dependency._srcAccessMask = HalAccessBits::AccessNone;
-	dependency._dstStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
-	dependency._dstAccessMask = HalAccessBits::ColorAttachmentRead | HalAccessBits::ColorAttachmentWrite;
-	dependency._dependencyFlags = static_cast<HalDependencyFlags>(HalDependencyBits::DependencyNone);
-
-	HalRenderPassInfo renderPassInfo;
-	renderPassInfo._attachmentCount = 2;
-	renderPassInfo._pAttachments = renderAttachments;
-	renderPassInfo._subpassCount = 1;
-	renderPassInfo._pSubpasses = &subpassDesc;
-	renderPassInfo._dependencyCount = 1;
-	renderPassInfo._pDependencies = &dependency;
-	RenderPass* renderPass = renderDevice->CreateRenderPass(renderPassInfo);
 	
-	// with a renderpass object we can create our swap chain framebuffers
-	if (!renderDevice->CreateSwapChainFramebuffers(renderPass))
+	// create our swap chain framebuffers
+	if (!renderDevice->CreateSwapChainFramebuffers())
 	{
 		std::cerr << "Failed to create swap chain framebuffers\n";
 	}
@@ -493,7 +438,6 @@ int main(int argc, char* argv[])
 	destroyTestList();
 
 	// release resources
-	renderDevice->ReleaseRenderPass(renderPass);
 	if (pixelBuffer)
 		renderDevice->GetEngineAllocator()->Deallocate(pixelBuffer);
 	// release at last
