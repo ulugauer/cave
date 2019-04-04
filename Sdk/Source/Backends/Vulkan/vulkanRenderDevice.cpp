@@ -186,7 +186,9 @@ VulkanRenderDevice::~VulkanRenderDevice()
 	}
 
     if (_presentRenderPass)
+	{
         DeallocateDelete(*_pInstance->GetEngineAllocator(), *_presentRenderPass);
+	}
 
 	if (!_presentationFramebuffers.Empty())
 	{
