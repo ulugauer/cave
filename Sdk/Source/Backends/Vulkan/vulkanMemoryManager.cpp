@@ -40,9 +40,12 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 	, _vkImageTransferCommandBuffer(VK_NULL_HANDLE)
 	, _bufferMemoryPages(renderDevice->GetEngineAllocator())
 	, _vkCopyFence(VK_NULL_HANDLE)
+    , _vkCopyImageFence(VK_NULL_HANDLE)
 	, _stagingMemoryPages(renderDevice->GetEngineAllocator())
 	, _copyCount(0)
 	, _copyWaitCount(0)
+    , _copyImageCount(0)
+    , _copyImageWaitCount(0)
 {
 	// store some physical device properties
 	VkPhysicalDeviceProperties deviceProperties = physicalDevice->GetPhysicalDeviceProperties();
@@ -82,6 +85,13 @@ VulkanMemoryManager::VulkanMemoryManager(VulkanInstance* instance, VulkanPhysica
 
 	VulkanApi::GetApi()->vkResetFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyFence);
 
+    // create image transfer sync fence
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+    if (VulkanApi::GetApi()->vkCreateFence(_pRenderDevice->GetDeviceHandle(), &fenceInfo, nullptr, &_vkCopyImageFence) != VK_SUCCESS)
+        throw BackendException("Error failed to create GPU device memory manager");
+
+    VulkanApi::GetApi()->vkResetFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyImageFence);
+
 	// Allocate a page at start
 	AllocateStagingPage(StagingBufferSize);
 }
@@ -102,6 +112,9 @@ VulkanMemoryManager::~VulkanMemoryManager()
 
 	if (_vkCopyFence != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkCopyFence, nullptr);
+
+    if (_vkCopyImageFence != VK_NULL_HANDLE)
+        VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkCopyImageFence, nullptr);
 
 	// Release staging memory pages
 	CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageIter = _stagingMemoryPages.begin();
@@ -487,6 +500,60 @@ void VulkanMemoryManager::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, uin
 
 	_copyCount++;
 	_copyWaitCount++;
+}
+
+void VulkanMemoryManager::CopyBufferToImage(VkBuffer srcBuffer, VkImage dstImage, caveVector<VkBufferImageCopy>& regions)
+{
+    if (_vkCommandPool == VK_NULL_HANDLE || _vkImageTransferCommandBuffer == VK_NULL_HANDLE)
+        return;
+
+    // transition for copy
+    VkImageMemoryBarrier barrier = {};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image = dstImage;
+    barrier.subresourceRange.aspectMask = regions[0].imageSubresource.aspectMask;   // the same for all
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = static_cast<uint32_t>(regions.Size());
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+    barrier.srcAccessMask = 0;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT; // We are going to write to the texture
+
+    VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageTransferCommandBuffer,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        0,
+        0, nullptr, // no memory barriers
+        0, nullptr, // no buffer barriers
+        1, &barrier);
+
+    VulkanApi::GetApi()->vkCmdCopyBufferToImage(_vkImageTransferCommandBuffer, srcBuffer, dstImage,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(regions.Size()), regions.Data());
+
+    // transition for shader usage
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image = dstImage;
+    barrier.subresourceRange.aspectMask = regions[0].imageSubresource.aspectMask;   // the same for all
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = static_cast<uint32_t>(regions.Size());
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT; // Next access is shader reads
+
+    VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageTransferCommandBuffer,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        0,
+        0, nullptr, // no memory barriers
+        0, nullptr, // no buffer barriers
+        1, &barrier);
 }
 
 }

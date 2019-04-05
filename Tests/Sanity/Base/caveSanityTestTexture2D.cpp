@@ -194,13 +194,10 @@ void CaveSanityTestTexture2D::LoadResource(cave::RenderDevice *device)
 	if (!_material || _material->GetStageCount() == 0)
 		throw CaveSanityTestException("CaveSanityTestIndexBuffer: Failed to load material");
 
-	// Create texture
+	// Create texture (allocate and upload data)
 	_texture = device->CreateTexture("UVChecker-dxt5.dds");
 	if (!_texture)
 		throw CaveSanityTestException("CaveSanityTestTexture2D: Failed to load texture");
-
-	// allocate memory
-	_texture->Bind();
 }
 
 void CaveSanityTestTexture2D::CreateRenderSection(RenderDevice *device, userContextData* pUserData)
