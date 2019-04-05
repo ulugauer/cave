@@ -110,22 +110,22 @@ VulkanMemoryManager::~VulkanMemoryManager()
 	if (_vkCommandPool != VK_NULL_HANDLE)
 		VulkanApi::GetApi()->vkDestroyCommandPool(_pRenderDevice->GetDeviceHandle(), _vkCommandPool, nullptr);
 
-	if (_vkCopyFence != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkCopyFence, nullptr);
+    if (_vkCopyFence != VK_NULL_HANDLE)
+        VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkCopyFence, nullptr);
 
     if (_vkCopyImageFence != VK_NULL_HANDLE)
         VulkanApi::GetApi()->vkDestroyFence(_pRenderDevice->GetDeviceHandle(), _vkCopyImageFence, nullptr);
 
-	// Release staging memory pages
-	CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageIter = _stagingMemoryPages.begin();
-	for (; pageIter != _stagingMemoryPages.end(); pageIter++)
-	{
-		ReleaseStagingMemory(pageIter->_deviceMemory);
-		if (pageIter->_vkBuffer != VK_NULL_HANDLE)
-			VulkanApi::GetApi()->vkDestroyBuffer(_pRenderDevice->GetDeviceHandle(), pageIter->_vkBuffer, nullptr);
-	}
+    // Release staging memory pages
+    CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageIter = _stagingMemoryPages.begin();
+    for (; pageIter != _stagingMemoryPages.end(); pageIter++)
+    {
+        ReleaseStagingMemory(pageIter->_deviceMemory);
+        if (pageIter->_vkBuffer != VK_NULL_HANDLE)
+            VulkanApi::GetApi()->vkDestroyBuffer(_pRenderDevice->GetDeviceHandle(), pageIter->_vkBuffer, nullptr);
+    }
 
-	// Release buffer memory pages
+    // Release buffer memory pages
 	CaveList<VulkanDeviceMemoryPageEntry>::Iterator pageBufferIter = _bufferMemoryPages.begin();
 	for (; pageBufferIter != _bufferMemoryPages.end(); pageBufferIter++)
 	{
