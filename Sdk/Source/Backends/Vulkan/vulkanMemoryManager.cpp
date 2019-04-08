@@ -257,43 +257,75 @@ void VulkanMemoryManager::ReleaseImageMemory(VulkanDeviceMemory& deviceMemory)
 
 void VulkanMemoryManager::SubmitCopies()
 {
-	if (_copyCount == 0)
-		return;
+    if (_copyCount > 0)
+    {
+        VulkanApi::GetApi()->vkEndCommandBuffer(_vkTransferCommandBuffer);
 
-	VulkanApi::GetApi()->vkEndCommandBuffer(_vkTransferCommandBuffer);
+        // submit job
+        VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &_vkTransferCommandBuffer;
 
-	// submit job
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &_vkTransferCommandBuffer;
+        VulkanApi::GetApi()->vkQueueSubmit(_pRenderDevice->GetGraphicsQueue(), 1, &submitInfo, _vkCopyFence);
 
-	VulkanApi::GetApi()->vkQueueSubmit(_pRenderDevice->GetGraphicsQueue(), 1, &submitInfo, _vkCopyFence);
-	
-	_copyCount = 0;
+        _copyCount = 0;
+    }
+    if (_copyImageCount > 0)
+    {
+        VulkanApi::GetApi()->vkEndCommandBuffer(_vkImageTransferCommandBuffer);
+
+        // submit job
+        VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &_vkImageTransferCommandBuffer;
+
+        VulkanApi::GetApi()->vkQueueSubmit(_pRenderDevice->GetGraphicsQueue(), 1, &submitInfo, _vkCopyImageFence);
+
+        _copyImageCount = 0;
+    }
 }
 
 void VulkanMemoryManager::WaitForCopies()
 {
 	SubmitCopies(); // just in case it did not happen already
 
-	if (_copyWaitCount == 0)
-		return;
+    if (_copyWaitCount > 0)
+    {
+        VkResult result = VulkanApi::GetApi()->vkGetFenceStatus(_pRenderDevice->GetDeviceHandle(), _vkCopyFence);
+        if (result == VK_NOT_READY)
+        {
+            // Wait for fence
+            VulkanApi::GetApi()->vkWaitForFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyFence, VK_TRUE, (std::numeric_limits<uint64_t>::max)());
+        }
 
-	VkResult result = VulkanApi::GetApi()->vkGetFenceStatus(_pRenderDevice->GetDeviceHandle(), _vkCopyFence);
-	if (result == VK_NOT_READY)
-	{
-		// Wait for fence
-		VulkanApi::GetApi()->vkWaitForFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyFence, VK_TRUE, (std::numeric_limits<uint64_t>::max)());
-	}
+        _copyWaitCount = 0;
 
-	_copyWaitCount = 0;
+        // Reset fence for re-use
+        VulkanApi::GetApi()->vkResetFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyFence);
 
-	// Reset fence for re-use
-	VulkanApi::GetApi()->vkResetFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyFence);
+        // we re-use the command buffer which is safe after we waited for the fence
+        VulkanApi::GetApi()->vkResetCommandBuffer(_vkTransferCommandBuffer, 0);
+    }
 
-	// we re-use the command buffer which is safe after we waited for the fence
-	VulkanApi::GetApi()->vkResetCommandBuffer(_vkTransferCommandBuffer, 0);
+    if (_copyImageWaitCount > 0)
+    {
+        VkResult result = VulkanApi::GetApi()->vkGetFenceStatus(_pRenderDevice->GetDeviceHandle(), _vkCopyImageFence);
+        if (result == VK_NOT_READY)
+        {
+            // Wait for fence
+            VulkanApi::GetApi()->vkWaitForFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyImageFence, VK_TRUE, (std::numeric_limits<uint64_t>::max)());
+        }
+
+        _copyImageWaitCount = 0;
+
+        // Reset fence for re-use
+        VulkanApi::GetApi()->vkResetFences(_pRenderDevice->GetDeviceHandle(), 1, &_vkCopyImageFence);
+
+        // we re-use the command buffer which is safe after we waited for the fence
+        VulkanApi::GetApi()->vkResetCommandBuffer(_vkImageTransferCommandBuffer, 0);
+    }
 
 	// Make staging buffers available again
 	// Reset first page remove others
@@ -507,6 +539,20 @@ void VulkanMemoryManager::CopyBufferToImage(VkBuffer srcBuffer, VkImage dstImage
     if (_vkCommandPool == VK_NULL_HANDLE || _vkImageTransferCommandBuffer == VK_NULL_HANDLE)
         return;
 
+    // First copy in frame
+    if (_copyImageCount == 0)
+    {
+        // If we already submited some copies we need to wait before restart
+        if (_copyImageWaitCount > 0)
+            WaitForCopies();
+
+        VkCommandBufferBeginInfo beginInfo = {};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+        VulkanApi::GetApi()->vkBeginCommandBuffer(_vkImageTransferCommandBuffer, &beginInfo);
+    }
+
     // transition for copy
     VkImageMemoryBarrier barrier = {};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -549,11 +595,14 @@ void VulkanMemoryManager::CopyBufferToImage(VkBuffer srcBuffer, VkImage dstImage
     barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT; // Next access is shader reads
 
     VulkanApi::GetApi()->vkCmdPipelineBarrier(_vkImageTransferCommandBuffer,
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
         0,
         0, nullptr, // no memory barriers
         0, nullptr, // no buffer barriers
         1, &barrier);
+
+    _copyImageCount++;
+    _copyImageWaitCount++;
 }
 
 }

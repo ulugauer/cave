@@ -154,7 +154,9 @@ void VulkanImage::Update(const void* data)
 
         bufferOffset += mipSize;
     }
-}
 
+    // copy buffer
+    memManager->CopyBufferToImage(stagingBufferInfo._stagingBuffer, _vkImage, imageCopyArray);
+}
 
 }
