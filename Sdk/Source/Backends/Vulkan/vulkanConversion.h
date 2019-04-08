@@ -77,6 +77,24 @@ public:
     static HalImageFormat ConvertImageFormatFromVulkan(VkFormat imageFormat);
 
     /**
+    * @brief Convert from generic image view type to vulkan view type
+    *
+    * @param[in] imageViewType  Generic image view type
+    *
+    * @return Vulkan view type
+    */
+    static VkImageViewType ConvertImageViewTypeToVulkan(HalImageViewType imageViewType);
+
+    /**
+   * @brief Convert from vulkan image view type to generic image view type
+   *
+   * @param[in] imageViewType	Vulkan view type
+   *
+   * @return Generic image view type
+   */
+    static HalImageViewType ConvertImageViewTypeFromVulkan(VkImageViewType imageViewType);
+
+    /**
     * @brief Query image size info for an image format
     *
     * @param[in] imageFormat	Vulkan image format
@@ -84,6 +102,60 @@ public:
     * @return VulkanImageSizeInfo struct
     */
     static VulkanImageSizeInfo GetImageSizeInfo(VkFormat imageFormat);
+
+    /**
+    * @brief Convert from generic image aspect flags to vulkan aspect flags
+    *
+    * @param[in] imageAspectFlags  Generic image aspect flags
+    *
+    * @return Vulkan aspect flags
+    */
+    static VkImageAspectFlags ConvertImageAspectFlagsToVulkan(HalImageAspectFlags imageAspectFlags);
+
+    /**
+   * @brief Convert from vulkan image aspect flags to generic image aspect flags
+   *
+   * @param[in] imageAspectFlags	Vulkan aspect flags
+   *
+   * @return Generic image aspect flags
+   */
+    static HalImageAspectFlags ConvertImageAspectFlagsFormatFromVulkan(VkImageAspectFlags imageAspectFlags);
+
+    /**
+    * @brief Convert from generic component swizzle to vulkan component swizzle
+    *
+    * @param[in] swizzle  Generic component swizzle
+    *
+    * @return Vulkan component swizzle
+    */
+    static VkComponentSwizzle ConvertComponentSwizzleToVulkan(HalComponentSwizzle swizzle);
+
+    /**
+    * @brief Convert from vulkan component swizzle to generic component swizzle
+    *
+    * @param[in] swizzle  Generic component swizzle
+    *
+    * @return Vulkan component swizzle
+    */
+    static HalComponentSwizzle ConvertComponentSwizzleFromVulkan(VkComponentSwizzle swizzle);
+
+    /**
+    * @brief Convert from generic component mapping to vulkan component mapping
+    *
+    * @param[in] components  Generic component mapping
+    *
+    * @return Vulkan component mapping
+    */
+    static VkComponentMapping ConvertComponentMappingToVulkan(HalComponentMapping components);
+
+    /**
+   * @brief Convert from vulkan component mapping to generic component mapping
+   *
+   * @param[in] components	Vulkan component mapping
+   *
+   * @return Generic component mapping
+   */
+    static HalComponentMapping ConvertComponentMappingFromVulkan(VkComponentMapping components);
 
     /**
     * @brief Convert from generic sample count to vulkan sample count

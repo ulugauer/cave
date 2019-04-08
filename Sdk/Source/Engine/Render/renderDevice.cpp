@@ -35,6 +35,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderIndexBuffer.h"
 #include "renderUniformBuffer.h"
 #include "renderTexture.h"
+#include "renderTextureView.h"
 #include "renderCommandBuffer.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
@@ -580,6 +581,33 @@ void RenderDevice::ReleaseTexture(RenderTexture* texture)
 		_pResourceManager->ReleaseTexture(texture);
 	}
 }
+
+RenderTextureView* RenderDevice::CreateTextureView(HalImage* image, HalImageViewInfo& imageView)
+{
+    RenderTextureView* textureView = nullptr;
+
+    try
+    {
+        textureView = AllocateObject<RenderTextureView>(*_pRenderInstance->GetEngineAllocator(), *this, image, imageView);
+        if (textureView)
+            textureView->AddRef();
+
+        return textureView;
+    }
+    catch (std::exception&)
+    {
+        return textureView;
+    }
+}
+
+void RenderDevice::ReleaseTextureView(RenderTextureView* textureView)
+{
+    if (textureView)
+    {
+        textureView->Relase();
+    }
+}
+
 
 bool RenderDevice::AllocateCommandBuffers(RenderCommandPool* commandPool
 		, HalCommandBufferInfo& commandBufferInfo

@@ -82,6 +82,51 @@ enum class HalImageFormat
 };
 
 /**
+* @brief A strongly typed enum class representing image view types
+*/
+enum class HalImageViewType {
+    Image1D = 0,
+    Image2D = 1,
+    Image3D = 2,
+    ImageCube = 3,
+    Image1DArray = 4,
+    Image2DArray = 5,
+    ImageCubeArray = 6
+};
+
+/**
+ * @brief A strongly typed enum class representing component swizzle
+ */
+enum HalComponentSwizzle {
+    Identity = 0,
+    Zero = 1,
+    One = 2,
+    Red = 3,
+    Green = 4,
+    Blue = 5,
+    Alpha = 6
+};
+
+/**
+ * @brief A strongly typed enum class representing image aspect flags
+ */
+enum class HalImageAspectFlagBits {
+    Color = 0x0001,
+    Depth = 0x0002,
+    Stencil = 0x0004,
+    MetaData = 0x0008,
+    Plane0 = 0x0010,
+    Plane1 = 0x0020,
+    Plane2 = 0x0040,
+    MemoryPlane0Ext = 0x0080,
+    MemoryPlane1Ext = 0x0100,
+    MemoryPlane2Ext = 0x0200,
+    MemoryPlane3Ext = 0x0400
+};
+
+typedef uint32_t HalImageAspectFlags;   ///< HalImageAspectFlagBits flags
+
+/**
 *  @brief A strongly typed enum class representing component types
 */
 enum class HalComponentType
@@ -1033,6 +1078,55 @@ struct CAVE_INTERFACE HalImageInfo
 		_queueFamilyIndexCount = 0;
 		_queueFamilyIndices = nullptr;
 	}
+};
+
+/**
+* @brief Hal component swizzle info
+*/
+struct HalComponentMapping 
+{
+    HalComponentSwizzle    _r;
+    HalComponentSwizzle    _g;
+    HalComponentSwizzle    _b;
+    HalComponentSwizzle    _a;
+};
+
+/**
+* @brief Hal sub-resource info
+*/
+struct HalImageSubresourceRange 
+{
+    HalImageAspectFlags _aspectMask;
+    uint32_t _baseMipLevel;
+    uint32_t _levelCount;
+    uint32_t _baseArrayLayer;
+    uint32_t _layerCount;
+};
+
+/**
+* @brief Hal image view create info
+*/
+struct CAVE_INTERFACE HalImageViewInfo
+{
+    HalImageFormat _format;             ///< Image format
+    HalImageViewType _type;             ///< View type
+    HalComponentMapping _components;    ///< Component swizzle
+    HalImageSubresourceRange _subresourceRange; ///< View sub-resource info
+
+    HalImageViewInfo()
+    {
+        _format = HalImageFormat::Undefined;
+        _type = HalImageViewType::Image2D;
+        _components._r = HalComponentSwizzle::Identity;
+        _components._g = HalComponentSwizzle::Identity;
+        _components._b = HalComponentSwizzle::Identity;
+        _components._a = HalComponentSwizzle::Identity;
+        _subresourceRange._aspectMask = static_cast<HalImageAspectFlags>(HalImageAspectFlagBits::Color);
+        _subresourceRange._baseMipLevel = 0;
+        _subresourceRange._levelCount = 0;
+        _subresourceRange._baseArrayLayer = 0;
+        _subresourceRange._layerCount = 0;
+    }
 };
 
 /**

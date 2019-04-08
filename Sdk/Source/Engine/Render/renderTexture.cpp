@@ -75,4 +75,22 @@ void RenderTexture::Update(const void* pData)
 		_halImage->Update(pData);
 }
 
+HalImageFormat RenderTexture::GetImageFormat()
+{
+    HalImageFormat format = HalImageFormat::Undefined;
+    if (_halImage)
+        format = _halImage->GetImageFormat();
+
+    return format;
+}
+
+uint32_t RenderTexture::GetLevelCount()
+{
+    uint32_t levels = 0;
+    if (_halImage)
+        levels = _halImage->GetLevelCount();
+
+    return levels;
+}
+
 }

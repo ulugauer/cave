@@ -87,6 +87,22 @@ public:
 	*/
 	HalImage* GetHalHandle() { return _halImage; }
 
+    /**
+    * @brief Query image format
+    *
+    * @retrun HalImageFormat enum
+    *
+    */
+    HalImageFormat GetImageFormat();
+
+    /**
+    * @brief Query image level count
+    *
+    * @retrun amount mip level
+    *
+    */
+    uint32_t GetLevelCount();
+
 protected:
 	RenderDevice & _renderDevice;	///< Render device object
 	HalImage* _halImage;			///< Pointer to low level data image object

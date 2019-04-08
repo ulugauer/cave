@@ -309,6 +309,16 @@ public:
 	*/
 	HalImage* CreateImage(HalImageInfo& imageInfo) override;
 
+    /**
+    * @brief Create a texture view object
+    *
+    * @param[in] image		    Pointer to hal image object
+    * @param[in] viewInfo		Image view create info
+    *
+    * @return  HalImageView abstraction interface
+    */
+    HalImageView* CreateImageView(HalImage* image, HalImageViewInfo& viewInfo) override;
+
 	/**
 	* @brief Allocate command buffers
 	*

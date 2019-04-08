@@ -12,34 +12,26 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file halBuffer.cpp
+/// @file halImageView.cpp
 ///       Hardware data buffer abstraction
 
-#include "halImage.h"
+#include "halImageView.h"
 #include "halRenderDevice.h"
 
 namespace cave
 {
 
-HalImage::HalImage(HalRenderDevice* renderDevice, HalImageInfo& imageInfo)
-	: _pDevice(renderDevice)
-	, _imageInfo(imageInfo)
+HalImageView::HalImageView(HalRenderDevice* renderDevice, HalImage* image, const HalImageViewInfo& viewInfo)
+    : _pDevice(renderDevice)
+    , _image(image)
+    , _imageViewInfo(viewInfo)
 {
 
 }
 
-HalImage::~HalImage()
+HalImageView::~HalImageView()
 {
 
 }
 
-HalImageFormat HalImage::GetImageFormat()
-{
-    return _imageInfo._format;
-}
-
-uint32_t HalImage::GetLevelCount()
-{
-    return _imageInfo._level;
-}
 }

@@ -36,6 +36,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halCommandBuffer.h"
 #include "halBuffer.h"
 #include "halImage.h"
+#include "halImageView.h"
 #include "halDescriptorSet.h"
 #include "Memory/allocatorBase.h"
 
@@ -306,6 +307,16 @@ public:
 	* @return  HalImage abstraction interface
 	*/
 	virtual HalImage* CreateImage(HalImageInfo& imageInfo) = 0;
+
+    /**
+    * @brief Create a texture view object
+    *
+    * @param[in] image		    Pointer to hal image object
+    * @param[in] viewInfo		Image view create info
+    *
+    * @return  HalImageView abstraction interface
+    */
+    virtual HalImageView* CreateImageView(HalImage* image, HalImageViewInfo& viewInfo) = 0;
 
 	/**
 	* @brief Allocate command buffers

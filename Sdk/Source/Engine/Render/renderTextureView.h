@@ -13,82 +13,66 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halBuffer.h
-///       Hardware data buffer abstraction
+/// @file renderTextureView.h
+///       Render texture view interface
 
-#include "engineDefines.h"
-#include "Memory/allocatorBase.h"
+#include "Common/caveRefCount.h"
+#include "Common/caveString.h"
+#include "Memory/allocatorGlobal.h"
 #include "halTypes.h"
 
-#include <iostream>		// includes exception handling
 #include <memory>
 
-/** \addtogroup backend
+/** \addtogroup engine
 *  @{
-*
+*		This module contains all code related to the engine
 */
 
 namespace cave
 {
 
-///< forwards
-class HalRenderDevice;
+/// forward declaration
+class RenderDevice;
+class HalImage;
+class HalImageView;
+
 
 /**
-* @brief Abstraction of device images
+* @brief Represents a texture interface
 */
-class HalImage
+class CAVE_INTERFACE RenderTextureView : public CaveRefCount
 {
 public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice	Pointer to render device object
-	* @param[in] imageInfo		Image create info
-	*/
-	HalImage(HalRenderDevice* renderDevice, HalImageInfo& imageInfo);
-
-	/** @brief Destructor */
-	virtual ~HalImage();
-
-	/**
-	* @brief Bind Binds a image and allocates memory
-	*
-	*/
-	virtual void Bind() = 0;
-
-	/**
-	* @brief Copy data to device memory
-	*
-	* @param[in] pData		Pointer to image data
-	*
-	*/
-	virtual void Update(const void* pData) = 0;
 
     /**
-    * @brief Query image format
+    * @brief Constructor
     *
-    * @retrun HalImageFormat enum
+    * @param[in] renderDevice       Pointer to render device
+    * @param[in] image              HAL image pointer
+    * @param[in] viewInfo           HAL image view create info
     *
     */
-    HalImageFormat GetImageFormat();
+    RenderTextureView(RenderDevice& renderDevice, HalImage* image, HalImageViewInfo& viewInfo);
+    /** @brief destructor */
+    virtual ~RenderTextureView();
 
     /**
-    * @brief Query image level count
+    * @brief Get low level HAL handle
     *
-    * @retrun amount mip level
-    *
+    * @return HalImage handle
     */
-    uint32_t GetLevelCount();
+    HalImageView* GetHalHandle() { return _halImageView; }
 
-private:
-	HalRenderDevice * _pDevice;	///< Pointer to device object
-	HalImageInfo _imageInfo;	///< Buffer create info
+protected:
+    RenderDevice & _renderDevice;   ///< Render device object
+    HalImageView* _halImageView;    ///< Pointer to hal image view object
 };
 
 }
 
 /** @}*/
+
+
 
 
 

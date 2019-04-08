@@ -53,6 +53,7 @@ private:
 private:
 	cave::RenderMaterial* _material;
 	cave::RenderTexture* _texture;
+    cave::RenderTextureView* _textureView;
 	cave::RenderLayerSection* _layerSection;
 	cave::RenderInputAssembly* _inputAssembly;
 	cave::RenderVertexInput* _vertexInput;

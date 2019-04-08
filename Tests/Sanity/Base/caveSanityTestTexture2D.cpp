@@ -28,6 +28,7 @@ using namespace cave;
 CaveSanityTestTexture2D::CaveSanityTestTexture2D()
 	: _material(nullptr)
 	, _texture(nullptr)
+    , _textureView(nullptr)
 	, _layerSection(nullptr)
 	, _inputAssembly(nullptr)
 	, _vertexInput(nullptr)
@@ -174,6 +175,8 @@ void CaveSanityTestTexture2D::Cleanup(RenderDevice *device, userContextData*)
 		DeallocateDelete(*device->GetEngineAllocator(), *_material);
 	if (_texture)
 		device->ReleaseTexture(_texture);
+    if (_textureView)
+        device->ReleaseTextureView(_textureView);
 }
 
 bool CaveSanityTestTexture2D::RunPerformance(RenderDevice*, userContextData*)
@@ -198,6 +201,20 @@ void CaveSanityTestTexture2D::LoadResource(cave::RenderDevice *device)
 	_texture = device->CreateTexture("UVChecker-dxt5.dds");
 	if (!_texture)
 		throw CaveSanityTestException("CaveSanityTestTexture2D: Failed to load texture");
+
+    // Create texture view
+    HalImageViewInfo halImageViewInfo;
+    halImageViewInfo._format = _texture->GetImageFormat();
+    halImageViewInfo._type = HalImageViewType::Image2D;
+    halImageViewInfo._subresourceRange._aspectMask = static_cast<HalImageAspectFlags>(HalImageAspectFlagBits::Color);
+    halImageViewInfo._subresourceRange._baseArrayLayer = 0;
+    halImageViewInfo._subresourceRange._baseMipLevel = 0;
+    halImageViewInfo._subresourceRange._layerCount = 1;
+    halImageViewInfo._subresourceRange._levelCount = _texture->GetLevelCount();
+
+    _textureView = device->CreateTextureView(_texture->GetHalHandle(), halImageViewInfo);
+    if (!_textureView)
+        throw CaveSanityTestException("CaveSanityTestTexture2D: Failed to create texture view");
 }
 
 void CaveSanityTestTexture2D::CreateRenderSection(RenderDevice *device, userContextData* pUserData)

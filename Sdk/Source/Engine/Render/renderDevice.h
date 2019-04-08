@@ -60,6 +60,7 @@ class RenderVertexBuffer;
 class RenderIndexBuffer;
 class RenderUniformBuffer;
 class RenderTexture;
+class RenderTextureView;
 
 
 /**
@@ -456,12 +457,31 @@ public:
 	*/
 	RenderTexture* CreateTexture(const char* file);
 
-	/**
-	* @brief Release a texture object
-	*
-	* @param[in] texture	 RenderTexture object to release
-	*/
-	void ReleaseTexture(RenderTexture* texture);
+    /**
+    * @brief Release a texture object
+    *
+    * @param[in] texture	 RenderTexture object to release
+    */
+    void ReleaseTexture(RenderTexture* texture);
+
+    /**
+    * @brief Create a texture view object
+    * A texture view object is required for accessing a texture
+    * in a shader.
+    *
+    * @param[in] image		    Pointer to hal image object
+    * @param[in] viewInfo		Image view create info
+    *
+    * @return RenderTextureView object
+    */
+    RenderTextureView* CreateTextureView(HalImage* image, HalImageViewInfo& imageView);
+
+    /**
+    * @brief Release a texture view object
+    *
+    * @param[in] textureView	 ReleaseTextureView object to release
+    */
+    void ReleaseTextureView(RenderTextureView* textureView);
 
 	/**
 	* @brief Create a render pass object

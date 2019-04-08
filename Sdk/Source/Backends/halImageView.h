@@ -13,7 +13,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halBuffer.h
+/// @file halImageView.h
 ///       Hardware data buffer abstraction
 
 #include "engineDefines.h"
@@ -33,62 +33,36 @@ namespace cave
 
 ///< forwards
 class HalRenderDevice;
+class HalImage;
 
 /**
-* @brief Abstraction of device images
+* @brief Abstraction of device image views
 */
-class HalImage
+class HalImageView
 {
 public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice	Pointer to render device object
-	* @param[in] imageInfo		Image create info
-	*/
-	HalImage(HalRenderDevice* renderDevice, HalImageInfo& imageInfo);
-
-	/** @brief Destructor */
-	virtual ~HalImage();
-
-	/**
-	* @brief Bind Binds a image and allocates memory
-	*
-	*/
-	virtual void Bind() = 0;
-
-	/**
-	* @brief Copy data to device memory
-	*
-	* @param[in] pData		Pointer to image data
-	*
-	*/
-	virtual void Update(const void* pData) = 0;
-
     /**
-    * @brief Query image format
+    * @brief Constructor
     *
-    * @retrun HalImageFormat enum
-    *
+    * @param[in] renderDevice	Pointer to render device object
+    * @param[in] image;         Pointer to image we create this view for
+    * @param[in] viewInfo		Image view create info
     */
-    HalImageFormat GetImageFormat();
+    HalImageView(HalRenderDevice* renderDevice, HalImage* image,  const HalImageViewInfo& viewInfo);
 
-    /**
-    * @brief Query image level count
-    *
-    * @retrun amount mip level
-    *
-    */
-    uint32_t GetLevelCount();
+    /** @brief Destructor */
+    virtual ~HalImageView();
 
 private:
-	HalRenderDevice * _pDevice;	///< Pointer to device object
-	HalImageInfo _imageInfo;	///< Buffer create info
+    HalRenderDevice* _pDevice;	///< Pointer to device object
+    HalImage* _image;   ///< Image objeect the view relates to
+    HalImageViewInfo _imageViewInfo;	///< Image view create info
 };
 
 }
 
 /** @}*/
+
 
 
 

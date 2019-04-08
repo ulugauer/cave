@@ -13,8 +13,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file vulkanBuffer.h
-///       Vulkan device buffer
+/// @file vulkanImage.h
+///       Vulkan device image
 
 #include "halImage.h"
 #include "vulkanMemoryManager.h"

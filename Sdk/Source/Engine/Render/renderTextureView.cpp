@@ -12,34 +12,41 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file halBuffer.cpp
-///       Hardware data buffer abstraction
+/// @file renderTextureView.cpp
+///       Render texture view interface
 
-#include "halImage.h"
-#include "halRenderDevice.h"
+#include "renderTextureView.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halImageView.h"
+
+#include <cassert>
 
 namespace cave
 {
-
-HalImage::HalImage(HalRenderDevice* renderDevice, HalImageInfo& imageInfo)
-	: _pDevice(renderDevice)
-	, _imageInfo(imageInfo)
+RenderTextureView::RenderTextureView(RenderDevice& renderDevice, HalImage* image, HalImageViewInfo& viewInfo)
+    : CaveRefCount(renderDevice.GetEngineAllocator())
+    , _renderDevice(renderDevice)
+    , _halImageView(nullptr)
 {
-
+  
+    // Allocate low level object
+    try
+    {
+        _halImageView = renderDevice.GetHalRenderDevice()->CreateImageView(image, viewInfo);
+    }
+    catch (std::exception& e)
+    {
+        std::string msg(e.what());
+        throw EngineError(msg);
+    }
 }
 
-HalImage::~HalImage()
+RenderTextureView::~RenderTextureView()
 {
-
+    // Free handle
+    if (_halImageView)
+        DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halImageView);
 }
 
-HalImageFormat HalImage::GetImageFormat()
-{
-    return _imageInfo._format;
-}
-
-uint32_t HalImage::GetLevelCount()
-{
-    return _imageInfo._level;
-}
 }

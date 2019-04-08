@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "Render/renderIndexBuffer.h"
 #include "Render/renderUniformBuffer.h"
 #include "Render/renderTexture.h"
+#include "Render/renderTextureView.h"
 #include "Render/renderCommandPool.h"
 #include "Render/renderLayerSection.h"
 #include "Render/renderGraphicsPipeline.h"

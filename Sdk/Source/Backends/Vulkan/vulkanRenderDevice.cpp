@@ -41,6 +41,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanDescriptorSet.h"
 #include "vulkanBuffer.h"
 #include "vulkanImage.h"
+#include "vulkanImageView.h"
 #include "vulkanConversion.h"
 #include "vulkanApi.h"
 
@@ -736,6 +737,16 @@ HalImage* VulkanRenderDevice::CreateImage(HalImageInfo& imageInfo)
 	VulkanImage *image = AllocateObject<VulkanImage>(*_pInstance->GetEngineAllocator(), this, imageInfo);
 
 	return image;
+}
+
+HalImageView* VulkanRenderDevice::CreateImageView(HalImage* image, HalImageViewInfo& viewInfo)
+{
+    if (!_pPhysicalDevice || !_vkDevice)
+        return nullptr;
+
+    VulkanImageView *imageView = AllocateObject<VulkanImageView>(*_pInstance->GetEngineAllocator(), this, image, viewInfo);
+
+    return imageView;
 }
 
 bool VulkanRenderDevice::AllocateCommandBuffers(HalCommandPool* commandPool

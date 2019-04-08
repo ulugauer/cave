@@ -51,7 +51,8 @@ set(RENDER_SOURCE Render/renderInstance.h Render/renderInstance.cpp
 				  Render/renderVertexBuffer.h Render/renderVertexBuffer.cpp 
 				  Render/renderIndexBuffer.h Render/renderIndexBuffer.cpp 
 				  Render/renderUniformBuffer.h Render/renderUniformBuffer.cpp 
-				  Render/renderTexture.h Render/renderTexture.cpp )
+				  Render/renderTexture.h Render/renderTexture.cpp 
+                  Render/renderTextureView.h Render/renderTextureView.cpp )
 
 set(MEMORY_SOURCE Memory/allocatorBase.h 
 				  Memory/allocatorGlobal.h

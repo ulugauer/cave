@@ -230,6 +230,78 @@ VulkanTypeConversion::ConvertImageFormatFromVulkan(VkFormat imageFormat)
     return format;
 }
 
+VkImageViewType 
+VulkanTypeConversion::ConvertImageViewTypeToVulkan(HalImageViewType imageViewType)
+{
+    VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_1D;
+
+    switch (imageViewType)
+    {
+    case HalImageViewType::Image1D:
+        viewType = VK_IMAGE_VIEW_TYPE_1D;
+        break;
+    case HalImageViewType::Image2D:
+        viewType = VK_IMAGE_VIEW_TYPE_2D;
+        break;
+    case HalImageViewType::Image3D:
+        viewType = VK_IMAGE_VIEW_TYPE_3D;
+        break;
+    case HalImageViewType::ImageCube:
+        viewType = VK_IMAGE_VIEW_TYPE_CUBE;
+        break;
+    case HalImageViewType::Image1DArray:
+        viewType = VK_IMAGE_VIEW_TYPE_1D_ARRAY;
+        break;
+    case HalImageViewType::Image2DArray:
+        viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+        break;
+    case HalImageViewType::ImageCubeArray:
+        viewType = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return viewType;
+}
+
+HalImageViewType 
+VulkanTypeConversion::ConvertImageViewTypeFromVulkan(VkImageViewType imageViewType)
+{
+    HalImageViewType viewType = HalImageViewType::Image2D;
+
+    switch (imageViewType)
+    {
+    case VK_IMAGE_VIEW_TYPE_1D:
+        viewType = HalImageViewType::Image1D;
+        break;
+    case VK_IMAGE_VIEW_TYPE_2D:
+        viewType = HalImageViewType::Image2D;
+        break;
+    case VK_IMAGE_VIEW_TYPE_3D:
+        viewType = HalImageViewType::Image3D;
+        break;
+    case VK_IMAGE_VIEW_TYPE_CUBE:
+        viewType = HalImageViewType::ImageCube;
+        break;
+    case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
+        viewType = HalImageViewType::Image1DArray;
+        break;
+    case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
+        viewType = HalImageViewType::Image2DArray;
+        break;
+    case VK_IMAGE_VIEW_TYPE_CUBE_ARRAY:
+        viewType = HalImageViewType::ImageCubeArray;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return viewType;
+}
+
 VulkanImageSizeInfo 
 VulkanTypeConversion::GetImageSizeInfo(VkFormat imageFormat)
 {
@@ -249,6 +321,167 @@ VulkanTypeConversion::GetImageSizeInfo(VkFormat imageFormat)
     }
 
     return imageSizeInfo;
+}
+
+VkImageAspectFlags 
+VulkanTypeConversion::ConvertImageAspectFlagsToVulkan(HalImageAspectFlags imageAspectFlags)
+{
+    VkImageAspectFlags aspectFlags = 0;
+
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::Color))
+        aspectFlags |= VK_IMAGE_ASPECT_COLOR_BIT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::Depth))
+        aspectFlags |= VK_IMAGE_ASPECT_DEPTH_BIT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::Stencil))
+        aspectFlags |= VK_IMAGE_ASPECT_STENCIL_BIT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::MetaData))
+        aspectFlags |= VK_IMAGE_ASPECT_METADATA_BIT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::Plane0))
+        aspectFlags |= VK_IMAGE_ASPECT_PLANE_0_BIT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::Plane1))
+        aspectFlags |= VK_IMAGE_ASPECT_PLANE_1_BIT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::Plane2))
+        aspectFlags |= VK_IMAGE_ASPECT_PLANE_2_BIT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::MemoryPlane0Ext))
+        aspectFlags |= VK_IMAGE_ASPECT_MEMORY_PLANE_0_BIT_EXT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::MemoryPlane1Ext))
+        aspectFlags |= VK_IMAGE_ASPECT_MEMORY_PLANE_1_BIT_EXT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::MemoryPlane2Ext))
+        aspectFlags |= VK_IMAGE_ASPECT_MEMORY_PLANE_2_BIT_EXT;
+    if (imageAspectFlags & static_cast<uint32_t>(HalImageAspectFlagBits::MemoryPlane3Ext))
+        aspectFlags |= VK_IMAGE_ASPECT_MEMORY_PLANE_3_BIT_EXT;
+
+    assert(aspectFlags != 0);
+    return aspectFlags;
+}
+
+HalImageAspectFlags 
+VulkanTypeConversion::ConvertImageAspectFlagsFormatFromVulkan(VkImageAspectFlags imageAspectFlags)
+{
+    HalImageAspectFlags aspectFlags = 0;
+
+    if (imageAspectFlags & VK_IMAGE_ASPECT_COLOR_BIT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::Color);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_DEPTH_BIT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::Depth);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_STENCIL_BIT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::Stencil);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_METADATA_BIT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::MetaData);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_PLANE_0_BIT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::Plane0);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_PLANE_1_BIT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::Plane1);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_PLANE_2_BIT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::Plane2);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_MEMORY_PLANE_0_BIT_EXT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::MemoryPlane0Ext);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_MEMORY_PLANE_1_BIT_EXT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::MemoryPlane1Ext);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_MEMORY_PLANE_2_BIT_EXT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::MemoryPlane2Ext);
+    if (imageAspectFlags & VK_IMAGE_ASPECT_MEMORY_PLANE_3_BIT_EXT)
+        aspectFlags |= static_cast<uint32_t>(HalImageAspectFlagBits::MemoryPlane2Ext);
+
+    assert(aspectFlags != 0);
+    return aspectFlags;
+}
+
+
+VkComponentSwizzle 
+VulkanTypeConversion::ConvertComponentSwizzleToVulkan(HalComponentSwizzle swizzle)
+{
+    VkComponentSwizzle vkSwizzle = VkComponentSwizzle::VK_COMPONENT_SWIZZLE_IDENTITY;
+
+    switch (swizzle)
+    {
+    case HalComponentSwizzle::Identity:
+        vkSwizzle = VK_COMPONENT_SWIZZLE_IDENTITY;
+        break;
+    case HalComponentSwizzle::One:
+        vkSwizzle = VK_COMPONENT_SWIZZLE_ONE;
+        break;
+    case HalComponentSwizzle::Zero:
+        vkSwizzle = VK_COMPONENT_SWIZZLE_ZERO;
+        break;
+    case HalComponentSwizzle::Red:
+        vkSwizzle = VK_COMPONENT_SWIZZLE_R;
+        break;
+    case HalComponentSwizzle::Green:
+        vkSwizzle = VK_COMPONENT_SWIZZLE_G;
+        break;
+    case HalComponentSwizzle::Blue:
+        vkSwizzle = VK_COMPONENT_SWIZZLE_B;
+        break;
+    case HalComponentSwizzle::Alpha:
+        vkSwizzle = VK_COMPONENT_SWIZZLE_A;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return vkSwizzle;
+}
+
+HalComponentSwizzle 
+VulkanTypeConversion::ConvertComponentSwizzleFromVulkan(VkComponentSwizzle swizzle)
+{
+    HalComponentSwizzle halSwizzle = HalComponentSwizzle::Identity;
+
+    switch (swizzle)
+    {
+    case VK_COMPONENT_SWIZZLE_IDENTITY:
+        halSwizzle = HalComponentSwizzle::Identity;
+        break;
+    case VK_COMPONENT_SWIZZLE_ONE:
+        halSwizzle = HalComponentSwizzle::One;
+        break;
+    case VK_COMPONENT_SWIZZLE_ZERO:
+        halSwizzle = HalComponentSwizzle::Zero;
+        break;
+    case VK_COMPONENT_SWIZZLE_R:
+        halSwizzle = HalComponentSwizzle::Red;
+        break;
+    case VK_COMPONENT_SWIZZLE_G:
+        halSwizzle = HalComponentSwizzle::Green;
+        break;
+    case VK_COMPONENT_SWIZZLE_B:
+        halSwizzle = HalComponentSwizzle::Blue;
+        break;
+    case VK_COMPONENT_SWIZZLE_A:
+        halSwizzle = HalComponentSwizzle::Alpha;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return halSwizzle;
+}
+
+VkComponentMapping 
+VulkanTypeConversion::ConvertComponentMappingToVulkan(HalComponentMapping components)
+{
+    VkComponentMapping component = { 
+        ConvertComponentSwizzleToVulkan(components._r),
+        ConvertComponentSwizzleToVulkan(components._g),
+        ConvertComponentSwizzleToVulkan(components._b),
+        ConvertComponentSwizzleToVulkan(components._a) };
+
+    return component;
+}
+
+HalComponentMapping 
+VulkanTypeConversion::ConvertComponentMappingFromVulkan(VkComponentMapping components)
+{
+    HalComponentMapping component = {
+        ConvertComponentSwizzleFromVulkan(components.r),
+        ConvertComponentSwizzleFromVulkan(components.g),
+        ConvertComponentSwizzleFromVulkan(components.b),
+        ConvertComponentSwizzleFromVulkan(components.a) };
+
+    return component;
 }
 
 VkSampleCountFlagBits

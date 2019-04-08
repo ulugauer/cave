@@ -13,15 +13,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halBuffer.h
-///       Hardware data buffer abstraction
+/// @file vulkanImageView.h
+///       Vulkan device image view
 
-#include "engineDefines.h"
-#include "Memory/allocatorBase.h"
-#include "halTypes.h"
+#include "halImageView.h"
+#include "vulkanMemoryManager.h"
 
-#include <iostream>		// includes exception handling
-#include <memory>
+#include "vulkan.h"
 
 /** \addtogroup backend
 *  @{
@@ -32,64 +30,42 @@ namespace cave
 {
 
 ///< forwards
-class HalRenderDevice;
+class VulkanRenderDevice;
 
 /**
-* @brief Abstraction of device images
+* @brief Vulkan device image
 */
-class HalImage
+class VulkanImageView : public HalImageView
 {
 public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice	Pointer to render device object
-	* @param[in] imageInfo		Image create info
-	*/
-	HalImage(HalRenderDevice* renderDevice, HalImageInfo& imageInfo);
+    /**
+    * @brief Constructor
+    *
+    * @param[in] device			Pointer to render device object
+    * @param[in] image;         Pointer to image we create this view for
+    * @param[in] viewInfo		Image view create info
+    */
+    VulkanImageView(VulkanRenderDevice* device, HalImage* image, HalImageViewInfo& viewInfo);
 
-	/** @brief Destructor */
-	virtual ~HalImage();
-
-	/**
-	* @brief Bind Binds a image and allocates memory
-	*
-	*/
-	virtual void Bind() = 0;
-
-	/**
-	* @brief Copy data to device memory
-	*
-	* @param[in] pData		Pointer to image data
-	*
-	*/
-	virtual void Update(const void* pData) = 0;
+    /** @brief Destructor */
+    virtual ~VulkanImageView();
 
     /**
-    * @brief Query image format
+    * @brief Get image view object
     *
-    * @retrun HalImageFormat enum
-    *
+    * @return Vulkan image object
     */
-    HalImageFormat GetImageFormat();
-
-    /**
-    * @brief Query image level count
-    *
-    * @retrun amount mip level
-    *
-    */
-    uint32_t GetLevelCount();
+    VkImageView GetImageView() { return _vkImageView; }
 
 private:
-	HalRenderDevice * _pDevice;	///< Pointer to device object
-	HalImageInfo _imageInfo;	///< Buffer create info
+    VulkanRenderDevice* _pDevice;	///< Pointer to device object
+    VkImageView _vkImageView; ///< Low level vulkan handle
+    VkImageViewCreateInfo _vkImageViewCreateInfo;	///< Vulkan image view creation info
 };
 
 }
 
 /** @}*/
-
 
 
 
