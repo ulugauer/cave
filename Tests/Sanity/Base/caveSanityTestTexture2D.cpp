@@ -29,6 +29,7 @@ CaveSanityTestTexture2D::CaveSanityTestTexture2D()
 	: _material(nullptr)
 	, _texture(nullptr)
     , _textureView(nullptr)
+    , _textureSampler(nullptr)
 	, _layerSection(nullptr)
 	, _inputAssembly(nullptr)
 	, _vertexInput(nullptr)
@@ -177,6 +178,8 @@ void CaveSanityTestTexture2D::Cleanup(RenderDevice *device, userContextData*)
 		device->ReleaseTexture(_texture);
     if (_textureView)
         device->ReleaseTextureView(_textureView);
+    if (_textureSampler)
+        device->ReleaseTextureSampler(_textureSampler);
 }
 
 bool CaveSanityTestTexture2D::RunPerformance(RenderDevice*, userContextData*)
@@ -215,6 +218,17 @@ void CaveSanityTestTexture2D::LoadResource(cave::RenderDevice *device)
     _textureView = device->CreateTextureView(_texture->GetHalHandle(), halImageViewInfo);
     if (!_textureView)
         throw CaveSanityTestException("CaveSanityTestTexture2D: Failed to create texture view");
+
+    // create texture sampler
+    HalSamplerCreateInfo halSamplerInfo;
+    halSamplerInfo._magFilter = HalFilter::Linear;
+    halSamplerInfo._minFilter = HalFilter::Linear;
+    halSamplerInfo._mipmapMode = HalSamplerMipmapMode::Linear;
+    halSamplerInfo._maxLod = static_cast<float>(_texture->GetLevelCount());
+
+    _textureSampler = device->CreateTextureSampler(halSamplerInfo);
+    if(!_textureSampler)
+        throw CaveSanityTestException("CaveSanityTestTexture2D: Failed to create texture sampler");
 }
 
 void CaveSanityTestTexture2D::CreateRenderSection(RenderDevice *device, userContextData* pUserData)

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanBuffer.h"
 #include "vulkanImage.h"
 #include "vulkanImageView.h"
+#include "vulkanSampler.h"
 #include "vulkanConversion.h"
 #include "vulkanApi.h"
 
@@ -100,6 +101,7 @@ VulkanRenderDevice::VulkanRenderDevice(VulkanInstance* instance, VulkanPhysicalD
 
 	// store some device features for later queries
 	_deviceFeatures.caps.bits.bTextureCompressionBC = supportedFeatures.textureCompressionBC;
+    _deviceFeatures.caps.bits.bSamplerAnisotropy = supportedFeatures.samplerAnisotropy;
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	float queuePriority = 1.0f;
@@ -747,6 +749,16 @@ HalImageView* VulkanRenderDevice::CreateImageView(HalImage* image, HalImageViewI
     VulkanImageView *imageView = AllocateObject<VulkanImageView>(*_pInstance->GetEngineAllocator(), this, image, viewInfo);
 
     return imageView;
+}
+
+HalSampler* VulkanRenderDevice::CreateSampler(HalSamplerCreateInfo& samplerInfo)
+{
+    if (!_pPhysicalDevice || !_vkDevice)
+        return nullptr;
+
+    VulkanSampler *sampler = AllocateObject<VulkanSampler>(*_pInstance->GetEngineAllocator(), this, samplerInfo);
+
+    return sampler;
 }
 
 bool VulkanRenderDevice::AllocateCommandBuffers(HalCommandPool* commandPool

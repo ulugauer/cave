@@ -61,6 +61,9 @@ bool HalRenderDevice::GetDeviceFeature(HalDeviceFeatureCaps cap)
 	case HalDeviceFeatureCaps::TextureCompressionBC:
 		bSupported = _deviceFeatures.caps.bits.bTextureCompressionBC;
 		break;
+    case HalDeviceFeatureCaps::SamplerAnisotropy:
+        bSupported = _deviceFeatures.caps.bits.bSamplerAnisotropy;
+        break;
 	default:
 		bSupported = false;
 		break;

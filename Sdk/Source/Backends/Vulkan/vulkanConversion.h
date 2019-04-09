@@ -158,6 +158,78 @@ public:
     static HalComponentMapping ConvertComponentMappingFromVulkan(VkComponentMapping components);
 
     /**
+    * @brief Convert from generic sampler address mode to vulkan sampler address mode
+    *
+    * @param[in] addressMode  Generic sampler address mode
+    *
+    * @return Vulkan sampler address mode
+    */
+    static VkSamplerAddressMode ConvertSamplerAddressModeToVulkan(HalSamplerAddressMode addressMode);
+
+    /**
+    * @brief Convert from vulkan sampler address mode to generic sampler address mode
+    *
+    * @param[in] addressMode  vulkan sampler address mode
+    *
+    * @return generic sampler address mode
+    */
+    static HalSamplerAddressMode ConvertSamplerAddressModeFromVulkan(VkSamplerAddressMode addressMode);
+
+    /**
+    * @brief Convert from generic filter type to vulkan filter type
+    *
+    * @param[in] filter  Generic filter type
+    *
+    * @return Vulkan filter type
+    */
+    static VkFilter ConvertFilterToVulkan(HalFilter filter);
+
+    /**
+   * @brief Convert from vulkan filter type to generic filter type
+   *
+   * @param[in] filter  vulkan filter type
+   *
+   * @return generic filter type
+   */
+    static HalFilter ConvertFilterFromVulkan(VkFilter filter);
+
+    /**
+    * @brief Convert from generic sampler mipmap mode to vulkan sampler mipmap mode
+    *
+    * @param[in] mipmapMode  Generic sampler mipmap mode
+    *
+    * @return Vulkan sampler mipmap mode
+    */
+    static VkSamplerMipmapMode ConvertSamplerMipmapModeToVulkan(HalSamplerMipmapMode mipmapMode);
+
+    /**
+    * @brief Convert from vulkan sampler mipmap mode to generic sampler mipmap mode
+    *
+    * @param[in] mipmapMode  vulkan sampler mipmap mode
+    *
+    * @return generic sampler mipmap mode
+    */
+    static HalSamplerMipmapMode ConvertSamplerMipmapModeFromVulkan(VkSamplerMipmapMode mipmapMode);
+
+    /**
+    * @brief Convert from generic border color to vulkan border color
+    *
+    * @param[in] borderColor  Generic border color
+    *
+    * @return Vulkan border color
+    */
+    static VkBorderColor ConvertBorderColorToVulkan(HalBorderColor borderColor);
+
+    /**
+    * @brief Convert from vulkan border color to generic border color
+    *
+    * @param[in] borderColor  vulkan border color
+    *
+    * @return generic border color
+    */
+    static HalBorderColor ConvertBorderColorFromVulkan(VkBorderColor borderColor);
+
+    /**
     * @brief Convert from generic sample count to vulkan sample count
     *
     * @param[in] sampleCount	Generic sample count

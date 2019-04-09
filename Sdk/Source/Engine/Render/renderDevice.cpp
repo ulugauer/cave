@@ -36,6 +36,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderUniformBuffer.h"
 #include "renderTexture.h"
 #include "renderTextureView.h"
+#include "renderTextureSampler.h"
 #include "renderCommandBuffer.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
@@ -608,6 +609,31 @@ void RenderDevice::ReleaseTextureView(RenderTextureView* textureView)
     }
 }
 
+RenderTextureSampler* RenderDevice::CreateTextureSampler(HalSamplerCreateInfo& samplerInfo)
+{
+    RenderTextureSampler* textureSampler = nullptr;
+
+    try
+    {
+        textureSampler = AllocateObject<RenderTextureSampler>(*_pRenderInstance->GetEngineAllocator(), *this, samplerInfo);
+        if (textureSampler)
+            textureSampler->AddRef();
+
+        return textureSampler;
+    }
+    catch (std::exception&)
+    {
+        return textureSampler;
+    }
+}
+
+void RenderDevice::ReleaseTextureSampler(RenderTextureSampler* textureSampler)
+{
+    if (textureSampler)
+    {
+        textureSampler->Relase();
+    }
+}
 
 bool RenderDevice::AllocateCommandBuffers(RenderCommandPool* commandPool
 		, HalCommandBufferInfo& commandBufferInfo

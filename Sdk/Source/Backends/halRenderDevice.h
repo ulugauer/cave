@@ -37,6 +37,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halBuffer.h"
 #include "halImage.h"
 #include "halImageView.h"
+#include "halSampler.h"
 #include "halDescriptorSet.h"
 #include "Memory/allocatorBase.h"
 
@@ -317,6 +318,15 @@ public:
     * @return  HalImageView abstraction interface
     */
     virtual HalImageView* CreateImageView(HalImage* image, HalImageViewInfo& viewInfo) = 0;
+
+    /**
+    * @brief Create a sampler object
+    *
+    * @param[in] samplerInfo    Sampler create info
+    *
+    * @return  HalSampler abstraction interface
+    */
+    virtual HalSampler* CreateSampler(HalSamplerCreateInfo& samplerInfo) = 0;
 
 	/**
 	* @brief Allocate command buffers

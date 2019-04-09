@@ -484,6 +484,222 @@ VulkanTypeConversion::ConvertComponentMappingFromVulkan(VkComponentMapping compo
     return component;
 }
 
+VkSamplerAddressMode 
+VulkanTypeConversion::ConvertSamplerAddressModeToVulkan(HalSamplerAddressMode addressMode)
+{
+    VkSamplerAddressMode vkAddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+    switch (addressMode)
+    {
+    case HalSamplerAddressMode::Repeat:
+        vkAddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        break;
+    case HalSamplerAddressMode::MirroredRepeat:
+        vkAddressMode = VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+        break;
+    case HalSamplerAddressMode::ClampToEdge:
+        vkAddressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        break;
+    case HalSamplerAddressMode::ClampToBorder:
+        vkAddressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+        break;
+    case HalSamplerAddressMode::MirrorClampToEdge:
+        vkAddressMode = VK_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return vkAddressMode;
+}
+
+HalSamplerAddressMode 
+VulkanTypeConversion::ConvertSamplerAddressModeFromVulkan(VkSamplerAddressMode addressMode)
+{
+    HalSamplerAddressMode halAddressMode = HalSamplerAddressMode::Repeat;
+
+    switch (addressMode)
+    {
+    case VK_SAMPLER_ADDRESS_MODE_REPEAT:
+        halAddressMode = HalSamplerAddressMode::Repeat;
+        break;
+    case VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT:
+        halAddressMode = HalSamplerAddressMode::MirroredRepeat;
+        break;
+    case VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE:
+        halAddressMode = HalSamplerAddressMode::ClampToEdge;
+        break;
+    case VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER:
+        halAddressMode = HalSamplerAddressMode::ClampToBorder;
+        break;
+    case VK_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE:
+        halAddressMode = HalSamplerAddressMode::MirrorClampToEdge;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return halAddressMode;
+}
+
+VkFilter 
+VulkanTypeConversion::ConvertFilterToVulkan(HalFilter filter)
+{
+    VkFilter vkFilter = VK_FILTER_NEAREST;
+
+    switch (filter)
+    {
+    case HalFilter::Nearest:
+        vkFilter = VK_FILTER_NEAREST;
+        break;
+    case HalFilter::Linear:
+        vkFilter = VK_FILTER_LINEAR;
+        break;
+    case HalFilter::Cubic:
+        vkFilter = VK_FILTER_CUBIC_IMG;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return vkFilter;
+}
+
+HalFilter 
+VulkanTypeConversion::ConvertFilterFromVulkan(VkFilter filter)
+{
+    HalFilter halFilter = HalFilter::Nearest;
+
+    switch (filter)
+    {
+    case VK_FILTER_NEAREST:
+        halFilter = HalFilter::Nearest;
+        break;
+    case VK_FILTER_LINEAR:
+        halFilter = HalFilter::Linear;
+        break;
+    case VK_FILTER_CUBIC_IMG:
+        halFilter = HalFilter::Cubic;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return halFilter;
+}
+
+VkSamplerMipmapMode 
+VulkanTypeConversion::ConvertSamplerMipmapModeToVulkan(HalSamplerMipmapMode mipmapMode)
+{
+    VkSamplerMipmapMode vkSamplerMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+
+    switch (mipmapMode)
+    {
+    case HalSamplerMipmapMode::Nearest:
+        vkSamplerMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+        break;
+    case HalSamplerMipmapMode::Linear:
+        vkSamplerMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return vkSamplerMode;
+}
+
+HalSamplerMipmapMode 
+VulkanTypeConversion::ConvertSamplerMipmapModeFromVulkan(VkSamplerMipmapMode mipmapMode)
+{
+    HalSamplerMipmapMode halSamplerMode = HalSamplerMipmapMode::Nearest;
+
+    switch (mipmapMode)
+    {
+    case VK_SAMPLER_MIPMAP_MODE_NEAREST:
+        halSamplerMode = HalSamplerMipmapMode::Nearest;
+        break;
+    case VK_SAMPLER_MIPMAP_MODE_LINEAR:
+        halSamplerMode = HalSamplerMipmapMode::Linear;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return halSamplerMode;
+}
+
+VkBorderColor 
+VulkanTypeConversion::ConvertBorderColorToVulkan(HalBorderColor borderColor)
+{
+    VkBorderColor vkBorderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+
+    switch (borderColor)
+    {
+    case HalBorderColor::FloatTransparentBlack:
+        vkBorderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+        break;
+    case HalBorderColor::IntTransparentBlack:
+        vkBorderColor = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK;
+        break;
+    case HalBorderColor::FloatOpaqueBlack:
+        vkBorderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK;
+        break;
+    case HalBorderColor::IntOpaqueBlack:
+        vkBorderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+        break;
+    case HalBorderColor::FloatOpaqueWhite:
+        vkBorderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+        break;
+    case HalBorderColor::IntOpaqueWhite:
+        vkBorderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return vkBorderColor;
+}
+
+HalBorderColor 
+VulkanTypeConversion::ConvertBorderColorFromVulkan(VkBorderColor borderColor)
+{
+    HalBorderColor halBorderColor = HalBorderColor::FloatTransparentBlack;
+
+    switch (borderColor)
+    {
+    case VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK:
+        halBorderColor = HalBorderColor::FloatTransparentBlack;
+        break;
+    case VK_BORDER_COLOR_INT_TRANSPARENT_BLACK:
+        halBorderColor = HalBorderColor::IntTransparentBlack;
+        break;
+    case VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK:
+        halBorderColor = HalBorderColor::FloatOpaqueBlack;
+        break;
+    case VK_BORDER_COLOR_INT_OPAQUE_BLACK:
+        halBorderColor = HalBorderColor::IntOpaqueBlack;
+        break;
+    case VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE:
+        halBorderColor = HalBorderColor::FloatOpaqueWhite;
+        break;
+    case VK_BORDER_COLOR_INT_OPAQUE_WHITE:
+        halBorderColor = HalBorderColor::IntOpaqueWhite;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return halBorderColor;
+}
+
 VkSampleCountFlagBits
 VulkanTypeConversion::ConvertSampleCountToVulkan(HalSampleCount sampleCount)
 {

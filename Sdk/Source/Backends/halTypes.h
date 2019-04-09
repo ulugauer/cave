@@ -31,6 +31,9 @@ namespace cave
 #define HAL_SUBPASS_EXTERNAL            (~0U)	///< Special value for subpass before or after present
 #define HAL_WHOLE_SIZE					(~0ULL)	///< Special value for memory size
 
+// forward
+class HalSampler;
+
 /**
 *  @brief A strongly typed enum class representing device extension queries
 */
@@ -45,7 +48,8 @@ enum class HalExtensionCaps
 */
 enum class HalDeviceFeatureCaps
 {
-	TextureCompressionBC = 0,		///< Are BC compressed texture are supported
+    TextureCompressionBC = 0,   ///< BC compressed texture are supported
+    SamplerAnisotropy = 1,      ///< Anisotropic filtering support
 };
 
 /**
@@ -437,6 +441,58 @@ enum class HalDynamicStates
 };
 
 /**
+*  @brief A strongly typed enum class for sampler creation
+*/
+enum class HalSamplerCreateFlagBits 
+{
+    SubSampled = 0x0001,
+    SubSampledCoarseReconstruction = 0x0002,
+};
+
+typedef uint32_t HalSamplerCreateFlags;		///< Sampler creation info
+
+/**
+*  @brief A strongly typed enum class representing texture filtering
+*/
+enum class HalFilter 
+{
+    Nearest = 0,
+    Linear = 1,
+    Cubic = 1000015000,
+};
+
+/**
+*  @brief A strongly typed enum class representing texture mipmap filtering
+*/
+enum class HalSamplerMipmapMode 
+{
+    Nearest = 0,
+    Linear = 1,
+};
+
+/**
+*  @brief A strongly typed enum class representing texture wrapping modes
+*/
+enum class HalSamplerAddressMode 
+{
+    Repeat = 0,
+    MirroredRepeat = 1,
+    ClampToEdge = 2,
+    ClampToBorder = 3,
+    MirrorClampToEdge = 4,
+};
+
+enum class HalBorderColor 
+{
+    FloatTransparentBlack = 0,
+    IntTransparentBlack = 1,
+    FloatOpaqueBlack = 2,
+    IntOpaqueBlack = 3,
+    FloatOpaqueWhite = 4,
+    IntOpaqueWhite = 5,
+};
+
+/**
 *  @brief A strongly typed enum class representing the shader stages
 */
 enum class HalShaderStages
@@ -636,6 +692,7 @@ struct CAVE_INTERFACE HalDeviceFeatures
 	{
 		struct {
 			bool bTextureCompressionBC : 1;		///< Support of BC compressed textures
+            bool bSamplerAnisotropy : 1;		///< Support anisotropic filtering
 		} bits;
 
 		uint32_t u32Values;
@@ -781,13 +838,6 @@ struct CAVE_INTERFACE HalColorBlendAttachment
 	}
 };
 
-/**
-* @brief Sampler setup
-*/
-struct CAVE_INTERFACE HalSampler
-{
-
-};
 
 /**
 * @brief Color blending state
@@ -1126,6 +1176,49 @@ struct CAVE_INTERFACE HalImageViewInfo
         _subresourceRange._levelCount = 0;
         _subresourceRange._baseArrayLayer = 0;
         _subresourceRange._layerCount = 0;
+    }
+};
+
+/**
+* @brief Hal sampler create info
+*/
+struct CAVE_INTERFACE HalSamplerCreateInfo
+{
+    HalSamplerCreateFlags    _flags;
+    HalFilter                _magFilter;
+    HalFilter                _minFilter;
+    HalSamplerMipmapMode     _mipmapMode;
+    HalSamplerAddressMode    _addressModeU;
+    HalSamplerAddressMode    _addressModeV;
+    HalSamplerAddressMode    _addressModeW;
+    float                    _mipLodBias;
+    bool                     _anisotropyEnable;
+    float                    _maxAnisotropy;
+    bool                     _compareEnable;
+    HalCompareOp             _compareOp;
+    float                    _minLod;
+    float                    _maxLod;
+    HalBorderColor           _borderColor;
+    bool                     _unnormalizedCoordinates;
+
+    HalSamplerCreateInfo()
+    {
+        _flags = 0;
+        _magFilter = HalFilter::Nearest;
+        _minFilter = HalFilter::Nearest;
+        _mipmapMode = HalSamplerMipmapMode::Nearest;
+        _addressModeU = HalSamplerAddressMode::Repeat;
+        _addressModeV = HalSamplerAddressMode::Repeat;
+        _addressModeW = HalSamplerAddressMode::Repeat;
+        _mipLodBias = 0;
+        _anisotropyEnable = false;
+        _maxAnisotropy = 0;
+        _compareEnable = false;
+        _compareOp = HalCompareOp::AlwaysPass;
+        _minLod = 0;
+        _maxLod = 0;
+        _borderColor = HalBorderColor::FloatOpaqueBlack;
+        _unnormalizedCoordinates = false;
     }
 };
 

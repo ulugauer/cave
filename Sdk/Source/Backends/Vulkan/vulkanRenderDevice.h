@@ -319,6 +319,15 @@ public:
     */
     HalImageView* CreateImageView(HalImage* image, HalImageViewInfo& viewInfo) override;
 
+    /**
+    * @brief Create a sampler object
+    *
+    * @param[in] samplerInfo    Samp[ler create info
+    *
+    * @return  HalSampler abstraction interface
+    */
+    virtual HalSampler* CreateSampler(HalSamplerCreateInfo& samplerInfo) override;
+
 	/**
 	* @brief Allocate command buffers
 	*

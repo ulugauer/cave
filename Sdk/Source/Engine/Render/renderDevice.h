@@ -61,6 +61,7 @@ class RenderIndexBuffer;
 class RenderUniformBuffer;
 class RenderTexture;
 class RenderTextureView;
+class RenderTextureSampler;
 
 
 /**
@@ -482,6 +483,22 @@ public:
     * @param[in] textureView	 ReleaseTextureView object to release
     */
     void ReleaseTextureView(RenderTextureView* textureView);
+
+    /**
+   * @brief Create a texture sampler object
+   *
+   * @param[in] samplerInfo    Samp[ler create info
+   *
+   * @return  HalSampler abstraction interface
+   */
+    RenderTextureSampler* CreateTextureSampler(HalSamplerCreateInfo& samplerInfo);
+
+    /**
+    * @brief Release a texture sampler object
+    *
+    * @param[in] textureSampler	 RenderTextureSampler object to release
+    */
+    void ReleaseTextureSampler(RenderTextureSampler* textureSampler);
 
 	/**
 	* @brief Create a render pass object
