@@ -37,6 +37,8 @@ namespace cave
 class HalDescriptorPool;
 class HalDescriptorSet;
 class HalBuffer;
+class HalImageView;
+class HalSampler;
 
 /**
 * @brief Structure specifying descriptor buffer info
@@ -49,6 +51,17 @@ struct HalDescriptorBufferInfo
 };
 
 /**
+* @brief Structure specifying descriptor image info
+*/
+struct HalDescriptorImageInfo
+{
+    HalImageView* _imageView;       ///< The render image view resource.
+    HalSampler* _imageSampler;      ///< The render image sampler resource.
+    HalImageLayout _imageLayout;    ///< Image layout at access time.
+};
+
+
+/**
 * @brief Structure specifying the parameters of a descriptor set write operation
 */
 struct HalWriteDescriptorSet
@@ -58,14 +71,15 @@ struct HalWriteDescriptorSet
 	uint32_t _dstArrayElement;						///< The starting element in that array.
 	uint32_t _descriptorCount;						///< The number of descriptors to update.
 	HalDescriptorType _descriptorType;				///< Specifying the type of each descriptor in _pBufferInfo
-	//const HalDescriptorImageInfo* _pImageInfo;
-	HalDescriptorBufferInfo* _pBufferInfo;	///< Info points to an array of HalDescriptorBufferInfo structures or is ignored.
+	HalDescriptorImageInfo* _pImageInfo;            ///< Info points to an array of HalDescriptorImageInfo structures or is ignored.
+	HalDescriptorBufferInfo* _pBufferInfo;          ///< Info points to an array of HalDescriptorBufferInfo structures or is ignored.
 	//const HalBufferView* _pTexelBufferView;
 
 	HalWriteDescriptorSet()
 		: _dstSet(nullptr)
 		, _dstArrayElement(0)
 		, _descriptorCount(0)
+        , _pImageInfo(nullptr)
 		, _pBufferInfo(nullptr)
 	{}
 };

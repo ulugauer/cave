@@ -47,6 +47,8 @@ private:
 	void CreateRenderPass(cave::RenderDevice *device);
 	void CreateVertexBuffer(cave::RenderDevice *device);
 	void CreateIndexBuffer(cave::RenderDevice *device);
+    void CreateDescriptorSetLayout(cave::RenderDevice *device);
+    void CreateDescriptorPool(cave::RenderDevice *device);
 	void CreateGraphicsPipeline(cave::RenderDevice *device, cave::RenderPass* renderPass);
 	void AllocateCommandBuffers(cave::RenderDevice *device, cave::RenderCommandPool* commandPool);
 
@@ -69,6 +71,8 @@ private:
 	cave::RenderIndexBuffer* _indexBuffer;
 	cave::RenderGraphicsPipeline* _graphicsPipeline;
 	cave::RenderCommandBuffer** _commandBuffers;
+    cave::RenderDescriptorPool* _descriptorPool;
+    cave::RenderDescriptorSet* _descriptorSet;
 };
 
 

@@ -35,6 +35,8 @@ namespace cave
 class RenderDevice;
 class RenderDescriptorPool;
 class RenderUniformBuffer;
+class RenderTextureView;
+class RenderTextureSampler;
 class RenderDescriptorSet;
 class HalDescriptorSet;
 
@@ -49,6 +51,16 @@ struct CAVE_INTERFACE RenderDescriptorBufferInfo
 };
 
 /**
+* @brief Structure specifying descriptor image info
+*/
+struct CAVE_INTERFACE RenderDescriptorImageInfo
+{
+    RenderTextureView* _imageView;	        ///< The render image view resource.
+    RenderTextureSampler* _imageSampler;    ///< The render image sampler resource.
+    HalImageLayout _imageLayout;            ///< Image layout at access time
+};
+
+/**
 * @brief Structure specifying the parameters of a descriptor set write operation
 */
 struct CAVE_INTERFACE RenderWriteDescriptorSet
@@ -58,7 +70,7 @@ struct CAVE_INTERFACE RenderWriteDescriptorSet
 	uint32_t _dstArrayElement;						///< The starting element in that array.
 	uint32_t _descriptorCount;						///< The number of descriptors to update.
 	HalDescriptorType _descriptorType;				///< Specifying the type of each descriptor in _pBufferInfo
-	//const HalDescriptorImageInfo* _pImageInfo;
+	const RenderDescriptorImageInfo* _pImageInfo;   ///< Info points to an array of RenderDescriptorImageInfo structures or is ignored.
 	const RenderDescriptorBufferInfo* _pBufferInfo;	///< Info points to an array of RenderDescriptorBufferInfo structures or is ignored.
 	//const HalBufferView* _pTexelBufferView;
 
@@ -66,6 +78,7 @@ struct CAVE_INTERFACE RenderWriteDescriptorSet
 		: _dstSet(nullptr)
 		, _dstArrayElement(0)
 		, _descriptorCount(0)
+        , _pImageInfo(nullptr)
 		, _pBufferInfo(nullptr)
 	{}
 };

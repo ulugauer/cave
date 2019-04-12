@@ -104,7 +104,7 @@ void ImageResource::LoadImageResource(ResourceObjectFinder& objectFinder, ImageR
 	std::ifstream fileStream;
 	if (objectFinder.OpenFileBinary(fileString.c_str(), fileStream))
 	{
-		image->decode(true, fileStream);
+		image->decode(false, fileStream);
 		fileStream.close();
 	}
 }

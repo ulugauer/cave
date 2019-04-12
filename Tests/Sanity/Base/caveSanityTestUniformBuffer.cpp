@@ -334,7 +334,7 @@ void CaveSanityTestUniformBuffer::CreateDescriptorSetLayout(cave::RenderDevice *
 	setLayoutInfo._bindingCount = static_cast<uint32_t>(LayoutBindingArray.Size());
 	setLayoutInfo._pBindings = LayoutBindingArray.Data();
 	descriptorSetLayouts.Push(setLayoutInfo);
-
+    
 	_descriptorSet = device->CreateDescriptorSets(descriptorSetLayouts);
 
 	if (!_descriptorSet)
@@ -343,21 +343,6 @@ void CaveSanityTestUniformBuffer::CreateDescriptorSetLayout(cave::RenderDevice *
 
 void CaveSanityTestUniformBuffer::CreatePipelineLayout(cave::RenderDevice *device)
 {
-	caveVector<HalDescriptorSetLayout> descriptorSetLayouts(device->GetEngineAllocator());
-	caveVector<HalDescriptorSetLayoutBinding> LayoutBindingArray(device->GetEngineAllocator());
-	HalDescriptorSetLayoutBinding uboLayoutBinding;
-	uboLayoutBinding._binding = 0;
-	uboLayoutBinding._descriptorType = HalDescriptorType::UniformBuffer;
-	uboLayoutBinding._descriptorCount = 1;
-	uboLayoutBinding._stageFlags = static_cast<HalShaderStagesFlags>(HalShaderStages::Vertex);
-	uboLayoutBinding._pImmutableSamplers = nullptr;
-	LayoutBindingArray.Push(uboLayoutBinding);
-
-	HalDescriptorSetLayout setLayoutInfo = {};
-	setLayoutInfo._bindingCount = static_cast<uint32_t>(LayoutBindingArray.Size());
-	setLayoutInfo._pBindings = LayoutBindingArray.Data();
-	descriptorSetLayouts.Push(setLayoutInfo);
-
 	caveVector<HalPushConstantRange> pushConstants(device->GetEngineAllocator());
 	_pipelineLayout = device->CreatePipelineLayout(_descriptorSet, pushConstants);
 

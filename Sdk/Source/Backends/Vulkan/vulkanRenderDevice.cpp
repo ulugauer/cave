@@ -631,6 +631,19 @@ static void UpdateDescriptorSetBufferInfo(HalDescriptorBufferInfo** inBufferInfo
 	}
 }
 
+static void UpdateDescriptorSetImageInfo(HalDescriptorImageInfo** inImageInfos, VkDescriptorImageInfo** outImageInfos, uint32_t count)
+{
+    for (size_t i = 0; i < count; ++i)
+    {
+        VulkanImageView* imageView = static_cast<VulkanImageView*>(inImageInfos[i]->_imageView);
+        VulkanSampler* imageSampler = static_cast<VulkanSampler*>(inImageInfos[i]->_imageSampler);
+        outImageInfos[i]->imageView = imageView->GetImageView();
+        outImageInfos[i]->sampler = imageSampler->GetSampler();
+        outImageInfos[i]->imageLayout = VulkanTypeConversion::ConvertImageLayoutToVulkan(inImageInfos[i]->_imageLayout);
+        
+    }
+}
+
 void VulkanRenderDevice::UpdateDescriptorSets(caveVector<HalWriteDescriptorSet>& descriptorWrites)
 {
 	uint32_t descriptorWritesCount = static_cast<uint32_t>(descriptorWrites.Size());
@@ -671,6 +684,21 @@ void VulkanRenderDevice::UpdateDescriptorSets(caveVector<HalWriteDescriptorSet>&
 
 				vkWriteDescriptorSets[i].pBufferInfo = descriptorBufferInfos;
 			}
+            if (descriptorWrites[i]._pImageInfo)
+            {
+                // this descriptor write contains image updates
+                assert(descriptorWrites[i]._descriptorType == HalDescriptorType::SampledImage ||
+                    descriptorWrites[i]._descriptorType == HalDescriptorType::Sampler ||
+                    descriptorWrites[i]._descriptorType == HalDescriptorType::StorageImage ||
+                    descriptorWrites[i]._descriptorType == HalDescriptorType::CombinedImageSampler);
+
+                size_t descriptorInfoSize = descriptorWrites[i]._descriptorCount * sizeof(VkDescriptorImageInfo);
+                VkDescriptorImageInfo  *descriptorImageInfos = static_cast<VkDescriptorImageInfo *>(GetEngineAllocator()->Allocate(descriptorInfoSize, 4));
+                if (descriptorImageInfos)
+                    UpdateDescriptorSetImageInfo(&descriptorWrites[i]._pImageInfo, &descriptorImageInfos, descriptorWrites[i]._descriptorCount);
+
+                vkWriteDescriptorSets[i].pImageInfo = descriptorImageInfos;
+            }
 		}
 
 		VulkanApi::GetApi()->vkUpdateDescriptorSets(_vkDevice, descriptorWritesCount, vkWriteDescriptorSets, 0, nullptr);
@@ -685,6 +713,10 @@ void VulkanRenderDevice::UpdateDescriptorSets(caveVector<HalWriteDescriptorSet>&
 			{
 				GetEngineAllocator()->Deallocate((void *)vkWriteDescriptorSets[i].pBufferInfo);
 			}
+            if (vkWriteDescriptorSets[i].pImageInfo)
+            {
+                GetEngineAllocator()->Deallocate((void *)vkWriteDescriptorSets[i].pImageInfo);
+            }
 		}
 
 		GetEngineAllocator()->Deallocate((void *)vkWriteDescriptorSets);

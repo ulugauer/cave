@@ -259,6 +259,16 @@ static void UpdateDescriptorSetBufferInfo(const RenderDescriptorBufferInfo** inB
 	}
 }
 
+static void UpdateDescriptorSetImageInfo(const RenderDescriptorImageInfo** inImageInfos, HalDescriptorImageInfo** outImageInfos, uint32_t count)
+{
+    for (size_t i = 0; i < count; ++i)
+    {
+        outImageInfos[i]->_imageSampler = inImageInfos[i]->_imageSampler->GetHalHandle();
+        outImageInfos[i]->_imageView = inImageInfos[i]->_imageView->GetHalHandle();
+        outImageInfos[i]->_imageLayout = inImageInfos[i]->_imageLayout;
+    }
+}
+
 void RenderDevice::UpdateDescriptorSets(caveVector<RenderWriteDescriptorSet>& descriptorWrites)
 {
 	//Convert descriptor writes
@@ -283,6 +293,15 @@ void RenderDevice::UpdateDescriptorSets(caveVector<RenderWriteDescriptorSet>& de
 
 			halDescriptorWriteSet._pBufferInfo = descriptorBufferInfos;
 		}
+        if (descriptorWrites[i]._pImageInfo)
+        {
+            size_t descriptorInfoSize = descriptorWrites[i]._descriptorCount * sizeof(HalDescriptorImageInfo);
+            HalDescriptorImageInfo *descriptorImageInfos = static_cast<HalDescriptorImageInfo*>(GetEngineAllocator()->Allocate(descriptorInfoSize, 4));
+            if (descriptorImageInfos)
+                UpdateDescriptorSetImageInfo(&descriptorWrites[i]._pImageInfo, &descriptorImageInfos, descriptorWrites[i]._descriptorCount);
+
+            halDescriptorWriteSet._pImageInfo = descriptorImageInfos;
+        }
 
 		halDescriptorWrites.Push(halDescriptorWriteSet);
 	}
@@ -297,6 +316,10 @@ void RenderDevice::UpdateDescriptorSets(caveVector<RenderWriteDescriptorSet>& de
 		{
 			GetEngineAllocator()->Deallocate((void *)halDescriptorWrites[i]._pBufferInfo);
 		}
+        if (halDescriptorWrites[i]._pImageInfo)
+        {
+            GetEngineAllocator()->Deallocate((void *)halDescriptorWrites[i]._pImageInfo);
+        }
 	}
 }
 
