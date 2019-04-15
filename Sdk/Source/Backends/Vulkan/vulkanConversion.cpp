@@ -230,6 +230,54 @@ VulkanTypeConversion::ConvertImageFormatFromVulkan(VkFormat imageFormat)
     return format;
 }
 
+VkImageType 
+VulkanTypeConversion::ConvertImageTypeToVulkan(HalImageType imageType)
+{
+    VkImageType vkImageType = VK_IMAGE_TYPE_1D;
+
+    switch (imageType)
+    {
+    case HalImageType::Image1D:
+        vkImageType = VK_IMAGE_TYPE_1D;
+        break;
+    case HalImageType::Image2D:
+        vkImageType = VK_IMAGE_TYPE_2D;
+        break;
+    case HalImageType::Image3D:
+        vkImageType = VK_IMAGE_TYPE_3D;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return vkImageType;
+}
+
+HalImageType
+VulkanTypeConversion::ConvertImageTypeFromVulkan(VkImageType imageType)
+{
+    HalImageType halImageType = HalImageType::Image1D;
+
+    switch (imageType)
+    {
+    case VK_IMAGE_TYPE_1D:
+        halImageType = HalImageType::Image1D;
+        break;
+    case VK_IMAGE_TYPE_2D:
+        halImageType = HalImageType::Image2D;
+        break;
+    case VK_IMAGE_TYPE_3D:
+        halImageType = HalImageType::Image3D;
+        break;
+    default:
+        assert(false);
+        break;
+    }
+
+    return halImageType;
+}
+
 VkImageViewType 
 VulkanTypeConversion::ConvertImageViewTypeToVulkan(HalImageViewType imageViewType)
 {
@@ -387,6 +435,61 @@ VulkanTypeConversion::ConvertImageAspectFlagsFormatFromVulkan(VkImageAspectFlags
     return aspectFlags;
 }
 
+VkImageUsageFlags 
+VulkanTypeConversion::ConvertImageUsageFlagsToVulkan(HalImageUsageFlags imageUsageFlags)
+{
+    VkImageUsageFlags vkUsageFlag = 0;
+
+    if (imageUsageFlags & static_cast<uint32_t>(HalImageUsageFlagBits::TransferSrc))
+        vkUsageFlag |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    if (imageUsageFlags & static_cast<uint32_t>(HalImageUsageFlagBits::TransferDst))
+        vkUsageFlag |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    if (imageUsageFlags & static_cast<uint32_t>(HalImageUsageFlagBits::Sampled))
+        vkUsageFlag |= VK_IMAGE_USAGE_SAMPLED_BIT;
+    if (imageUsageFlags & static_cast<uint32_t>(HalImageUsageFlagBits::Storage))
+        vkUsageFlag |= VK_IMAGE_USAGE_STORAGE_BIT;
+    if (imageUsageFlags & static_cast<uint32_t>(HalImageUsageFlagBits::ColorAttachment))
+        vkUsageFlag |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    if (imageUsageFlags & static_cast<uint32_t>(HalImageUsageFlagBits::DepthAttachment))
+        vkUsageFlag |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    if (imageUsageFlags & static_cast<uint32_t>(HalImageUsageFlagBits::TransientAttachment))
+        vkUsageFlag |= VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT;
+    if (imageUsageFlags & static_cast<uint32_t>(HalImageUsageFlagBits::InputAttachment))
+        vkUsageFlag |= VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT;
+    if(imageUsageFlags & static_cast<uint32_t>(HalImageUsageFlagBits::ShadingRateImageNV))
+        vkUsageFlag |= VK_IMAGE_USAGE_SHADING_RATE_IMAGE_BIT_NV;
+
+    assert(vkUsageFlag != 0);
+    return vkUsageFlag;
+}
+
+HalImageUsageFlags
+VulkanTypeConversion::ConvertImageUsageFlagsFromVulkan(VkImageUsageFlags imageUsageFlags)
+{
+    HalImageUsageFlags halUsageFlag = 0;
+
+    if (imageUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
+        halUsageFlag |= static_cast<uint32_t>(HalImageUsageFlagBits::TransferSrc);
+    if (imageUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+        halUsageFlag |= static_cast<uint32_t>(HalImageUsageFlagBits::TransferDst);
+    if (imageUsageFlags & VK_IMAGE_USAGE_SAMPLED_BIT)
+        halUsageFlag |= static_cast<uint32_t>(HalImageUsageFlagBits::Sampled);
+    if (imageUsageFlags & VK_IMAGE_USAGE_STORAGE_BIT)
+        halUsageFlag |= static_cast<uint32_t>(HalImageUsageFlagBits::Storage);
+    if (imageUsageFlags & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+        halUsageFlag |= static_cast<uint32_t>(HalImageUsageFlagBits::ColorAttachment);
+    if (imageUsageFlags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
+        halUsageFlag |= static_cast<uint32_t>(HalImageUsageFlagBits::DepthAttachment);
+    if (imageUsageFlags & VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT)
+        halUsageFlag |= static_cast<uint32_t>(HalImageUsageFlagBits::TransientAttachment);
+    if (imageUsageFlags & VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT)
+        halUsageFlag |= static_cast<uint32_t>(HalImageUsageFlagBits::InputAttachment);
+    if (imageUsageFlags & VK_IMAGE_USAGE_SHADING_RATE_IMAGE_BIT_NV)
+        halUsageFlag |= static_cast<uint32_t>(HalImageUsageFlagBits::ShadingRateImageNV);
+
+    assert(halUsageFlag != 0);
+    return halUsageFlag;
+}
 
 VkComponentSwizzle 
 VulkanTypeConversion::ConvertComponentSwizzleToVulkan(HalComponentSwizzle swizzle)

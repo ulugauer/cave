@@ -86,9 +86,20 @@ enum class HalImageFormat
 };
 
 /**
+* @brief A strongly typed enum class representing image type
+*/
+enum class HalImageType
+{
+    Image1D = 0,
+    Image2D = 1,
+    Image3D = 2
+};
+
+/**
 * @brief A strongly typed enum class representing image view types
 */
-enum class HalImageViewType {
+enum class HalImageViewType 
+{
     Image1D = 0,
     Image2D = 1,
     Image3D = 2,
@@ -101,7 +112,8 @@ enum class HalImageViewType {
 /**
  * @brief A strongly typed enum class representing component swizzle
  */
-enum HalComponentSwizzle {
+enum HalComponentSwizzle 
+{
     Identity = 0,
     Zero = 1,
     One = 2,
@@ -114,7 +126,8 @@ enum HalComponentSwizzle {
 /**
  * @brief A strongly typed enum class representing image aspect flags
  */
-enum class HalImageAspectFlagBits {
+enum class HalImageAspectFlagBits 
+{
     Color = 0x0001,
     Depth = 0x0002,
     Stencil = 0x0004,
@@ -129,6 +142,24 @@ enum class HalImageAspectFlagBits {
 };
 
 typedef uint32_t HalImageAspectFlags;   ///< HalImageAspectFlagBits flags
+
+/**
+ * @brief A strongly typed enum class representing image usage flags
+ */
+enum class HalImageUsageFlagBits 
+{
+    TransferSrc = 0x0001,
+    TransferDst = 0x0002,
+    Sampled = 0x0004,
+    Storage = 0x0008,
+    ColorAttachment = 0x0010,
+    DepthAttachment = 0x0020,
+    TransientAttachment = 0x0040,
+    InputAttachment = 0x0080,
+    ShadingRateImageNV = 0x0100,
+};
+
+typedef uint32_t HalImageUsageFlags;   ///< HalImageUsageFlagBits flags
 
 /**
 *  @brief A strongly typed enum class representing component types
@@ -1099,6 +1130,7 @@ struct CAVE_INTERFACE HalBufferInfo
 struct CAVE_INTERFACE HalImageInfo
 {
 	HalImageFormat _format;					///< Image format
+    HalImageType _type;                     ///< Image type
 	uint32_t _width;						///< Image width in pixels
 	uint32_t _height;						///< Image height in pixels
 	uint32_t _depth;						///< Image depth
@@ -1107,14 +1139,15 @@ struct CAVE_INTERFACE HalImageInfo
 	uint32_t _componentCount;				///< amount of components (1-4)
 	uint32_t _componentSize;				///< size of a single component in bytes (1-4)
 	HalSampleCount _sampleCount;			///< MSAA sample count
-	bool _useAsRenderTarget;				///< Use this texture as render target
 	HalMemoryPropertyFlags _properties;		///< Memory properties
+    HalImageUsageFlags _usage;              ///< Texture usage Flag
 	uint32_t _queueFamilyIndexCount;		///< Index count
 	const uint32_t* _queueFamilyIndices;	///< Queue family indices array
 
 	HalImageInfo()
 	{
 		_format = HalImageFormat::Undefined;
+        _type = HalImageType::Image2D;
 		_width = 0;
 		_height = 0;
 		_depth = 0;
@@ -1123,7 +1156,7 @@ struct CAVE_INTERFACE HalImageInfo
 		_componentCount = 0;
 		_componentSize = 0;
 		_sampleCount = HalSampleCount::SampleCount1;
-		_useAsRenderTarget = false;
+        _usage = static_cast<HalImageUsageFlags>(HalImageUsageFlagBits::TransferSrc);
 		_properties = 0;
 		_queueFamilyIndexCount = 0;
 		_queueFamilyIndices = nullptr;

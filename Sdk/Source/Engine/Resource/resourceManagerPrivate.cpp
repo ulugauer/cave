@@ -335,6 +335,7 @@ RenderTexture* ResourceManagerPrivate::GetTexture(const char* file)
     imageInfo._format = imageData.format;
     imageInfo._componentCount = imageData.componentCount;
     imageInfo._componentSize = imageData.componentSize;
+    imageInfo._usage = (static_cast<HalImageUsageFlags>(HalImageUsageFlagBits::TransferDst) | static_cast<HalImageUsageFlags>(HalImageUsageFlagBits::Sampled));
 
     RenderTexture* texture = nullptr;
     try

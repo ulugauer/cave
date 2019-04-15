@@ -77,6 +77,24 @@ public:
     static HalImageFormat ConvertImageFormatFromVulkan(VkFormat imageFormat);
 
     /**
+   * @brief Convert from generic image type to vulkan image type
+   *
+   * @param[in] imageType  Generic image type
+   *
+   * @return Vulkan image type
+   */
+    static VkImageType ConvertImageTypeToVulkan(HalImageType imageType);
+
+    /**
+   * @brief Convert from generic image type to vulkan image type
+   *
+   * @param[in] imageType	Vulkan image type
+   *
+   * @return Generic image type
+   */
+    static HalImageType ConvertImageTypeFromVulkan(VkImageType imageType);
+
+    /**
     * @brief Convert from generic image view type to vulkan view type
     *
     * @param[in] imageViewType  Generic image view type
@@ -120,6 +138,24 @@ public:
    * @return Generic image aspect flags
    */
     static HalImageAspectFlags ConvertImageAspectFlagsFormatFromVulkan(VkImageAspectFlags imageAspectFlags);
+
+    /**
+    * @brief Convert from generic image usage flags to vulkan usage flags
+    *
+    * @param[in] imageUsageFlags  Generic image usage flags
+    *
+    * @return Vulkan usage flags
+    */
+    static VkImageUsageFlags ConvertImageUsageFlagsToVulkan(HalImageUsageFlags imageUsageFlags);
+
+    /**
+    * @brief Convert from vulkan image usage flags to generic usage flags
+    *
+    * @param[in] imageUsageFlags  vulkan image usage flags
+    *
+    * @return generic usage flags
+    */
+    static HalImageUsageFlags ConvertImageUsageFlagsFromVulkan(VkImageUsageFlags imageUsageFlags);
 
     /**
     * @brief Convert from generic component swizzle to vulkan component swizzle

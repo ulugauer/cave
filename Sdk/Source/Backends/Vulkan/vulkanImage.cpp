@@ -37,7 +37,7 @@ VulkanImage::VulkanImage(VulkanRenderDevice* device, HalImageInfo& imageInfo)
 
     _vkCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     _vkCreateInfo.pNext = nullptr;
-    _vkCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+    _vkCreateInfo.imageType = VulkanTypeConversion::ConvertImageTypeToVulkan(imageInfo._type);
     _vkCreateInfo.format = VulkanTypeConversion::ConvertImageFormatToVulkan(imageInfo._format);
     _vkCreateInfo.extent.width = imageInfo._width;
     _vkCreateInfo.extent.height = imageInfo._height;
@@ -46,7 +46,7 @@ VulkanImage::VulkanImage(VulkanRenderDevice* device, HalImageInfo& imageInfo)
     _vkCreateInfo.arrayLayers = imageInfo._slices;
     _vkCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     _vkCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    _vkCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    _vkCreateInfo.usage = VulkanTypeConversion::ConvertImageUsageFlagsToVulkan(imageInfo._usage);
     _vkCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     _vkCreateInfo.samples = VulkanTypeConversion::ConvertSampleCountToVulkan(imageInfo._sampleCount);
     _vkCreateInfo.flags = 0; // Optional
