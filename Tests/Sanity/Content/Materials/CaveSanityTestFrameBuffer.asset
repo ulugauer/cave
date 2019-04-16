@@ -1,0 +1,26 @@
+{
+   "material": {
+    "name": "ColoredMaterial",
+      "values": {
+        "diffuse": [
+          0.69,
+          0.85,
+          0.24
+        ],
+        "opacity": 1.0
+      }
+    },
+
+  "program": {
+    "name": "SimpleColor",
+    "language": "spirv",
+    "vertex": {
+      "source": "Shader/CaveSanityTestMappedVbo_vert.spv",
+      "entry": "main"
+    },
+    "fragment": {
+      "source": "Shader/CaveSanityTestMappedVbo_frag.spv",
+      "entry": "main"
+    }
+  }
+ }

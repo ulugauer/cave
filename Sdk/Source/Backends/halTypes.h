@@ -1067,7 +1067,7 @@ struct CAVE_INTERFACE HalDescriptorSetLayout
 /**
 * @brief Structure specifying the allocation parameters for descriptor sets
 */
-struct HalDescriptorSetAllocateInfo 
+struct CAVE_INTERFACE HalDescriptorSetAllocateInfo
 {
 	uint32_t _descriptorSetCount; ///< Determines the number of descriptor sets to be allocated from the pool
 	const HalDescriptorSetLayout* _pSetLayouts;	///< Sn array of descriptor set layouts, with each member specifying how the corresponding descriptor set is allocated.
@@ -1166,7 +1166,7 @@ struct CAVE_INTERFACE HalImageInfo
 /**
 * @brief Hal component swizzle info
 */
-struct HalComponentMapping 
+struct CAVE_INTERFACE HalComponentMapping
 {
     HalComponentSwizzle    _r;
     HalComponentSwizzle    _g;
@@ -1177,7 +1177,7 @@ struct HalComponentMapping
 /**
 * @brief Hal sub-resource info
 */
-struct HalImageSubresourceRange 
+struct CAVE_INTERFACE HalImageSubresourceRange
 {
     HalImageAspectFlags _aspectMask;
     uint32_t _baseMipLevel;
@@ -1258,7 +1258,7 @@ struct CAVE_INTERFACE HalSamplerCreateInfo
 /**
 * @brief Structure specifying descriptor pool size
 */
-struct HalDescriptorPoolSize 
+struct CAVE_INTERFACE HalDescriptorPoolSize
 {
 	HalDescriptorType	_type;				///< Must be a valid HalDescriptorType value
 	uint32_t            _descriptorCount;	///< Must be greater than 0
@@ -1306,7 +1306,7 @@ union CAVE_INTERFACE HalClearValue
 /**
 * @brief 2D extend
 */
-struct HalExtent2D 
+struct CAVE_INTERFACE HalExtent2D
 {
 	uint32_t    _width;		///< Width
 	uint32_t    _height;	///< Height
@@ -1322,6 +1322,7 @@ struct CAVE_INTERFACE HalRect2D
 	uint32_t _width;	///< Extend in x
 	uint32_t _height;	///< Extend in y
 };
+
 
 }
 

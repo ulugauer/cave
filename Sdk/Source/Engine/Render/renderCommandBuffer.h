@@ -33,6 +33,7 @@ namespace cave
 /// forward declaration
 class RenderDevice;
 class RenderPass;
+class RenderFrameBuffer;
 class HalCommandBuffer;
 class RenderCommandBuffer;
 
@@ -43,14 +44,15 @@ class RenderCommandBuffer;
 struct CAVE_INTERFACE RenderCmdRenderPassInfo
 {
 	RenderPass* _renderPass;			///< Pointer to an instance of RenderPass object
-	// RenderFramebuffer* _framebuffer;	///< to do
-	int32_t _swapChainIndex;				///< If _framebuffer = nullptr fetch framebuffer from swap chain 
+	RenderFrameBuffer* _framebuffer;	///< FrameBuffer object we render to or nullptr for swapchain framebuffer
+	int32_t _swapChainIndex;			///< If _framebuffer = nullptr fetch framebuffer from swap chain 
 	HalRect2D _renderRect;				///< Render areaa within the framebuffer
 	uint32_t _clearValueCount;			///< Count of clear value arrau
 	const HalClearValue* _clearValues;	///< Array of clear values
 
 	RenderCmdRenderPassInfo()
 		: _renderPass(nullptr)
+        , _framebuffer(nullptr)
 		, _swapChainIndex(-1)
 	{}
 };

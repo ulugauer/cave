@@ -13,8 +13,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 */
 #pragma once
 
-/// @file halBuffer.h
-///       Hardware data buffer abstraction
+/// @file halFrameBuffer.h
+///       Hardware framebuffer abstraction
 
 #include "engineDefines.h"
 #include "Memory/allocatorBase.h"
@@ -33,71 +33,35 @@ namespace cave
 
 ///< forwards
 class HalRenderDevice;
+class HalRenderPass;
+class HalImageView;
 
 /**
-* @brief Abstraction of device images
+* @brief Abstraction of device framebuffers
 */
-class HalImage
+class HalFrameBuffer
 {
 public:
-	/**
-	* @brief Constructor
-	*
-	* @param[in] renderDevice	Pointer to render device object
-	* @param[in] imageInfo		Image create info
-	*/
-	HalImage(HalRenderDevice* renderDevice, HalImageInfo& imageInfo);
-
-	/** @brief Destructor */
-	virtual ~HalImage();
-
-	/**
-	* @brief Bind Binds a image and allocates memory
-	*
-	*/
-	virtual void Bind() = 0;
-
-	/**
-	* @brief Copy data to device memory
-	*
-	* @param[in] pData		Pointer to image data
-	*
-	*/
-	virtual void Update(const void* pData) = 0;
-
     /**
-    * @brief Query image format
+    * @brief Constructor
     *
-    * @retrun HalImageFormat enum
-    *
+    * @param[in] renderDevice	Pointer to render device object
+    * @param[in] width  Framebuffer width
+    * @param[in] height Framebuffer height
+    * @param[in] layers Framebuffer layers count
     */
-    HalImageFormat GetImageFormat();
+    HalFrameBuffer(HalRenderDevice* renderDevice, uint32_t width, uint32_t height, uint32_t layers);
 
-    /**
-    * @brief Query image level count
-    *
-    * @retrun amount mip level
-    *
-    */
-    uint32_t GetLevelCount();
-
-    /**
-    * @brief Query image color/depth type
-    *
-    * @retrun true if image has a depth format
-    *
-    */
-    bool IsDepthFormat();
+    /** @brief Destructor */
+    virtual ~HalFrameBuffer();
 
 private:
-	HalRenderDevice * _pDevice;	///< Pointer to device object
-	HalImageInfo _imageInfo;	///< Buffer create info
+    HalRenderDevice* _pDevice;	///< Pointer to device object
+    uint32_t _width;
+    uint32_t _height;
+    uint32_t _layers;
 };
 
 }
 
 /** @}*/
-
-
-
-

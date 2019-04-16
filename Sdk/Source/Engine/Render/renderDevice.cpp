@@ -37,6 +37,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderTexture.h"
 #include "renderTextureView.h"
 #include "renderTextureSampler.h"
+#include "renderRenderTarget.h"
+#include "renderFrameBuffer.h"
 #include "renderCommandBuffer.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
@@ -507,6 +509,25 @@ void RenderDevice::ReleaseGraphicsPipeline(RenderGraphicsPipeline* graphicsPipel
 	}
 }
 
+RenderFrameBuffer* RenderDevice::CreateFrameBuffer(RenderPass& renderPass,
+    uint32_t width, uint32_t height, caveVector<RenderTarget*>& renderAttachments)
+{
+    RenderFrameBuffer* framebuffer = AllocateObject<RenderFrameBuffer>(*_pRenderInstance->GetEngineAllocator(), *this, 
+        renderPass,  width, height, renderAttachments);
+    if (framebuffer)
+        framebuffer->AddRef();
+
+    return framebuffer;
+}
+
+void RenderDevice::ReleaseFrameBuffer(RenderFrameBuffer* framebuffer)
+{
+    if (framebuffer)
+    {
+        framebuffer->Relase();
+    }
+}
+
 RenderVertexBuffer* RenderDevice::CreateVertexBuffer(HalBufferInfo& bufferInfo)
 {
 	RenderVertexBuffer* vertexBuffer = nullptr;
@@ -658,6 +679,32 @@ void RenderDevice::ReleaseTextureSampler(RenderTextureSampler* textureSampler)
     }
 }
 
+RenderTarget* RenderDevice::CreateRenderTarget(HalImageInfo& imageInfo)
+{
+    RenderTarget* renderTarget = nullptr;
+
+    try
+    {
+        renderTarget = AllocateObject<RenderTarget>(*_pRenderInstance->GetEngineAllocator(), *this, imageInfo);
+        if (renderTarget)
+            renderTarget->AddRef();
+
+        return renderTarget;
+    }
+    catch (std::exception&)
+    {
+        return renderTarget;
+    }
+}
+
+void RenderDevice::ReleaseRenderTarget(RenderTarget* renderTarget)
+{
+    if (renderTarget)
+    {
+        renderTarget->Relase();
+    }
+}
+
 bool RenderDevice::AllocateCommandBuffers(RenderCommandPool* commandPool
 		, HalCommandBufferInfo& commandBufferInfo
 		, caveVector<RenderCommandBuffer*>& commandBuffers)
@@ -709,6 +756,7 @@ void RenderDevice::CmdBeginRenderPass(RenderCommandBuffer* commandBuffer, Render
 {
 	HalCmdRenderPassInfo halInfo;
 	halInfo._renderPass = renderPassBeginInfo._renderPass->GetHalHandle();
+    halInfo._framebuffer = (renderPassBeginInfo._framebuffer != nullptr) ? renderPassBeginInfo._framebuffer->GetHalHandle() : nullptr;
 	halInfo._swapChainIndex = renderPassBeginInfo._swapChainIndex;
 	halInfo._renderRect = renderPassBeginInfo._renderRect;
 	halInfo._clearValueCount = renderPassBeginInfo._clearValueCount;

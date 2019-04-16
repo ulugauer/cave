@@ -284,6 +284,20 @@ public:
 	*/
 	HalGraphicsPipeline* CreateGraphicsPipeline(HalGraphicsPipelineInfo& graphicsPipelineInfo) override;
 
+    /**
+    * @brief Create a framebuffer object
+    *
+    * @param[in] renderPass HalRenderPass object
+    * @param[in] width  Framebuffer width
+    * @param[in] height Framebuffer height
+    * @param[in] layers Framebuffer layer count
+    * @param[in] renderAttachments Array of HalImageView objects
+    *
+    * @return RenderFrameBuffer object
+    */
+    HalFrameBuffer* CreateFrameBuffer(HalRenderPass* renderPass,
+        uint32_t width, uint32_t height, uint32_t layers, caveVector<HalImageView*>& renderAttachments) override;
+
 	/**
 	* @brief Create semaphore object
 	*

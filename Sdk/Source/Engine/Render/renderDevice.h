@@ -62,6 +62,8 @@ class RenderUniformBuffer;
 class RenderTexture;
 class RenderTextureView;
 class RenderTextureSampler;
+class RenderTarget;
+class RenderFrameBuffer;
 
 
 /**
@@ -485,12 +487,12 @@ public:
     void ReleaseTextureView(RenderTextureView* textureView);
 
     /**
-   * @brief Create a texture sampler object
-   *
-   * @param[in] samplerInfo    Samp[ler create info
-   *
-   * @return  HalSampler abstraction interface
-   */
+     * @brief Create a texture sampler object
+     *
+     * @param[in] samplerInfo    Sampler create info
+     *
+     * @return  RenderTextureSampler abstraction interface
+     */
     RenderTextureSampler* CreateTextureSampler(HalSamplerCreateInfo& samplerInfo);
 
     /**
@@ -499,6 +501,22 @@ public:
     * @param[in] textureSampler	 RenderTextureSampler object to release
     */
     void ReleaseTextureSampler(RenderTextureSampler* textureSampler);
+
+    /**
+     * @brief Create a texture render target object
+     *
+     * @param[in] imageInfo    Image create info
+     *
+     * @return  Render target abstraction interface
+     */
+    RenderTarget* CreateRenderTarget(HalImageInfo& imageInfo);
+
+    /**
+    * @brief Release a texture render target object
+    *
+    * @param[in] renderTarget	 RenderTarget object to release
+    */
+    void ReleaseRenderTarget(RenderTarget* renderTarget);
 
 	/**
 	* @brief Create a render pass object
@@ -526,11 +544,31 @@ public:
 	RenderGraphicsPipeline* CreateGraphicsPipeline(RenderGraphicsPipelineInfo& graphicsPipelineInfo);
 
 	/**
-	* @brief Allocte command buffers for submits
+	* @brief Release a graphics pipeline object
 	*
 	* @param[in] graphicsPipeline	 RenderGraphicsPipeline to release
 	*/
 	void ReleaseGraphicsPipeline(RenderGraphicsPipeline* graphicsPipeline);
+
+    /**
+    * @brief Create a framebuffer object
+    *
+    * @param[in] renderPass RenderPass object
+    * @param[in] width  Framebuffer width
+    * @param[in] height Framebuffer height
+    * @param[in] renderAttachments Array of RenderTarget objects
+    *
+    * @return RenderFrameBuffer object
+    */
+    RenderFrameBuffer* CreateFrameBuffer(RenderPass& renderPass, 
+        uint32_t width, uint32_t height, caveVector<RenderTarget*>& renderAttachments);
+
+    /**
+    * @brief Release a framebuffer object
+    *
+    * @param[in] framebuffer	 RenderFrameBuffer to release
+    */
+    void ReleaseFrameBuffer(RenderFrameBuffer* framebuffer);
 
 	/**************************************************************************
 	*

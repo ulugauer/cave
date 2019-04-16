@@ -31,7 +31,8 @@ set(BACKENDS_SOURCE halTypes.h
 					halBuffer.h halBuffer.cpp 
 					halImage.h halImage.cpp
                     halImageView.h halImageView.cpp 
-                    halSampler.h halSampler.cpp)
+                    halSampler.h halSampler.cpp 
+                    halFrameBuffer.h halFrameBuffer.cpp )
 
 # vulkan source
 set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h 
@@ -61,7 +62,8 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 						   Vulkan/vulkanBuffer.h Vulkan/vulkanBuffer.cpp 
 						   Vulkan/vulkanImage.h Vulkan/vulkanImage.cpp 
                            Vulkan/vulkanImageView.h Vulkan/vulkanImageView.cpp 
-                           Vulkan/vulkanSampler.h Vulkan/vulkanSampler.cpp )
+                           Vulkan/vulkanSampler.h Vulkan/vulkanSampler.cpp 
+                           Vulkan/vulkanFrameBuffer.h Vulkan/vulkanFrameBuffer.cpp )
 
 
 # Create named folders for the sources within the .vcproj

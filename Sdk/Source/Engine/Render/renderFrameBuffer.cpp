@@ -12,26 +12,41 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file renderRenderPass.cpp
-///       Render pass interface
+/// @file renderFrameBuffer.cpp
+///       Render framebuffer interface
 
-#include "renderRenderPass.h"
+#include "renderFrameBuffer.h"
 #include "renderDevice.h"
+#include "renderRenderPass.h"
+#include "renderRenderTarget.h"
 #include "engineError.h"
-#include "halRenderPass.h"
+#include "halImage.h"
+#include "halImageView.h"
 
 #include <cassert>
 
 namespace cave
 {
-RenderPass::RenderPass(RenderDevice& renderDevice, HalRenderPassInfo& renderPassInfo)
-	: CaveRefCount(renderDevice.GetEngineAllocator())
-	, _renderDevice(renderDevice)
+RenderFrameBuffer::RenderFrameBuffer(RenderDevice& renderDevice, RenderPass& renderPass,
+    uint32_t width, uint32_t height, caveVector<RenderTarget*>& renderAttachments)
+    : CaveRefCount(renderDevice.GetEngineAllocator())
+    , _renderDevice(renderDevice)
+    , _halFrameBuffer(nullptr)
 {
-	// Allocate low level object
     try
     {
-        _halRenderPass = renderDevice.GetHalRenderDevice()->CreateRenderPass(renderPassInfo);
+        // add image views based on attachments
+        HalImageViewInfo imageView;
+        caveVector<HalImageView*> halImageViews(renderDevice.GetEngineAllocator());
+        for (size_t i = 0; i < renderAttachments.Size(); i++)
+        {
+
+            halImageViews.Push(renderAttachments[i]->GetImageViewHandle());
+        }
+
+        // Allocate low level object
+        _halFrameBuffer = renderDevice.GetHalRenderDevice()->CreateFrameBuffer(renderPass.GetHalHandle(), width, height, 1,
+            halImageViews);
     }
     catch (std::exception& e)
     {
@@ -40,10 +55,11 @@ RenderPass::RenderPass(RenderDevice& renderDevice, HalRenderPassInfo& renderPass
     }
 }
 
-RenderPass::~RenderPass()
+RenderFrameBuffer::~RenderFrameBuffer()
 {
-	if (_halRenderPass)
-		DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halRenderPass);
+    // Free handle
+    if (_halFrameBuffer)
+        DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halFrameBuffer);
 }
 
 }

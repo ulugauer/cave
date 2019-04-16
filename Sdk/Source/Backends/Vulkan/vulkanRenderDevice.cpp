@@ -43,6 +43,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanImage.h"
 #include "vulkanImageView.h"
 #include "vulkanSampler.h"
+#include "vulkanFrameBuffer.h"
 #include "vulkanConversion.h"
 #include "vulkanApi.h"
 
@@ -743,6 +744,29 @@ HalGraphicsPipeline* VulkanRenderDevice::CreateGraphicsPipeline(HalGraphicsPipel
 	return graphicsPipeline;
 }
 
+HalFrameBuffer* VulkanRenderDevice::CreateFrameBuffer(HalRenderPass* renderPass,
+    uint32_t width, uint32_t height, uint32_t layers,
+    caveVector<HalImageView*>& renderAttachments)
+{
+    if (!_pPhysicalDevice || !_vkDevice)
+        return nullptr;
+
+    VulkanRenderPass* vkRenderPass = static_cast<VulkanRenderPass*>(renderPass);
+    // setup vulkan image view array
+    caveVector<VkImageView> vkImageViews(_pInstance->GetEngineAllocator());
+    vkImageViews.Resize(renderAttachments.Size());
+    for (size_t i = 0; i < vkImageViews.Size(); i++)
+    {
+        VulkanImageView* vkImageView = static_cast<VulkanImageView*>(renderAttachments[i]);
+        vkImageViews[i] = vkImageView->GetImageView();
+    }
+
+    VulkanFrameBuffer* framebuffer = AllocateObject<VulkanFrameBuffer>(*_pInstance->GetEngineAllocator(), this, 
+        vkRenderPass->GetRenderPass(), width, height, layers, vkImageViews);
+
+    return framebuffer;
+}
+
 HalSemaphore* VulkanRenderDevice::CreateSemaphore()
 {
 	if (!_pPhysicalDevice || !_vkDevice)
@@ -857,7 +881,17 @@ void VulkanRenderDevice::CmdBeginRenderPass(HalCommandBuffer* commandBuffer, Hal
 	vkRenderPassInfo.pNext = nullptr;
 	VulkanRenderPass* vulkanRenderPass = static_cast<VulkanRenderPass*>(renderPassBeginInfo._renderPass);
 	vkRenderPassInfo.renderPass = vulkanRenderPass->GetRenderPass();
-	vkRenderPassInfo.framebuffer = _presentationFramebuffers[renderPassBeginInfo._swapChainIndex];
+    
+    if (renderPassBeginInfo._framebuffer != nullptr)
+    {
+        VulkanFrameBuffer* vulkanFrameBuffer = static_cast<VulkanFrameBuffer*>(renderPassBeginInfo._framebuffer);
+        vkRenderPassInfo.framebuffer = vulkanFrameBuffer->GetFrameBuffer();
+    }
+    else
+    {
+        vkRenderPassInfo.framebuffer = _presentationFramebuffers[renderPassBeginInfo._swapChainIndex];
+    }
+
 	vkRenderPassInfo.renderArea.offset.x = renderPassBeginInfo._renderRect._x;
 	vkRenderPassInfo.renderArea.offset.y = renderPassBeginInfo._renderRect._y;
 	vkRenderPassInfo.renderArea.extent.height = renderPassBeginInfo._renderRect._height;

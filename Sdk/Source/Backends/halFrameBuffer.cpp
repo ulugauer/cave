@@ -12,48 +12,27 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file halBuffer.cpp
-///       Hardware data buffer abstraction
+/// @file halFrameBuffer.cpp
+///       Hardware framebuffer abstraction
 
-#include "halImage.h"
+#include "halFrameBuffer.h"
 #include "halRenderDevice.h"
 
 namespace cave
 {
 
-HalImage::HalImage(HalRenderDevice* renderDevice, HalImageInfo& imageInfo)
-	: _pDevice(renderDevice)
-	, _imageInfo(imageInfo)
+HalFrameBuffer::HalFrameBuffer(HalRenderDevice* renderDevice, uint32_t width, uint32_t height, uint32_t layers)
+    : _pDevice(renderDevice)
+    , _width(width)
+    , _height(height)
+    , _layers(layers)
 {
 
 }
 
-HalImage::~HalImage()
+HalFrameBuffer::~HalFrameBuffer()
 {
 
-}
-
-HalImageFormat HalImage::GetImageFormat()
-{
-    return _imageInfo._format;
-}
-
-uint32_t HalImage::GetLevelCount()
-{
-    return _imageInfo._level;
-}
-
-bool HalImage::IsDepthFormat()
-{
-    bool isDepth = false;
-    if (_imageInfo._format == HalImageFormat::D32SFloat ||
-        _imageInfo._format == HalImageFormat::D32SFloatS8Uint ||
-        _imageInfo._format == HalImageFormat::D24UnormS8Uint)
-    {
-        isDepth = true;
-    }
-
-    return isDepth;
 }
 
 }

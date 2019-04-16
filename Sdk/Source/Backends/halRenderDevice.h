@@ -39,6 +39,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halImageView.h"
 #include "halSampler.h"
 #include "halDescriptorSet.h"
+#include "halFrameBuffer.h"
 #include "Memory/allocatorBase.h"
 
 #include <iostream>		// includes exception handling
@@ -283,6 +284,20 @@ public:
 	* @return  HalGraphicsPipeline abstraction interface
 	*/
 	virtual HalGraphicsPipeline* CreateGraphicsPipeline(HalGraphicsPipelineInfo& graphicsPipelineInfo) = 0;
+
+    /**
+    * @brief Create a framebuffer object
+    *
+    * @param[in] renderPass HalRenderPass object
+    * @param[in] width  Framebuffer width
+    * @param[in] height Framebuffer height
+    * @param[in] layer Framebuffer layer count
+    * @param[in] renderAttachments Array of HalImageView objects
+    *
+    * @return RenderFrameBuffer object
+    */
+    virtual HalFrameBuffer* CreateFrameBuffer(HalRenderPass* renderPass,
+        uint32_t width, uint32_t height, uint32_t layers, caveVector<HalImageView*>& renderAttachments) = 0;
 
 	/**
 	* @brief Create semaphore object
