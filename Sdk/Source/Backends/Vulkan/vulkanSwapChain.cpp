@@ -284,6 +284,17 @@ void VulkanSwapChain::CreatePresentationSemaphores()
 	}
 }
 
+const VkImage VulkanSwapChain::GetSwapChainImage(size_t index) const
+{
+    VkImage image = VK_NULL_HANDLE;
+    if (index < _swapChainImageVector.Size())
+    {
+        return _swapChainImageVector[index];
+    }
+
+    return image;
+}
+
 const VkImageView VulkanSwapChain::GetSwapChainImageView(size_t index) const
 {
 	VkImageView imageView = VK_NULL_HANDLE;
@@ -293,6 +304,11 @@ const VkImageView VulkanSwapChain::GetSwapChainImageView(size_t index) const
 	}
 
 	return imageView;
+}
+
+const VkImage VulkanSwapChain::GetSwapChainDepthImage() const
+{
+    return _swapChainDepthImage;
 }
 
 const VkImageView VulkanSwapChain::GetSwapChainDepthImageView() const

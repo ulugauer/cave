@@ -1017,6 +1017,212 @@ void VulkanRenderDevice::CmdDrawIndexed(HalCommandBuffer* commandBuffer, uint32_
 		, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
+void VulkanRenderDevice::CmdCopyImage(HalCommandBuffer* commandBuffer, HalImage* srcImage, HalImageLayout srcLayout, 
+    HalImage* dstImage, HalImageLayout dstLayout, uint32_t regionCount, HalImageCopy* regions)
+{
+    if (srcImage && dstImage)
+    {
+        VulkanImage* vkSrcImage = static_cast<VulkanImage*>(srcImage);
+        VulkanImage* vkDstImage = static_cast<VulkanImage*>(dstImage);
+        VulkanCommandBuffer* vkCmdBuffer = static_cast<VulkanCommandBuffer*>(commandBuffer);
+
+        uint32_t maxSrcLevel = 0;
+        uint32_t maxDstLevel = 0;
+
+        // create VkImageCopy structs
+        caveVector<VkImageCopy> vkCopyImageArray(_pInstance->GetEngineAllocator());
+        vkCopyImageArray.Resize(regionCount);
+        for (uint32_t i = 0; i < regionCount; i++)
+        {
+            VkImageCopy vkImageCopy = {};
+            vkImageCopy.srcOffset = VulkanTypeConversion::ConvertOffset3DToVulkan(regions[i]._srcOffset);
+            vkImageCopy.srcSubresource.aspectMask = VulkanTypeConversion::ConvertImageAspectFlagsToVulkan(regions[i]._srcLayers._aspectMask);
+            vkImageCopy.srcSubresource.baseArrayLayer = regions[i]._srcLayers._baseArrayLayer;
+            vkImageCopy.srcSubresource.layerCount = regions[i]._srcLayers._layerCount;
+            vkImageCopy.srcSubresource.mipLevel = regions[i]._srcLayers._mipLevel;
+
+            if (regions[i]._srcLayers._mipLevel >= maxSrcLevel)
+                maxSrcLevel = regions[i]._srcLayers._mipLevel + 1;
+
+            vkImageCopy.dstOffset = VulkanTypeConversion::ConvertOffset3DToVulkan(regions[i]._dstOffset);
+            vkImageCopy.dstSubresource.aspectMask = VulkanTypeConversion::ConvertImageAspectFlagsToVulkan(regions[i]._dstLayers._aspectMask);
+            vkImageCopy.dstSubresource.baseArrayLayer = regions[i]._dstLayers._baseArrayLayer;
+            vkImageCopy.dstSubresource.layerCount = regions[i]._dstLayers._layerCount;
+            vkImageCopy.dstSubresource.mipLevel = regions[i]._dstLayers._mipLevel;
+
+            if (regions[i]._dstLayers._mipLevel >= maxDstLevel)
+                maxDstLevel = regions[i]._dstLayers._mipLevel + 1;
+
+            vkImageCopy.extent = VulkanTypeConversion::ConvertExtent3DToVulkan(regions[i]._extent);
+
+            vkCopyImageArray.Push(vkImageCopy);
+        }
+
+        // transition source and dest image to be ready for the copy
+        VkImageAspectFlags aspectFlag = (srcImage->IsDepthFormat()) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
+        aspectFlag |= (srcImage->IsStencilFormat()) ? VK_IMAGE_ASPECT_STENCIL_BIT : 0;
+
+        VkImageMemoryBarrier imageStartBarrier[2];
+        imageStartBarrier[0].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        imageStartBarrier[0].pNext = nullptr;
+        imageStartBarrier[0].srcAccessMask = VulkanTypeConversion::GetAccessFlagsFromLayout(srcLayout);
+        imageStartBarrier[0].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+        imageStartBarrier[0].oldLayout = VulkanTypeConversion::ConvertImageLayoutToVulkan(srcLayout);
+        imageStartBarrier[0].newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        imageStartBarrier[0].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[0].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[0].image = vkSrcImage->GetImage();
+        imageStartBarrier[0].subresourceRange = VkImageSubresourceRange{ aspectFlag, 0, maxSrcLevel, 0, 1 };
+
+        imageStartBarrier[1].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        imageStartBarrier[1].pNext = nullptr;
+        imageStartBarrier[1].srcAccessMask = 0;
+        imageStartBarrier[1].dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        imageStartBarrier[1].oldLayout = VulkanTypeConversion::ConvertImageLayoutToVulkan(dstLayout);
+        imageStartBarrier[1].newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        imageStartBarrier[1].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[1].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[1].image = vkDstImage->GetImage();
+        imageStartBarrier[1].subresourceRange = VkImageSubresourceRange{ aspectFlag, 0, maxDstLevel, 0, 1 };
+
+        VulkanApi::GetApi()->vkCmdPipelineBarrier(vkCmdBuffer->GetCommandBuffer(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
+            , 0, nullptr
+            , 0, nullptr
+            , 2, imageStartBarrier);
+
+        VulkanApi::GetApi()->vkCmdCopyImage(vkCmdBuffer->GetCommandBuffer(), vkSrcImage->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            vkDstImage->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, regionCount, vkCopyImageArray.Data());
+
+        // Transition images back to previous layout
+        imageStartBarrier[0].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        imageStartBarrier[0].pNext = nullptr;
+        imageStartBarrier[0].srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+        imageStartBarrier[0].dstAccessMask = VulkanTypeConversion::GetAccessFlagsFromLayout(srcLayout);
+        imageStartBarrier[0].oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        imageStartBarrier[0].newLayout = VulkanTypeConversion::ConvertImageLayoutToVulkan(srcLayout);
+        imageStartBarrier[0].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[0].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[0].image = vkSrcImage->GetImage();
+        imageStartBarrier[0].subresourceRange = VkImageSubresourceRange{ aspectFlag, 0, maxSrcLevel, 0, 1 };
+
+        imageStartBarrier[1].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        imageStartBarrier[1].pNext = nullptr;
+        imageStartBarrier[1].srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        imageStartBarrier[1].dstAccessMask = VulkanTypeConversion::GetAccessFlagsFromLayout(dstLayout);
+        imageStartBarrier[1].oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        imageStartBarrier[1].newLayout = VulkanTypeConversion::ConvertImageLayoutToVulkan(dstLayout);
+        imageStartBarrier[1].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[1].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[1].image = vkDstImage->GetImage();
+        imageStartBarrier[1].subresourceRange = VkImageSubresourceRange{ aspectFlag, 0, maxDstLevel, 0, 1 };
+
+        VulkanApi::GetApi()->vkCmdPipelineBarrier(vkCmdBuffer->GetCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT, 
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0
+            , 0, nullptr
+            , 0, nullptr
+            , 2, imageStartBarrier);
+    }
+}
+
+void VulkanRenderDevice::CmdCopyImage(HalCommandBuffer* commandBuffer, HalImage* srcImage, HalImageLayout srcLayout,
+    size_t swapChainIndex, uint32_t regionCount, HalImageCopy* regions)
+{
+    VkImage dstImage = _pSwapChain->GetSwapChainImage(swapChainIndex);
+    if (srcImage && dstImage)
+    {
+        VulkanImage* vkSrcImage = static_cast<VulkanImage*>(srcImage);
+        VulkanCommandBuffer* vkCmdBuffer = static_cast<VulkanCommandBuffer*>(commandBuffer);
+
+        uint32_t maxSrcLevel = 0;
+
+        // create VkImageCopy structs
+        caveVector<VkImageCopy> vkCopyImageArray(_pInstance->GetEngineAllocator());
+        vkCopyImageArray.Resize(regionCount);
+        for (uint32_t i = 0; i < regionCount; i++)
+        {
+            vkCopyImageArray[i].srcOffset = VulkanTypeConversion::ConvertOffset3DToVulkan(regions[i]._srcOffset);
+            vkCopyImageArray[i].srcSubresource.aspectMask = VulkanTypeConversion::ConvertImageAspectFlagsToVulkan(regions[i]._srcLayers._aspectMask);
+            vkCopyImageArray[i].srcSubresource.baseArrayLayer = regions[i]._srcLayers._baseArrayLayer;
+            vkCopyImageArray[i].srcSubresource.layerCount = regions[i]._srcLayers._layerCount;
+            vkCopyImageArray[i].srcSubresource.mipLevel = regions[i]._srcLayers._mipLevel;
+
+            if (regions[i]._srcLayers._mipLevel >= maxSrcLevel)
+                maxSrcLevel = regions[i]._srcLayers._mipLevel + 1;
+
+            vkCopyImageArray[i].dstOffset = VulkanTypeConversion::ConvertOffset3DToVulkan(regions[i]._dstOffset);
+            vkCopyImageArray[i].dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            vkCopyImageArray[i].dstSubresource.baseArrayLayer = 0;
+            vkCopyImageArray[i].dstSubresource.layerCount = 1;
+            vkCopyImageArray[i].dstSubresource.mipLevel = 0;
+
+            vkCopyImageArray[i].extent = VulkanTypeConversion::ConvertExtent3DToVulkan(regions[i]._extent);
+        }
+
+        // transition source and dest image to be ready for the copy
+        assert(!srcImage->IsDepthFormat() || !srcImage->IsStencilFormat());
+
+        VkImageMemoryBarrier imageStartBarrier[2];
+        imageStartBarrier[0].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        imageStartBarrier[0].pNext = nullptr;
+        imageStartBarrier[0].srcAccessMask = 0;// VulkanTypeConversion::GetAccessFlagsFromLayout(srcLayout);
+        imageStartBarrier[0].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+        imageStartBarrier[0].oldLayout = VulkanTypeConversion::ConvertImageLayoutToVulkan(srcLayout);
+        imageStartBarrier[0].newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        imageStartBarrier[0].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[0].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[0].image = vkSrcImage->GetImage();
+        imageStartBarrier[0].subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, maxSrcLevel, 0, 1 };
+
+        imageStartBarrier[1].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        imageStartBarrier[1].pNext = nullptr;
+        imageStartBarrier[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        imageStartBarrier[1].dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        imageStartBarrier[1].oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        imageStartBarrier[1].newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        imageStartBarrier[1].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[1].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[1].image = dstImage;
+        imageStartBarrier[1].subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+
+        VulkanApi::GetApi()->vkCmdPipelineBarrier(vkCmdBuffer->GetCommandBuffer(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0
+            , 0, nullptr
+            , 0, nullptr
+            , 2, imageStartBarrier);
+
+        VulkanApi::GetApi()->vkCmdCopyImage(vkCmdBuffer->GetCommandBuffer(), vkSrcImage->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            dstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, regionCount, vkCopyImageArray.Data());
+
+        // Transition images back to previous layout
+        imageStartBarrier[0].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        imageStartBarrier[0].pNext = nullptr;
+        imageStartBarrier[0].srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+        imageStartBarrier[0].dstAccessMask = VulkanTypeConversion::GetAccessFlagsFromLayout(srcLayout);
+        imageStartBarrier[0].oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        imageStartBarrier[0].newLayout = VulkanTypeConversion::ConvertImageLayoutToVulkan(srcLayout);
+        imageStartBarrier[0].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[0].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[0].image = vkSrcImage->GetImage();
+        imageStartBarrier[0].subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, maxSrcLevel, 0, 1 };
+
+        imageStartBarrier[1].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        imageStartBarrier[1].pNext = nullptr;
+        imageStartBarrier[1].srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        imageStartBarrier[1].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        imageStartBarrier[1].oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        imageStartBarrier[1].newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        imageStartBarrier[1].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[1].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageStartBarrier[1].image = dstImage;
+        imageStartBarrier[1].subresourceRange = VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+
+        VulkanApi::GetApi()->vkCmdPipelineBarrier(vkCmdBuffer->GetCommandBuffer(), VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0
+            , 0, nullptr
+            , 0, nullptr
+            , 2, imageStartBarrier);
+    }
+}
+
 void VulkanRenderDevice::FlushCopies()
 {
 	// flush outstanding copies

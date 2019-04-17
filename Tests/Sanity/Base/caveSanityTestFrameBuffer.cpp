@@ -85,6 +85,17 @@ bool CaveSanityTestFrameBuffer::Run(RenderDevice *device, RenderCommandPool* com
         return false;
     }
 
+    // setup copy struct
+    HalImageCopy halImageCopy;
+    halImageCopy._srcOffset = HalOffset3D{ 0, 0, 0 };
+    halImageCopy._srcLayers._aspectMask = static_cast<HalImageAspectFlags>(HalImageAspectFlagBits::Color);
+    halImageCopy._srcLayers._baseArrayLayer = 0;
+    halImageCopy._srcLayers._layerCount = 1;
+    halImageCopy._srcLayers._mipLevel = 0;
+    halImageCopy._dstOffset = HalOffset3D{ 0, 0, 0 };
+    halImageCopy._dstLayers = {};   // no need to setup dest. we copy to swapchain
+    halImageCopy._extent = HalExtent3D{ pUserData->winWidth, pUserData->winHeight , 1};
+
     // start command buffer recording
     HalCommandBufferBeginInfo beginInfo; // always the same here
     beginInfo._flags = static_cast<uint32_t>(HalCommandBufferUsage::SimultaneousUse);
@@ -98,11 +109,11 @@ bool CaveSanityTestFrameBuffer::Run(RenderDevice *device, RenderCommandPool* com
     for (size_t i = 0; i < device->GetSwapChainImageCount(); i++)
     {
         device->BeginCommandBuffer(_commandBuffers[i], beginInfo);
+
         // render pass begin
         RenderCmdRenderPassInfo renderPassBeginInfo;
         renderPassBeginInfo._renderPass = _renderPass;
         renderPassBeginInfo._framebuffer = _framebuffer;
-        //renderPassBeginInfo._swapChainIndex = static_cast<int32_t>(i); ///< fetch framebuffer from swap chain
         renderPassBeginInfo._clearValueCount = 2;
         renderPassBeginInfo._clearValues = clearValues;
         renderPassBeginInfo._renderRect = renderArea;
@@ -118,6 +129,9 @@ bool CaveSanityTestFrameBuffer::Run(RenderDevice *device, RenderCommandPool* com
         device->CmdDrawIndexed(_commandBuffers[i], _indexBuffer->GetIndexCount(), 1, 0, 0, 0);
 
         device->CmdEndRenderPass(_commandBuffers[i]);
+        // copy to swapchain
+        device->CmdCopyImage(_commandBuffers[i], _colorRenderTarget->GetImageHandle(), HalImageLayout::ColorAttachment, i, 1, &halImageCopy);
+
         device->EndCommandBuffer(_commandBuffers[i]);
     }
 

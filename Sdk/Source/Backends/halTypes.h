@@ -1187,6 +1187,17 @@ struct CAVE_INTERFACE HalImageSubresourceRange
 };
 
 /**
+* @brief Hal sub-resource info
+*/
+struct CAVE_INTERFACE HalImageSubresourceLayers
+{
+    HalImageAspectFlags   _aspectMask;
+    uint32_t              _mipLevel;
+    uint32_t              _baseArrayLayer;
+    uint32_t              _layerCount;
+};
+
+/**
 * @brief Hal image view create info
 */
 struct CAVE_INTERFACE HalImageViewInfo
@@ -1323,6 +1334,37 @@ struct CAVE_INTERFACE HalRect2D
 	uint32_t _height;	///< Extend in y
 };
 
+/**
+* @brief 3D extend
+*/
+struct CAVE_INTERFACE HalExtent3D
+{
+    uint32_t    _width;		///< Width
+    uint32_t    _height;	///< Height
+    uint32_t    _depth;	///< Depth
+};
+
+/**
+* @brief 3D offset
+*/
+struct CAVE_INTERFACE HalOffset3D
+{
+    int32_t    _x; ///< x offset
+    int32_t    _y; ///< y offset
+    int32_t    _z; ///< z offset
+};
+
+/**
+* @brief Imagee copy information struct
+*/
+struct CAVE_INTERFACE HalImageCopy
+{
+    HalImageSubresourceLayers _srcLayers;   ///< setup to use in copy from the source image
+    HalOffset3D _srcOffset;                 ///< offset in texel in the source image
+    HalImageSubresourceLayers _dstLayers;   ///< setup to use in copy from the dest image
+    HalOffset3D _dstOffset;                 ///< offset in texel in the dest image
+    HalExtent3D _extent;                    ///< size in texel to copy of the image
+};
 
 }
 

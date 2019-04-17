@@ -543,6 +543,33 @@ public:
     * @return Vulkan VkDescriptorPoolCreateFlags
     */
     static VkDescriptorPoolCreateFlags ConvertDescriptorPoolFlagsToVulkan(HalDescriptorPoolCreateFlags poolFlags);
+
+    /**
+    * @brief Convert from generic 3d offset to vulkan offset
+    *
+    * @param[in] offset3D   Generic 3d offset
+    *
+    * @return Vulkan VkOffset3D
+    */
+    static VkOffset3D ConvertOffset3DToVulkan(HalOffset3D& offset3D);
+
+    /**
+    * @brief Convert from generic 3d extent to vulkan extent
+    *
+    * @param[in] extent3D   Generic 3d extent
+    *
+    * @return Vulkan VkExtent3D
+    */
+    static VkExtent3D ConvertExtent3DToVulkan(HalExtent3D& extent3D);
+
+    /**
+    * @brief Return matching access flag based on image layout
+    *
+    * @param[in] layout   Generic image layout
+    *
+    * @return Vulkan VkAccessFlags
+    */
+    static VkAccessFlags GetAccessFlagsFromLayout(HalImageLayout layout);
 };
 
 }

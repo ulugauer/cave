@@ -472,6 +472,33 @@ public:
 	virtual void CmdDrawIndexed(HalCommandBuffer* commandBuffer, uint32_t indexCount, uint32_t instanceCount
 		, uint32_t firstIndex, int32_t vertexOffset, uint32_t firstInstance) = 0;
 
+    /**
+    * @brief Copy command for copying a source image to a dest image
+    *
+    * @param[in] commandBuffer  Command buffer we use for recording
+    * @param[in] srcImage       Copy source
+    * @param[in] srcLayout      Current layout of the source image
+    * @param[in] dstImage       Copy target
+    * @param[in] dstLayout      Current layout of the dest image
+    * @param[in] regionCount    Region array size
+    * @param[in] regions        Pointer to array of HalImageCopy structs
+    */
+    virtual void CmdCopyImage(HalCommandBuffer* commandBuffer, HalImage* srcImage, HalImageLayout srcLayout
+        , HalImage* dstImage, HalImageLayout dstLayout, uint32_t regionCount, HalImageCopy* regions) = 0;
+
+    /**
+    * @brief Copy command for copying a source image to a swap chain image
+    *
+    * @param[in] commandBuffer  Command buffer we use for recording
+    * @param[in] srcImage       Copy source
+    * @param[in] srcLayout      Current layout of the source image
+    * @param[in] swapChainIndex Index into swapchain
+    * @param[in] regionCount    Region array size
+    * @param[in] regions        Pointer to array of HalImageCopy structs
+    */
+    virtual void CmdCopyImage(HalCommandBuffer* commandBuffer, HalImage* srcImage, HalImageLayout srcLayout, size_t swapChainIndex,
+        uint32_t regionCount, HalImageCopy* regions) = 0;
+
 	/**
 	* @brief Submit scheduled copies
 	* Note that this call just submits scheduled copies but we do not wait for it.

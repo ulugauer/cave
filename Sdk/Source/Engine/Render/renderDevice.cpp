@@ -839,6 +839,26 @@ void RenderDevice::CmdDrawIndexed(RenderCommandBuffer* commandBuffer, uint32_t i
 		_pHalRenderDevice->CmdDrawIndexed(commandBuffer->GetHalHandle(), indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
+void RenderDevice::CmdCopyImage(RenderCommandBuffer* commandBuffer, HalImage* srcImage, HalImageLayout srcLayout,
+    HalImage* dstImage, HalImageLayout dstLayout, uint32_t regionCount, HalImageCopy* regions)
+{
+    if (commandBuffer && srcImage && dstImage && regions)
+    {
+        _pHalRenderDevice->CmdCopyImage(commandBuffer->GetHalHandle(), srcImage, srcLayout,
+            dstImage, dstLayout, regionCount, regions);
+    }
+}
+
+void RenderDevice::CmdCopyImage(RenderCommandBuffer* commandBuffer, HalImage* srcImage, HalImageLayout srcLayout, size_t swapChainIndex,
+    uint32_t regionCount, HalImageCopy* regions)
+{
+    if (commandBuffer && srcImage && regions)
+    {
+        _pHalRenderDevice->CmdCopyImage(commandBuffer->GetHalHandle(), srcImage, srcLayout,
+            swapChainIndex, regionCount, regions);
+    }
+}
+
 void RenderDevice::FlushCopies()
 {
 	_pHalRenderDevice->FlushCopies();

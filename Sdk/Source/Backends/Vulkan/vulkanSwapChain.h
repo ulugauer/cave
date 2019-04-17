@@ -84,6 +84,15 @@ public:
 	*/
 	const VkFormat GetSwapChainDepthImageFormat() const { return _swapChainDepthImageFormat; }
 
+    /**
+    * @brief Get swap image handle
+    *
+    * @param[in] index	Index into image array
+    *
+    * @return Color image handle or null handle
+    */
+    const VkImage GetSwapChainImage(size_t index) const;
+
 	/**
 	* @brief Get swap image view handle
 	*
@@ -92,6 +101,13 @@ public:
 	* @return Image view handle or null handle
 	*/
 	const VkImageView GetSwapChainImageView(size_t index) const;
+
+    /**
+    * @brief Get swap depth image handle
+    *
+    * @return Depth image handle or null handle
+    */
+    const VkImage GetSwapChainDepthImage() const;
 
 	/**
 	* @brief Get swap depth image view handle

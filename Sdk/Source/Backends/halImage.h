@@ -89,6 +89,14 @@ public:
     */
     bool IsDepthFormat();
 
+    /**
+    * @brief Query if image is stencil
+    *
+    * @retrun true if image has a stencil format
+    *
+    */
+    bool IsStencilFormat();
+
 private:
 	HalRenderDevice * _pDevice;	///< Pointer to device object
 	HalImageInfo _imageInfo;	///< Buffer create info

@@ -56,4 +56,16 @@ bool HalImage::IsDepthFormat()
     return isDepth;
 }
 
+bool HalImage::IsStencilFormat()
+{
+    bool isStencil = false;
+    if (_imageInfo._format == HalImageFormat::D32SFloatS8Uint ||
+        _imageInfo._format == HalImageFormat::D24UnormS8Uint)
+    {
+        isStencil = true;
+    }
+
+    return isStencil;
+}
+
 }

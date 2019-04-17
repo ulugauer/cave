@@ -1723,4 +1723,31 @@ VulkanTypeConversion::ConvertDescriptorPoolFlagsToVulkan(HalDescriptorPoolCreate
     return vkFlags;
 }
 
+VkOffset3D 
+VulkanTypeConversion::ConvertOffset3DToVulkan(HalOffset3D& offset3D)
+{
+    return VkOffset3D{ offset3D._x, offset3D._y, offset3D._z };
+}
+
+VkExtent3D
+VulkanTypeConversion::ConvertExtent3DToVulkan(HalExtent3D& extent3D)
+{
+    return VkExtent3D{ extent3D._width, extent3D._height, extent3D._depth };
+}
+
+VkAccessFlags 
+VulkanTypeConversion::GetAccessFlagsFromLayout(HalImageLayout layout)
+{
+    VkAccessFlags vkFlags = 0;
+
+    if (layout == HalImageLayout::ColorAttachment)
+        vkFlags = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+    else if (layout == HalImageLayout::DepthStencilAttachment)
+        vkFlags = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+    else if (layout == HalImageLayout::DepthStencilReadOnly)
+        vkFlags = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+
+    return vkFlags;
+}
+
 }
