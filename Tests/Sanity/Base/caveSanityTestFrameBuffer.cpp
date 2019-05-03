@@ -341,7 +341,7 @@ void CaveSanityTestFrameBuffer::CreateRenderPass(cave::RenderDevice *device)
     renderAttachments[0]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
     renderAttachments[0]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
     renderAttachments[0]._initialLayout = HalImageLayout::Undefined;
-    renderAttachments[0]._finalLayout = HalImageLayout::PresentSrcKHR;
+    renderAttachments[0]._finalLayout = HalImageLayout::ColorAttachment;
 
     HalAttachmentReference colorAttachRef;
     colorAttachRef._attachment = 0;
@@ -368,7 +368,7 @@ void CaveSanityTestFrameBuffer::CreateRenderPass(cave::RenderDevice *device)
     subpassDesc._pDepthStencilAttachment = &depthAttachRef;
 
     HalSubpassDependency dependency;
-    dependency._srcSubpass = HAL_SUBPASS_EXTERNAL;	// special subpass
+    dependency._srcSubpass = 0;	// our subpass
     dependency._dstSubpass = 0;	// our subpass
     dependency._srcStageMask = static_cast<HalPipelineStageFlags>(HalPipelineStageBits::ColorAttachmentOutput);
     dependency._srcAccessMask = HalAccessBits::AccessNone;
@@ -520,6 +520,8 @@ void CaveSanityTestFrameBuffer::CreateFrameBuffer(cave::RenderDevice *device, us
 
     // back up with memory
     _depthRenderTarget->Bind();
+
+    // Note our renderpass does the neccessary transition to render target usage
 
     caveVector<RenderTarget*> renderAttachments(device->GetEngineAllocator());
     renderAttachments.Push(_colorRenderTarget);
