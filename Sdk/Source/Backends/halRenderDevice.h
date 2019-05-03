@@ -33,6 +33,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halRenderPass.h"
 #include "halGraphicsPipeline.h"
 #include "halSemaphore.h"
+#include "halFence.h"
 #include "halCommandBuffer.h"
 #include "halBuffer.h"
 #include "halImage.h"
@@ -302,9 +303,20 @@ public:
 	/**
 	* @brief Create semaphore object
 	*
+    * @param[in] semaphoreDesc  Semaphore creation description
+    *
 	* @return  HalSemaphore abstraction interface
 	*/
-	virtual HalSemaphore* CreateSemaphore() = 0;
+	virtual HalSemaphore* CreateSemaphore(HalSemaphoreDesc& semaphoreDesc) = 0;
+
+    /**
+    * @brief Create fence object
+    *
+    * @param[in] fenceDesc  Fence creation description
+    *
+    * @return  HalFence abstraction interface
+    */
+    virtual HalFence* CreateFence(HalFenceDesc& fenceDesc) = 0;
 
 	/**
 	* @brief Create a buffer object
@@ -386,6 +398,18 @@ public:
 	* @param[in] commandBuffer	Command buffer we use for recording
 	*/
 	virtual void CmdEndRenderPass(HalCommandBuffer* commandBuffer) = 0;
+
+    /**
+    * @brief Transition a resource from one stage to another using barriers
+    *
+    * @param[in] commandBuffer          Command buffer we use for recording
+    * @param[in] srcStageMask           Source stage to sync
+    * @param[in] dstStageMask           Dest stage to wait
+    * @param[in] TransitionBarrierDes   Describes the various used barriers
+    */
+    virtual void CmdTransitionResource(HalCommandBuffer* commandBuffer, 
+        HalPipelineStageFlags srcStageMask, HalPipelineStageFlags dstStageMask, 
+        HalTransitionBarrierDesc& TransitionBarrierDes) = 0;
 
 	/**
 	* @brief Bind graphics pipeline
@@ -498,6 +522,14 @@ public:
     */
     virtual void CmdCopyImage(HalCommandBuffer* commandBuffer, HalImage* srcImage, HalImageLayout srcLayout, size_t swapChainIndex,
         uint32_t regionCount, HalImageCopy* regions) = 0;
+
+    /**
+    * @brief Submit command buffers to graphics queue
+    *
+    * @param[in] HalSubmitInfo  Describes the execution of commands in the batch
+    * @param[in] fence          Is an optional handle to a fence to be signaled once all submitted command buffers have completed execution
+    */
+    virtual bool CmdSubmitGraphicsQueue(HalSubmitInfo& submitInfo, HalFence* fence) = 0;
 
 	/**
 	* @brief Submit scheduled copies

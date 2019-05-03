@@ -28,6 +28,7 @@ set(BACKENDS_SOURCE halTypes.h
 					halDescriptorPool.h halDescriptorPool.cpp 
 					halDescriptorSet.h halDescriptorSet.cpp 
 					halSemaphore.h halSemaphore.cpp 
+                    halFence.h halFence.cpp
 					halBuffer.h halBuffer.cpp 
 					halImage.h halImage.cpp
                     halImageView.h halImageView.cpp 
@@ -59,6 +60,7 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 						   Vulkan/vulkanDescriptorPool.h Vulkan/vulkanDescriptorPool.cpp 
 						   Vulkan/vulkanDescriptorSet.h Vulkan/vulkanDescriptorSet.cpp 
 						   Vulkan/vulkanSemaphore.h Vulkan/vulkanSemaphore.cpp 
+                           Vulkan/vulkanFence.h Vulkan/vulkanFence.cpp 
 						   Vulkan/vulkanBuffer.h Vulkan/vulkanBuffer.cpp 
 						   Vulkan/vulkanImage.h Vulkan/vulkanImage.cpp 
                            Vulkan/vulkanImageView.h Vulkan/vulkanImageView.cpp 

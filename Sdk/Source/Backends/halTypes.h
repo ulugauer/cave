@@ -33,6 +33,10 @@ namespace cave
 
 // forward
 class HalSampler;
+class HalImage;
+class HalBuffer;
+class HalCommandBuffer;
+class HalSemaphore;
 
 /**
 *  @brief A strongly typed enum class representing device extension queries
@@ -252,21 +256,32 @@ enum class HalPipelineBindPoints
 */
 enum class HalPipelineStageBits
 {
-	TopOfPipe = 0x1,
-	DrawIndirect = 0x2,
-	VertexInput = 0x4,
-	VertexShader = 0x8,
-	TessellationControlShader = 0x10,
-	TessellationEvaluationShader = 0x20,
-	GeometryShader = 0x40,
-	FragmentShader = 0x80,
-	EarlyFragmentTests = 0x100,
-	LateFragmentTests = 0x200,
-	ColorAttachmentOutput = 0x400,
-	ComputeShader = 0x800,
-	Transfer = 0x1000,
-	BottomOfPipe = 0x2000,
-	Host = 0x4000,
+    TopOfPipe = 0x1,
+    DrawIndirect = 0x2,
+    VertexInput = 0x4,
+    VertexShader = 0x8,
+    TessellationControlShader = 0x10,
+    TessellationEvaluationShader = 0x20,
+    GeometryShader = 0x40,
+    FragmentShader = 0x80,
+    EarlyFragmentTests = 0x100,
+    LateFragmentTests = 0x200,
+    ColorAttachmentOutput = 0x400,
+    ComputeShader = 0x800,
+    Transfer = 0x1000,
+    BottomOfPipe = 0x2000,
+    Host = 0x4000,
+    AllGraphics = 0x8000,
+    AllCommands = 0x10000,
+    CommandProcess = 0x00020000,            // NV EXT
+    ConditionalRendering = 0x00040000,      // EXT
+    TaskShader = 0x00080000,                // NV EXT
+    MeshShader = 0x00100000,                // NV EXT
+    FragmentDensityProcess = 0x00800000,    // EXT
+    RayTracingShader = 0x00200000,          // NV EXT
+    ShadingRateImage = 0x00400000,          // NV EXT
+    TransfromFeedback = 0x01000000,         // EXT
+    AccelerationStructureBuild = 0x02000000,// NV EXT
 };
 typedef uint32_t HalPipelineStageFlags;		///< Combined pipeline stage flags
 
@@ -697,6 +712,27 @@ enum class HalSubpassContents
 	Inline = 0,					// render pass commands are in primary command buffer
 	SecondarCommandBuffer = 1	// render pass command are in secondary command buffer
 };
+
+/**
+*  @brief A strongly typed enum class representing fence creation flags
+*/
+enum class HalFenceCreateBits
+{
+    Unsignaled = 0,     // create fence in a unsignaled state
+    Signaled = 1        // create fence in a signaled state
+};
+
+typedef uint32_t HalFenceCreateFlags;	///< Fence create flags
+
+/**
+*  @brief A strongly typed enum class representing semaphore creation flags
+*/
+enum class HalSemaphoreCreateBits
+{
+    Reserved = 0,     // reserved for future use
+};
+
+typedef uint32_t HalSemaphoreCreateFlags;	///< Semaphore create flags
 
 /**
 * @brief Structure for device capabilities
@@ -1355,7 +1391,7 @@ struct CAVE_INTERFACE HalOffset3D
 };
 
 /**
-* @brief Imagee copy information struct
+* @brief Image copy information struct
 */
 struct CAVE_INTERFACE HalImageCopy
 {
@@ -1364,6 +1400,88 @@ struct CAVE_INTERFACE HalImageCopy
     HalImageSubresourceLayers _dstLayers;   ///< setup to use in copy from the dest image
     HalOffset3D _dstOffset;                 ///< offset in texel in the dest image
     HalExtent3D _extent;                    ///< size in texel to copy of the image
+};
+
+/**
+* @brief Memory Barrier desc
+*/
+struct CAVE_INTERFACE HalMemoryBarrier 
+{
+    HalAccessFlags  _srcAccessMask;
+    HalAccessFlags  _dstAccessMask;
+};
+
+/**
+* @brief Buffer Barrier desc
+*/
+struct CAVE_INTERFACE HalBufferMemoryBarrier
+{
+    HalAccessFlags  _srcAccessMask;
+    HalAccessFlags  _dstAccessMask;
+    uint32_t        _srcQueueFamilyIndex;
+    uint32_t        _dstQueueFamilyIndex;
+    HalBuffer*      _buffer;
+    uint64_t        _offset;
+    uint64_t        _size;
+};
+
+/**
+* @brief Image Barrier desc
+*/
+struct CAVE_INTERFACE HalImageMemoryBarrier
+{
+    HalAccessFlags              _srcAccessMask;
+    HalAccessFlags              _dstAccessMask;
+    HalImageLayout              _oldLayout;
+    HalImageLayout              _newLayout;
+    uint32_t                    _srcQueueFamilyIndex;
+    uint32_t                    _dstQueueFamilyIndex;
+    HalImage*                   _image;
+    HalImageSubresourceRange    _subresourceRange;
+};
+
+/**
+* @brief Combined transition Barrier desc
+*/
+struct CAVE_INTERFACE HalTransitionBarrierDesc
+{
+    uint32_t                        _memoryBarrierCount;
+    const HalMemoryBarrier*         _pMemoryBarriers;
+    uint32_t                        _bufferMemoryBarrierCount;
+    const HalBufferMemoryBarrier*   _pBufferMemoryBarriers;
+    uint32_t                        _imageMemoryBarrierCount;
+    const HalImageMemoryBarrier*    _pImageMemoryBarriers;
+};
+
+/**
+* @brief Struct for creating a fence
+*/
+struct CAVE_INTERFACE HalFenceDesc
+{
+    HalFenceCreateFlags _createFlags;
+};
+
+/**
+* @brief Struct for creating a semaphore
+*/
+struct CAVE_INTERFACE HalSemaphoreDesc
+{
+    HalSemaphoreCreateFlags _createFlags;
+};
+
+
+/**
+* @brief Struct for submitting command bufffers
+*/
+struct CAVE_INTERFACE HalSubmitInfo
+{
+    HalPipelineStageFlags** _waitStageMask;
+    size_t                  _waitSemaphoreCount;
+    HalSemaphore**          _pWaitSemaphores;
+    size_t                  _signalSemaphoreCount;
+    HalSemaphore**          _pSignalSemaphores;
+    size_t                  _commandBufferCount;
+    HalCommandBuffer**      _pCommandBuffers;
 };
 
 }

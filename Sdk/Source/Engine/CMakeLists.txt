@@ -47,6 +47,7 @@ set(RENDER_SOURCE Render/renderInstance.h Render/renderInstance.cpp
 				  Render/renderDescriptorPool.h Render/renderDescriptorPool.cpp 
 				  Render/renderDescriptorSet.h Render/renderDescriptorSet.cpp 
 				  Render/renderSemaphore.h Render/renderSemaphore.cpp 
+                  Render/renderFence.h Render/renderFence.cpp 
 				  Render/renderBuffer.h Render/renderBuffer.cpp 
 				  Render/renderVertexBuffer.h Render/renderVertexBuffer.cpp 
 				  Render/renderIndexBuffer.h Render/renderIndexBuffer.cpp 

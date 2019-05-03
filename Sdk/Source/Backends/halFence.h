@@ -11,38 +11,44 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file vulkanSemaphore.cpp
-///       vulkan semaphore abstraction
+/// @file halFence.h
+///       Hardware fence abstraction
 
-#include "vulkanSemaphore.h"
-#include "vulkanRenderDevice.h"
-#include "vulkanApi.h"
+#include "engineDefines.h"
+#include "halInstance.h"
+#include "halTypes.h"
+#include "Memory/allocatorBase.h"
 
-#include<limits>
+#include <iostream>		// includes exception handling
+#include <memory>
+
+/** \addtogroup backend
+*  @{
+*
+*/
 
 namespace cave
 {
 
-
-VulkanSemaphore::VulkanSemaphore(VulkanRenderDevice* device, HalSemaphoreDesc& )
-	: HalSemaphore()
-	, _pDevice(device)
+/**
+* @brief Abstracts GPU fence on the hardware level
+*/
+class HalFence
 {
-	VkSemaphoreCreateInfo createInfo;
-	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
+public:
+    /**
+    * @brief Constructor
+    *
+    */
+    HalFence();
 
-	VulkanApi::GetApi()->vkCreateSemaphore(_pDevice->GetDeviceHandle(), &createInfo, nullptr, &_vkSemaphore);
-	assert(_vkSemaphore != VK_NULL_HANDLE);
-}
-
-VulkanSemaphore::~VulkanSemaphore()
-{
-	if (_vkSemaphore != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroySemaphore(_pDevice->GetDeviceHandle(), _vkSemaphore, nullptr);
-}
-
+    /** @brief Destructor */
+    virtual ~HalFence();
+};
 
 }
+
+/** @}*/
+

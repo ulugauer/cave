@@ -570,6 +570,16 @@ public:
     * @return Vulkan VkAccessFlags
     */
     static VkAccessFlags GetAccessFlagsFromLayout(HalImageLayout layout);
+
+    /**
+    * @brief  Convert from generic fence creation flags to vulkan fence creation flags
+    *
+    * @param[in] createFlags   Generic fence creation flags
+    *
+    * @return Vulkan VkFenceCreateFlags
+    */
+    static VkFenceCreateFlags ConvertFenceCreateFlagsToVulkan(HalFenceCreateFlags createFlags);
+
 };
 
 }

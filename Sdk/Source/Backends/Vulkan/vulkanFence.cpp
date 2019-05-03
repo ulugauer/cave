@@ -12,11 +12,12 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file vulkanSemaphore.cpp
-///       vulkan semaphore abstraction
+/// @file vulkanFence.cpp
+///       vulkan fence abstraction
 
-#include "vulkanSemaphore.h"
+#include "vulkanFence.h"
 #include "vulkanRenderDevice.h"
+#include "vulkanConversion.h"
 #include "vulkanApi.h"
 
 #include<limits>
@@ -25,23 +26,24 @@ namespace cave
 {
 
 
-VulkanSemaphore::VulkanSemaphore(VulkanRenderDevice* device, HalSemaphoreDesc& )
-	: HalSemaphore()
-	, _pDevice(device)
+VulkanFence::VulkanFence(VulkanRenderDevice* device, HalFenceDesc& fenceDesc)
+    : HalFence()
+    , _pDevice(device)
+    , _vkFence(VK_NULL_HANDLE)
 {
-	VkSemaphoreCreateInfo createInfo;
-	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
+    VkFenceCreateInfo createInfo;
+    createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    createInfo.pNext = nullptr;
+    createInfo.flags = VulkanTypeConversion::ConvertFenceCreateFlagsToVulkan(fenceDesc._createFlags);
 
-	VulkanApi::GetApi()->vkCreateSemaphore(_pDevice->GetDeviceHandle(), &createInfo, nullptr, &_vkSemaphore);
-	assert(_vkSemaphore != VK_NULL_HANDLE);
+    VulkanApi::GetApi()->vkCreateFence(_pDevice->GetDeviceHandle(), &createInfo, nullptr, &_vkFence);
+    assert(_vkFence != VK_NULL_HANDLE);
 }
 
-VulkanSemaphore::~VulkanSemaphore()
+VulkanFence::~VulkanFence()
 {
-	if (_vkSemaphore != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroySemaphore(_pDevice->GetDeviceHandle(), _vkSemaphore, nullptr);
+    if (_vkFence != VK_NULL_HANDLE)
+        VulkanApi::GetApi()->vkDestroyFence(_pDevice->GetDeviceHandle(), _vkFence, nullptr);
 }
 
 

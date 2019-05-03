@@ -301,9 +301,20 @@ public:
 	/**
 	* @brief Create semaphore object
 	*
+    * @param[in] semaphoreDesc  Semaphore creation description
+    *
 	* @return  HalSemaphore abstraction interface
 	*/
-	HalSemaphore* CreateSemaphore() override;
+	HalSemaphore* CreateSemaphore(HalSemaphoreDesc& semaphoreDesc) override;
+
+    /**
+   * @brief Create fence object
+   *
+   * @param[in] fenceDesc  Fence creation description
+   *
+   * @return  HalFence abstraction interface
+   */
+    HalFence* CreateFence(HalFenceDesc& fenceDesc) override;
 
 	/**
 	* @brief Create a low level buffer object
@@ -385,6 +396,18 @@ public:
 	* @param[in] commandBuffer	Command buffer we use for recording
 	*/
 	void CmdEndRenderPass(HalCommandBuffer* commandBuffer) override;
+
+    /**
+    * @brief Transition a resource from one stage to another using barriers
+    *
+    * @param[in] commandBuffer          Command buffer we use for recording
+    * @param[in] srcStageMask           Source stage to sync
+    * @param[in] dstStageMask           Dest stage to wait
+    * @param[in] TransitionBarrierDes   Describes the various used barriers
+    */
+    void CmdTransitionResource(HalCommandBuffer* commandBuffer,
+        HalPipelineStageFlags srcStageMask, HalPipelineStageFlags dstStageMask,
+        HalTransitionBarrierDesc& TransitionBarrierDes) override;
 
 	/**
 	* @brief Bind graphics pipeline
@@ -497,6 +520,14 @@ public:
     */
     void CmdCopyImage(HalCommandBuffer* commandBuffer, HalImage* srcImage, HalImageLayout srcLayout, size_t swapChainIndex,
         uint32_t regionCount, HalImageCopy* regions) override;
+
+    /**
+    * @brief Submit command buffers to graphics queue
+    *
+    * @param[in] HalSubmitInfo  Describes the execution of commands in the batch
+    * @param[in] fence          Is an optional handle to a fence to be signaled once all submitted command buffers have completed execution
+    */
+    bool CmdSubmitGraphicsQueue(HalSubmitInfo& submitInfo, HalFence* fence) override;
 
 	/**
 	* @brief Submit scheduled copies

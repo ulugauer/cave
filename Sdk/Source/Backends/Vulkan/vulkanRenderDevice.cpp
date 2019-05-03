@@ -35,6 +35,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "vulkanRenderPass.h"
 #include "vulkanGraphicsPipeline.h"
 #include "vulkanSemaphore.h"
+#include "vulkanFence.h"
 #include "vulkanCommandPool.h"
 #include "vulkanCommandBuffer.h"
 #include "vulkanDescriptorPool.h"
@@ -767,14 +768,24 @@ HalFrameBuffer* VulkanRenderDevice::CreateFrameBuffer(HalRenderPass* renderPass,
     return framebuffer;
 }
 
-HalSemaphore* VulkanRenderDevice::CreateSemaphore()
+HalSemaphore* VulkanRenderDevice::CreateSemaphore(HalSemaphoreDesc& semaphoreDesc)
 {
 	if (!_pPhysicalDevice || !_vkDevice)
 		return nullptr;
 
-	VulkanSemaphore* semaphore = AllocateObject<VulkanSemaphore>(*_pInstance->GetEngineAllocator(), this);
+	VulkanSemaphore* semaphore = AllocateObject<VulkanSemaphore>(*_pInstance->GetEngineAllocator(), this, semaphoreDesc);
 
 	return semaphore;
+}
+
+HalFence* VulkanRenderDevice::CreateFence(HalFenceDesc& fenceDesc)
+{
+    if (!_pPhysicalDevice || !_vkDevice)
+        return nullptr;
+
+    VulkanFence* fence = AllocateObject<VulkanFence>(*_pInstance->GetEngineAllocator(), this, fenceDesc);
+
+    return fence;
 }
 
 HalBuffer* VulkanRenderDevice::CreateBuffer(HalBufferInfo& bufferInfo)
@@ -921,6 +932,74 @@ void VulkanRenderDevice::CmdEndRenderPass(HalCommandBuffer* commandBuffer)
 		return;
 
 	VulkanApi::GetApi()->vkCmdEndRenderPass(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer());
+}
+
+void VulkanRenderDevice::CmdTransitionResource(HalCommandBuffer* commandBuffer, 
+    HalPipelineStageFlags srcStageMask, HalPipelineStageFlags dstStageMask,
+    HalTransitionBarrierDesc& transitionBarrierDes)
+{
+    if (!_pPhysicalDevice || !_vkDevice)
+        return;
+
+    VkPipelineStageFlags vkSrcStageMask = VulkanTypeConversion::ConvertPipelineFlagsToVulkan(srcStageMask);
+    VkPipelineStageFlags vkDstStageMask = VulkanTypeConversion::ConvertPipelineFlagsToVulkan(dstStageMask);
+
+    // memory barrier
+    caveVector<VkMemoryBarrier> vkMemoryBarriers(_pInstance->GetEngineAllocator());
+    for (size_t i = 0; i < transitionBarrierDes._memoryBarrierCount; i++)
+    {
+        VkMemoryBarrier vkMemoryBarrier = { VK_STRUCTURE_TYPE_MEMORY_BARRIER };
+        vkMemoryBarrier.srcAccessMask = VulkanTypeConversion::ConvertAccessFlagsToVulkan(transitionBarrierDes._pMemoryBarriers[i]._srcAccessMask);
+        vkMemoryBarrier.dstAccessMask = VulkanTypeConversion::ConvertAccessFlagsToVulkan(transitionBarrierDes._pMemoryBarriers[i]._dstAccessMask);
+
+        vkMemoryBarriers.Push(vkMemoryBarrier);
+    }
+
+    // buffer barrier
+    caveVector<VkBufferMemoryBarrier > vkBufferMemoryBarriers(_pInstance->GetEngineAllocator());
+    for (size_t i = 0; i < transitionBarrierDes._bufferMemoryBarrierCount; i++)
+    {
+        VulkanBuffer* vkBuffer = static_cast<VulkanBuffer*>(transitionBarrierDes._pBufferMemoryBarriers[i]._buffer);
+        VkBufferMemoryBarrier vkBufferMemoryBarrier = { VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER };
+        vkBufferMemoryBarrier.srcAccessMask = VulkanTypeConversion::ConvertAccessFlagsToVulkan(transitionBarrierDes._pBufferMemoryBarriers[i]._srcAccessMask);
+        vkBufferMemoryBarrier.dstAccessMask = VulkanTypeConversion::ConvertAccessFlagsToVulkan(transitionBarrierDes._pBufferMemoryBarriers[i]._dstAccessMask);
+        vkBufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        vkBufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        vkBufferMemoryBarrier.buffer = (vkBuffer) ? vkBuffer->GetBuffer() : nullptr;
+        vkBufferMemoryBarrier.offset = static_cast<VkDeviceSize>(transitionBarrierDes._pBufferMemoryBarriers[i]._offset);
+        vkBufferMemoryBarrier.size = static_cast<VkDeviceSize>(transitionBarrierDes._pBufferMemoryBarriers[i]._size);
+
+        vkBufferMemoryBarriers.Push(vkBufferMemoryBarrier);
+    }
+
+    // image barrier
+    caveVector<VkImageMemoryBarrier> vkImageMemoryBarriers(_pInstance->GetEngineAllocator());
+    for (size_t i = 0; i < transitionBarrierDes._imageMemoryBarrierCount; i++)
+    {
+        VulkanImage* vkImage = static_cast<VulkanImage*>(transitionBarrierDes._pImageMemoryBarriers[i]._image);
+        VkImageMemoryBarrier vkImageMemoryBarrier = { VK_STRUCTURE_TYPE_MEMORY_BARRIER };
+        vkImageMemoryBarrier.srcAccessMask = VulkanTypeConversion::ConvertAccessFlagsToVulkan(transitionBarrierDes._pImageMemoryBarriers[i]._srcAccessMask);
+        vkImageMemoryBarrier.dstAccessMask = VulkanTypeConversion::ConvertAccessFlagsToVulkan(transitionBarrierDes._pImageMemoryBarriers[i]._dstAccessMask);
+        vkImageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        vkImageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        vkImageMemoryBarrier.image = (vkImage) ? vkImage->GetImage() : nullptr;
+        vkImageMemoryBarrier.oldLayout = VulkanTypeConversion::ConvertImageLayoutToVulkan(transitionBarrierDes._pImageMemoryBarriers[i]._oldLayout);
+        vkImageMemoryBarrier.newLayout = VulkanTypeConversion::ConvertImageLayoutToVulkan(transitionBarrierDes._pImageMemoryBarriers[i]._newLayout);
+        vkImageMemoryBarrier.subresourceRange.aspectMask = 
+            VulkanTypeConversion::ConvertImageAspectFlagsToVulkan(transitionBarrierDes._pImageMemoryBarriers[i]._subresourceRange._aspectMask);
+        vkImageMemoryBarrier.subresourceRange.baseArrayLayer = transitionBarrierDes._pImageMemoryBarriers[i]._subresourceRange._baseArrayLayer;
+        vkImageMemoryBarrier.subresourceRange.baseMipLevel = transitionBarrierDes._pImageMemoryBarriers[i]._subresourceRange._baseMipLevel;
+        vkImageMemoryBarrier.subresourceRange.layerCount = transitionBarrierDes._pImageMemoryBarriers[i]._subresourceRange._layerCount;
+        vkImageMemoryBarrier.subresourceRange.levelCount = transitionBarrierDes._pImageMemoryBarriers[i]._subresourceRange._levelCount;
+
+        vkImageMemoryBarriers.Push(vkImageMemoryBarrier);
+    }
+
+    VulkanApi::GetApi()->vkCmdPipelineBarrier(static_cast<VulkanCommandBuffer*>(commandBuffer)->GetCommandBuffer(),
+        vkSrcStageMask, vkDstStageMask, 0,
+        transitionBarrierDes._memoryBarrierCount, vkMemoryBarriers.Data(),
+        transitionBarrierDes._bufferMemoryBarrierCount, vkBufferMemoryBarriers.Data(),
+        transitionBarrierDes._imageMemoryBarrierCount, vkImageMemoryBarriers.Data());
 }
 
 void VulkanRenderDevice::CmdBindGraphicsPipeline(HalCommandBuffer* commandBuffer, HalGraphicsPipeline* graphicsPipelineInfo)
@@ -1221,6 +1300,61 @@ void VulkanRenderDevice::CmdCopyImage(HalCommandBuffer* commandBuffer, HalImage*
             , 0, nullptr
             , 2, imageStartBarrier);
     }
+}
+
+bool VulkanRenderDevice::CmdSubmitGraphicsQueue(HalSubmitInfo& submitInfo, HalFence* fence)
+{
+    VkSubmitInfo vkSubmitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+
+    // setup command buffers
+    caveVector<VkCommandBuffer> vkCommandBuffers(GetEngineAllocator());
+    for (size_t i = 0; i < submitInfo._commandBufferCount; i++)
+    {
+        VulkanCommandBuffer* vkCmdBuffer = static_cast<VulkanCommandBuffer*>(submitInfo._pCommandBuffers[i]);
+        vkCommandBuffers.Push(vkCmdBuffer->GetCommandBuffer());
+    }
+
+    // setup wait semaphores
+    caveVector<VkSemaphore> vkWaitSemaphores(GetEngineAllocator());
+    for (size_t i = 0; i < submitInfo._waitSemaphoreCount; i++)
+    {
+        VulkanSemaphore* vkSemaphore = static_cast<VulkanSemaphore*>(submitInfo._pWaitSemaphores[i]);
+        vkWaitSemaphores.Push(vkSemaphore->GetSemaphore());
+    }
+
+    // setup wait stages
+    caveVector<VkPipelineStageFlags> vkWaitStages(GetEngineAllocator());
+    for (size_t i = 0; i < submitInfo._waitSemaphoreCount; i++)
+    {
+        VkPipelineStageFlags vkWaitStage = VulkanTypeConversion::ConvertPipelineFlagsToVulkan(*submitInfo._waitStageMask[i]);
+        vkWaitStages.Push(vkWaitStage);
+    }
+
+    // setup signal semaphores
+    caveVector<VkSemaphore> vkSignalSemaphores(GetEngineAllocator());
+    for (size_t i = 0; i < submitInfo._signalSemaphoreCount; i++)
+    {
+        VulkanSemaphore* vkSemaphore = static_cast<VulkanSemaphore*>(submitInfo._pSignalSemaphores[i]);
+        vkSignalSemaphores.Push(vkSemaphore->GetSemaphore());
+    }
+
+
+    vkSubmitInfo.commandBufferCount = static_cast<uint32_t>(submitInfo._commandBufferCount);
+    vkSubmitInfo.pCommandBuffers = vkCommandBuffers.Data();
+    vkSubmitInfo.waitSemaphoreCount = static_cast<uint32_t>(submitInfo._waitSemaphoreCount);
+    vkSubmitInfo.pWaitSemaphores = vkWaitSemaphores.Data();
+    vkSubmitInfo.pWaitDstStageMask = vkWaitStages.Data();
+    vkSubmitInfo.signalSemaphoreCount = static_cast<uint32_t>(submitInfo._signalSemaphoreCount);
+    vkSubmitInfo.pSignalSemaphores = vkSignalSemaphores.Data();
+
+    VkResult result = VK_INCOMPLETE;
+    if (_graphicsQueue)
+    {
+        VulkanFence* vkFence = static_cast<VulkanFence*>(fence);
+        result = VulkanApi::GetApi()->vkQueueSubmit(_graphicsQueue, 1, &vkSubmitInfo, (vkFence) ? vkFence->GetFence() : nullptr);
+    }
+
+    return (result == VK_SUCCESS);
 }
 
 void VulkanRenderDevice::FlushCopies()

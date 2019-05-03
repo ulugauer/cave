@@ -12,37 +12,36 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
 
-/// @file vulkanSemaphore.cpp
-///       vulkan semaphore abstraction
+/// @file renderFence.cpp
+///       Render fence interface
 
-#include "vulkanSemaphore.h"
-#include "vulkanRenderDevice.h"
-#include "vulkanApi.h"
+#include "renderFence.h"
+#include "renderDevice.h"
+#include "engineError.h"
+#include "halFence.h"
 
-#include<limits>
+#include <cassert>
 
 namespace cave
 {
-
-
-VulkanSemaphore::VulkanSemaphore(VulkanRenderDevice* device, HalSemaphoreDesc& )
-	: HalSemaphore()
-	, _pDevice(device)
+RenderFence::RenderFence(RenderDevice& renderDevice, bool signaled)
+    : CaveRefCount(renderDevice.GetEngineAllocator())
+    , _renderDevice(renderDevice)
+    , _halFence(nullptr)
 {
-	VkSemaphoreCreateInfo createInfo;
-	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
+    // Allocate low level object
+    HalFenceDesc fenceDesc = {};
+    if (signaled)
+        fenceDesc._createFlags = static_cast<HalFenceCreateFlags>(HalFenceCreateBits::Signaled);
 
-	VulkanApi::GetApi()->vkCreateSemaphore(_pDevice->GetDeviceHandle(), &createInfo, nullptr, &_vkSemaphore);
-	assert(_vkSemaphore != VK_NULL_HANDLE);
+    _halFence = renderDevice.GetHalRenderDevice()->CreateFence(fenceDesc);
+    assert(_halFence);
 }
 
-VulkanSemaphore::~VulkanSemaphore()
+RenderFence::~RenderFence()
 {
-	if (_vkSemaphore != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroySemaphore(_pDevice->GetDeviceHandle(), _vkSemaphore, nullptr);
+    if (_halFence)
+        DeallocateDelete(*_renderDevice.GetEngineAllocator(), *_halFence);
 }
-
 
 }

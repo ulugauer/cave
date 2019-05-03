@@ -30,7 +30,8 @@ RenderSemaphore::RenderSemaphore(RenderDevice& renderDevice)
 	, _halSemaphore(nullptr)
 {
 	// Allocate low level object
-	_halSemaphore = renderDevice.GetHalRenderDevice()->CreateSemaphore();
+    HalSemaphoreDesc semaDesc = {};
+	_halSemaphore = renderDevice.GetHalRenderDevice()->CreateSemaphore(semaDesc);
 	assert(_halSemaphore);
 }
 

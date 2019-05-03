@@ -40,6 +40,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "renderRenderTarget.h"
 #include "renderFrameBuffer.h"
 #include "renderCommandBuffer.h"
+#include "renderSemaphore.h"
+#include "renderFence.h"
 #include "halRenderDevice.h"
 #include "engineError.h"
 #include "engineLog.h"
@@ -772,6 +774,14 @@ void RenderDevice::CmdEndRenderPass(RenderCommandBuffer* commandBuffer)
 		_pHalRenderDevice->CmdEndRenderPass(commandBuffer->GetHalHandle());
 }
 
+void RenderDevice::CmdTransitionResource(RenderCommandBuffer* commandBuffer,
+    HalPipelineStageFlags srcStageMask, HalPipelineStageFlags dstStageMask,
+    HalTransitionBarrierDesc& TransitionBarrierDes)
+{
+    if (commandBuffer)
+        _pHalRenderDevice->CmdTransitionResource(commandBuffer->GetHalHandle(), srcStageMask, dstStageMask, TransitionBarrierDes);
+}
+
 void RenderDevice::CmdBindGraphicsPipeline(RenderCommandBuffer* commandBuffer, RenderGraphicsPipeline* graphicsPipelineInfo)
 {
 	if (commandBuffer && graphicsPipelineInfo)
@@ -857,6 +867,44 @@ void RenderDevice::CmdCopyImage(RenderCommandBuffer* commandBuffer, HalImage* sr
         _pHalRenderDevice->CmdCopyImage(commandBuffer->GetHalHandle(), srcImage, srcLayout,
             swapChainIndex, regionCount, regions);
     }
+}
+
+bool RenderDevice::CmdSubmitGraphicsQueue(caveVector<RenderCommandBuffer*>& commandBuffers,
+    caveVector<RenderSemaphore*>& waitSemaphores,
+    caveVector<HalPipelineStageFlags*>& stageMasks,
+    caveVector<RenderSemaphore*>& signalSemaphores,
+    RenderFence* fence)
+{
+    // convert to hal
+    HalSubmitInfo halSubmitInfo = {};
+
+    caveVector<HalCommandBuffer*> halCommandBuffers(GetEngineAllocator());
+    for (size_t i = 0; i < commandBuffers.Size(); i++)
+    {
+        halCommandBuffers.Push(commandBuffers[i]->GetHalHandle());
+    }
+
+    caveVector<HalSemaphore*> halWaitSemaphores(GetEngineAllocator());
+    for (size_t i = 0; i < waitSemaphores.Size(); i++)
+    {
+        halWaitSemaphores.Push(waitSemaphores[i]->GetHalHandle());
+    }
+
+    caveVector<HalSemaphore*> halSignalSemaphores(GetEngineAllocator());
+    for (size_t i = 0; i < signalSemaphores.Size(); i++)
+    {
+        halSignalSemaphores.Push(signalSemaphores[i]->GetHalHandle());
+    }
+
+    halSubmitInfo._commandBufferCount = halCommandBuffers.Size();
+    halSubmitInfo._pCommandBuffers = halCommandBuffers.Data();
+    halSubmitInfo._waitSemaphoreCount = halWaitSemaphores.Size();
+    halSubmitInfo._pWaitSemaphores = halWaitSemaphores.Data();
+    halSubmitInfo._waitStageMask = stageMasks.Data();
+    halSubmitInfo._signalSemaphoreCount = halSignalSemaphores.Size();
+    halSubmitInfo._pSignalSemaphores = halSignalSemaphores.Data();
+
+    return _pHalRenderDevice->CmdSubmitGraphicsQueue(halSubmitInfo, (fence) ? fence->GetHalHandle() : nullptr);
 }
 
 void RenderDevice::FlushCopies()

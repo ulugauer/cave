@@ -1750,4 +1750,15 @@ VulkanTypeConversion::GetAccessFlagsFromLayout(HalImageLayout layout)
     return vkFlags;
 }
 
+VkFenceCreateFlags 
+VulkanTypeConversion::ConvertFenceCreateFlagsToVulkan(HalFenceCreateFlags createFlags)
+{
+    VkFenceCreateFlags vkFlags = 0;
+
+    if (createFlags & static_cast<uint32_t>(HalFenceCreateBits::Signaled))
+        vkFlags |= VK_FENCE_CREATE_SIGNALED_BIT;
+
+    return vkFlags;
+}
+
 }

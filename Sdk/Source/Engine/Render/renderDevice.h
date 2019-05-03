@@ -64,6 +64,8 @@ class RenderTextureView;
 class RenderTextureSampler;
 class RenderTarget;
 class RenderFrameBuffer;
+class RenderSemaphore;
+class RenderFence;
 
 
 /**
@@ -625,6 +627,18 @@ public:
 	*/
 	void CmdEndRenderPass(RenderCommandBuffer* commandBuffer);
 
+    /**
+    * @brief Transition a resource from one stage to another using barriers
+    *
+    * @param[in] commandBuffer          Command buffer we use for recording
+    * @param[in] srcStageMask           Source stage to sync
+    * @param[in] dstStageMask           Dest stage to wait
+    * @param[in] TransitionBarrierDes   Describes the various used barriers
+    */
+    void CmdTransitionResource(RenderCommandBuffer* commandBuffer,
+        HalPipelineStageFlags srcStageMask, HalPipelineStageFlags dstStageMask,
+        HalTransitionBarrierDesc& TransitionBarrierDes);
+
 	/**
 	* @brief Bind graphics pipeline
 	*
@@ -737,6 +751,21 @@ public:
     */
     void CmdCopyImage(RenderCommandBuffer* commandBuffer, HalImage* srcImage, HalImageLayout srcLayout, size_t swapChainIndex,
         uint32_t regionCount, HalImageCopy* regions);
+
+    /**
+    * @brief Submit command buffers to graphics queue
+    *
+    * @param[in] commandBuffers     Is an array of command buffers to execute in the batch
+    * @param[in] waitSemaphores     Is an array of semaphores upon which to wait before the command buffers for this batch begin execution
+    * @param[in] stageMasks         Is an array of pipeline stages at which each corresponding semaphore wait will occur
+    * @param[in] signalSemaphores   Is an array of semaphores which will be signaled when the command buffers for this batch have completed execution
+    * @param[in] fence              Is an optional handle to a fence to be signaled once all submitted command buffers have completed execution
+    */ 
+    bool CmdSubmitGraphicsQueue(caveVector<RenderCommandBuffer*>& commandBuffers,
+        caveVector<RenderSemaphore*>& waitSemaphores,
+        caveVector<HalPipelineStageFlags*>& stageMasks,
+        caveVector<RenderSemaphore*>& signalSemaphores,
+        RenderFence* fence);
 
 	/**
 	* @brief Submit scheduled copies

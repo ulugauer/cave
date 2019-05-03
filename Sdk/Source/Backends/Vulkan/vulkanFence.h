@@ -11,38 +11,63 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
+/// @file vulkanFence.h
+///       vulkan fence abstraction
 
-/// @file vulkanSemaphore.cpp
-///       vulkan semaphore abstraction
+#include "halFence.h"
+#include "osPlatformLib.h"
 
-#include "vulkanSemaphore.h"
-#include "vulkanRenderDevice.h"
-#include "vulkanApi.h"
+#include "vulkan.h"
 
-#include<limits>
+/** \addtogroup backend
+*  @{
+*
+*/
 
 namespace cave
 {
 
+///< forwards
+class VulkanRenderDevice;
 
-VulkanSemaphore::VulkanSemaphore(VulkanRenderDevice* device, HalSemaphoreDesc& )
-	: HalSemaphore()
-	, _pDevice(device)
+/**
+* @brief Handles GPU fence on the hardware level
+*/
+class VulkanFence : public HalFence
 {
-	VkSemaphoreCreateInfo createInfo;
-	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
+public:
+    /**
+    * @brief Constructor
+    *
+    * @param[in] device	    Pointer to device object
+    * @param[in] fenceDesc	Fence creation description
+    *
+    */
+    VulkanFence(VulkanRenderDevice* device, HalFenceDesc& fenceDesc);
 
-	VulkanApi::GetApi()->vkCreateSemaphore(_pDevice->GetDeviceHandle(), &createInfo, nullptr, &_vkSemaphore);
-	assert(_vkSemaphore != VK_NULL_HANDLE);
+    /** @brief Destructor */
+    virtual ~VulkanFence();
+
+    /**
+    * @brief Get fence object
+    *
+    * @return Vulkan VkFence object
+    */
+    const VkFence& GetFence() const
+    {
+        return _vkFence;
+    }
+
+private:
+    VulkanRenderDevice* _pDevice;	///< Pointer to device object
+    VkFence _vkFence;	///< Low level fence handle
+};
+
 }
 
-VulkanSemaphore::~VulkanSemaphore()
-{
-	if (_vkSemaphore != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroySemaphore(_pDevice->GetDeviceHandle(), _vkSemaphore, nullptr);
-}
+/** @}*/
 
 
-}
+
+

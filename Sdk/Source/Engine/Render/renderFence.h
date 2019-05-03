@@ -11,38 +11,61 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTH
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 */
+#pragma once
 
-/// @file vulkanSemaphore.cpp
-///       vulkan semaphore abstraction
+/// @file renderFence.h
+///       Render fence interface
 
-#include "vulkanSemaphore.h"
-#include "vulkanRenderDevice.h"
-#include "vulkanApi.h"
+#include "Common/caveRefCount.h"
+#include "Memory/allocatorGlobal.h"
 
-#include<limits>
+#include <memory>
+
+/** \addtogroup engine
+*  @{
+*		This module contains all code related to the engine
+*/
 
 namespace cave
 {
 
+/// forward declaration
+class RenderDevice;
+class HalFence;
 
-VulkanSemaphore::VulkanSemaphore(VulkanRenderDevice* device, HalSemaphoreDesc& )
-	: HalSemaphore()
-	, _pDevice(device)
+/**
+* @brief Interface for semaphores
+*/
+class CAVE_INTERFACE RenderFence : public CaveRefCount
 {
-	VkSemaphoreCreateInfo createInfo;
-	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
+public:
 
-	VulkanApi::GetApi()->vkCreateSemaphore(_pDevice->GetDeviceHandle(), &createInfo, nullptr, &_vkSemaphore);
-	assert(_vkSemaphore != VK_NULL_HANDLE);
+    /**
+    * @brief Constructor
+    *
+    * @param[in] renderDevice   Pointer to render device
+    * @param[in] signaled       Create Fence in signaled state
+    *
+    */
+    RenderFence(RenderDevice& renderDevice, bool signaled);
+
+    /** @brief destructor */
+    virtual ~RenderFence();
+
+    /**
+    * @brief Get low level HAL handle
+    *
+    * @return HalVertexInput handle
+    */
+    HalFence* GetHalHandle() { return _halFence; }
+
+private:
+    RenderDevice& _renderDevice;    ///< Render device object
+    HalFence* _halFence;            ///< Pointer to low level fence object
+};
+
 }
-
-VulkanSemaphore::~VulkanSemaphore()
-{
-	if (_vkSemaphore != VK_NULL_HANDLE)
-		VulkanApi::GetApi()->vkDestroySemaphore(_pDevice->GetDeviceHandle(), _vkSemaphore, nullptr);
-}
+/** @}*/
 
 
-}
+

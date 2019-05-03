@@ -40,10 +40,11 @@ public:
 	/**
 	* @brief Constructor
 	*
-	* @param[in] device	Pointer to device object
+	* @param[in] device         Pointer to device object
+    * @param[in] semaphoreDesc  Semaphore creation description
 	*
 	*/
-	VulkanSemaphore(VulkanRenderDevice* device);
+	VulkanSemaphore(VulkanRenderDevice* device, HalSemaphoreDesc& semaphoreDesc);
 
 	/** @brief Destructor */
 	virtual ~VulkanSemaphore();
