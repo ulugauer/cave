@@ -29,5 +29,5 @@ CAVE_SANITY_TEST_ITERATE(CaveSanityTestDepth)
 CAVE_SANITY_TEST_ITERATE(CaveSanityTestPushConstansts)
 CAVE_SANITY_TEST_ITERATE(CaveSanityTestTexture2D)
 CAVE_SANITY_TEST_ITERATE(CaveSanityTestFrameBuffer)
-
+CAVE_SANITY_TEST_ITERATE(CaveSanityTestMsaa)
 

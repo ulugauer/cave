@@ -44,7 +44,8 @@ set(CAVE_SANITY_BASE_SOURCE  Base/caveSanityTestDevice.h Base/caveSanityTestDevi
 							 Base/caveSanityTestDepth.h Base/caveSanityTestDepth.cpp 
 							 Base/caveSanityTestPushConstants.h Base/caveSanityTestPushConstants.cpp 
 							 Base/caveSanityTestTexture2D.h Base/caveSanityTestTexture2D.cpp 
-                             Base/caveSanityTestFrameBuffer.h Base/caveSanityTestFrameBuffer.cpp) 
+                             Base/caveSanityTestFrameBuffer.h Base/caveSanityTestFrameBuffer.cpp 
+                             Base/caveSanityTestMsaa.h Base/caveSanityTestMsaa.cpp) 
 
 # Create named folders for the sources within the .vcproj
 # Empty name lists them directly under the .vcproj
