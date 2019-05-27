@@ -70,7 +70,9 @@ private:
     cave::RenderGraphicsPipeline* _graphicsPipeline;
     cave::RenderTarget* _colorRenderTarget;
     cave::RenderTarget* _depthRenderTarget;
+    cave::RenderTarget* _resolveRenderTarget;
     cave::RenderFrameBuffer* _framebuffer;
     cave::RenderCommandBuffer** _commandBuffers;
+    cave::HalSampleCount _sampleCount;
 };
 

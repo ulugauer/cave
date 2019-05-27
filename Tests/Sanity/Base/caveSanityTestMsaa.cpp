@@ -42,8 +42,10 @@ CaveSanityTestMsaa::CaveSanityTestMsaa()
     , _graphicsPipeline(nullptr)
     , _colorRenderTarget(nullptr)
     , _depthRenderTarget(nullptr)
+    , _resolveRenderTarget(nullptr)
     , _framebuffer(nullptr)
     , _commandBuffers(nullptr)
+    , _sampleCount(HalSampleCount::SampleCount8)
 {
 
 }
@@ -130,7 +132,7 @@ bool CaveSanityTestMsaa::Run(RenderDevice *device, RenderCommandPool* commandPoo
 
         device->CmdEndRenderPass(_commandBuffers[i]);
         // copy to swapchain
-        device->CmdCopyImage(_commandBuffers[i], _colorRenderTarget->GetImageHandle(), HalImageLayout::ColorAttachment, i, 1, &halImageCopy);
+        device->CmdCopyImage(_commandBuffers[i], _resolveRenderTarget->GetImageHandle(), HalImageLayout::ColorAttachment, i, 1, &halImageCopy);
 
         device->EndCommandBuffer(_commandBuffers[i]);
     }
@@ -168,6 +170,8 @@ void CaveSanityTestMsaa::Cleanup(RenderDevice *device, userContextData*)
         device->ReleaseRenderTarget(_colorRenderTarget);
     if (_depthRenderTarget)
         device->ReleaseRenderTarget(_depthRenderTarget);
+    if (_resolveRenderTarget)
+        device->ReleaseRenderTarget(_resolveRenderTarget);
     if (_framebuffer)
         device->ReleaseFrameBuffer(_framebuffer);
     if (_renderPass)
@@ -282,6 +286,7 @@ void CaveSanityTestMsaa::CreateMultisampleState(cave::RenderDevice *device)
 {
     // multisample state
     HalMultisampleState multisampleInfo;
+    multisampleInfo._rasterizationSamples = _sampleCount;
     _multisampleState = device->CreateMultisampleState(multisampleInfo);
 
     if (!_multisampleState)
@@ -333,9 +338,10 @@ void CaveSanityTestMsaa::CreatePipelineLayout(cave::RenderDevice *device)
 
 void CaveSanityTestMsaa::CreateRenderPass(cave::RenderDevice *device)
 {
-    HalRenderPassAttachment renderAttachments[2];
+    // color attachment
+    HalRenderPassAttachment renderAttachments[3];
     renderAttachments[0]._format = device->GetSwapChainImageFormat();
-    renderAttachments[0]._samples = HalSampleCount::SampleCount1;
+    renderAttachments[0]._samples = _sampleCount;
     renderAttachments[0]._loadOp = HalAttachmentLoadOperation::Clear;
     renderAttachments[0]._storeOp = HalAttachmentStoreOperation::Store;
     renderAttachments[0]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
@@ -349,7 +355,7 @@ void CaveSanityTestMsaa::CreateRenderPass(cave::RenderDevice *device)
 
     // depth attachment
     renderAttachments[1]._format = device->GetSwapChainDepthImageFormat();
-    renderAttachments[1]._samples = HalSampleCount::SampleCount1;
+    renderAttachments[1]._samples = _sampleCount;
     renderAttachments[1]._loadOp = HalAttachmentLoadOperation::Clear;
     renderAttachments[1]._storeOp = HalAttachmentStoreOperation::DontCare;
     renderAttachments[1]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
@@ -361,11 +367,26 @@ void CaveSanityTestMsaa::CreateRenderPass(cave::RenderDevice *device)
     depthAttachRef._attachment = 1;
     depthAttachRef._layout = HalImageLayout::DepthStencilAttachment;
 
+    // resolve attachment
+    renderAttachments[2]._format = device->GetSwapChainImageFormat();
+    renderAttachments[2]._samples = HalSampleCount::SampleCount1;
+    renderAttachments[2]._loadOp = HalAttachmentLoadOperation::DontCare;
+    renderAttachments[2]._storeOp = HalAttachmentStoreOperation::Store;
+    renderAttachments[2]._loadStencilOp = HalAttachmentLoadOperation::DontCare;
+    renderAttachments[2]._storeStencilOp = HalAttachmentStoreOperation::DontCare;
+    renderAttachments[2]._initialLayout = HalImageLayout::Undefined;
+    renderAttachments[2]._finalLayout = HalImageLayout::ColorAttachment;
+
+    HalAttachmentReference resolveAttachRef;
+    resolveAttachRef._attachment = 2;
+    resolveAttachRef._layout = HalImageLayout::ColorAttachment;
+
     HalSubpassDescription subpassDesc;
     subpassDesc._pipelineBindPoint = HalPipelineBindPoints::Graphics;
     subpassDesc._colorAttachmentCount = 1;
     subpassDesc._pColorAttachments = &colorAttachRef;
     subpassDesc._pDepthStencilAttachment = &depthAttachRef;
+    subpassDesc._pResolveAttachments = &resolveAttachRef;
 
     HalSubpassDependency dependency;
     dependency._srcSubpass = 0;	// our subpass
@@ -377,7 +398,7 @@ void CaveSanityTestMsaa::CreateRenderPass(cave::RenderDevice *device)
     dependency._dependencyFlags = static_cast<HalDependencyFlags>(HalDependencyBits::DependencyNone);
 
     HalRenderPassInfo renderPassInfo;
-    renderPassInfo._attachmentCount = 2;
+    renderPassInfo._attachmentCount = 3;
     renderPassInfo._pAttachments = renderAttachments;
     renderPassInfo._subpassCount = 1;
     renderPassInfo._pSubpasses = &subpassDesc;
@@ -495,6 +516,7 @@ void CaveSanityTestMsaa::CreateFrameBuffer(cave::RenderDevice *device, userConte
     colorImageInfo._slices = 1;
     colorImageInfo._level = 1;
     colorImageInfo._format = device->GetSwapChainImageFormat();
+    colorImageInfo._sampleCount = _sampleCount;
     colorImageInfo._usage = (static_cast<HalImageUsageFlags>(HalImageUsageFlagBits::TransferSrc) |
         static_cast<HalImageUsageFlags>(HalImageUsageFlagBits::ColorAttachment));
 
@@ -513,6 +535,7 @@ void CaveSanityTestMsaa::CreateFrameBuffer(cave::RenderDevice *device, userConte
     depthImageInfo._slices = 1;
     depthImageInfo._level = 1;
     depthImageInfo._format = device->GetSwapChainDepthImageFormat();
+    depthImageInfo._sampleCount = _sampleCount;
     depthImageInfo._usage = static_cast<HalImageUsageFlags>(HalImageUsageFlagBits::DepthAttachment);
 
     _depthRenderTarget = device->CreateRenderTarget(depthImageInfo);
@@ -522,11 +545,32 @@ void CaveSanityTestMsaa::CreateFrameBuffer(cave::RenderDevice *device, userConte
     // back up with memory
     _depthRenderTarget->Bind();
 
+    // Create resolve render target
+    HalImageInfo resolveImageInfo;
+    resolveImageInfo._width = pUserData->winWidth;
+    resolveImageInfo._height = pUserData->winHeight;
+    resolveImageInfo._depth = 1;
+    resolveImageInfo._slices = 1;
+    resolveImageInfo._level = 1;
+    resolveImageInfo._format = device->GetSwapChainImageFormat();
+    resolveImageInfo._sampleCount = cave::HalSampleCount::SampleCount1;
+    resolveImageInfo._usage = (static_cast<HalImageUsageFlags>(HalImageUsageFlagBits::TransferDst) |
+        static_cast<HalImageUsageFlags>(HalImageUsageFlagBits::TransferSrc) |
+        static_cast<HalImageUsageFlags>(HalImageUsageFlagBits::ColorAttachment));
+
+    _resolveRenderTarget = device->CreateRenderTarget(resolveImageInfo);
+    if (!_resolveRenderTarget)
+        throw CaveSanityTestException("CaveSanityTestMsaa: Failed to create resolve render target");
+
+    // back up with memory
+    _resolveRenderTarget->Bind();
+
     // Note our renderpass does the neccessary transition to render target usage
 
     caveVector<RenderTarget*> renderAttachments(device->GetEngineAllocator());
     renderAttachments.Push(_colorRenderTarget);
     renderAttachments.Push(_depthRenderTarget);
+    renderAttachments.Push(_resolveRenderTarget);
     _framebuffer = device->CreateFrameBuffer(*renderPass, pUserData->winWidth, pUserData->winHeight, renderAttachments);
 
     if (!_framebuffer)

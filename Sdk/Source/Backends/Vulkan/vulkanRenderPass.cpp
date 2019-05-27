@@ -104,8 +104,8 @@ VulkanRenderPass::VulkanRenderPass(VulkanRenderDevice* device, HalRenderPassInfo
 					{
 						for (size_t j = 0; j < renderPassInfo._pSubpasses[i]._colorAttachmentCount; ++j)
 						{
-							resolveRef[j].attachment = renderPassInfo._pSubpasses[i]._pColorAttachments[j]._attachment;
-							resolveRef[j].layout = VulkanTypeConversion::ConvertImageLayoutToVulkan(renderPassInfo._pSubpasses[i]._pColorAttachments[j]._layout);
+							resolveRef[j].attachment = renderPassInfo._pSubpasses[i]._pResolveAttachments[j]._attachment;
+							resolveRef[j].layout = VulkanTypeConversion::ConvertImageLayoutToVulkan(renderPassInfo._pSubpasses[i]._pResolveAttachments[j]._layout);
 						}
 
 						subpass[i].pResolveAttachments = resolveRef;
