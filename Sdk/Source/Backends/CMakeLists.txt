@@ -1,5 +1,10 @@
 # The Backend
 
+# find DX12 package
+IF(WIN32)
+find_package(D3D12 REQUIRED)
+ENDIF()
+
 # local pre-processor defines 
 IF(WIN32)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
