@@ -6,6 +6,11 @@ IF(UNIX)
 	find_package(X11 REQUIRED) 
 ENDIF()
 
+# find DX12 package
+IF(WIN32)
+	find_package(D3D12 REQUIRED)
+ENDIF()
+
 
 # local pre-processor defines 
 IF(WIN32)
@@ -114,6 +119,11 @@ target_include_directories(cave PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Input)
 # 3rd party libs
 target_include_directories(cave PRIVATE ${PROJECT_3RDPARTY_JSON_DIR})
 target_include_directories(cave PRIVATE ${PROJECT_3RDPARTY_VULKANSDK_HEADER_DIR})
+
+# On windows link DX libs
+IF(WIN32)
+	target_link_libraries (cave ${D3D12_LIBRARIES})
+ENDIF()
 
 # Creates folder "cave" and adds target project (cave.vcproj)
 set_property(TARGET cave PROPERTY FOLDER "sdk")

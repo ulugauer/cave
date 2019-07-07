@@ -72,23 +72,39 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
                            Vulkan/vulkanSampler.h Vulkan/vulkanSampler.cpp 
                            Vulkan/vulkanFrameBuffer.h Vulkan/vulkanFrameBuffer.cpp )
 
+IF(WIN32)						   
+# D3D source
+set(BACKENDS_D3D_SOURCE D3d/d3dInstance.h D3d/d3dInstance.cpp )
+ELSEIF()
+set(BACKENDS_D3D_SOURCE "")
+ENDIF()
 
 # Create named folders for the sources within the .vcproj
 # Empty name lists them directly under the .vcproj
 source_group("backends" FILES ${BACKENDS_SOURCE})
 source_group("backends\\vulkan" FILES ${BACKENDS_VULKAN_SOURCE})
+IF(WIN32)	
+source_group("backends\\d3d" FILES ${BACKENDS_D3D_SOURCE})
+ENDIF()
 
 #Generate the static library from the sources
-add_library(backends OBJECT ${BACKENDS_SOURCE} ${BACKENDS_VULKAN_SOURCE})
+add_library(backends OBJECT ${BACKENDS_SOURCE} ${BACKENDS_VULKAN_SOURCE} ${BACKENDS_D3D_SOURCE})
 
 # additional include directories
 target_include_directories(backends PRIVATE . )
 target_include_directories(backends PRIVATE Vulkan )
+IF(WIN32)	
+target_include_directories(backends PRIVATE D3D )
+ENDIF()
 target_include_directories(backends PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Engine)
 target_include_directories(backends PRIVATE ${PROJECT_SOURCE_DIR}/Sdk/Source/Os)
 
 # 3rd party includes
 target_include_directories(backends PRIVATE ${PROJECT_3RDPARTY_VULKANSDK_HEADER_DIR})
+IF(WIN32)
+target_include_directories(backends PRIVATE ${D3D12_INCLUDE_DIR})
+target_include_directories(backends PRIVATE ${DXGI_INCLUDE_DIR})
+ENDIF()
 
 # Creates folder "os" and adds target project (os.vcproj)
 set_property(TARGET backends PROPERTY FOLDER "sdk")

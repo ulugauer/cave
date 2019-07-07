@@ -37,10 +37,6 @@ find_path(DXGI_INCLUDE_DIR    # Set variable DXGI_INCLUDE_DIR
           HINTS
           )
 
-  message(STATUS "D3D12 " ${D3D12_INCLUDE_DIR})
-  message(STATUS "DXGI " ${DXGI_INCLUDE_DIR})
-  message(STATUS "ARCH " ${CMAKE_CL_64})
-
 if(CMAKE_CL_64)
   find_library(D3D12_LIBRARY NAMES d3d12.lib
                HINTS ${WIN10_SDK_PATH}/Lib/${WIN10_SDK_VERSION}/um/x64 )

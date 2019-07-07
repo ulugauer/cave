@@ -6,6 +6,11 @@ IF(UNIX)
 	find_package(X11 REQUIRED)
 ENDIF()
 
+# find DX12 package
+IF(WIN32)
+	find_package(D3D12 REQUIRED)
+ENDIF()
+
 
 # local pre-processor defines 
 IF(WIN32)
@@ -74,8 +79,10 @@ IF(UNIX)
 	set(OS_LIBRARIES 
 		xcb
 		${X11_LIBRARIES} )
+ELSEIF(WIN32)
+	set(OS_LIBRARIES ${D3D12_LIBRARIES})
 ELSE()
-	set(OS_LIBRARIES "")
+	set(c "")
 ENDIF()
 
 # Properties->Linker->Input->Additional Dependencies
