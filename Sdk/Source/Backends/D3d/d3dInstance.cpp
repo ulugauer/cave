@@ -28,74 +28,73 @@ using namespace Microsoft::WRL;
 namespace cave
 {
 
-	D3dInstance::D3dInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName)
-		: HalInstance(allocator, type)
-		, _physicalDeviceCount(0)
-		//, _physicalDeviceArray(nullptr)
-	{
+    D3dInstance::D3dInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName)
+        : HalInstance(allocator, type)
+        , _physicalDeviceCount(0)
+    {
 #if defined(_DEBUG)
-		// Always enable the debug layer before doing anything DX12 related
-		// so all possible errors generated while creating DX12 objects
-		// are caught by the debug layer.
-		ComPtr<ID3D12Debug> debugInterface;
-		if (D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface)) < 0)
-		{
-			throw BackendException("Failed to create D3D12 debug interface");
-		}
-		debugInterface->EnableDebugLayer();
+        // Always enable the debug layer before doing anything DX12 related
+        // so all possible errors generated while creating DX12 objects
+        // are caught by the debug layer.
+        ComPtr<ID3D12Debug> debugInterface;
+        if (D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface)) < 0)
+        {
+            throw BackendException("Failed to create D3D12 debug interface");
+        }
+        debugInterface->EnableDebugLayer();
 #endif
 
-		ComPtr<IDXGIFactory4> dxgiFactory;
-		UINT createFactoryFlags = 0;
+        UINT createFactoryFlags = 0;
 #if defined(_DEBUG)
-		createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+        createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
 #endif
-		HRESULT res = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory));
-		if (FAILED(res))
-		{
-			throw BackendException("Failed to create DXGI interface");
-		}
+        HRESULT res = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&_dxgiFactory));
+        if (FAILED(res))
+        {
+            throw BackendException("Failed to create DXGI interface");
+        }
 
-		// iterate through all HW adapters. We don support SW adapters
-		ComPtr<IDXGIAdapter1> dxgiAdapter1;
-		SIZE_T maxDedicatedVideoMemory = 0;
-		for (uint32_t i = 0; dxgiFactory->EnumAdapters1(i, &dxgiAdapter1) != DXGI_ERROR_NOT_FOUND; ++i)
-		{
-			DXGI_ADAPTER_DESC1 dxgiAdapterDesc1;
-			dxgiAdapter1->GetDesc1(&dxgiAdapterDesc1);
+        // iterate through all HW adapters. We don support SW adapters
+        ComPtr<IDXGIAdapter1> dxgiAdapter1;
+        SIZE_T maxDedicatedVideoMemory = 0;
+        for (uint32_t i = 0; _dxgiFactory->EnumAdapters1(i, &dxgiAdapter1) != DXGI_ERROR_NOT_FOUND; ++i)
+        {
+            DXGI_ADAPTER_DESC1 dxgiAdapterDesc1;
+            dxgiAdapter1->GetDesc1(&dxgiAdapterDesc1);
 
-			// Check to see if the adapter can create a D3D12 device without actually 
-			// creating it. The adapter with the largest dedicated video memory
-			// is favored.
-			if ((dxgiAdapterDesc1.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) == 0 &&
-				SUCCEEDED(D3D12CreateDevice(dxgiAdapter1.Get(),
-					D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), nullptr)) &&
-				dxgiAdapterDesc1.DedicatedVideoMemory > maxDedicatedVideoMemory)
-			{
-				maxDedicatedVideoMemory = dxgiAdapterDesc1.DedicatedVideoMemory;
-				if (dxgiAdapter1.As(&_dxgiAdapter4) < 0)
-				{
-					throw BackendException("Failed to find suitable adapter");
-				}
-			}
-		}
-	}
+            // Check to see if the adapter can create a D3D12 device without actually 
+            // creating it. The adapter with the largest dedicated video memory
+            // is favored.
+            if ((dxgiAdapterDesc1.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) == 0 &&
+                SUCCEEDED(D3D12CreateDevice(dxgiAdapter1.Get(),
+                    D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), nullptr)) &&
+                dxgiAdapterDesc1.DedicatedVideoMemory > maxDedicatedVideoMemory)
+            {
+                maxDedicatedVideoMemory = dxgiAdapterDesc1.DedicatedVideoMemory;
+                if (dxgiAdapter1.As(&_dxgiAdapter4) < 0)
+                {
+                    throw BackendException("Failed to find suitable adapter");
+                }
+                _physicalDeviceCount++;
+            }
+        }
+    }
 
-	D3dInstance::~D3dInstance()
-	{
-	}
+    D3dInstance::~D3dInstance()
+    {
+    }
 
-	bool D3dInstance::QueryPhysicalDevices()
-	{
-		bool success = false;
-		
+    bool D3dInstance::QueryPhysicalDevices()
+    {
+        bool success = false;
+        
 
-		return success;
-	}
+        return success;
+    }
 
-	HalRenderDevice* D3dInstance::CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator, SwapChainInfo& swapChainInfo)
-	{
-		return nullptr;
-	}
+    HalRenderDevice* D3dInstance::CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator, SwapChainInfo& swapChainInfo)
+    {
+        return nullptr;
+    }
 
 }

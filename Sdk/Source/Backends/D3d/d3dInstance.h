@@ -32,71 +32,64 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 namespace cave
 {
 
-	/**
-	* Vulkan device instance
-	*/
-	class D3dInstance : public HalInstance
-	{
-	public:
-		/**
-		* @brief Constructor
-		*
-		* @param allocator	Pointer to global allocator
-		* @param type	Backend graphics API
-		* @param applicationName	Name of application (optional)
-		*
-		*/
-		D3dInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName);
+    /**
+    * Vulkan device instance
+    */
+    class D3dInstance : public HalInstance
+    {
+    public:
+        /**
+        * @brief Constructor
+        *
+        * @param allocator	Pointer to global allocator
+        * @param type	Backend graphics API
+        * @param applicationName	Name of application (optional)
+        *
+        */
+        D3dInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName);
 
-		/** @brief Destructor */
-		virtual ~D3dInstance();
+        /** @brief Destructor */
+        virtual ~D3dInstance();
 
-		/**
-		* @brief Create a list of physical devices supported by this instance
-		*
-		* @return True if a list was successfuly build
-		*/
-		bool QueryPhysicalDevices();
+        /**
+        * @brief Create a list of physical devices supported by this instance
+        *
+        * @return True if a list was successfuly build
+        */
+        bool QueryPhysicalDevices();
 
-		/**
-		* @brief Create a hardware render device
-		*
-		* @param[in] allocator	Engine global allocator
-		* @param[in] swapChainInfo	Swap chain creation info
-		*
-		* @return Pointer to a hardware render device
-		*/
-		HalRenderDevice* CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator, SwapChainInfo& swapChainInfo) override;
+        /**
+        * @brief Create a hardware render device
+        *
+        * @param[in] allocator	Engine global allocator
+        * @param[in] swapChainInfo	Swap chain creation info
+        *
+        * @return Pointer to a hardware render device
+        */
+        HalRenderDevice* CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator, SwapChainInfo& swapChainInfo) override;
 
-		/**
-		* @brief Get vulkan instance handle
-		*
-		* @return Lowlevel vulkan handle
-		*/
-		//D3dInstance GetInstanceHandle() { return _d3dInstance; }
+        /**
+        * @brief Get vulkan instance handle
+        *
+        * @return Lowlevel vulkan handle
+        */
+        //D3dInstance GetInstanceHandle() { return _d3dInstance; }
 
-	private:
-		/**
-		* @brief Create a presentation surface
-		*
-		* @param[in] swapChainInfo	Swap chain creation info
-		*
-		* @return Vulkan handle to surface
-		*/
-		//VkSurfaceKHR CreatePresentaionSurface(SwapChainInfo& swapChainInfo);
+    private:
+        /**
+        * @brief Create a presentation surface
+        *
+        * @param[in] swapChainInfo	Swap chain creation info
+        *
+        * @return Vulkan handle to surface
+        */
+        //VkSurfaceKHR CreatePresentaionSurface(SwapChainInfo& swapChainInfo);
 
-		/**
-		* @brief Create a debug callback handle
-		*
-		*/
-		//void CreateDebugCallback();
-
-	private:
-		Microsoft::WRL::ComPtr<IDXGIAdapter4> _dxgiAdapter4; ///< com ptr to dxgi adapter
-		uint32_t _physicalDeviceCount;	///< Physical devices accessible by this instance
-		//VulkanPhysicalDevice* _physicalDeviceArray;	///< Pointer to array of physical devices
-		//VkDebugReportCallbackEXT _callback;	///< Debug callback
-	};
+    private:
+        Microsoft::WRL::ComPtr<IDXGIAdapter4> _dxgiAdapter4;    ///< com ptr to dxgi adapter
+        Microsoft::WRL::ComPtr<IDXGIFactory4> _dxgiFactory;     ///< comp ptr to dxgi interface
+        uint32_t _physicalDeviceCount;	///< Physical devices accessible by this instance
+    };
 
 }
 

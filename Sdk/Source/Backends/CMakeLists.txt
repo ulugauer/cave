@@ -74,7 +74,8 @@ set(BACKENDS_VULKAN_SOURCE Vulkan/vulkanApi.h
 
 IF(WIN32)						   
 # D3D source
-set(BACKENDS_D3D_SOURCE D3d/d3dInstance.h D3d/d3dInstance.cpp )
+set(BACKENDS_D3D_SOURCE D3d/d3dInstance.h D3d/d3dInstance.cpp 
+                        D3d/dx12RenderDevice.h D3d/dx12RenderDevice.cpp )
 ELSEIF()
 set(BACKENDS_D3D_SOURCE "")
 ENDIF()
