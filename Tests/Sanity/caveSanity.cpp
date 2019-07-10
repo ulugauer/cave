@@ -247,7 +247,7 @@ int main(int argc, char* argv[])
 		engineInstance = std::unique_ptr<EngineInstance>(new EngineInstance(engineInfo));
 
 		// Create render instance. Basically the door to the hardware device.
-		renderInstance = engineInstance->CreateRenderInstance(RenderInstanceTypes::InstanceDX12);
+		renderInstance = engineInstance->CreateRenderInstance(RenderInstanceTypes::InstanceVulkan);
 		// create a window frontend interface
 		frontend = engineInstance->CreateFrontend();
 		// create window and fill in OS dependend information 
