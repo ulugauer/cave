@@ -21,6 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "vulkan.h"
 
+#ifdef _WIN32
+#include <d3d12.h>
+#endif
+
 #include <iostream>		// includes exception handling
 #include <memory>
 
@@ -88,7 +92,7 @@ typedef struct SwapChainInfo
 	uint32_t stencilBits;	///< Amount of total stencil bits (0, 8)
 	bool fullscreen;	///< Create fullscreen window
 	bool offscreen;	///< We do not render to a window
-#ifdef VK_USE_PLATFORM_WIN32_KHR
+#if defined(VK_USE_PLATFORM_WIN32_KHR) || defined(__d3d12_h__)
 	HINSTANCE hInstance;	///< Filled in at CreateOsWindow call
 	HWND hWindow;	///< Filled in at CreateOsWindow call
 #else

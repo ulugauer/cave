@@ -17,20 +17,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 #include "d3dInstance.h"
 #include "dx12RenderDevice.h"
+#include "d3dSwapChain.h"
+
+using namespace Microsoft::WRL;
 
 namespace cave
 {
 
-Dx12RenderDevice::Dx12RenderDevice(D3dInstance* instance)
+Dx12RenderDevice::Dx12RenderDevice(D3dInstance* instance, IDXGIAdapter4* adapter)
     : HalRenderDevice(instance)
     , _d3dInstance(instance)
+    , _d3dAdapter(adapter)
+    , _d3d12Device2(nullptr)
+    , _graphicsQueue(nullptr)
+    , _pSwapChain(nullptr)
 {
+    // create device
+    HRESULT res = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_d3d12Device2));
+    if (FAILED(res))
+    {
+        throw BackendException("Failed to create DX12 device");
+    }
 
+    // Enable debug messages in debug mode.
+#if defined(_DEBUG)
+    ComPtr<ID3D12InfoQueue> pInfoQueue;
+    if (SUCCEEDED(_d3d12Device2.As(&pInfoQueue)))
+    {
+        pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
+        pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
+        pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
+    }
+#endif
+
+
+    D3D12_COMMAND_QUEUE_DESC desc = {};
+    desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+    desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    desc.NodeMask = 0;
+
+    res = _d3d12Device2->CreateCommandQueue(&desc, IID_PPV_ARGS(&_graphicsQueue));
+    if (FAILED(res))
+    {
+        throw BackendException("Failed to create DX12 command queue");
+    }
 }
 
 Dx12RenderDevice::~Dx12RenderDevice()
 {
-
+    if (_pSwapChain)
+    {
+        DeallocateDelete(*_d3dInstance->GetEngineAllocator(), *_pSwapChain);
+    }
 }
 
 void Dx12RenderDevice::GetApiVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
@@ -55,7 +94,17 @@ void Dx12RenderDevice::WaitIdle()
 
 void Dx12RenderDevice::CreateSwapChain(SwapChainInfo& swapChainInfo)
 {
+    if (!_d3d12Device2)
+        throw BackendException("DX12 device not properly setup");
 
+    // we support only one swap chain per render device
+    if (_pSwapChain)
+        return;
+
+    _pSwapChain = AllocateObject<D3dSwapChain>(*_d3dInstance->GetEngineAllocator(), _d3dInstance, this, swapChainInfo);
+
+    if (!_pSwapChain)
+        throw BackendException("Failed to create D3D swap chain");
 }
 
 HalCommandPool* Dx12RenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPoolInfo)

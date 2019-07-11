@@ -69,11 +69,18 @@ namespace cave
         HalRenderDevice* CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator, SwapChainInfo& swapChainInfo) override;
 
         /**
-        * @brief Get vulkan instance handle
+        * @brief Get D3D dxgi handle
         *
         * @return Lowlevel vulkan handle
         */
-        //D3dInstance GetInstanceHandle() { return _d3dInstance; }
+        IDXGIFactory4* GetDxgiHandle() { return _dxgiFactory.Get(); }
+
+        /**
+        * @brief Query if tearing is supported 
+        *
+        * @return true if tearing is supported
+        */
+        bool GetTearingSupport() { return _tearing; }
 
     private:
         /**
@@ -88,7 +95,9 @@ namespace cave
     private:
         Microsoft::WRL::ComPtr<IDXGIAdapter4> _dxgiAdapter4;    ///< com ptr to dxgi adapter
         Microsoft::WRL::ComPtr<IDXGIFactory4> _dxgiFactory;     ///< comp ptr to dxgi interface
-        uint32_t _physicalDeviceCount;	///< Physical devices accessible by this instance
+        uint32_t _physicalDeviceCount; ///< Physical devices accessible by this instance
+        std::string _appName; ///< application name
+        bool _tearing; ///< true if tearing (vsync off) is supported
     };
 
 }

@@ -35,6 +35,7 @@ namespace cave
 
 ///< forwards
 class D3dInstance;
+class D3dSwapChain;
 
 /**
 * Dx12 render device
@@ -48,7 +49,7 @@ public:
     * @param[in] instance	Pointer to instance object
     *
     */
-    Dx12RenderDevice(D3dInstance* instance);
+    Dx12RenderDevice(D3dInstance* instance, IDXGIAdapter4* adapter);
 
     /** @brief Destructor */
     virtual ~Dx12RenderDevice();
@@ -563,6 +564,15 @@ public:
     void CreateSwapChainFramebuffers() override;
 
     /**
+    * @brief Get graphics queue
+    *
+    * @return VkQueue handle
+    */
+    ID3D12CommandQueue* GetGraphicsQueue() const {
+        return _graphicsQueue.Get();
+    }
+
+    /**
     * @brief Read pixels from the last used swap chain image
     *		 The returned pixels are always in RGBA format.
     *		 data must point to a memory which has sufficient space.
@@ -575,7 +585,10 @@ public:
 
 private:
     D3dInstance* _d3dInstance;
-    Microsoft::WRL::ComPtr<ID3D12Device2> _d3d12Device2;
+    IDXGIAdapter4* _d3dAdapter; ///< D3D physical device
+    Microsoft::WRL::ComPtr<ID3D12Device2> _d3d12Device2;    ///< DX 12 device 
+    Microsoft::WRL::ComPtr<ID3D12CommandQueue> _graphicsQueue; ///< D3D command queue
+    D3dSwapChain* _pSwapChain; ///< pointer to swap chain object
 };
 
 }

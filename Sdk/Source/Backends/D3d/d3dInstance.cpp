@@ -16,8 +16,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 ///       D3D instance
 
 #include "d3dInstance.h"
-//#include "vulkanPhysicalDevice.h"
-//#include "vulkanRenderDevice.h"
+#include "dx12RenderDevice.h"
 
 using namespace Microsoft::WRL;
 
@@ -30,7 +29,11 @@ namespace cave
 
     D3dInstance::D3dInstance(std::shared_ptr<AllocatorBase> allocator, BackendInstanceTypes type, const char* applicationName)
         : HalInstance(allocator, type)
+        , _dxgiAdapter4(nullptr)
+        , _dxgiFactory(nullptr)
         , _physicalDeviceCount(0)
+        , _appName(applicationName)
+        , _tearing(false)
     {
 #if defined(_DEBUG)
         // Always enable the debug layer before doing anything DX12 related
@@ -78,6 +81,21 @@ namespace cave
                 _physicalDeviceCount++;
             }
         }
+
+        // check for vsync off feature
+        ComPtr<IDXGIFactory4> factory4;
+        if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory4))))
+        {
+            ComPtr<IDXGIFactory5> factory5;
+            if (SUCCEEDED(factory4.As(&factory5)))
+            {
+                res = factory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &_tearing, sizeof(_tearing));
+                if (FAILED(res))
+                {
+                    _tearing = false;
+                }
+            }
+        }
     }
 
     D3dInstance::~D3dInstance()
@@ -86,15 +104,18 @@ namespace cave
 
     bool D3dInstance::QueryPhysicalDevices()
     {
-        bool success = false;
-        
-
-        return success;
+        return (_physicalDeviceCount > 0);
     }
 
-    HalRenderDevice* D3dInstance::CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator, SwapChainInfo& swapChainInfo)
+    HalRenderDevice* D3dInstance::CreateRenderDevice(std::shared_ptr<AllocatorBase> allocator, SwapChainInfo& )
     {
-        return nullptr;
+        if (_dxgiAdapter4 == nullptr)
+            throw BackendException("CreateRenderDevice: no suitable adapter found");
+
+        // We have something suitable -> create device
+        Dx12RenderDevice* renderDevice = AllocateObject<Dx12RenderDevice>(*allocator, this, _dxgiAdapter4.Get());
+
+        return renderDevice;
     }
 
 }
