@@ -68,7 +68,7 @@ D3dSwapChain::D3dSwapChain(D3dInstance* instance, Dx12RenderDevice* renderDevice
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.NumDescriptors = 3;
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    Microsoft::WRL::ComPtr<ID3D12Device2> device = renderDevice->GetDeviceHandle();
+    ID3D12Device2* device = renderDevice->GetDeviceHandle();
     res = device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&_descriptorPool));
     if (FAILED(res))
         throw BackendException("Failed to create swap resource descriptor heap");

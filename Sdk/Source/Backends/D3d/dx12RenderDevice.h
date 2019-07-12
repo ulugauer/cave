@@ -38,6 +38,17 @@ class D3dInstance;
 class D3dSwapChain;
 
 /**
+* Device related values
+**/
+struct Dx12DeviceCaps
+{
+	uint32_t rtvDescriptorSize = 0;	///< render target view descriptor size
+	uint32_t dsvDescriptorSize = 0;	///< depth stencil view descriptor size
+	uint32_t shaderResourceDescriptorSize = 0;	///< shader resoure descriptor size
+	uint32_t samplerDescriptorSize = 0;	///< sampler descriptor size
+};
+
+/**
 * Dx12 render device
 */
 class Dx12RenderDevice : public HalRenderDevice
@@ -59,7 +70,7 @@ public:
     *
     * @return Lowlevel vulkan handle
     */
-    Microsoft::WRL::ComPtr<ID3D12Device2> GetDeviceHandle() { return _d3d12Device2; }
+    ID3D12Device2* GetDeviceHandle() { return _d3d12Device2.Get(); }
 
     /**
     * @brief Query API version number
@@ -572,6 +583,15 @@ public:
         return _graphicsQueue.Get();
     }
 
+	/**
+	* @brief Get graphics queue
+	*
+	* @return VkQueue handle
+	*/
+	const Dx12DeviceCaps& GetDeviceCaps() {
+		return _deviceCaps;
+	}
+
     /**
     * @brief Read pixels from the last used swap chain image
     *		 The returned pixels are always in RGBA format.
@@ -589,6 +609,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Device2> _d3d12Device2;    ///< DX 12 device 
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> _graphicsQueue; ///< D3D command queue
     D3dSwapChain* _pSwapChain; ///< pointer to swap chain object
+
+	Dx12DeviceCaps _deviceCaps;	///< Device related nmbers
 };
 
 }

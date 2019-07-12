@@ -62,6 +62,13 @@ Dx12RenderDevice::Dx12RenderDevice(D3dInstance* instance, IDXGIAdapter4* adapter
     {
         throw BackendException("Failed to create DX12 command queue");
     }
+
+	// get descriptor sizes
+	_deviceCaps.rtvDescriptorSize = _d3d12Device2->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	_deviceCaps.dsvDescriptorSize = _d3d12Device2->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	_deviceCaps.shaderResourceDescriptorSize = _d3d12Device2->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	_deviceCaps.samplerDescriptorSize = _d3d12Device2->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+
 }
 
 Dx12RenderDevice::~Dx12RenderDevice()
