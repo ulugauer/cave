@@ -79,6 +79,12 @@ namespace cave
                     throw BackendException("Failed to find suitable adapter");
                 }
                 _physicalDeviceCount++;
+                if (dxgiAdapterDesc1.VendorId == 0x10DE)
+                    _vendorName = "NVIDIA";
+                else if (dxgiAdapterDesc1.VendorId == 0x1002)
+                    _vendorName = "AMD";
+                else if (dxgiAdapterDesc1.VendorId == 0x0300)
+                    _vendorName = "INTEL";
             }
         }
 

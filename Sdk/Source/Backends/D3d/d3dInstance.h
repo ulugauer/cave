@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <dxgi1_6.h>
 #include <wrl.h>
 
+#include <string>
+
 /** \addtogroup backend
 *  @{
 *
@@ -82,6 +84,13 @@ namespace cave
         */
         bool GetTearingSupport() { return _tearing; }
 
+        /**
+        * @brief Query vendor name
+        *
+        * @return vendor string
+        */
+        const char* GetVendorName() { return _vendorName.c_str(); }
+
     private:
         /**
         * @brief Create a presentation surface
@@ -98,6 +107,7 @@ namespace cave
         uint32_t _physicalDeviceCount; ///< Physical devices accessible by this instance
         std::string _appName; ///< application name
         bool _tearing; ///< true if tearing (vsync off) is supported
+        std::string _vendorName;
     };
 
 }

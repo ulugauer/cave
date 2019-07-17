@@ -18,6 +18,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "d3dInstance.h"
 #include "dx12RenderDevice.h"
 #include "d3dSwapChain.h"
+#include "dx12CommandPool.h"
 
 using namespace Microsoft::WRL;
 
@@ -81,17 +82,21 @@ Dx12RenderDevice::~Dx12RenderDevice()
 
 void Dx12RenderDevice::GetApiVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
 {
-
+    major = 12;
+    minor = 0;
+    patch = 0;
 }
 
 void Dx12RenderDevice::GetDriverVersion(uint32_t& major, uint32_t& minor, uint32_t& patch)
 {
-
+    major = 0;
+    minor = 0;
+    patch = 0;
 }
 
 const char* Dx12RenderDevice::GetDeviceName()
 {
-    return nullptr;
+    return _d3dInstance->GetVendorName();
 }
 
 void Dx12RenderDevice::WaitIdle()
@@ -116,7 +121,11 @@ void Dx12RenderDevice::CreateSwapChain(SwapChainInfo& swapChainInfo)
 
 HalCommandPool* Dx12RenderDevice::CreateCommandPool(HalCommandPoolInfo& commandPoolInfo)
 {
-    return nullptr;
+    if(!_d3d12Device2)
+        return nullptr;
+
+    Dx12CommandPool* commandPool = AllocateObject<Dx12CommandPool>(*_d3dInstance->GetEngineAllocator(), this, commandPoolInfo);
+    return commandPool;
 }
 
 HalDescriptorPool* Dx12RenderDevice::CreateDescriptorPool(HalDescriptorPoolInfo& descriptorPoolInfo)
@@ -361,7 +370,10 @@ const HalExtent2D Dx12RenderDevice::GetSwapChainExtend()
 
 const uint32_t Dx12RenderDevice::AcquireNextSwapChainImage(uint64_t timeout)
 {
-    return 0;
+    if (!_pSwapChain)
+        return (std::numeric_limits<uint32_t>::max)();
+
+    return (std::numeric_limits<uint32_t>::max)();
 }
 
 void Dx12RenderDevice::CreateSwapChainFramebuffers()

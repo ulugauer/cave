@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include <wrl.h>
 
 #include <vector>
+#include <array>
 
 /** \addtogroup backend
 *  @{
@@ -44,6 +45,7 @@ class Dx12RenderDevice;
 */
 class D3dSwapChain
 {
+    static constexpr uint32_t kSwapChainImageCount = 3;
 public:
     /**
     * @brief Constructor
@@ -58,18 +60,28 @@ public:
     /** @brief Destructor */
     virtual ~D3dSwapChain();
 
+    /**
+    * @brief Get swap image count
+    *
+    * @return swap image count
+    */
+    const uint32_t GetSwapChainImageCount() const { return kSwapChainImageCount; }
+
 private:
     /**
     * @brief Create swap chain image views
     *
     */
-    void CreateImageViews();
+    void CreateImageViews(Dx12RenderDevice* renderDevice);
 
 private:
     D3dInstance* _pInstance;    ///< Pointer to instance
     Dx12RenderDevice* _pRenderDevice;   ///< Handle to render device
     Microsoft::WRL::ComPtr<IDXGISwapChain4> _swapChain4;    ///< Handle to a d3d swap chain
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> _descriptorPool;   ///< descripor allocation pool for swap surfaces
+    Microsoft::WRL::ComPtr<ID3D12Fence> _swapFence; ///< sync object for swapchain GPU
+    HANDLE _swapFenceEvent; ///< sync object for swapchain CPU
+    std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, kSwapChainImageCount> _swapChainImageVector;   ///< Array of swap chain images
 };
 
 }
