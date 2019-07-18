@@ -131,6 +131,19 @@ const char* RenderDevice::GetDeviceName()
 	return _pHalRenderDevice->GetDeviceName();
 }
 
+RenderInstanceTypes RenderDevice::GetInstanceType() const
+{
+    RenderInstanceTypes type = RenderInstanceTypes::InstanceVulkan;
+    if (_pHalInstance)
+    {
+        BackendInstanceTypes beType = _pHalInstance->GetInstanceType();
+        if(beType == BackendInstanceTypes::InstanceDX12)
+            type = RenderInstanceTypes::InstanceDX12;
+    }
+
+    return type;
+}
+
 void RenderDevice::WaitIdle()
 {
 	if (_pHalRenderDevice)
