@@ -137,7 +137,7 @@ ELSE()
 ENDIF()
 
 # copy files we need to output folder
-add_custom_command(TARGET cave POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory
-                   ${PROJECT_3RDPARTY_VULKANSDK_LIB_DIR} $<TARGET_FILE_DIR:cave>)
+#add_custom_command(TARGET cave POST_BUILD
+#                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+#                   ${PROJECT_3RDPARTY_VULKANSDK_LIB_DIR} $<TARGET_FILE_DIR:cave>)
 
