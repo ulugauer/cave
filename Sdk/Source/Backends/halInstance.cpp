@@ -19,7 +19,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #include "halInstance.h"
 #include "vulkanInstance.h"
 #include "vulkanRenderDevice.h"
+#ifdef _WIN32
 #include "d3dInstance.h"
+#endif
 
 namespace cave
 {
@@ -41,8 +43,10 @@ HalInstance* HalInstance::CreateInstance(std::shared_ptr<AllocatorBase> allocato
 	HalInstance* pHalInstance = nullptr;
 	if (type == BackendInstanceTypes::InstanceVulkan)
 		pHalInstance = AllocateObject<VulkanInstance>(*allocator, allocator, type, applicationName);
+#ifdef _WIN32
 	else if (type == BackendInstanceTypes::InstanceDX12)
 		pHalInstance = AllocateObject<D3dInstance>(*allocator, allocator, type, applicationName);
+#endif
 
 	if (pHalInstance)
 		pHalInstance->QueryPhysicalDevices();
