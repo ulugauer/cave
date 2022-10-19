@@ -363,6 +363,12 @@ VulkanTypeConversion::GetImageSizeInfo(VkFormat imageFormat)
         imageSizeInfo._compressed = true;
         imageSizeInfo._elementSize = 1;
         break;
+    case VK_FORMAT_BC7_UNORM_BLOCK:
+        imageSizeInfo._blockSize = 16;
+        imageSizeInfo._blockDimension = 4;
+        imageSizeInfo._compressed = true;
+        imageSizeInfo._elementSize = 1;
+        break;
     default:
         assert(false);
         break;

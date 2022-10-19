@@ -69,7 +69,7 @@ bool CaveSanityTestDevice::Run(RenderDevice *device, RenderCommandPool* commandP
 		CreateGraphicsPipeline(device, _renderPass);
 		AllocateCommandBuffers(device, commandPool);
 	}
-	catch (CaveSanityTestException err)
+	catch (CaveSanityTestException const& err)
 	{
 		std::cerr << err.what();
 		return false;

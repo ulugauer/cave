@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
 		std::cerr << "Driver Vesrion: " << major << "." << minor << "." << patch << std::endl;
 		std::cerr << "Device Name: " << renderDevice->GetDeviceName() << "\n\n";
 	}
-	catch (cave::EngineError err)
+	catch (cave::EngineError const& err)
 	{
 		std::cerr << err.what();
 		return -1;
@@ -290,6 +290,7 @@ int main(int argc, char* argv[])
 	// asynchronously load our image assets for lader usage
 	ResourceManager& rm = renderDevice->GetResourceManager();
 	rm.LoadImageAsset("UVChecker-dxt5.dds");
+	rm.LoadImageAsset("x.dds");
 	
 	// create our swap chain framebuffers
 	if (!renderDevice->CreateSwapChainFramebuffers())

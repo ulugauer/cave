@@ -73,7 +73,7 @@ bool CaveSanityTestMappedVbo::Run(RenderDevice *device, RenderCommandPool* comma
 		CreateGraphicsPipeline(device, _renderPass);
 		AllocateCommandBuffers(device, commandPool);
 	}
-	catch (CaveSanityTestException err)
+	catch (CaveSanityTestException const& err)
 	{
 		std::cerr << err.what();
 		return false;
@@ -388,7 +388,7 @@ void CaveSanityTestMappedVbo::CreateVertexBuffer(cave::RenderDevice *device)
 		// map memory
 		_vertexBuffer->Map(0, bufferInfo._size, &data);
 	}
-	catch (cave::EngineError err)
+	catch (cave::EngineError const& err)
 	{
 		throw CaveSanityTestException(err.what());
 		return;

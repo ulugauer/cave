@@ -26,14 +26,15 @@ First:
 
 ## Windows :
 
-	start cmake .. -G "Visual Studio 14 2015 Win64" 
+	start cmake .. -G "Visual Studio 14 2015 Win64"
 
 ## Linux (Ubuntu 16.04) :
 
-    cmake .. -DCMAKE_BUILD_TYPE=Release	
+    cmake .. -DCMAKE_BUILD_TYPE=Release
+    make CC="gcc -g"
 
 # Sanity
 
-To run CAVE engine sanity navigate to [projctRoot]/binary/[platform]  
-Run CaveSanity -r ../../Tests/Sanity for low level engine tests.  
+To run CAVE engine sanity navigate to [projctRoot]/binary/[platform]
+Run CaveSanity -r ../../Tests/Sanity for low level engine tests.
 Run CaveSanity -h for more options.

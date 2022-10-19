@@ -82,7 +82,7 @@ bool CaveSanityTestTexture2D::Run(RenderDevice *device, RenderCommandPool* comma
 		CreateGraphicsPipeline(device, _renderPass);
 		AllocateCommandBuffers(device, commandPool);
 	}
-	catch (CaveSanityTestException err)
+	catch (CaveSanityTestException const& err)
 	{
 		std::cerr << err.what();
 		return false;
@@ -211,7 +211,8 @@ void CaveSanityTestTexture2D::LoadResource(cave::RenderDevice *device)
 		throw CaveSanityTestException("CaveSanityTestTexture2D: Failed to load material");
 
 	// Create texture (allocate and upload data)
-	_texture = device->CreateTexture("UVChecker-dxt5.dds");
+	//_texture = device->CreateTexture("UVChecker-dxt5.dds");
+	_texture = device->CreateTexture("x.dds");
 	if (!_texture)
 		throw CaveSanityTestException("CaveSanityTestTexture2D: Failed to create texture");
 
@@ -447,7 +448,7 @@ void CaveSanityTestTexture2D::CreateVertexBuffer(cave::RenderDevice *device)
 		_vertexBuffer->Bind();
 		_vertexBuffer->Update(0, bufferInfo._size, vertices.data());
 	}
-	catch (cave::EngineError err)
+	catch (cave::EngineError const& err)
 	{
 		throw CaveSanityTestException(err.what());
 		return;
@@ -479,7 +480,7 @@ void CaveSanityTestTexture2D::CreateIndexBuffer(cave::RenderDevice *device)
 		_indexBuffer->Bind();
 		_indexBuffer->Update(0, bufferInfo._size, indices.data());
 	}
-	catch (cave::EngineError err)
+	catch (cave::EngineError const& err)
 	{
 		throw CaveSanityTestException(err.what());
 		return;
