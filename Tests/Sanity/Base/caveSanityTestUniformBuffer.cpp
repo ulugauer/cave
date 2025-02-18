@@ -89,7 +89,7 @@ bool CaveSanityTestUniformBuffer::Run(RenderDevice *device, RenderCommandPool* c
 		CreateGraphicsPipeline(device, _renderPass);
 		AllocateCommandBuffers(device, commandPool);
 	}
-	catch (CaveSanityTestException err)
+	catch (CaveSanityTestException &err)
 	{
 		std::cerr << err.what();
 		return false;
@@ -436,7 +436,7 @@ void CaveSanityTestUniformBuffer::CreateVertexBuffer(cave::RenderDevice *device)
 		_vertexBuffer->Bind();
 		_vertexBuffer->Update(0, bufferInfo._size, vertices.data());
 	}
-	catch (cave::EngineError err)
+	catch (cave::EngineError &err)
 	{
 		throw CaveSanityTestException(err.what());
 		return;
@@ -468,7 +468,7 @@ void CaveSanityTestUniformBuffer::CreateIndexBuffer(cave::RenderDevice *device)
 		_indexBuffer->Bind();
 		_indexBuffer->Update(0, bufferInfo._size, indices.data());
 	}
-	catch (cave::EngineError err)
+	catch (cave::EngineError &err)
 	{
 		throw CaveSanityTestException(err.what());
 		return;
@@ -502,7 +502,7 @@ void CaveSanityTestUniformBuffer::CreateUniformBuffer(cave::RenderDevice *device
 		_uniformBuffer->Bind();
 		_uniformBuffer->Update(0, bufferInfo._size, &XForm);
 	}
-	catch (cave::EngineError err)
+	catch (cave::EngineError &err)
 	{
 		throw CaveSanityTestException(err.what());
 		return;

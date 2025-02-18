@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
 		std::cerr << "Driver Vesrion: " << major << "." << minor << "." << patch << std::endl;
 		std::cerr << "Device Name: " << renderDevice->GetDeviceName() << "\n\n";
 	}
-	catch (cave::EngineError err)
+	catch (cave::EngineError &err)
 	{
 		std::cerr << err.what();
 		return -1;

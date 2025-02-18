@@ -81,7 +81,7 @@ bool CaveSanityTestMsaa::Run(RenderDevice *device, RenderCommandPool* commandPoo
         CreateFrameBuffer(device, pUserData, _renderPass);
         AllocateCommandBuffers(device, commandPool);
     }
-    catch (CaveSanityTestException err)
+    catch (CaveSanityTestException &err)
     {
         std::cerr << err.what();
         return false;
@@ -439,7 +439,7 @@ void CaveSanityTestMsaa::CreateVertexBuffer(cave::RenderDevice *device)
         _vertexBuffer->Bind();
         _vertexBuffer->Update(0, bufferInfo._size, vertices.data());
     }
-    catch (cave::EngineError err)
+    catch (cave::EngineError &err)
     {
         throw CaveSanityTestException(err.what());
         return;
@@ -471,7 +471,7 @@ void CaveSanityTestMsaa::CreateIndexBuffer(cave::RenderDevice *device)
         _indexBuffer->Bind();
         _indexBuffer->Update(0, bufferInfo._size, indices.data());
     }
-    catch (cave::EngineError err)
+    catch (cave::EngineError &err)
     {
         throw CaveSanityTestException(err.what());
         return;
